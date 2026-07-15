@@ -200,3 +200,139 @@
   -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
 }
 
+
+/* LAYER-7 — Cinematic landing (noir scrollytelling) */
+@keyframes route-wipe-kf {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0); }
+  100% { transform: translateX(100%); }
+}
+.route-wipe {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    oklch(0.60 0.19 258 / 0) 20%,
+    oklch(0.60 0.19 258 / 0.7) 48%,
+    oklch(0.85 0.15 200 / 0.9) 50%,
+    oklch(0.60 0.19 258 / 0.7) 52%,
+    oklch(0.60 0.19 258 / 0) 80%,
+    transparent 100%);
+  transform: translateX(-100%);
+  animation: route-wipe-kf 700ms cubic-bezier(.7,0,.2,1) both;
+  mix-blend-mode: screen;
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-33.333%); }
+}
+.marquee-track { animation: marquee-scroll 45s linear infinite; }
+.marquee-track:hover { animation-play-state: paused; }
+
+@keyframes neon-in {
+  0% { opacity: 0; transform: translateY(6px); text-shadow: none; filter: blur(6px); }
+  40% { opacity: 0.35; filter: blur(1px); }
+  60% { opacity: 1; filter: blur(0); text-shadow: 0 0 6px rgba(34,211,238,0.6), 0 0 18px rgba(34,211,238,0.4); }
+  62% { opacity: 0.4; }
+  66% { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0); text-shadow: 0 0 8px rgba(34,211,238,0.7), 0 0 24px rgba(34,211,238,0.35), 0 0 48px rgba(34,211,238,0.2); }
+}
+.neon-letter {
+  display: inline-block;
+  animation: neon-in 620ms cubic-bezier(.4,0,.2,1) both;
+  color: #fff;
+}
+
+/* Word treatments used inside beats */
+.word-glow {
+  color: rgb(34,211,238);
+  text-shadow: 0 0 12px rgba(34,211,238,0.7), 0 0 32px rgba(34,211,238,0.35);
+}
+@keyframes glitch-shift {
+  0%, 92%, 100% { transform: translate(0,0); }
+  93% { transform: translate(-2px, 1px); }
+  94% { transform: translate(2px, -1px); }
+  95% { transform: translate(-1px, -2px); }
+  96% { transform: translate(1px, 2px); }
+}
+.word-glitch {
+  display: inline-block;
+  color: #ff4d6d;
+  animation: glitch-shift 4s infinite;
+  text-shadow: 1px 0 rgba(34,211,238,0.6), -1px 0 rgba(245,185,66,0.6);
+}
+.word-underline {
+  position: relative;
+  color: #f5b942;
+}
+.word-underline::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -6px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(245,185,66,0.9), transparent);
+  transform-origin: left;
+  animation: underline-draw 1.4s ease-out 0.4s both;
+}
+@keyframes underline-draw {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Ken Burns for district cards */
+@keyframes kenburns {
+  0% { transform: scale(1.05) translate(0,0); }
+  100% { transform: scale(1.18) translate(-1.5%, -1.5%); }
+}
+.kenburns { animation: kenburns 14s ease-in-out infinite alternate; will-change: transform; }
+
+/* Finale beat — city surge */
+@keyframes finale-surge {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.finale-beat {
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(34,211,238,0.18), transparent 55%),
+    radial-gradient(ellipse at 80% 70%, rgba(245,185,66,0.15), transparent 55%),
+    linear-gradient(135deg, #04060a 0%, #0a0f1a 50%, #04060a 100%);
+  background-size: 200% 200%;
+  animation: finale-surge 12s ease-in-out infinite;
+}
+
+/* Noir landing wrapper — override light theme for the landing sections */
+.noir-landing {
+  background: #04060a;
+  color: #fff;
+  color-scheme: dark;
+}
+.noir-landing .stencil { color: rgba(255,255,255,0.6); }
+
+/* Hero */
+.hero-type { line-height: 0.85; }
+@keyframes scroll-hint {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
+.scroll-hint { animation: scroll-hint 1.8s ease-in-out infinite; }
+
+/* Blur-up image reveal */
+.blur-up { filter: blur(14px); transition: filter 700ms ease; }
+.blur-up.loaded { filter: blur(0); }
+
+/* Section corner ticks (bigger for cinematic hero) */
+.hero-frame::before, .hero-frame::after {
+  content: ""; position: absolute; width: 24px; height: 24px;
+  border-color: rgba(34,211,238,0.7);
+}
+.hero-frame::before { top: 12px; left: 12px; border-top: 2px solid; border-left: 2px solid; }
+.hero-frame::after { bottom: 12px; right: 12px; border-bottom: 2px solid; border-right: 2px solid; }
+
+/* Boot logo flicker */
+@keyframes boot-flicker {
+  0%, 100% { opacity: 1; }
+  8% { opacity: 0.4; }
+  12% { opacity: 1; }
+  40% { opacity: 0.75; }
+  42% { opacity: 1; }
+}
+.boot-logo { animation: boot-flicker 1.6s infinite; }
