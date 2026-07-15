@@ -83,31 +83,12 @@ function CityHall() {
           <Stat label="CALIBRATION" value={cal.label.toUpperCase()} accent={cal.tone === "good"} />
         </div>
 
-
-  return (
-    <div className="min-h-screen grain">
-      <TopBar />
-      <main className="mx-auto max-w-5xl px-4 py-10">
-        <div className="mb-8">
-          <div className="font-mono text-xs tracking-[0.3em] text-primary">CITY HALL</div>
-          <h1 className="mt-2 text-3xl font-semibold">Your Trust Calibration</h1>
-          <p className="mt-2 text-muted-foreground">
-            The goal isn't a single high score. The goal is to catch imposters
-            AND trust real people. Neither paranoid nor gullible.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Stat label="CASES" value={p.casesPlayed} />
-          <Stat label="POINTS" value={p.points} accent />
-          <Stat label="STATUS" value={cal.label} accent={cal.tone === "good"} />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="font-mono text-xs tracking-widest text-muted-foreground">
-              THE 2×2 · YOUR POSITION
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="rounded-sm border border-border bg-card p-6 hud-frame">
+            <div className="stencil text-[10px] text-primary mb-4">
+              // THREAT MATRIX · YOUR POSITION
             </div>
+
             <div className="mt-4 relative aspect-square max-w-xs mx-auto">
               <div className="grid grid-cols-2 gap-2 h-full">
                 <Quadrant label="CALIBRATED" active={missRate < 0.2 && faRate < 0.2} tone="good" />
