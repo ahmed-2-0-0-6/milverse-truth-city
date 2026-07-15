@@ -77,14 +77,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "MILVERSE — Survive the age of scams" },
+      {
+        name: "description",
+        content:
+          "MILVERSE is a media-literacy city where you learn to spot scams, deepfakes, and misinformation by DOING — not by reading tips.",
+      },
+      { property: "og:title", content: "MILVERSE" },
+      {
+        property: "og:description",
+        content: "A flight simulator for scams. Learn by playing.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
