@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as MirrorRouteImport } from './routes/mirror'
 import { Route as CityHallRouteImport } from './routes/city-hall'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MirrorCaseIdRouteImport } from './routes/mirror.$caseId'
 
 const MirrorRoute = MirrorRouteImport.update({
   id: '/mirror',
@@ -28,35 +29,43 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MirrorCaseIdRoute = MirrorCaseIdRouteImport.update({
+  id: '/$caseId',
+  path: '/$caseId',
+  getParentRoute: () => MirrorRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/city-hall': typeof CityHallRoute
-  '/mirror': typeof MirrorRoute
+  '/mirror': typeof MirrorRouteWithChildren
+  '/mirror/$caseId': typeof MirrorCaseIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/city-hall': typeof CityHallRoute
-  '/mirror': typeof MirrorRoute
+  '/mirror': typeof MirrorRouteWithChildren
+  '/mirror/$caseId': typeof MirrorCaseIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/city-hall': typeof CityHallRoute
-  '/mirror': typeof MirrorRoute
+  '/mirror': typeof MirrorRouteWithChildren
+  '/mirror/$caseId': typeof MirrorCaseIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/city-hall' | '/mirror'
+  fullPaths: '/' | '/city-hall' | '/mirror' | '/mirror/$caseId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/city-hall' | '/mirror'
-  id: '__root__' | '/' | '/city-hall' | '/mirror'
+  to: '/' | '/city-hall' | '/mirror' | '/mirror/$caseId'
+  id: '__root__' | '/' | '/city-hall' | '/mirror' | '/mirror/$caseId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CityHallRoute: typeof CityHallRoute
-  MirrorRoute: typeof MirrorRoute
+  MirrorRoute: typeof MirrorRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -82,13 +91,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mirror/$caseId': {
+      id: '/mirror/$caseId'
+      path: '/$caseId'
+      fullPath: '/mirror/$caseId'
+      preLoaderRoute: typeof MirrorCaseIdRouteImport
+      parentRoute: typeof MirrorRoute
+    }
   }
 }
+
+interface MirrorRouteChildren {
+  MirrorCaseIdRoute: typeof MirrorCaseIdRoute
+}
+
+const MirrorRouteChildren: MirrorRouteChildren = {
+  MirrorCaseIdRoute: MirrorCaseIdRoute,
+}
+
+const MirrorRouteWithChildren =
+  MirrorRoute._addFileChildren(MirrorRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CityHallRoute: CityHallRoute,
-  MirrorRoute: MirrorRoute,
+  MirrorRoute: MirrorRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
