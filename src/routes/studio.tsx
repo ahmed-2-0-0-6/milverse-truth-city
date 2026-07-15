@@ -126,6 +126,7 @@ function buildScenario(d: Draft): Scenario {
 
   return {
     id,
+    shareCode: generateShareCode(),
     title: `${d.personaName} — ${d.relationship}`,
     teaser: d.opener.slice(0, 80) + (d.opener.length > 80 ? "…" : ""),
     channel: "text",
@@ -159,11 +160,7 @@ function buildScenario(d: Draft): Scenario {
       pushLines: d.truth === "IMPOSTER" ? [`can you help me with ${agendaText[d.agenda]}?`] : [],
     },
     evidenceChips: chips,
-  };
-}
-
-function shareCode(id: string): string {
-  return id.replace("citizen-", "").slice(0, 6).toUpperCase();
+  } as Scenario & { shareCode: string };
 }
 
 function Studio() {
@@ -171,14 +168,25 @@ function Studio() {
   const [step, setStep] = useState(1);
   const [draft, setDraft] = useState<Draft>(BLANK);
   const [error, setError] = useState<string | null>(null);
+  const [publishing, setPublishing] = useState(false);
+  const publishFn = useServerFn(publishCitizenCase);
 
-  function publish() {
+  async function publish() {
     const err = validate(draft);
     if (err) { setError(err); return; }
+    setPublishing(true);
+    setError(null);
     const s = buildScenario(draft);
+    const code = (s as Scenario & { shareCode: string }).shareCode;
     saveCitizenCase(s);
-    const code = shareCode(s.id);
-    alert(`Published! Share code: ${code}\n\nA friend can enter this on Case Files to play your case.`);
+    try {
+      await publishFn({ data: { shareCode: code, scenario: s as unknown as Record<string, unknown>, deviceId: getDeviceId() } as never });
+      alert(`Published to the cloud!\n\nShare code: ${code}\n\nAnyone on any device can enter this code on Case Files to play your case.`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Cloud sync failed.";
+      alert(`Saved locally — cloud sync failed:\n${msg}\n\nShare code (local only): ${code}`);
+    }
+    setPublishing(false);
     navigate({ to: "/mirror/$caseId", params: { caseId: s.id } });
   }
 
