@@ -99,7 +99,7 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
       className="fixed inset-0 z-[300] flex items-center justify-center overflow-hidden select-none"
       style={{ background: "radial-gradient(circle at 50% 45%, rgba(10,14,22,0.92) 0%, rgba(0,0,0,0.98) 60%, #000 100%)" }}
       aria-live="polite"
-      onClick={() => { if (!doneRef.current) { doneRef.current = true; onDone(); } }}
+      onClick={() => { if (canSkip && !doneRef.current) { doneRef.current = true; onDone(); } }}
     >
       {/* Spotlight cone */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden style={{
