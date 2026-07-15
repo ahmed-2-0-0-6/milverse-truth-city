@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as QuickTourRouteImport } from './routes/quick-tour'
+import { Route as PilotRouteImport } from './routes/pilot'
 import { Route as KitRouteImport } from './routes/kit'
 import { Route as CityHallRouteImport } from './routes/city-hall'
 import { Route as IndexRouteImport } from './routes/index'
@@ -27,6 +28,11 @@ const StudioRoute = StudioRouteImport.update({
 const QuickTourRoute = QuickTourRouteImport.update({
   id: '/quick-tour',
   path: '/quick-tour',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PilotRoute = PilotRouteImport.update({
+  id: '/pilot',
+  path: '/pilot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KitRoute = KitRouteImport.update({
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/city-hall': typeof CityHallRoute
   '/kit': typeof KitRoute
+  '/pilot': typeof PilotRoute
   '/quick-tour': typeof QuickTourRoute
   '/studio': typeof StudioRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/city-hall': typeof CityHallRoute
   '/kit': typeof KitRoute
+  '/pilot': typeof PilotRoute
   '/quick-tour': typeof QuickTourRoute
   '/studio': typeof StudioRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/city-hall': typeof CityHallRoute
   '/kit': typeof KitRoute
+  '/pilot': typeof PilotRoute
   '/quick-tour': typeof QuickTourRoute
   '/studio': typeof StudioRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/city-hall'
     | '/kit'
+    | '/pilot'
     | '/quick-tour'
     | '/studio'
     | '/feed/$caseId'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/'
     | '/city-hall'
     | '/kit'
+    | '/pilot'
     | '/quick-tour'
     | '/studio'
     | '/feed/$caseId'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/city-hall'
     | '/kit'
+    | '/pilot'
     | '/quick-tour'
     | '/studio'
     | '/feed/$caseId'
@@ -139,6 +151,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CityHallRoute: typeof CityHallRoute
   KitRoute: typeof KitRoute
+  PilotRoute: typeof PilotRoute
   QuickTourRoute: typeof QuickTourRoute
   StudioRoute: typeof StudioRoute
   FeedCaseIdRoute: typeof FeedCaseIdRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/quick-tour'
       fullPath: '/quick-tour'
       preLoaderRoute: typeof QuickTourRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pilot': {
+      id: '/pilot'
+      path: '/pilot'
+      fullPath: '/pilot'
+      preLoaderRoute: typeof PilotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kit': {
@@ -219,6 +239,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CityHallRoute: CityHallRoute,
   KitRoute: KitRoute,
+  PilotRoute: PilotRoute,
   QuickTourRoute: QuickTourRoute,
   StudioRoute: StudioRoute,
   FeedCaseIdRoute: FeedCaseIdRoute,
@@ -229,13 +250,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
