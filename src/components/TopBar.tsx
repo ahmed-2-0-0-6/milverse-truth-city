@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX, BookOpen } from "lucide-react";
 import {
   loadProfile,
   calibrationLabel,
@@ -60,6 +60,14 @@ export function TopBar() {
             <span>HANDLE</span>
             <span className="text-foreground">{call}</span>
           </div>
+          <Link
+            to="/manual"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded border border-border px-2 py-1.5 stencil text-[10px] text-muted-foreground hover:text-foreground hover:bg-accent"
+            title="Field Manual"
+          >
+            <BookOpen className="h-3.5 w-3.5" />
+            <span className="hidden md:inline">MANUAL</span>
+          </Link>
           <VisualQualityToggle />
           <button
             onClick={() => { setMuted(!muted); setLocalMuted(!muted); }}
@@ -70,7 +78,7 @@ export function TopBar() {
             {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
           </button>
           <Link
-            to="/city-hall"
+            to="/profile"
             className={`flex items-center gap-2 rounded border px-2.5 py-1.5 stencil text-[10px] transition-colors hover:bg-accent ${toneClass}`}
           >
             {rank && <span className="opacity-70">{rank.code}</span>}

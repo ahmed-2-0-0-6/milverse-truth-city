@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { TopBar } from "@/components/TopBar";
 import { FEED_SCENARIOS } from "@/lib/feed/scenarios";
+import { FormatBadge } from "@/components/feed/FormatFrame";
+import { DistrictIntro } from "@/components/DistrictIntro";
+import feedArt from "@/assets/district-feed.jpg";
 import { Newspaper, Share2 } from "lucide-react";
 
 export const Route = createFileRoute("/feed/")({
@@ -22,6 +25,16 @@ const TIER_NAMES: Record<1 | 2 | 3, string> = {
 function FeedIndex() {
   return (
     <div className="min-h-screen grain">
+      <DistrictIntro
+        id="feed"
+        chapter="CHAPTER 02"
+        title="THE FEED"
+        art={feedArt}
+        lines={[
+          "The message arrives from someone you love. It carries a claim you'd want to be true — or dread is true.",
+          "Your job is to check the claim without breaking the person. Verify the source. Correct with dignity. Both are the work.",
+        ]}
+      />
       <TopBar />
       <main className="mx-auto max-w-5xl px-4 py-10">
         <Link to="/" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">← CITY</Link>
@@ -54,13 +67,16 @@ function FeedIndex() {
                     params={{ caseId: s.id }}
                     className="group rounded-xl border border-border bg-card p-6 transition-all hover:border-primary/50 hover:-translate-y-0.5 hover:shadow-[0_0_32px_oklch(0.82_0.15_210/0.15)]"
                   >
-                    <div className="flex items-start justify-between">
+                    <div className="flex items-start justify-between gap-2">
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 text-primary">
                         <Newspaper className="h-5 w-5" />
                       </div>
-                      <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[9px] font-mono tracking-widest text-primary">
-                        <Share2 className="h-2.5 w-2.5" /> FORWARD
-                      </span>
+                      <div className="flex flex-col items-end gap-1">
+                        <FormatBadge format={s.format ?? "whatsapp"} aiGenerated={s.aiGenerated} />
+                        <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[9px] font-mono tracking-widest text-primary">
+                          <Share2 className="h-2.5 w-2.5" /> T{s.tier}
+                        </span>
+                      </div>
                     </div>
                     <h3 className="mt-5 text-lg font-semibold">{s.title}</h3>
                     <p className="mt-1 text-sm text-muted-foreground">{s.teaser}</p>

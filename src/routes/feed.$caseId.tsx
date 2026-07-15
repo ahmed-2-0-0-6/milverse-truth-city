@@ -9,8 +9,11 @@ import {
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
 import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
-import { Send, Search, Forward, Heart, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
+import { Send, Search, Heart, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
+import { FormatFrame } from "@/components/feed/FormatFrame";
+import { Toolbelt } from "@/components/feed/Toolbelt";
+import { TacticStamp } from "@/components/TacticStamp";
 
 export const Route = createFileRoute("/feed/$caseId")({
   loader: ({ params }) => {
@@ -242,36 +245,17 @@ function Sim({
       <div className="flex-1 overflow-hidden border-x border-border bg-background/40">
         {tab === "chat" ? (
           <div ref={scroller} className="h-full overflow-y-auto p-4 space-y-3">
-            <ForwardCard scenario={scenario} />
+            <FormatFrame format={scenario.format ?? "whatsapp"} senderName={scenario.sender.name} forward={scenario.forward} aiGenerated={scenario.aiGenerated} />
             {messages.map((m, i) => <FeedRow key={i} m={m} />)}
           </div>
         ) : (
-          <div className="p-4 space-y-2">
-            <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-2">
-              VERIFICATION ACTIONS · each one costs a turn (a small hit to dignity — they'll feel you're stalling)
-            </div>
-            {scenario.actions.map((a) => {
-              const used = state.actionsUsed.includes(a.id);
-              return (
-                <button
-                  key={a.id}
-                  onClick={() => doAction(a.id)}
-                  disabled={used}
-                  className={`w-full text-left rounded-md border p-3 text-sm transition ${
-                    used
-                      ? "border-primary/40 bg-primary/5 opacity-70"
-                      : "border-border bg-card hover:border-primary/50"
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <Search className="h-4 w-4 text-primary shrink-0" />
-                    <span className="font-medium">{a.label}</span>
-                    {used && <span className="ml-auto font-mono text-[10px] tracking-widest text-primary">USED</span>}
-                  </div>
-                  {used && <div className="mt-2 text-xs text-muted-foreground">{a.result}</div>}
-                </button>
-              );
-            })}
+          <div className="p-4">
+            <Toolbelt
+              actions={scenario.actions}
+              format={scenario.format ?? "whatsapp"}
+              used={state.actionsUsed}
+              onUse={doAction}
+            />
           </div>
         )}
       </div>
@@ -290,7 +274,7 @@ function Sim({
           </button>
         </div>
         <div className="mt-2 font-mono text-[10px] tracking-widest text-muted-foreground">
-          OPEN TOOLKIT TO CHECK FACTS · BE KIND, BE CORRECT
+          OPEN TOOLBELT · PICK THE RIGHT TOOL FOR THIS FORMAT
         </div>
       </div>
     </main>
@@ -316,25 +300,6 @@ function FeedRow({ m }: { m: FeedMessage }) {
   );
 }
 
-function ForwardCard({ scenario }: { scenario: FeedScenario }) {
-  const f = scenario.forward;
-  return (
-    <div className="rounded-lg border border-caution/40 bg-caution/5 overflow-hidden">
-      {f.meta && <div className="px-3 py-1.5 font-mono text-[10px] tracking-widest text-caution border-b border-caution/30 flex items-center gap-1.5">
-        <Forward className="h-3 w-3" /> {f.meta}
-      </div>}
-      {f.imageEmoji && (
-        <div className="flex items-center justify-center bg-muted/40 py-8 text-6xl" aria-label={f.imageAlt}>{f.imageEmoji}</div>
-      )}
-      <div className="p-3">
-        {f.headline && <div className="text-sm font-semibold">{f.headline}</div>}
-        <div className="mt-2 space-y-1 text-xs text-muted-foreground">
-          {f.bodyLines.map((l, i) => <p key={i}>{l}</p>)}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /* ─────────── VERDICT ─────────── */
 function VerdictScreen({
@@ -499,6 +464,8 @@ function Debrief({ scenario, outcome, state, verdict, conclusion, finalReply }: 
           <FeedStarAxis label="Reasoning" value={clampedReasoning} />
         </div>
       </section>
+
+      {scenario.tacticId && <TacticStamp tacticId={scenario.tacticId} />}
 
       {conclusion.trim() && (
         <div className="rounded-xl border border-border bg-card p-6">

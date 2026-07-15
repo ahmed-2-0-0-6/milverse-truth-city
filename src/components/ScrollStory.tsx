@@ -19,7 +19,13 @@ const BEATS = [
   { headline: "Every day, someone in your family gets a message.", sub: "It's already happened this week. Maybe today." },
   { headline: "It looks real. It sounds real.", sub: "Perfect grammar. Familiar face. Small ask." },
   { headline: "Spotting fakes is dying. Verifying is forever.", sub: "You can't out-see a machine. You can out-verify one." },
-  { headline: "Welcome to MILVERSE.", sub: "Train your trust.", finale: true },
+  { headline: "Enter as a target. Leave as a designer.", sub: "This is Media & Information Literacy, played.", finale: true },
+];
+
+const MIL_TRIAD = [
+  { word: "MEDIA", line: "Every format of message — WhatsApp forward, news screenshot, AI-generated voice." },
+  { word: "INFORMATION", line: "Name the manipulation. Impersonation. Urgency. Out-of-context. Forgery." },
+  { word: "LITERACY", line: "Learn the counter-move. Verify the source, not the surface. Correct with dignity." },
 ];
 
 export function ScrollStory() {
@@ -128,6 +134,33 @@ export function ScrollStory() {
           </div>
         </section>
       ))}
+
+      {/* MIL triad — judge-proofing */}
+      <section className="story-beat relative min-h-[80vh] flex items-center justify-center overflow-hidden px-6 border-y border-white/5">
+        <div className="beat-bg absolute inset-0 -z-10" aria-hidden>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/[0.05] to-transparent" />
+        </div>
+        <div className="relative max-w-5xl text-center">
+          <div className="stencil text-[10px] text-cyan-300/70 mb-6">THE THESIS</div>
+          <h2 className="beat-line text-3xl sm:text-5xl font-black leading-tight tracking-tight text-white mb-10"
+              style={{ fontFamily: '"Bebas Neue", "Space Grotesk", sans-serif' }}>
+            THIS IS MEDIA &amp; INFORMATION LITERACY, <span className="text-cyan-300">PLAYED.</span>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {MIL_TRIAD.map((m) => (
+              <div key={m.word} className="beat-line border border-white/10 bg-white/[0.03] p-6 rounded-sm">
+                <div className="text-5xl sm:text-6xl font-black text-cyan-300 tracking-tight"
+                     style={{ fontFamily: '"Bebas Neue", sans-serif', textShadow: "0 0 24px rgba(34,211,238,0.45)" }}>
+                  {m.word}
+                </div>
+                <p className="mt-3 text-sm text-white/70 leading-relaxed">{m.line}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
 
       {/* Horizontal district gallery */}
       <div ref={horizontalRef} className="relative hidden md:block overflow-hidden">

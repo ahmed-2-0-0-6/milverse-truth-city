@@ -6,12 +6,30 @@ import type { InspiredByCase } from "@/lib/mirror/inspired";
 
 export type FeedTier = 1 | 2 | 3;
 export type FeedVerdict = "TRUE" | "FALSE" | "MISLEADING" | "UNVERIFIED";
+export type FeedFormat = "whatsapp" | "instagram" | "news" | "image" | "video";
+export type FeedToolKind = "reverse_image" | "check_source" | "cross_check" | "check_date";
+
+// TacticId mirrored from src/lib/manual/entries.ts. Kept as a plain string union here
+// to avoid a circular import; the Field Manual owns the canonical list.
+export type FeedTacticId =
+  | "impersonation"
+  | "urgency-fear"
+  | "out-of-context"
+  | "engagement-bait"
+  | "imposter-outlet"
+  | "phishing"
+  | "trust-farming"
+  | "ai-generated"
+  | "mis-dis-mal"
+  | "forgery-engine";
 
 export interface FeedAction {
   id: string;
   label: string;
   result: string;
   decisive?: boolean;
+  /** Which real-world verification tool this action simulates. */
+  tool?: FeedToolKind;
 }
 
 export interface FeedForward {
@@ -28,6 +46,12 @@ export interface FeedScenario {
   teaser: string;
   tier: FeedTier;
   verdict: FeedVerdict;
+  /** Native media format the artifact arrives in. Defaults to "whatsapp". */
+  format?: FeedFormat;
+  /** Marks cases where the artifact is (in-fiction) AI-generated. */
+  aiGenerated?: boolean;
+  /** The MIL tactic this case teaches. Revealed on debrief. */
+  tacticId?: FeedTacticId;
   sender: {
     name: string;
     relationship: string;
@@ -519,6 +543,390 @@ export const FEED_SCENARIOS: FeedScenario[] = [
   },
 ];
 
+/* ── NEW CASES — media-format & AI-literacy expansion ─────────── */
+
+const NEW_CASES: FeedScenario[] = [
+  {
+    id: "insta-brand-giveaway",
+    title: "The Instagram brand giveaway",
+    teaser: "A shiny post promises a free iPhone if you tag 3 friends and pay a small \"shipping fee\".",
+    tier: 1,
+    verdict: "FALSE",
+    format: "instagram",
+    tacticId: "imposter-outlet",
+    sender: { name: "Cousin Areeba", relationship: "Instagram DM", voice: "excited, sends screenshots, uses emojis" },
+    senderMotive: "She saw a real friend she trusts also 'won' one. It felt legit.",
+    opener: "Yaar look at this — free iPhone giveaway, sirf tag karna hai! Main ne register kar diya, tum bhi karo 🎁📱",
+    forward: {
+      meta: "@apple.giftshop.official · 4h",
+      headline: "🎉 iPhone 17 GIVEAWAY — 500 winners this week",
+      imageEmoji: "📱",
+      imageAlt: "Instagram post showing an iPhone with confetti overlays",
+      bodyLines: [
+        "Follow · like · tag 3 friends.",
+        "Rs 950 shipping fee via easypaisa to confirm.",
+        "12,438 likes · 847 comments — mostly 'thank you got mine!'",
+      ],
+    },
+    actions: [
+      { id: "check-handle", label: "Open Apple's real Instagram handle", tool: "check_source", result: "Real handle is @apple with a verified check. This one is @apple.giftshop.official — extra words, no check mark. Created 6 weeks ago.", decisive: true },
+      { id: "check-website", label: "Check Apple's website for the giveaway", tool: "check_source", result: "No such campaign on apple.com. Apple has never run a paid-shipping giveaway.", decisive: true },
+      { id: "reverse-image", label: "Reverse-search the giveaway image", tool: "reverse_image", result: "The 'iPhone with confetti' image is a stock render used by dozens of copycat pages.", decisive: true },
+      { id: "check-comments", label: "Read the 'winner' comments carefully", tool: "check_source", result: "All 'thank you got mine' comments come from accounts with zero posts, generic names, and were created in the same week." },
+    ],
+    truthNote: "Legit brand giveaways never charge a shipping fee to a personal wallet. The lookalike handle + fake winner comments are the whole trap.",
+    respectfulScript: "Areeba yeh page fake hai — asli Apple handle @apple hai (verified). Yeh ek scam page hai jo shipping fee ke naam pe paisa maang raha hai. Register mat karna, aur mujhe screenshot bhej do main isay report karta hoon.",
+    inspiredBy: {
+      patternName: "Fake Brand Giveaway",
+      country: "Global",
+      year: "2018–ongoing",
+      whatHappened: "Copycat Instagram/Facebook pages impersonate major brands with slightly altered handles. They run 'giveaways' that require a small payment or personal data. The 'winners' in comments are bot accounts created the same week.",
+      prevention: [
+        "Real brand accounts are verified — always check the tick.",
+        "No brand charges a personal wallet for shipping.",
+        "Trace comment authors — bots have empty timelines.",
+      ],
+    },
+  },
+
+  {
+    id: "news-screenshot-riot",
+    title: "The news screenshot",
+    teaser: "\"BBC just reported this — riots in Karachi, government hiding it.\"",
+    tier: 2,
+    verdict: "FALSE",
+    format: "news",
+    tacticId: "imposter-outlet",
+    sender: { name: "Uncle Imtiaz", relationship: "Family group", voice: "grave, cites 'foreign media', trusts BBC over local channels" },
+    senderMotive: "He genuinely believes foreign media tells the truth local media hides.",
+    opener: "Yeh BBC ki khabar hai — humare media ko dekho, ek word nahi kiya. Shame. Share karo sab ko.",
+    forward: {
+      meta: "screenshot from BBC.com",
+      headline: "Major riots erupt in Karachi as protesters clash with police",
+      imageEmoji: "🏛️",
+      imageAlt: "A news-article screenshot with a red BBC-style logo",
+      bodyLines: [
+        "BBC News · 2 hours ago",
+        "Thousands reported injured, army called in.",
+        "Government has cut internet in affected districts.",
+      ],
+    },
+    actions: [
+      { id: "check-bbc", label: "Open BBC.com and search the headline", tool: "check_source", result: "No such story on bbc.com or bbc.com/urdu. The real BBC has published nothing matching this today.", decisive: true },
+      { id: "cross-check", label: "Cross-check other outlets", tool: "cross_check", result: "Neither Dawn, Reuters, AFP, nor Al Jazeera carries this story. Zero corroboration anywhere.", decisive: true },
+      { id: "check-logo", label: "Zoom into the logo and font", tool: "check_source", result: "Logo is close but font weight is wrong. Real BBC uses BBC Reith — this screenshot uses generic Arial Bold." },
+      { id: "check-date", label: "Check the timestamp format", tool: "check_date", result: "'2 hours ago' with no date. Real BBC articles show a full timestamp with timezone.", decisive: true },
+    ],
+    truthNote: "This is a fabricated news screenshot inside a lookalike BBC frame. Real journalism has a URL you can open — a screenshot alone is never a source.",
+    respectfulScript: "Uncle main ne BBC ki website khud khol ke check ki — yeh khabar wahan bilkul nahi hai. Yeh screenshot fake hai, logo bhi thora sa off hai. Foreign media pe trust achhi cheez hai — lekin unki actual site pe ja ke confirm karna zaroori hai. Screenshot alone is not a source.",
+    inspiredBy: {
+      patternName: "Fabricated News Screenshot",
+      country: "Global",
+      year: "2015–ongoing",
+      whatHappened: "Fake screenshots styled after major newsrooms (BBC, Reuters, Al Jazeera, CNN) circulate as 'proof' of stories those outlets never published. The visual authority of the logo does the work — most recipients never open the actual site.",
+      prevention: [
+        "A screenshot alone is not evidence — open the real site.",
+        "Real newsrooms have URLs, timestamps with timezones, and archive.org copies.",
+        "Foreign-media authority is exactly what makes forgery valuable.",
+      ],
+    },
+  },
+
+  {
+    id: "viral-photo-flood",
+    title: "The heartbreaking flood photo",
+    teaser: "A child sits on a rooftop as water rises — captioned as \"today, Sindh\".",
+    tier: 2,
+    verdict: "MISLEADING",
+    format: "image",
+    tacticId: "out-of-context",
+    sender: { name: "Ammi", relationship: "Direct WhatsApp", voice: "emotional, protective, sends duas" },
+    senderMotive: "She's watching real floods on TV and this photo made her cry. She wants people to donate.",
+    opener: "Beta dekho — Sindh ke hallat. Yeh bacha subah se chhat pe akela hai. Please share, log donate karain.",
+    forward: {
+      meta: "shared 4× today",
+      headline: "TODAY in Sindh — please pray and donate",
+      imageEmoji: "🏚️",
+      imageAlt: "A child on a rooftop with rising water and grey sky",
+      bodyLines: [
+        "Pakistan is drowning.",
+        "Government sleeping.",
+        "Share to spread awareness.",
+      ],
+    },
+    actions: [
+      { id: "reverse-image", label: "Reverse-search the photo", tool: "reverse_image", result: "This exact image appears in international wire services from 2013 Bangladesh floods. The child was rescued that same day.", decisive: true },
+      { id: "check-sindh", label: "Check whether Sindh floods are actually happening now", tool: "cross_check", result: "Yes — PDMA and multiple newsrooms confirm real, ongoing flooding in Sindh right now, with different verified photos.", decisive: true },
+      { id: "check-date", label: "Check the photo's EXIF / earliest online date", tool: "check_date", result: "Earliest online appearance: 2013. It has resurfaced during every South Asian flood since.", decisive: true },
+      { id: "check-donation", label: "Check the donation link if any", tool: "check_source", result: "No donation link at all — just an emotional caption. Legit relief campaigns always name the receiving org." },
+    ],
+    truthNote: "The Sindh flood is real. This photo is not from Sindh, not from now, and not from that child today. Real disaster, wrong image — MISLEADING, not simply fake.",
+    respectfulScript: "Ammi jaan, Sindh mein flood bilkul asli hai — lekin yeh khaas tasveer 2013 ke Bangladesh flood ki hai, aur woh bacha wahan usi din safe ho gaya tha. Agar hum ghalat photo forward karain, log kal ko asli flood pe bhi shak karain ge. Main aap ko Alkhidmat aur JDC ke asli donation links bhejta hoon — woh iss waqt zameen pe kaam kar rahe hain ❤️",
+    inspiredBy: {
+      patternName: "Recycled Disaster Photo (Emotional)",
+      country: "Global",
+      year: "2013–ongoing",
+      whatHappened: "During every major flood, cyclone, or earthquake, emotional archive images resurface with new captions. The disaster is real, so the false image feels 'emotionally true' — and correcting it feels like denialism.",
+      prevention: [
+        "Reverse-image every viral disaster photo before sharing.",
+        "Direct donations to named, verified relief orgs.",
+        "'Real disaster, wrong photo' is the most common MIL trap in South Asia.",
+      ],
+    },
+  },
+
+  {
+    id: "video-cure-tiktok",
+    title: "The 30-second cure video",
+    teaser: "A short vertical clip of a smiling 'doctor' promising a diabetes cure in a week.",
+    tier: 2,
+    verdict: "MISLEADING",
+    format: "video",
+    tacticId: "out-of-context",
+    sender: { name: "Uncle Waseem", relationship: "Family group", voice: "trusts anything in a lab coat" },
+    senderMotive: "His brother has diabetes and this clip sounds like a real doctor giving real hope.",
+    opener: "Bhai dekho, yeh doctor sahab live keh rahe hain — cure hai. Bilal ke liye share kar do.",
+    forward: {
+      meta: "TikTok · 42s · reposted",
+      headline: "Doctor: sugar 7 din mein khatam",
+      imageEmoji: "🩺",
+      imageAlt: "A doctor in a white coat mid-sentence",
+      bodyLines: [
+        "Clip clearly shows him saying the remedy works.",
+        "1.2M views · 84K shares.",
+      ],
+    },
+    actions: [
+      { id: "find-full", label: "Find the full original interview", tool: "cross_check", result: "The 22-minute source interview is on the newsroom's YouTube. In it, the doctor says the OPPOSITE — the remedy does not work and can be dangerous.", decisive: true },
+      { id: "reverse-image", label: "Reverse-search a video frame", tool: "reverse_image", result: "The frame maps to a real 2023 news-channel interview about diabetes management, not any 'cure'.", decisive: true },
+      { id: "check-doctor", label: "Check the doctor's own public statement", tool: "check_source", result: "The doctor has publicly denounced the clip and asked people to stop sharing it.", decisive: true },
+      { id: "check-cuts", label: "Look for edit cuts in the clip", tool: "check_date", result: "Three hard cuts around the key sentence — stitched from three different parts of a longer interview." },
+    ],
+    truthNote: "The doctor is real. The face is real. The framing is false. Real person + false framing is the most-used misinformation form today.",
+    respectfulScript: "Uncle iss clip ka full interview YouTube pe hai — doctor sahab wahan bilkul ULTA keh rahe hain, yeh remedy woh khud mana kar rahe hain. Unhone khud clip disown ki hai. Bilal ke liye asli endocrinologist se milna behtar hai — main ek recommend karta hoon ❤️",
+    inspiredBy: {
+      patternName: "Deceptive Edit of Real Expert",
+      country: "Global",
+      year: "2018–ongoing",
+      whatHappened: "Real interviews with doctors and scientists are cut to seconds that reverse the speaker's point. The real face lends real credibility. Denials rarely reach the same audience as the clip.",
+      prevention: [
+        "Find the full interview before believing a 30-second cut.",
+        "Search the expert's name — they often publicly denounce misuse.",
+        "Real footage + false framing is today's dominant misinformation form.",
+      ],
+    },
+  },
+
+  {
+    id: "job-dubai-offer",
+    title: "The Dubai job offer",
+    teaser: "\"CONGRATULATIONS — you've been selected for a hotel job in Dubai. Send Rs 15,000 processing fee.\"",
+    tier: 2,
+    verdict: "FALSE",
+    format: "whatsapp",
+    tacticId: "phishing",
+    sender: { name: "Neighbour Faisal", relationship: "Direct message", voice: "hopeful, unemployed for months, forwards fast" },
+    senderMotive: "He's been jobless for 8 months. This message arrived at 2am and felt like an answer to prayer.",
+    opener: "Bhai yeh dekho — mujhe Dubai job offer aya hai, hotel mein. Rs 15,000 processing fee hai bas. Kya karoon?",
+    forward: {
+      meta: "WhatsApp · from +971 5X XXX XXXX",
+      headline: "SELECTION LETTER — DUBAI HOSPITALITY GROUP",
+      imageEmoji: "🏨",
+      imageAlt: "A hotel-letterhead style PDF thumbnail",
+      bodyLines: [
+        "You have been shortlisted based on your CV.",
+        "Salary: AED 4,500 + accommodation + visa.",
+        "Processing fee: PKR 15,000 to secure position (refundable on arrival).",
+        "Reply with CNIC, photo, passport copy today.",
+      ],
+    },
+    actions: [
+      { id: "check-agency", label: "Check the recruitment agency on Protector of Emigrants (BEOE)", tool: "check_source", result: "No such licensed agency on the BEOE list. All legitimate overseas recruitment must be through licensed agencies.", decisive: true },
+      { id: "check-hotel", label: "Check the hotel's actual careers page", tool: "check_source", result: "No such vacancy or campaign on the hotel group's own site. Their real hiring goes through named recruiters.", decisive: true },
+      { id: "cross-check", label: "Search the offer text online", tool: "cross_check", result: "Near-identical letter appears on FIA cybercrime alert pages as a documented scam template.", decisive: true },
+      { id: "check-cnic-ask", label: "Note what's being asked over WhatsApp", tool: "check_date", result: "CNIC + photo + passport + wallet fee = complete kit for identity fraud. Real employers never take this over WhatsApp." },
+    ],
+    truthNote: "Legitimate overseas jobs are placed through BEOE-licensed agencies with printed challans and named employers — never via WhatsApp with a personal-wallet 'processing fee'. Youth unemployment is the whole exploit.",
+    respectfulScript: "Bhai yeh 100% scam hai — BEOE ki list pe yeh agency hai hi nahi. Legit Dubai jobs kabhi WhatsApp pe CNIC copy nahi maangte, aur na hi personal wallet mein fee lete hain. Paisay mat bhejna. Main tumhein 2 asli BEOE-licensed agencies ke naam bhejta hoon — un se apply karo.",
+    inspiredBy: {
+      patternName: "Fake Overseas Job Offer",
+      country: "Global",
+      year: "2010–ongoing",
+      whatHappened: "Fraudsters send fake selection letters for jobs in the Gulf, Europe, or Canada, extracting 'processing fees' and identity documents. Victims lose money and often have their CNIC used to open fraudulent accounts.",
+      prevention: [
+        "All legit overseas recruitment from Pakistan goes through BEOE-licensed agencies.",
+        "Verify the employer on their own site — never trust a WhatsApp letter.",
+        "Never send CNIC or passport copies over WhatsApp.",
+      ],
+    },
+  },
+
+  {
+    id: "disaster-charity-scam",
+    title: "The disaster charity account",
+    teaser: "After an earthquake, a WhatsApp forward pushes a 'relief fund' account number — same day.",
+    tier: 3,
+    verdict: "FALSE",
+    format: "whatsapp",
+    tacticId: "phishing",
+    sender: { name: "Aunty Shameem", relationship: "Neighbourhood group", voice: "generous, motherly, first to donate for any tragedy" },
+    senderMotive: "She's genuinely moved by the earthquake and wants to help immediately.",
+    opener: "Bacchon zalzale ke liye emergency relief fund — please jo bhi ho sake donate karain. Time short hai.",
+    forward: {
+      meta: "Forwarded many times",
+      headline: "EARTHQUAKE RELIEF FUND — donate NOW",
+      imageEmoji: "🚨",
+      imageAlt: "A dark red banner with a distressed family photo",
+      bodyLines: [
+        "Personal easypaisa: 0300-XXXXXXX (Aslam Bhai, coordinator)",
+        "100% goes to affected families.",
+        "Time-critical — please forward to all groups.",
+      ],
+    },
+    actions: [
+      { id: "check-org", label: "Search for the org name behind the account", tool: "check_source", result: "There is no registered NGO tied to this account number. 'Aslam Bhai' is not a known relief coordinator anywhere.", decisive: true },
+      { id: "cross-check-orgs", label: "Cross-check real orgs on the ground", tool: "cross_check", result: "Alkhidmat, Edhi, JDC, and PRCS have all published their OFFICIAL relief accounts on their verified websites and social handles. None match this one.", decisive: true },
+      { id: "check-account", label: "Search the wallet number online", tool: "check_source", result: "Number appears on FIA cybercrime alerts and Twitter warnings from real relief workers as a known scam number." },
+      { id: "check-timing", label: "Note the timing", tool: "check_date", result: "Message sent within 6 hours of the disaster — genuine relief orgs need at least a day to set up channels and always publish through their official pages first.", decisive: true },
+    ],
+    truthNote: "Disaster charity fraud is a global constant — scammers race real NGOs by hours. Personal wallet numbers for 'relief' are the giveaway. Real relief moves through registered orgs, not individuals.",
+    respectfulScript: "Aunty aap ka dil bara hai — lekin yeh account fake hai. Real relief kabhi kisi ke personal easypaisa pe nahi jata. Alkhidmat, Edhi, JDC, aur PRCS ke official accounts un ki verified sites pe hain — main aap ko links bhejti hoon. Aap ka donation asli logon tak pahunche, yeh ehm hai ❤️",
+    inspiredBy: {
+      patternName: "Disaster Charity Fraud",
+      country: "Global",
+      year: "2004–ongoing",
+      whatHappened: "Within hours of any earthquake, flood, or tsunami, scammers circulate fake 'relief fund' account numbers, exploiting the urgency and generosity of the moment. Real NGOs take longer to publish channels — the scammers get there first.",
+      prevention: [
+        "Real relief goes through registered orgs, not personal wallets.",
+        "Donate only via accounts published on the NGO's own verified site.",
+        "Any 'urgent, share now' donation ask within hours of a disaster is suspect.",
+      ],
+    },
+  },
+
+  {
+    id: "ai-deepfake-pm",
+    title: "The AI-cloned voice note",
+    teaser: "A 12-second voice note of a well-known figure 'admitting' something explosive.",
+    tier: 3,
+    verdict: "FALSE",
+    format: "video",
+    aiGenerated: true,
+    tacticId: "ai-generated",
+    sender: { name: "Cousin Zohaib", relationship: "Political-debate WhatsApp group", voice: "chest-out, 'finally the truth is out'" },
+    senderMotive: "This confirms everything he already believed. He forwarded before playing it twice.",
+    opener: "Bhai audio sun — asli awaaz, koi shak nahi. Sab groups mein share karo, log haqeeqat jaanein.",
+    forward: {
+      meta: "Voice note · 12s · reposted from Telegram",
+      headline: "Leaked audio — [famous figure] confesses off-record",
+      imageEmoji: "🎙️",
+      imageAlt: "A blurred official photo with an audio waveform overlay",
+      bodyLines: [
+        "Voice matches perfectly.",
+        "Says exactly what critics have alleged for years.",
+        "Not on any news channel yet — 'they're hiding it'.",
+      ],
+    },
+    actions: [
+      { id: "cross-check", label: "Cross-check with mainstream newsrooms", tool: "cross_check", result: "Zero credible outlets carry this. AFP Fact Check has flagged the audio as AI-generated with a named detection lab report.", decisive: true },
+      { id: "check-source", label: "Trace the earliest post of the audio", tool: "check_source", result: "First surfaced on an anonymous Telegram channel with a track record of AI-generated forgeries. No named source, no original video, no press conference context.", decisive: true },
+      { id: "check-listen", label: "Listen carefully for AI artifacts", tool: "reverse_image", result: "Some odd breathing rhythm and one unusual sibilance. But state-of-the-art AI voices are already smoother than this — 'sounds real' is no longer a defence." },
+      { id: "check-official", label: "Check the figure's own channels and press office", tool: "check_source", result: "Official spokesperson has publicly denied the audio and shared a verified detection lab analysis calling it synthetic.", decisive: true },
+    ],
+    truthNote: "This is AI-generated audio. Spotting the artifact is a losing arms race — models keep improving. The winning move is SOURCE-checking: where did it come from, who confirms it, does the person's own office deny it? The Forgery Engine has arrived.",
+    respectfulScript: "Zohaib bhai — AFP Fact Check ne iss audio ko AI-generated declare kiya hai, aur khud [figure] ke office ne bhi mana kiya hai. Main aap ko dono links bhejta hoon. Audio bilkul asli lag rahi hai, lekin AI ab yehi kaam karti hai — isi liye 'sunne mein asli lagi' ab proof nahi. Source check karna aik siyasi position se pehle zaroori hai.",
+    inspiredBy: {
+      patternName: "AI-Cloned Voice / Deepfake Audio",
+      country: "Global",
+      year: "2023–ongoing",
+      whatHappened: "Consumer-grade voice cloning can now impersonate anyone from a minute of public audio. Fake 'confessions' and 'leaked calls' of politicians, CEOs, and even family members have been used to swing elections, authorise wire transfers, and extract ransoms.",
+      prevention: [
+        "Source-check, not sound-check. Where did the audio come from?",
+        "The subject's own verified channels are the fastest denial route.",
+        "Independent detection labs (AFP, DeepMedia, Reality Defender) publish forensic reports.",
+      ],
+    },
+  },
+
+  {
+    id: "ai-generated-photo",
+    title: "The AI-generated 'protest photo'",
+    teaser: "A photorealistic image of a huge protest that never happened.",
+    tier: 3,
+    verdict: "FALSE",
+    format: "image",
+    aiGenerated: true,
+    tacticId: "forgery-engine",
+    sender: { name: "Uncle Rehan", relationship: "Family group", voice: "activist, forwards political imagery, distrusts local media" },
+    senderMotive: "He believes this proves the cause he supports is finally getting the numbers.",
+    opener: "Yeh dekho — massive protest, kal shaam. Foreign media bhi hidden. Share every group.",
+    forward: {
+      meta: "Photo · claimed 'yesterday'",
+      headline: "Massive turnout — biggest gathering in years",
+      imageEmoji: "🌆",
+      imageAlt: "A crowd photo with slightly-off faces and duplicated banners",
+      bodyLines: [
+        "Aerial shot of a huge crowd at dusk.",
+        "'Millions turned out.'",
+        "No coverage on any channel.",
+      ],
+    },
+    actions: [
+      { id: "reverse-image", label: "Reverse-image search the photo", tool: "reverse_image", result: "No match anywhere except the WhatsApp forwards themselves. Not a real archive photo — but also not any known place.", decisive: true },
+      { id: "check-details", label: "Zoom into faces and banners", tool: "reverse_image", result: "Several faces have subtly warped features. Banner text is unreadable gibberish in a few places. Both are classic diffusion-model tells — but they're getting rarer.", decisive: true },
+      { id: "cross-check", label: "Cross-check any coverage or witness videos", tool: "cross_check", result: "Zero videos, zero eyewitness posts, zero geotagged content from that time or place. A crowd of this size cannot happen without hundreds of independent phones.", decisive: true },
+      { id: "check-detector", label: "Run through an AI-image detector", tool: "check_source", result: "Detectors flag high probability of AI generation. Detectors are imperfect — but combined with zero independent witnesses, the case is clear." },
+    ],
+    truthNote: "This image was generated by AI. The tell is not the pixels — models are almost past that already. The tell is the ABSENCE of everything a real event of this size produces: witnesses, phone videos, geotagged posts, journalists on the ground. No witnesses = no event.",
+    respectfulScript: "Uncle main ne dhang se check kiya — reverse image se koi match nahi, koi bhi eyewitness video ya geotagged post nahi, aur AI detectors bhi flag kar rahe hain. Itna bara ijtima ho, aur ek bhi phone video nahi ho — yeh mumkin hi nahi. Kisi ne AI se yeh tasveer banayi hai. Cause aap ka asli hai — asli photos share karain, yeh nahi.",
+    inspiredBy: {
+      patternName: "AI-Generated 'Photojournalism'",
+      country: "Global",
+      year: "2023–ongoing",
+      whatHappened: "Photorealistic AI images of events that never happened — protests, natural disasters, war scenes — spread as 'proof'. As models improve, spotting pixel artifacts fails; the defence shifts to source and witness verification.",
+      prevention: [
+        "No independent witnesses = no event.",
+        "Real crowds produce hundreds of phone videos; AI produces one photo.",
+        "Verify the source, not the surface. This is the Forgery Engine.",
+      ],
+    },
+  },
+];
+
+FEED_SCENARIOS.push(...NEW_CASES);
+
+/* ── Format + tactic defaults for existing cases ────────────────
+   Additive-only: keeps original data intact, just fills the new fields.
+*/
+const FORMAT_OVERRIDES: Record<string, { format?: FeedFormat; tactic?: FeedTacticId }> = {
+  "bank-rumor":            { format: "whatsapp", tactic: "urgency-fear" },
+  "flood-photo":           { format: "image",    tactic: "out-of-context" },
+  "unbelievable-true":     { format: "news",     tactic: "engagement-bait" },
+  "miracle-cure":          { format: "whatsapp", tactic: "engagement-bait" },
+  "free-laptop":           { format: "whatsapp", tactic: "phishing" },
+  "kidnap-van":            { format: "whatsapp", tactic: "urgency-fear" },
+  "doctor-clip":           { format: "video",    tactic: "out-of-context" },
+  "recalled-medicine":     { format: "news",     tactic: "mis-dis-mal" },
+  "old-protest":           { format: "image",    tactic: "out-of-context" },
+  "job-circular":          { format: "whatsapp", tactic: "phishing" },
+  "weird-but-true":        { format: "news",     tactic: "mis-dis-mal" },
+  "earthquake-prediction": { format: "whatsapp", tactic: "urgency-fear" },
+};
+
+for (const s of FEED_SCENARIOS) {
+  const o = FORMAT_OVERRIDES[s.id];
+  if (o) {
+    if (!s.format) s.format = o.format;
+    if (!s.tacticId) s.tacticId = o.tactic;
+  }
+  if (!s.format) s.format = "whatsapp";
+  // default all untagged actions to check_source
+  for (const a of s.actions) {
+    if (!a.tool) a.tool = "check_source";
+  }
+}
+
 export function getFeedScenario(id: string): FeedScenario | undefined {
+
   return FEED_SCENARIOS.find((s) => s.id === id);
 }

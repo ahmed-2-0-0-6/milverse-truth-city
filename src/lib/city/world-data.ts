@@ -80,7 +80,7 @@ export function smoothPath(points: { x: number; y: number }[]): string {
 
 /* ── Landmarks (world positions) ─────────────────────────────── */
 export interface Landmark {
-  id: "mirror-tower" | "feed-antenna" | "city-hall" | "studio" | "archive" | "market" | "arena";
+  id: "mirror-tower" | "feed-antenna" | "city-hall" | "studio" | "archive" | "market" | "arena" | "manual" | "profile" | "educators";
   label: string;
   x: number; y: number;
   kind: "hub" | "landmark" | "scaffold";
@@ -93,6 +93,9 @@ export const LANDMARKS: Landmark[] = [
   { id: "city-hall",   label: "CITY HALL",     x: 1500, y: 1050, kind: "landmark", to: "/city-hall" },
   { id: "studio",      label: "THE STUDIO",    x: 1180, y: 1700, kind: "landmark", to: "/studio" },
   { id: "archive",     label: "THE ARCHIVE",   x: 1820, y: 1700, kind: "landmark", to: "/archive" },
+  { id: "manual",      label: "FIELD MANUAL",  x: 1500, y: 640,  kind: "landmark", to: "/manual" },
+  { id: "profile",     label: "OPERATOR CARD", x: 900,  y: 1050, kind: "landmark", to: "/profile" },
+  { id: "educators",   label: "FOR EDUCATORS", x: 2100, y: 1050, kind: "landmark", to: "/educators" },
   { id: "market",      label: "THE MARKET",    x: 420,  y: 1820, kind: "scaffold", to: "/market" },
   { id: "arena",       label: "THE ARENA",     x: 2580, y: 1820, kind: "scaffold", to: "/arena" },
 ];
