@@ -29,7 +29,8 @@ export function VoiceNote({ voice, fromPlayer = false, speakerName, speakerVoice
     }
     setProgress(0);
     setPlaying(true);
-    const h = playVoiceNote(voice.text, voice.artifact, voice.artifactPos);
+    const gender = fromPlayer ? "neutral" : inferGender(speakerName, speakerVoiceDesc);
+    const h = playVoiceNote(voice.text, voice.artifact, voice.artifactPos, gender);
     handleRef.current = h;
     h.onProgress((t) => {
       setProgress(t);
