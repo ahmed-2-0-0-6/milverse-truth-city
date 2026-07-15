@@ -176,9 +176,9 @@ function CityHall() {
 
 function Stat({ label, value, accent }: { label: string; value: string | number; accent?: boolean }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-6">
-      <div className="font-mono text-xs tracking-widest text-muted-foreground">{label}</div>
-      <div className={`mt-2 text-3xl font-semibold ${accent ? "text-primary" : ""}`}>{value}</div>
+    <div className="rounded-sm border border-border bg-card p-5 hud-frame">
+      <div className="stencil text-[10px] text-muted-foreground">{label}</div>
+      <div className={`mt-2 text-3xl font-semibold tracking-tight ${accent ? "text-primary" : ""}`}>{value}</div>
     </div>
   );
 }
