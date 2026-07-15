@@ -133,6 +133,19 @@ function chooseArtifact(scenario: Scenario): ArtifactKind | null {
 
 /* ── Main reply function ───────────────────────────────────── */
 
+export type ReplyIntent =
+  | "voice"
+  | "answer"
+  | "deflection"
+  | "contradiction"
+  | "escalation"
+  | "verify_refuse"
+  | "verify_offer"
+  | "accusation_react"
+  | "filler"
+  | "push"
+  | "left";
+
 export interface EngineReply {
   text: string;
   meter: number;
@@ -142,7 +155,9 @@ export interface EngineReply {
   isTell?: boolean;
   tellExplanation?: string;
   voice?: VoicePayload;
+  intent: ReplyIntent;
 }
+
 
 export function respond(
   scenario: Scenario,
