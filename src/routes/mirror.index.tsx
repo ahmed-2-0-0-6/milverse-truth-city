@@ -119,6 +119,10 @@ function CaseFiles() {
           {codeErr && <span className="text-xs text-destructive">{codeErr}</span>}
         </div>
 
+        <RecommendedStrip />
+
+
+
 
         {tiers.map((tier) => {
           const cases = SCENARIOS.filter((s) => s.tier === tier);
