@@ -282,42 +282,52 @@ function PilotPage() {
         {(active || sample) && (
           <>
             {!sample && active && (
-            <div className="mt-8 rounded-xl border border-primary/40 bg-primary/5 p-6">
-              <div className="flex items-center justify-between">
-                <div className="font-mono text-[10px] tracking-widest text-primary">ACTIVE GROUP</div>
-            <div className="mt-8 rounded-xl border border-primary/40 bg-primary/5 p-6">
-              <div className="flex items-center justify-between">
-                <div className="font-mono text-[10px] tracking-widest text-primary">ACTIVE GROUP</div>
-                <button
-                  onClick={() => void refreshCloud()}
-                  disabled={cloudBusy}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-[10px] font-mono tracking-widest text-muted-foreground hover:text-foreground disabled:opacity-50"
-                  title="Refresh from cloud"
-                >
-                  <RefreshCw className={`h-3 w-3 ${cloudBusy ? "animate-spin" : ""}`} /> REFRESH
-                </button>
-              </div>
-              <div className="mt-2 flex flex-wrap items-center gap-3">
-                <div className="font-mono text-4xl tracking-widest text-foreground">{active}</div>
-                <button onClick={copy} className="inline-flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-mono tracking-widest text-primary">
-                  {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                  {copied ? "COPIED" : "COPY"}
-                </button>
-                <button onClick={leave} className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-mono tracking-widest text-muted-foreground hover:text-foreground">
-                  <LogOut className="h-3 w-3" /> LEAVE
-                </button>
-                {cloud.length > 0 && (
-                  <button onClick={exportCsv} className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-mono tracking-widest text-muted-foreground hover:text-foreground">
-                    <Download className="h-3 w-3" /> CSV
+              <div className="mt-8 rounded-xl border border-primary/40 bg-primary/5 p-6">
+                <div className="flex items-center justify-between">
+                  <div className="font-mono text-[10px] tracking-widest text-primary">ACTIVE GROUP</div>
+                  <button
+                    onClick={() => void refreshCloud()}
+                    disabled={cloudBusy}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-[10px] font-mono tracking-widest text-muted-foreground hover:text-foreground disabled:opacity-50"
+                    title="Refresh from cloud"
+                  >
+                    <RefreshCw className={`h-3 w-3 ${cloudBusy ? "animate-spin" : ""}`} /> REFRESH
                   </button>
-                )}
+                </div>
+                <div className="mt-2 flex flex-wrap items-center gap-3">
+                  <div className="font-mono text-4xl tracking-widest text-foreground">{active}</div>
+                  <button onClick={copy} className="inline-flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-mono tracking-widest text-primary">
+                    {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                    {copied ? "COPIED" : "COPY"}
+                  </button>
+                  <button onClick={leave} className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-mono tracking-widest text-muted-foreground hover:text-foreground">
+                    <LogOut className="h-3 w-3" /> LEAVE
+                  </button>
+                  {cloud.length > 0 && (
+                    <button onClick={exportCsv} className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-mono tracking-widest text-muted-foreground hover:text-foreground">
+                      <Download className="h-3 w-3" /> CSV
+                    </button>
+                  )}
+                </div>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Share the code so students can join on their own devices. Each device logs its
+                  outcomes to group <span className="font-mono text-foreground">{active}</span>.
+                  {cloudErr && <span className="block mt-1 text-caution text-xs">{cloudErr}</span>}
+                </p>
               </div>
-              <p className="mt-3 text-sm text-muted-foreground">
-                Share the code so students can join on their own devices. Each device logs its
-                outcomes to group <span className="font-mono text-foreground">{active}</span>.
-                {cloudErr && <span className="block mt-1 text-caution text-xs">{cloudErr}</span>}
-              </p>
-            </div>
+            )}
+{sample && (
+  <div className="mt-8 relative rounded-xl border border-caution/40 bg-caution/5 p-6 overflow-hidden">
+    <div className="pointer-events-none absolute -right-6 top-3 rotate-12 stencil text-[10px] tracking-widest text-caution/40 border border-caution/40 px-2 py-0.5">
+      SAMPLE — NOT REAL DATA
+    </div>
+    <div className="font-mono text-[10px] tracking-widest text-caution">SAMPLE GROUP · MILV-SAMPLE</div>
+    <div className="mt-2 font-mono text-4xl tracking-widest text-foreground">SAMPLE</div>
+    <p className="mt-3 text-sm text-muted-foreground">
+      This is a synthetic pilot with 3 devices and 8 cases each — showing how a real classroom's before/after calibration story looks after two sessions.
+    </p>
+  </div>
+)}
 
             <div className="mt-8 grid gap-4 sm:grid-cols-5">
               <Stat label="PLAYERS" value={players} accent />
