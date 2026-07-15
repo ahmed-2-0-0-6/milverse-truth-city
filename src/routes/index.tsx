@@ -75,10 +75,17 @@ function CityMap() {
         </section>
 
         {/* World / List */}
-        <section className="mx-auto max-w-6xl px-3 sm:px-4">
-          {view === "map"
-            ? <CityWorld onSwitchToList={() => setViewPersist("list")} />
-            : <CityList onSwitchToMap={() => setViewPersist("map")} />}
+        <section className="mx-auto max-w-6xl px-3 sm:px-4 relative">
+          {view === "map" && (
+            <div className="hero-3d" aria-hidden>
+              <CityHero3D className="absolute inset-0" />
+            </div>
+          )}
+          <div className="relative z-[1]">
+            {view === "map"
+              ? <CityWorld onSwitchToList={() => setViewPersist("list")} />
+              : <CityList onSwitchToMap={() => setViewPersist("map")} />}
+          </div>
         </section>
 
         <footer className="mx-auto max-w-6xl px-4 mt-6 border-t border-border pt-6 pb-10 text-center stencil text-[10px] text-muted-foreground space-y-3">
