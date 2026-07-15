@@ -22,14 +22,17 @@ interface District {
 const DISTRICTS: District[] = [
   {
     id: "mirror", name: "The Mirror", Icon: Eye, unlocked: true, to: "/mirror",
-    tagline: (p) => p ? `Tier ${unlockedMaxTier(p)} unlocked · flight simulator for scams` : "Flight simulator for scams",
+    tagline: (p) => p ? `Tier ${unlockedMaxTier(p)} unlocked · verify the person on the other end` : "Personal deception. Verify the person on the other end.",
+  },
+  {
+    id: "feed", name: "The Feed", Icon: Newspaper, unlocked: true, to: "/feed",
+    tagline: () => "Mass deception. Verify the claim without breaking the relationship.",
   },
   { id: "studio", name: "The Studio", Icon: Clapperboard, unlocked: true, to: "/studio", tagline: () => "Design a case. Share with friends." },
-  { id: "feed", name: "The Feed", Icon: Newspaper, unlocked: false, tagline: () => "Spot misinformation in a scrolling feed." },
-  { id: "market", name: "The Market", Icon: Store, unlocked: false, tagline: () => "Fake shops, phishing DMs, scam ads." },
-  { id: "arena", name: "The Arena", Icon: Swords, unlocked: false, tagline: () => "Multiplayer. The Imposter Protocol." },
-  { id: "archive", name: "The Archive", Icon: Library, unlocked: false, tagline: () => "Progress Ladder. Survivor library." },
-  { id: "hall", name: "City Hall", Icon: Landmark, unlocked: true, to: "/city-hall", tagline: () => "Your Trust Calibration." },
+  { id: "market", name: "The Market", Icon: Store, unlocked: false, tagline: () => "Fake shops and scam ads — verify the seller, not the price." },
+  { id: "arena", name: "The Arena", Icon: Swords, unlocked: false, tagline: () => "Multiplayer sources duel — whose evidence wins?" },
+  { id: "archive", name: "The Archive", Icon: Library, unlocked: false, tagline: () => "Survivor stories and the anatomy of past lies." },
+  { id: "hall", name: "City Hall", Icon: Landmark, unlocked: true, to: "/city-hall", tagline: () => "Your Trust Calibration — one chart, every district." },
 ];
 
 const INTRO_KEY = "milverse.intro.seen";
@@ -51,14 +54,17 @@ function CityMap() {
       {intro && <Intro onDone={() => { localStorage.setItem(INTRO_KEY, "1"); setIntro(false); }} />}
       <main className="mx-auto max-w-6xl px-4 py-10 sm:py-16">
         <section className="mb-8 max-w-2xl">
-          <div className="font-mono text-xs tracking-[0.3em] text-primary mb-3">WELCOME TO THE CITY</div>
+          <div className="font-mono text-xs tracking-[0.3em] text-primary mb-3">MEDIA & INFORMATION LITERACY · BY DOING</div>
           <h1 className="text-4xl sm:text-5xl font-semibold leading-tight tracking-tight">
-            Survive the age of scams,<br />deepfakes, and misinformation
-            <span className="text-primary">.</span>
+            Train your trust<span className="text-primary">.</span><br />
+            From viral lies to voice clones —<br />one verification instinct.
           </h1>
           <p className="mt-4 text-muted-foreground">
-            Seven districts. Each one teaches a survival skill through play — not tips. Start with{" "}
-            <span className="text-foreground">The Mirror</span>: a flight simulator for scams.
+            Two wings are open. <span className="text-foreground">The Mirror</span> trains you
+            against personal deception — the scammer talking to you.{" "}
+            <span className="text-foreground">The Feed</span> trains you against mass
+            misinformation — the viral lie your uncle just forwarded.
+            Same instinct powers both: <b>verify, use sources, protect evidence, protect people.</b>
           </p>
         </section>
 
@@ -95,8 +101,8 @@ function CityMap() {
 
 function Intro({ onDone }: { onDone: () => void }) {
   const slides = [
-    "Scams evolved. The obvious red flags are gone.",
-    "You can't spot your way to safety anymore. You have to VERIFY.",
+    "Lies come in two sizes: aimed at millions (misinformation) — and aimed at just you (scams).",
+    "Both die the same way: verification.",
     "MILVERSE is a city that trains that instinct. Enter.",
   ];
   const [i, setI] = useState(0);
