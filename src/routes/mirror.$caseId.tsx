@@ -11,6 +11,7 @@ import {
 import { generateContactReply } from "@/lib/mirror/ai.functions";
 import { ARTIFACT_LABEL } from "@/lib/mirror/voice";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
+import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
 import { tick, tensionCue } from "@/lib/mirror/audio";
 import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer } from "lucide-react";
@@ -803,11 +804,14 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     logPilotEntry({
       wing: "mirror",
       caseId: scenario.id,
+      tier: scenario.tier,
       result: result.resultKind,
       points: result.points,
+      probeStats: { strong: result.strong, weak: result.weak, wasted: result.wasted },
       ts: Date.now(),
     });
     window.dispatchEvent(new Event("milverse:profile"));
+    checkAndAwardBadges(p);
   }, [result, scenario.id, scenario.tier, scenario.truth, verdictRaw]);
 
   if (!result || !verdictRaw) {
