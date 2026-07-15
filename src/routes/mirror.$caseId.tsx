@@ -819,6 +819,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     const truthLabel: "REAL" | "FAKE" = scenario.truth === "REAL" ? "REAL" : "FAKE";
     const correctVerdict = verdictRaw.verdict === truthLabel;
 
+
     const correctChipIds = scenario.evidenceChips.filter((c) => c.correct).map((c) => c.id);
     const pickedCorrect = verdictRaw.picked.filter((id) => correctChipIds.includes(id)).length;
     const pickedRedHerring = verdictRaw.picked.filter((id) => !correctChipIds.includes(id)).length;
