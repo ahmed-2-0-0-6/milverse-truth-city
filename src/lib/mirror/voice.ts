@@ -29,16 +29,50 @@ export function waveformBars(text: string, count = 36): number[] {
   return bars;
 }
 
-/** Pick an appropriate voice (deep-ish, English if available). */
-function pickVoice(): SpeechSynthesisVoice | undefined {
+export type SpeakerGender = "male" | "female" | "neutral";
+
+/** Infer gender from a persona name + voice description. Best-effort heuristic. */
+export function inferGender(name?: string, voiceDesc?: string): SpeakerGender {
+  const hay = `${name ?? ""} ${voiceDesc ?? ""}`.toLowerCase();
+  // Explicit voice-description signals win.
+  if (/\b(male|man|guy|boy|bhai|uncle|sir|father|dad|brother|husband|boyfriend|him|his|he\b)\b/.test(hay)) return "male";
+  if (/\b(female|woman|girl|lady|aunty|apa|baji|mother|mom|sister|wife|girlfriend|her|she\b)\b/.test(hay)) return "female";
+  // Name-based fallback: common South-Asian + Western male/female first names.
+  const first = (name ?? "").trim().split(/\s+/)[0]?.toLowerCase() ?? "";
+  const male = ["ali","ahmed","ahmad","hassan","hussain","usman","bilal","omar","umar","asad","faisal","fahad","imran","kamran","rehan","salman","zain","zayan","hamza","haris","danish","junaid","waqas","adnan","arsalan","tariq","kashif","noman","raza","saad","talha","yasir","abdul","mohammed","muhammad","syed","waleed","adam","noah","liam","james","john","david","michael","daniel","chris","tom","alex","ben","sam","jake","ryan","mark","paul","peter","brian","kevin","steve","richard","robert","thomas","william"];
+  const female = ["ayesha","aisha","fatima","hira","sana","sara","sarah","zara","zainab","mariam","maryam","noor","nida","amna","laiba","iqra","kiran","rabia","saima","nadia","farah","zoya","hina","huma","sadia","tania","mahnoor","rida","emma","olivia","ava","sophia","isabella","mia","charlotte","amelia","lily","chloe","hannah","grace","zoe","anna","kate","laura","emily","sarah","rachel","jessica","ashley"];
+  if (male.includes(first)) return "male";
+  if (female.includes(first)) return "female";
+  return "neutral";
+}
+
+/** Pick a voice matching the desired gender, English preferred. */
+function pickVoice(gender: SpeakerGender = "neutral"): SpeechSynthesisVoice | undefined {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return undefined;
   const voices = window.speechSynthesis.getVoices();
   if (!voices.length) return undefined;
-  return (
-    voices.find((v) => /en[-_]?(us|gb|in)/i.test(v.lang) && /female|samantha|karen|serena|zira/i.test(v.name)) ||
-    voices.find((v) => /en/i.test(v.lang)) ||
-    voices[0]
-  );
+
+  const maleRe = /male|david|daniel|alex|fred|mark|thomas|tom|george|oliver|arthur|ravi|rishi|aaron/i;
+  const femaleRe = /female|samantha|karen|serena|zira|susan|victoria|allison|ava|kate|tessa|veena|rishi|monica|isha/i;
+  const enRe = /en[-_]?(us|gb|in|au)/i;
+
+  if (gender === "male") {
+    return (
+      voices.find((v) => enRe.test(v.lang) && maleRe.test(v.name) && !/female/i.test(v.name)) ||
+      voices.find((v) => maleRe.test(v.name) && !/female/i.test(v.name)) ||
+      voices.find((v) => /en/i.test(v.lang)) ||
+      voices[0]
+    );
+  }
+  if (gender === "female") {
+    return (
+      voices.find((v) => enRe.test(v.lang) && femaleRe.test(v.name)) ||
+      voices.find((v) => femaleRe.test(v.name)) ||
+      voices.find((v) => /en/i.test(v.lang)) ||
+      voices[0]
+    );
+  }
+  return voices.find((v) => enRe.test(v.lang)) || voices.find((v) => /en/i.test(v.lang)) || voices[0];
 }
 
 export interface PlaybackHandle {
@@ -51,7 +85,12 @@ export interface PlaybackHandle {
  * Speak a voice note. If artifact != null, layer a subtle audible tell.
  * Returns a handle for progress tracking + cancel.
  */
-export function playVoiceNote(text: string, artifact: ArtifactKind | null, artifactPos = 0.5): PlaybackHandle {
+export function playVoiceNote(
+  text: string,
+  artifact: ArtifactKind | null,
+  artifactPos = 0.5,
+  gender: SpeakerGender = "neutral",
+): PlaybackHandle {
   const duration = estimateDuration(text);
   const listeners: ((t: number) => void)[] = [];
   let cancelled = false;
