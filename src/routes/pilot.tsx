@@ -119,11 +119,13 @@ function PilotPage() {
     setTimeout(() => setCopied(false), 1200);
   }
 
+  const effectiveCloud = sample ? SAMPLE_ENTRIES : cloud;
+
   // Prefer cloud data when it has more entries; otherwise fall back to local.
-  const preferCloud = cloud.length >= log.length && cloud.length > 0;
+  const preferCloud = effectiveCloud.length >= log.length && effectiveCloud.length > 0;
   const merged: PilotEntry[] = useMemo(() => {
     if (preferCloud) {
-      return cloud.map((c) => ({
+      return effectiveCloud.map((c) => ({
         wing: c.wing, caseId: c.case_id,
         tier: (c.tier ?? undefined) as PilotEntry["tier"],
         result: c.result, points: c.points,
@@ -131,16 +133,16 @@ function PilotPage() {
       }));
     }
     return log;
-  }, [preferCloud, cloud, log]);
+  }, [preferCloud, effectiveCloud, log]);
 
   const s = summarize(merged);
   const myDeviceId = getDeviceId();
   const players = useMemo(() => {
     const set = new Set<string>();
-    cloud.forEach((c) => set.add(c.device_id));
-    set.add(myDeviceId);
+    effectiveCloud.forEach((c) => set.add(c.device_id));
+    if (!sample) set.add(myDeviceId);
     return set.size;
-  }, [cloud, myDeviceId]);
+  }, [effectiveCloud, myDeviceId, sample]);
 
   // Before/after per-device calibration: FIRST 3 vs LAST 3 completed cases.
   const beforeAfter = useMemo(() => {
