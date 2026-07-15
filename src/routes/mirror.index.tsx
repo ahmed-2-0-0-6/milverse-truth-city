@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { MessageSquare, ShieldAlert, Lock, CheckCircle2, Sparkles, Users } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
-import { SCENARIOS, loadCitizenCases, type TierId, type Scenario } from "@/lib/mirror/scenarios";
+import { SCENARIOS, loadCitizenCases, saveCitizenCase, type TierId, type Scenario } from "@/lib/mirror/scenarios";
 import { loadProfile, unlockedMaxTier, tierWins, type TrustProfile } from "@/lib/mirror/profile";
+import { fetchCitizenCase } from "@/lib/citizen.functions";
 
 export const Route = createFileRoute("/mirror/")({
   head: () => ({
@@ -29,6 +31,8 @@ function CaseFiles() {
   const [citizen, setCitizen] = useState<Scenario[]>([]);
   const [code, setCode] = useState("");
   const [codeErr, setCodeErr] = useState<string | null>(null);
+  const [codeBusy, setCodeBusy] = useState(false);
+  const fetchByCode = useServerFn(fetchCitizenCase);
   useEffect(() => {
     setProfile(loadProfile());
     setCitizen(loadCitizenCases());
@@ -37,13 +41,45 @@ function CaseFiles() {
     return () => window.removeEventListener("milverse:profile", on);
   }, []);
 
-  function openCode() {
-    const c = code.trim().toLowerCase();
+  async function openCode() {
+    const c = code.trim().toUpperCase();
     if (!c) return;
-    const target = citizen.find((s) => s.id.replace("citizen-", "").toLowerCase().startsWith(c));
-    if (!target) { setCodeErr("No case with that code on this device."); return; }
-    navigate({ to: "/mirror/$caseId", params: { caseId: target.id } });
+    setCodeErr(null);
+    // 1) local match by shareCode field
+    const localByShare = citizen.find((s) => s.shareCode === c);
+    if (localByShare) {
+      navigate({ to: "/mirror/$caseId", params: { caseId: localByShare.id } });
+      return;
+    }
+    // 2) legacy local match by id prefix (older cases pre-shareCode)
+    const legacyLocal = citizen.find((s) => s.id.replace("citizen-", "").toUpperCase().startsWith(c.slice(0, 6)));
+    if (legacyLocal) {
+      navigate({ to: "/mirror/$caseId", params: { caseId: legacyLocal.id } });
+      return;
+    }
+    // 3) backend fetch
+    if (!/^[A-Z0-9]{6}$/.test(c)) {
+      setCodeErr("Codes are 6 characters (letters and numbers).");
+      return;
+    }
+    setCodeBusy(true);
+    try {
+      const res = await fetchByCode({ data: { shareCode: c } as never });
+      const json = (res as { scenarioJson: string | null }).scenarioJson;
+      if (!json) {
+        setCodeErr("No case with that code — check the code and try again.");
+        setCodeBusy(false);
+        return;
+      }
+      const scenario = JSON.parse(json) as Scenario;
+      saveCitizenCase(scenario);
+      navigate({ to: "/mirror/$caseId", params: { caseId: scenario.id } });
+    } catch {
+      setCodeErr("Couldn't reach the case service. Try again in a moment.");
+    }
+    setCodeBusy(false);
   }
+
 
   const maxTier = profile ? unlockedMaxTier(profile) : 2;
   const tiers: TierId[] = [1, 2, 3, 4, 5];
