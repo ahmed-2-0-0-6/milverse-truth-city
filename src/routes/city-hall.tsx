@@ -141,6 +141,36 @@ function CityHall() {
           </div>
         </div>
 
+        <div className="rounded-sm border border-border bg-card p-6 mb-6 hud-frame">
+          <div className="stencil text-[10px] text-primary mb-4">
+            // BADGE CASE · {earned.length}/{BADGES.length} EARNED
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {BADGES.map((b) => {
+              const has = earned.includes(b.id);
+              return (
+                <div
+                  key={b.id}
+                  className={`rounded-md border p-3 flex items-center gap-3 transition ${
+                    has
+                      ? "border-primary/50 bg-primary/5"
+                      : "border-border/50 bg-muted/30 opacity-50"
+                  }`}
+                  title={b.blurb}
+                >
+                  <div className={`text-2xl ${has ? "" : "grayscale"}`}>{b.emoji}</div>
+                  <div className="min-w-0">
+                    <div className={`text-sm font-semibold truncate ${has ? "text-foreground" : "text-muted-foreground"}`}>
+                      {b.name}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground line-clamp-2">{b.blurb}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="rounded-sm border border-border bg-card p-6 mb-8 hud-frame">
           <div className="stencil text-[10px] text-primary mb-4">
             // CASE LOG · LAST 10
