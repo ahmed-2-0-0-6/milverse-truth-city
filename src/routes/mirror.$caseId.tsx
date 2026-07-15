@@ -458,8 +458,8 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
 }
 
 function MessageRow({
-  m, pinned, onPin,
-}: { m: Message; pinned: boolean; onPin?: () => void }) {
+  m, pinned, onPin, speakerName, speakerVoiceDesc,
+}: { m: Message; pinned: boolean; onPin?: () => void; speakerName?: string; speakerVoiceDesc?: string }) {
   if (m.role === "system") {
     return (
       <div className="msg-in flex justify-center">
