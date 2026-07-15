@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Play, Eye, Newspaper, Clapperboard, Library, Landmark as LandmarkIcon, Store, Swords } from "lucide-react";
+import { Play, Eye, Newspaper, Clapperboard, Library, Landmark as LandmarkIcon, Store, Swords, BookOpen, IdCard, GraduationCap } from "lucide-react";
 import { buildMirrorStations, buildFeedStations, MIRROR_COLOR, FEED_COLOR, type Station } from "@/lib/city/world-data";
 import { loadProfile, type TrustProfile } from "@/lib/mirror/profile";
 import { getMirrorRecommendations } from "@/lib/recommendations";
@@ -44,6 +44,9 @@ export function CityList({ onSwitchToMap }: { onSwitchToMap: () => void }) {
         <LandmarkTile to="/city-hall" Icon={LandmarkIcon} label="City Hall" />
         <LandmarkTile to="/studio" Icon={Clapperboard} label="Studio" />
         <LandmarkTile to="/archive" Icon={Library} label="Archive · City Library" badge={profile?.history?.length ? `${new Set(profile.history.map((h) => h.caseId)).size} ON SHELF` : undefined} />
+        <LandmarkTile to="/manual" Icon={BookOpen} label="Field Manual" badge="MIL" />
+        <LandmarkTile to="/profile" Icon={IdCard} label="Operator Profile" />
+        <LandmarkTile to="/educators" Icon={GraduationCap} label="For Educators" />
         <LandmarkTile to="/market" Icon={Store} label="Market · Blueprint" muted />
         <LandmarkTile to="/arena" Icon={Swords} label="Arena · Blueprint" muted />
       </div>

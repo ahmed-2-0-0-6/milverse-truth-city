@@ -12,16 +12,21 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as QuickTourRouteImport } from './routes/quick-tour'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PilotRouteImport } from './routes/pilot'
 import { Route as MarketRouteImport } from './routes/market'
 import { Route as KitRouteImport } from './routes/kit'
+import { Route as EducatorsRouteImport } from './routes/educators'
 import { Route as CityHallRouteImport } from './routes/city-hall'
 import { Route as ArenaRouteImport } from './routes/arena'
 import { Route as ArchiveRouteImport } from './routes/archive'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MirrorIndexRouteImport } from './routes/mirror.index'
+import { Route as ManualIndexRouteImport } from './routes/manual.index'
 import { Route as FeedIndexRouteImport } from './routes/feed.index'
 import { Route as MirrorCaseIdRouteImport } from './routes/mirror.$caseId'
+import { Route as ManualTakeItOutsideRouteImport } from './routes/manual.take-it-outside'
+import { Route as ManualEntryIdRouteImport } from './routes/manual.$entryId'
 import { Route as FeedCaseIdRouteImport } from './routes/feed.$caseId'
 import { Route as ArchiveSubmitRouteImport } from './routes/archive.submit'
 
@@ -40,6 +45,11 @@ const QuickTourRoute = QuickTourRouteImport.update({
   path: '/quick-tour',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PilotRoute = PilotRouteImport.update({
   id: '/pilot',
   path: '/pilot',
@@ -53,6 +63,11 @@ const MarketRoute = MarketRouteImport.update({
 const KitRoute = KitRouteImport.update({
   id: '/kit',
   path: '/kit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EducatorsRoute = EducatorsRouteImport.update({
+  id: '/educators',
+  path: '/educators',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CityHallRoute = CityHallRouteImport.update({
@@ -80,6 +95,11 @@ const MirrorIndexRoute = MirrorIndexRouteImport.update({
   path: '/mirror/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ManualIndexRoute = ManualIndexRouteImport.update({
+  id: '/manual/',
+  path: '/manual/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FeedIndexRoute = FeedIndexRouteImport.update({
   id: '/feed/',
   path: '/feed/',
@@ -88,6 +108,16 @@ const FeedIndexRoute = FeedIndexRouteImport.update({
 const MirrorCaseIdRoute = MirrorCaseIdRouteImport.update({
   id: '/mirror/$caseId',
   path: '/mirror/$caseId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManualTakeItOutsideRoute = ManualTakeItOutsideRouteImport.update({
+  id: '/manual/take-it-outside',
+  path: '/manual/take-it-outside',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManualEntryIdRoute = ManualEntryIdRouteImport.update({
+  id: '/manual/$entryId',
+  path: '/manual/$entryId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeedCaseIdRoute = FeedCaseIdRouteImport.update({
@@ -106,16 +136,21 @@ export interface FileRoutesByFullPath {
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
   '/city-hall': typeof CityHallRoute
+  '/educators': typeof EducatorsRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
   '/pilot': typeof PilotRoute
+  '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
   '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
   '/archive/submit': typeof ArchiveSubmitRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
+  '/manual/$entryId': typeof ManualEntryIdRoute
+  '/manual/take-it-outside': typeof ManualTakeItOutsideRoute
   '/mirror/$caseId': typeof MirrorCaseIdRoute
   '/feed/': typeof FeedIndexRoute
+  '/manual/': typeof ManualIndexRoute
   '/mirror/': typeof MirrorIndexRoute
 }
 export interface FileRoutesByTo {
@@ -123,16 +158,21 @@ export interface FileRoutesByTo {
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
   '/city-hall': typeof CityHallRoute
+  '/educators': typeof EducatorsRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
   '/pilot': typeof PilotRoute
+  '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
   '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
   '/archive/submit': typeof ArchiveSubmitRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
+  '/manual/$entryId': typeof ManualEntryIdRoute
+  '/manual/take-it-outside': typeof ManualTakeItOutsideRoute
   '/mirror/$caseId': typeof MirrorCaseIdRoute
   '/feed': typeof FeedIndexRoute
+  '/manual': typeof ManualIndexRoute
   '/mirror': typeof MirrorIndexRoute
 }
 export interface FileRoutesById {
@@ -141,16 +181,21 @@ export interface FileRoutesById {
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
   '/city-hall': typeof CityHallRoute
+  '/educators': typeof EducatorsRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
   '/pilot': typeof PilotRoute
+  '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
   '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
   '/archive/submit': typeof ArchiveSubmitRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
+  '/manual/$entryId': typeof ManualEntryIdRoute
+  '/manual/take-it-outside': typeof ManualTakeItOutsideRoute
   '/mirror/$caseId': typeof MirrorCaseIdRoute
   '/feed/': typeof FeedIndexRoute
+  '/manual/': typeof ManualIndexRoute
   '/mirror/': typeof MirrorIndexRoute
 }
 export interface FileRouteTypes {
@@ -160,16 +205,21 @@ export interface FileRouteTypes {
     | '/archive'
     | '/arena'
     | '/city-hall'
+    | '/educators'
     | '/kit'
     | '/market'
     | '/pilot'
+    | '/profile'
     | '/quick-tour'
     | '/review'
     | '/studio'
     | '/archive/submit'
     | '/feed/$caseId'
+    | '/manual/$entryId'
+    | '/manual/take-it-outside'
     | '/mirror/$caseId'
     | '/feed/'
+    | '/manual/'
     | '/mirror/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -177,16 +227,21 @@ export interface FileRouteTypes {
     | '/archive'
     | '/arena'
     | '/city-hall'
+    | '/educators'
     | '/kit'
     | '/market'
     | '/pilot'
+    | '/profile'
     | '/quick-tour'
     | '/review'
     | '/studio'
     | '/archive/submit'
     | '/feed/$caseId'
+    | '/manual/$entryId'
+    | '/manual/take-it-outside'
     | '/mirror/$caseId'
     | '/feed'
+    | '/manual'
     | '/mirror'
   id:
     | '__root__'
@@ -194,16 +249,21 @@ export interface FileRouteTypes {
     | '/archive'
     | '/arena'
     | '/city-hall'
+    | '/educators'
     | '/kit'
     | '/market'
     | '/pilot'
+    | '/profile'
     | '/quick-tour'
     | '/review'
     | '/studio'
     | '/archive/submit'
     | '/feed/$caseId'
+    | '/manual/$entryId'
+    | '/manual/take-it-outside'
     | '/mirror/$caseId'
     | '/feed/'
+    | '/manual/'
     | '/mirror/'
   fileRoutesById: FileRoutesById
 }
@@ -212,15 +272,20 @@ export interface RootRouteChildren {
   ArchiveRoute: typeof ArchiveRouteWithChildren
   ArenaRoute: typeof ArenaRoute
   CityHallRoute: typeof CityHallRoute
+  EducatorsRoute: typeof EducatorsRoute
   KitRoute: typeof KitRoute
   MarketRoute: typeof MarketRoute
   PilotRoute: typeof PilotRoute
+  ProfileRoute: typeof ProfileRoute
   QuickTourRoute: typeof QuickTourRoute
   ReviewRoute: typeof ReviewRoute
   StudioRoute: typeof StudioRoute
   FeedCaseIdRoute: typeof FeedCaseIdRoute
+  ManualEntryIdRoute: typeof ManualEntryIdRoute
+  ManualTakeItOutsideRoute: typeof ManualTakeItOutsideRoute
   MirrorCaseIdRoute: typeof MirrorCaseIdRoute
   FeedIndexRoute: typeof FeedIndexRoute
+  ManualIndexRoute: typeof ManualIndexRoute
   MirrorIndexRoute: typeof MirrorIndexRoute
 }
 
@@ -247,6 +312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QuickTourRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pilot': {
       id: '/pilot'
       path: '/pilot'
@@ -266,6 +338,13 @@ declare module '@tanstack/react-router' {
       path: '/kit'
       fullPath: '/kit'
       preLoaderRoute: typeof KitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/educators': {
+      id: '/educators'
+      path: '/educators'
+      fullPath: '/educators'
+      preLoaderRoute: typeof EducatorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/city-hall': {
@@ -303,6 +382,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MirrorIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/manual/': {
+      id: '/manual/'
+      path: '/manual'
+      fullPath: '/manual/'
+      preLoaderRoute: typeof ManualIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/feed/': {
       id: '/feed/'
       path: '/feed'
@@ -315,6 +401,20 @@ declare module '@tanstack/react-router' {
       path: '/mirror/$caseId'
       fullPath: '/mirror/$caseId'
       preLoaderRoute: typeof MirrorCaseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manual/take-it-outside': {
+      id: '/manual/take-it-outside'
+      path: '/manual/take-it-outside'
+      fullPath: '/manual/take-it-outside'
+      preLoaderRoute: typeof ManualTakeItOutsideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manual/$entryId': {
+      id: '/manual/$entryId'
+      path: '/manual/$entryId'
+      fullPath: '/manual/$entryId'
+      preLoaderRoute: typeof ManualEntryIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feed/$caseId': {
@@ -350,15 +450,20 @@ const rootRouteChildren: RootRouteChildren = {
   ArchiveRoute: ArchiveRouteWithChildren,
   ArenaRoute: ArenaRoute,
   CityHallRoute: CityHallRoute,
+  EducatorsRoute: EducatorsRoute,
   KitRoute: KitRoute,
   MarketRoute: MarketRoute,
   PilotRoute: PilotRoute,
+  ProfileRoute: ProfileRoute,
   QuickTourRoute: QuickTourRoute,
   ReviewRoute: ReviewRoute,
   StudioRoute: StudioRoute,
   FeedCaseIdRoute: FeedCaseIdRoute,
+  ManualEntryIdRoute: ManualEntryIdRoute,
+  ManualTakeItOutsideRoute: ManualTakeItOutsideRoute,
   MirrorCaseIdRoute: MirrorCaseIdRoute,
   FeedIndexRoute: FeedIndexRoute,
+  ManualIndexRoute: ManualIndexRoute,
   MirrorIndexRoute: MirrorIndexRoute,
 }
 export const routeTree = rootRouteImport
