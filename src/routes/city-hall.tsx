@@ -9,6 +9,7 @@ import {
   type TrustProfile,
 } from "@/lib/mirror/profile";
 import { BADGES, loadEarnedBadges } from "@/lib/mirror/badges";
+import { RecommendedStrip } from "@/components/RecommendedStrip";
 
 export const Route = createFileRoute("/city-hall")({
   head: () => ({
