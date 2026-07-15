@@ -1,13 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { TopBar } from "@/components/TopBar";
-import { loadProfile, calibrationLabel, type TrustProfile } from "@/lib/mirror/profile";
+import {
+  loadProfile,
+  calibrationLabel,
+  operatorRank,
+  operatorCallsign,
+  type TrustProfile,
+} from "@/lib/mirror/profile";
 
 export const Route = createFileRoute("/city-hall")({
   head: () => ({
     meta: [
-      { title: "City Hall — MILVERSE" },
-      { name: "description", content: "Your Trust Calibration profile." },
+      { title: "Operator Dossier — MILVERSE" },
+      { name: "description", content: "Your Trust Calibration profile and field rank." },
     ],
   }),
   component: CityHall,
@@ -21,16 +27,62 @@ function CityHall() {
     return (
       <div>
         <TopBar />
-        <div className="p-8 text-muted-foreground">Loading…</div>
+        <div className="p-8 stencil text-xs text-muted-foreground">// LOADING DOSSIER…</div>
       </div>
     );
   }
 
   const cal = calibrationLabel(p);
-  // 2x2: x=missedScams, y=falseAlarms
+  const rank = operatorRank(p);
+  const call = operatorCallsign(p);
   const total = Math.max(1, p.casesPlayed);
   const missRate = p.missedScams / total;
   const faRate = p.falseAlarms / total;
+
+  return (
+    <div className="min-h-screen grain">
+      <div className="pointer-events-none fixed inset-0 scanlines opacity-30" />
+      <TopBar />
+      <main className="mx-auto max-w-5xl px-4 py-10 relative">
+        <div className="mb-8 hud-frame border border-primary/30 bg-card/60 rounded-sm p-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="stencil text-[10px] text-primary">// OPERATOR DOSSIER · EYES ONLY</div>
+            <div className="h-px flex-1 bg-primary/20" />
+            <div className="stencil text-[10px] text-muted-foreground">{new Date().toISOString().slice(0, 10)}</div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div>
+              <div className="stencil text-[10px] text-muted-foreground">CALLSIGN</div>
+              <div className="text-3xl font-semibold text-primary tracking-wider">{call}</div>
+            </div>
+            <div>
+              <div className="stencil text-[10px] text-muted-foreground">FIELD RANK</div>
+              <div className="text-2xl font-semibold text-foreground">{rank.rank}</div>
+              <div className="stencil text-[10px] text-muted-foreground mt-1">{rank.code}</div>
+            </div>
+            <div>
+              <div className="stencil text-[10px] text-muted-foreground mb-1">
+                {rank.next ? `PROGRESS → ${rank.next}` : "MAX RANK"}
+              </div>
+              <div className="h-2 w-full bg-muted rounded-sm overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-700 shadow-[0_0_12px_oklch(0.82_0.16_85/0.6)]"
+                  style={{ width: `${Math.round(rank.progress * 100)}%` }}
+                />
+              </div>
+              <div className="stencil text-[10px] text-muted-foreground mt-1">
+                {Math.round(rank.progress * 100)}%
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+          <Stat label="CASES RUN" value={p.casesPlayed} />
+          <Stat label="XP" value={p.points} accent />
+          <Stat label="CALIBRATION" value={cal.label.toUpperCase()} accent={cal.tone === "good"} />
+        </div>
+
 
   return (
     <div className="min-h-screen grain">
