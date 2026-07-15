@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { TopBar } from "@/components/TopBar";
 import { VoiceNote } from "@/components/VoiceNote";
 import { getScenario, type EvidenceChip, type Scenario } from "@/lib/mirror/scenarios";
@@ -7,10 +8,12 @@ import {
   initState, respond, gradeProbe, idleNudge, verifyOutOfBand,
   VOB_METHODS, type EngineState, type Message, type VobMethod,
 } from "@/lib/mirror/engine";
+import { generateContactReply } from "@/lib/mirror/ai.functions";
 import { ARTIFACT_LABEL } from "@/lib/mirror/voice";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
 import { tick, tensionCue } from "@/lib/mirror/audio";
 import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer } from "lucide-react";
+
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
