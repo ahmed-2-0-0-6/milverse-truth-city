@@ -7,6 +7,7 @@ import {
   type FeedMessage, type FeedState, type FeedOutcome,
 } from "@/lib/feed/engine";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
+import { logPilotEntry } from "@/lib/pilot";
 import { Send, Search, Forward, Heart, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
 
 export const Route = createFileRoute("/feed/$caseId")({
@@ -84,6 +85,18 @@ function FeedPlay() {
               ts: Date.now(),
             });
             saveProfile(p);
+            logPilotEntry({
+              wing: "feed",
+              caseId: scenario.id,
+              result:
+                oc.result === "correct" ? "correct" :
+                oc.result === "missed_fake" ? "missed_scam" :
+                oc.result === "false_alarm" ? "false_alarm" :
+                oc.result === "pyrrhic" ? "pyrrhic" :
+                "false_alarm",
+              points: oc.points,
+              ts: Date.now(),
+            });
             window.dispatchEvent(new Event("milverse:profile"));
             setPhase("debrief");
           }}

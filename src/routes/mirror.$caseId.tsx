@@ -11,6 +11,7 @@ import {
 import { generateContactReply } from "@/lib/mirror/ai.functions";
 import { ARTIFACT_LABEL } from "@/lib/mirror/voice";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
+import { logPilotEntry } from "@/lib/pilot";
 import { tick, tensionCue } from "@/lib/mirror/audio";
 import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer } from "lucide-react";
 
@@ -799,6 +800,13 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       ts: Date.now(),
     });
     saveProfile(p);
+    logPilotEntry({
+      wing: "mirror",
+      caseId: scenario.id,
+      result: result.resultKind,
+      points: result.points,
+      ts: Date.now(),
+    });
     window.dispatchEvent(new Event("milverse:profile"));
   }, [result, scenario.id, scenario.tier, scenario.truth, verdictRaw]);
 

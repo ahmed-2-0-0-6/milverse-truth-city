@@ -59,7 +59,7 @@ function CaseFiles() {
           <div className="font-mono text-xs tracking-[0.3em] text-primary">THE MIRROR · TEXT CHANNEL</div>
           <h1 className="mt-2 text-3xl sm:text-4xl font-semibold">Case Files</h1>
           <p className="mt-3 text-muted-foreground">
-            Live, unscripted conversations. Your job is not to spot red flags — it's to{" "}
+            Live, unscripted conversations. Your job isn't to guess from vibes — it's to{" "}
             <span className="text-foreground">verify</span>. Win two cases in a tier to unlock the next.
           </p>
           <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-caution/30 bg-caution/10 px-3 py-1 text-[11px] font-mono tracking-widest text-caution">
