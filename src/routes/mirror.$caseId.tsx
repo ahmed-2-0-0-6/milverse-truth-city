@@ -137,6 +137,8 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
   const nudged = useRef<boolean>(false);
   const criticalCued = useRef<boolean>(false);
   const prevMeter = useRef<number>(state.meter);
+  const aiFailCount = useRef<number>(0);
+  const [aiDown, setAiDown] = useState(false);
 
   useEffect(() => {
     const opener: Message = { role: "contact", kind: "text", text: scenario.opener, ts: Date.now() };
