@@ -9,6 +9,7 @@ import {
   type TrustProfile,
 } from "@/lib/mirror/profile";
 import { isMuted, setMuted } from "@/lib/mirror/audio";
+import { VisualQualityToggle } from "@/components/VisualQualityToggle";
 
 export function TopBar() {
   const [profile, setProfile] = useState<TrustProfile | null>(null);
@@ -59,6 +60,7 @@ export function TopBar() {
             <span>HANDLE</span>
             <span className="text-foreground">{call}</span>
           </div>
+          <VisualQualityToggle />
           <button
             onClick={() => { setMuted(!muted); setLocalMuted(!muted); }}
             className="rounded border border-border p-2 text-muted-foreground transition hover:text-foreground hover:bg-accent"

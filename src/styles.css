@@ -151,3 +151,52 @@
   animation: scan-sweep 5s linear infinite;
   pointer-events: none;
 }
+
+/* LAYER-5 — atmosphere overlays */
+@keyframes atmo-grain-shift {
+  0%, 100% { transform: translate(0,0); }
+  20% { transform: translate(-2%,1%); }
+  40% { transform: translate(1%,-2%); }
+  60% { transform: translate(-1%,2%); }
+  80% { transform: translate(2%,-1%); }
+}
+.atmo-grain {
+  background-image:
+    radial-gradient(oklch(1 0 0 / 0.5) 1px, transparent 1px),
+    radial-gradient(oklch(1 0 0 / 0.3) 1px, transparent 1px);
+  background-size: 3px 3px, 5px 5px;
+  background-position: 0 0, 1px 1px;
+  animation: atmo-grain-shift 1.6s steps(6) infinite;
+  mix-blend-mode: overlay;
+}
+.atmo-vignette {
+  background: radial-gradient(ellipse at center, transparent 55%, oklch(0 0 0 / 0.35) 100%);
+}
+@keyframes atmo-flicker {
+  0%, 96%, 100% { opacity: 0; }
+  97% { opacity: 0.15; }
+  98% { opacity: 0.05; }
+  99% { opacity: 0.18; }
+}
+.atmo-flicker {
+  background: radial-gradient(ellipse at 20% 30%, oklch(0.60 0.19 258 / 0.25), transparent 45%),
+              radial-gradient(ellipse at 80% 70%, oklch(0.75 0.15 70 / 0.2), transparent 45%);
+  animation: atmo-flicker 7s infinite;
+}
+
+/* LAYER-4 — magnetic/pulsing CTA glow */
+@keyframes cta-glow {
+  0%, 100% { box-shadow: 0 4px 20px oklch(0.60 0.19 258 / 0.35), 0 0 0 0 oklch(0.60 0.19 258 / 0.5); }
+  50% { box-shadow: 0 6px 28px oklch(0.60 0.19 258 / 0.55), 0 0 0 6px oklch(0.60 0.19 258 / 0); }
+}
+.cta-glow { animation: cta-glow 2.4s ease-in-out infinite; }
+
+/* LAYER-1 — 3D hero backdrop container */
+.hero-3d {
+  position: absolute; inset: 0;
+  z-index: 0;
+  opacity: 0.55;
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
+}
+

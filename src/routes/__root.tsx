@@ -12,6 +12,9 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BadgeToast } from "@/components/BadgeToast";
+import { VisualQualityProvider } from "@/lib/visual-quality";
+import { AtmosphereLayer } from "@/components/AtmosphereLayer";
+import { GlowCursor } from "@/components/GlowCursor";
 
 function NotFoundComponent() {
   return (
@@ -129,9 +132,13 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <BadgeToast />
+      <VisualQualityProvider>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <BadgeToast />
+        <AtmosphereLayer />
+        <GlowCursor />
+      </VisualQualityProvider>
     </QueryClientProvider>
   );
 }
