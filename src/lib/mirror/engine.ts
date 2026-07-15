@@ -216,7 +216,9 @@ export function respond(
       isTell,
       tellExplanation,
       voice,
+      intent: "voice",
     };
+
   }
 
   /* ─── REAL PATH ───────────────────────────────────────── */
@@ -236,7 +238,9 @@ export function respond(
         meterType: "patience",
         internalNote: "REAL contact left — patience exhausted. FALSE ALARM.",
         isTell: false,
+        intent: "left",
       };
+
     }
 
     if (fact) {
