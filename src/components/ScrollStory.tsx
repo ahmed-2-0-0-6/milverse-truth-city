@@ -19,13 +19,13 @@ const BEATS = [
   { headline: "Every day, someone in your family gets a message.", sub: "It's already happened this week. Maybe today." },
   { headline: "It looks real. It sounds real.", sub: "Perfect grammar. Familiar face. Small ask." },
   { headline: "Spotting fakes is dying. Verifying is forever.", sub: "You can't out-see a machine. You can out-verify one." },
-  { headline: "Enter as a target. Leave as a designer.", sub: "This is Media & Information Literacy, played.", finale: true },
+  { headline: "Welcome to MILVERSE.", sub: "Enter as a target. Leave as a designer.", finale: true },
 ];
 
 const MIL_TRIAD = [
-  { word: "MEDIA", line: "Every format of message — WhatsApp forward, news screenshot, AI-generated voice." },
-  { word: "INFORMATION", line: "Name the manipulation. Impersonation. Urgency. Out-of-context. Forgery." },
-  { word: "LITERACY", line: "Learn the counter-move. Verify the source, not the surface. Correct with dignity." },
+  { word: "MEDIA", line: "Every format a lie can wear: posts, forwards, headlines, images." },
+  { word: "INFORMATION", line: "Name the manipulation: misinformation, disinformation, malinformation." },
+  { word: "LITERACY", line: "Learn the counter-move, then design your own cases." },
 ];
 
 export function ScrollStory() {
