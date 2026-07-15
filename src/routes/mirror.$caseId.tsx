@@ -981,6 +981,37 @@ function Debrief({ scenario }: { scenario: Scenario }) {
         )}
       </div>
 
+      {/* 4-axis star scoring */}
+      <section className="rounded-xl border border-border bg-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground">
+            INVESTIGATOR RATING
+          </div>
+          <div className="font-mono text-lg text-primary">
+            {result.stars.toFixed(1)} / 4.0
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <StarAxis label="Verdict" value={result.starVerdict} />
+          <StarAxis label="Evidence" value={result.starEvidence} />
+          <StarAxis label="Probing" value={result.starProbing} />
+          <StarAxis label="Verification" value={result.starVerification} />
+        </div>
+      </section>
+
+      {/* Investigator's conclusion */}
+      {verdictRaw.conclusion && (
+        <section className="rounded-xl border border-border bg-card p-6">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">
+            YOUR CONCLUSION
+          </div>
+          <p className="text-sm italic border-l-2 border-primary pl-3">
+            "{verdictRaw.conclusion}"
+          </p>
+        </section>
+      )}
+
+
       {/* Quoted tells from THIS conversation */}
       {result.tells.length > 0 && (
         <section className="rounded-xl border border-border bg-card p-6">
