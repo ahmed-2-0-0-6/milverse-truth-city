@@ -8,6 +8,7 @@ import {
   operatorCallsign,
   type TrustProfile,
 } from "@/lib/mirror/profile";
+import { BADGES, loadEarnedBadges } from "@/lib/mirror/badges";
 
 export const Route = createFileRoute("/city-hall")({
   head: () => ({
@@ -21,7 +22,18 @@ export const Route = createFileRoute("/city-hall")({
 
 function CityHall() {
   const [p, setP] = useState<TrustProfile | null>(null);
-  useEffect(() => setP(loadProfile()), []);
+  const [earned, setEarned] = useState<string[]>([]);
+  useEffect(() => {
+    setP(loadProfile());
+    setEarned(loadEarnedBadges());
+    const on = () => { setP(loadProfile()); setEarned(loadEarnedBadges()); };
+    window.addEventListener("milverse:profile", on);
+    window.addEventListener("milverse:badge", on);
+    return () => {
+      window.removeEventListener("milverse:profile", on);
+      window.removeEventListener("milverse:badge", on);
+    };
+  }, []);
 
   if (!p) {
     return (
