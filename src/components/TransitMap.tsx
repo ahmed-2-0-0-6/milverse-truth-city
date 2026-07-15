@@ -452,7 +452,7 @@ function LandmarkStation({
         </foreignObject>
       </g>
       <text y={30} textAnchor="middle" fontSize={7} className="stencil" fill="oklch(0.60 0.19 258)">{code}</text>
-      <text y={40} textAnchor="middle" fontSize={7} fill="oklch(0.985 0.003 250)">{label}</text>
+      <text y={40} textAnchor="middle" fontSize={7} fill="oklch(0.22 0.06 265)">{label}</text>
     </g>
   );
 }
