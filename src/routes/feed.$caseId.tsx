@@ -112,8 +112,9 @@ function FeedPlay() {
         />
       )}
       {phase === "debrief" && outcome && (
-        <Debrief scenario={scenario} outcome={outcome} state={state} />
+        <Debrief scenario={scenario} outcome={outcome} state={state} verdict={verdict} conclusion={conclusion} finalReply={finalReply} />
       )}
+
     </div>
   );
 }
