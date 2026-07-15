@@ -243,23 +243,29 @@ export function respond(
 
     }
 
+    let realIntent: ReplyIntent = "filler";
     if (fact) {
       text = fact.truth;
       note = `Real answered fact "${fact.id}" truthfully.`;
+      realIntent = "answer";
     } else if (accusation) {
       text = state.meter < 40
         ? "bro why are you being like this. i literally just said hi."
         : "wait what? 😅 you think i'm faking? it's actually me lol";
       note = "Real reacted to accusation. Patience dropping.";
+      realIntent = "accusation_react";
     } else if (verify) {
       text = "yeah of course — want me to voice note you? or call, whatever's easier.";
       note = "Real happily offers out-of-band verification.";
+      realIntent = "verify_offer";
     } else if (question) {
       text = pick(scenario.persona.fillers, state.fillerIdx++) + ". what about you though?";
       note = "Generic on-topic reply.";
+      realIntent = "filler";
     } else {
       text = pick(scenario.persona.fillers, state.fillerIdx++);
       note = "Small talk.";
+      realIntent = "filler";
     }
 
     return {
@@ -268,13 +274,16 @@ export function respond(
       meterType: "patience",
       factId: fact?.id,
       internalNote: note,
+      intent: realIntent,
     };
+
   }
 
   /* ─── IMPOSTER PATH ───────────────────────────────────── */
   let drop = 0;
   let pushedThisTurn = false;
 
+  let impIntent: ReplyIntent = "filler";
   if (fact) {
     state.factProbes[fact.id] = (state.factProbes[fact.id] || 0) + 1;
     const probes = state.factProbes[fact.id];
@@ -283,8 +292,8 @@ export function respond(
       text = fact.truth;
       drop += 1;
       note = `Imposter answered scraped fact "${fact.id}" correctly (Tier ${scenario.tier} — they knew this).`;
+      impIntent = "answer";
     } else if (probes === 1) {
-      // Tier 3+ smoother deflection: half-answer + redirect.
       if (cfg.responseStyle === "smooth" || cfg.responseStyle === "ghost" || cfg.responseStyle === "clean") {
         text = (fact.deflection ?? "let's come back to that.") + " but first — what should i do about the earlier point?";
       } else {
@@ -294,19 +303,21 @@ export function respond(
       note = `Imposter DEFLECTED gap "${fact.id}" (first press).`;
       isTell = true;
       tellExplanation = `Deflected instead of answering "${fact.id}" — a real person would just answer.`;
+      impIntent = "deflection";
     } else if (probes >= 2 && fact.contradiction) {
       text = fact.contradiction;
       drop += 20;
       note = `Imposter CONTRADICTED dossier on "${fact.id}" (pressed twice). Catchable lie.`;
       isTell = true;
       tellExplanation = `Contradicted your dossier fact "${fact.id}". This is the catch.`;
+      impIntent = "contradiction";
     } else {
-      // Escalation without contradiction available
       text = pick(scenario.persona.urgencyLines, state.urgencyIdx++);
       drop += 12;
       note = `Imposter escalated pressure on "${fact.id}".`;
       isTell = true;
       tellExplanation = `Escalated pressure instead of answering "${fact.id}".`;
+      impIntent = "escalation";
     }
   } else if (accusation) {
     drop += 12;
@@ -316,35 +327,37 @@ export function respond(
     note = "Imposter reacted to accusation — mask slipping.";
     isTell = state.meter < 50;
     if (isTell) tellExplanation = "Reacted defensively rather than laughing it off — mask cracking.";
+    impIntent = "accusation_react";
   } else if (verify) {
     drop += 15;
     text = "can't right now — in a meeting, phone's dying. text is faster, promise.";
     note = "Imposter refused out-of-band verification (huge tell).";
     isTell = true;
     tellExplanation = "Refused every attempt to verify out-of-band. This is the signature of an imposter.";
+    impIntent = "verify_refuse";
   } else if (question) {
     text = pick(scenario.persona.fillers, state.fillerIdx++);
     note = "Generic filler — no fact matched.";
+    impIntent = "filler";
   } else {
     text = pick(scenario.persona.fillers, state.fillerIdx++);
     note = "Small talk filler.";
+    impIntent = "filler";
   }
 
-  // Agenda push cadence: hold until turn threshold AND (composure low OR pressuring)
   const pushReady =
     state.turnCount >= cfg.minTurnsBeforePush &&
     scenario.persona.pushLines.length > 0 &&
     state.turnsSincePush >= 3 &&
     (state.meter < 70 || state.playerPressureStreak >= 1 || state.turnCount >= cfg.minTurnsBeforePush + 3);
 
-  // ONE intent per turn: if we already have a strong reply (fact deflection/contradiction/verify refusal),
-  // don't append push — send push AS the reply next turn if idle.
   const alreadyStrong = fact !== undefined || verify || accusation;
   if (pushReady && !alreadyStrong) {
     text = pick(scenario.persona.pushLines, state.pushIdx++);
     state.turnsSincePush = 0;
     pushedThisTurn = true;
     note += " Sent agenda push as full reply.";
+    impIntent = "push";
   }
 
   state.meter = Math.max(0, state.meter - drop);
@@ -353,7 +366,9 @@ export function respond(
     note += " Composure exhausted — imposter overplayed.";
     isTell = true;
     tellExplanation = "Composure gone — mask fully off. Aggressive when cornered.";
+    impIntent = "escalation";
   }
+
 
   return {
     text: trimReply(text),
