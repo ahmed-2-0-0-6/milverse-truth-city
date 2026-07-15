@@ -89,12 +89,17 @@ export function TopBar() {
           <Link
             to="/profile"
             className={`flex items-center gap-2 rounded border px-2.5 py-1.5 stencil text-[10px] transition-colors hover:bg-accent ${toneClass}`}
+            title={`${noirRank.current.name} · ${xp} XP${noirRank.next ? ` · next ${noirRank.next.name}` : ""}`}
           >
-            {rank && <span className="opacity-70">{rank.code}</span>}
-            <span className="hidden sm:inline text-foreground/90">{rank?.rank ?? "READER"}</span>
-            <span className="text-muted-foreground">·</span>
-            <span className="opacity-80">{cal.label.toUpperCase()}</span>
+            <span className="opacity-70">{noirRank.current.code}</span>
+            <span className="hidden sm:inline text-foreground/90">{noirRank.current.name}</span>
+            <span className="hidden md:inline-block h-1 w-8 overflow-hidden rounded-full bg-muted">
+              <span className="block h-full bg-primary" style={{ width: `${Math.round(noirRank.progress * 100)}%` }} />
+            </span>
+            <span className="hidden md:inline text-muted-foreground">·</span>
+            <span className="hidden md:inline opacity-80">{cal.label.toUpperCase()}</span>
           </Link>
+
         </div>
       </div>
     </header>
