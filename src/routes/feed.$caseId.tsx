@@ -31,6 +31,8 @@ function FeedPlay() {
   const [outcome, setOutcome] = useState<FeedOutcome | null>(null);
   const [verdict, setVerdict] = useState<FeedVerdict | null>(null);
   const [finalReply, setFinalReply] = useState("");
+  const [conclusion, setConclusion] = useState("");
+
 
   useEffect(() => {
     if (phase === "sim" && messages.length === 0) {
