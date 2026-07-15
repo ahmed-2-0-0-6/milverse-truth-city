@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Play, Pause, Mic } from "lucide-react";
-import { playVoiceNote, waveformBars, type PlaybackHandle } from "@/lib/mirror/voice";
+import { playVoiceNote, waveformBars, inferGender, type PlaybackHandle } from "@/lib/mirror/voice";
 import type { VoicePayload } from "@/lib/mirror/engine";
 
 interface Props {
   voice: VoicePayload;
   fromPlayer?: boolean;
+  speakerName?: string;
+  speakerVoiceDesc?: string;
 }
 
-export function VoiceNote({ voice, fromPlayer = false }: Props) {
+export function VoiceNote({ voice, fromPlayer = false, speakerName, speakerVoiceDesc }: Props) {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const handleRef = useRef<PlaybackHandle | null>(null);
