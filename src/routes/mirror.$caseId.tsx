@@ -818,8 +818,21 @@ function Debrief({ scenario }: { scenario: Scenario }) {
 
   const truthHeadline = scenario.truth === "REAL" ? "This person was REAL." : "This was an IMPOSTER.";
 
+  // Pick pivotal message: last isTell for missed_scam, first player msg for false_alarm.
+  const pivotal =
+    result.resultKind === "missed_scam"
+      ? [...(sim?.messages ?? [])].reverse().find((m) => m.role === "contact" && m.isTell)
+      : result.resultKind === "false_alarm"
+        ? sim?.messages.find((m) => m.role === "player")
+        : null;
+
   return (
     <main className="mx-auto max-w-2xl px-4 py-8 space-y-6">
+      <CinematicResult
+        kind={result.resultKind}
+        truth={scenario.truth}
+        pivotal={pivotal?.text}
+      />
       <div className={`rounded-xl border-2 p-6 ${verdictTone}`}>
         <div className="font-mono text-xs tracking-[0.3em] opacity-80">DEBRIEF · TIER {scenario.tier}</div>
         <h1 className="mt-2 text-2xl font-semibold">{truthHeadline}</h1>
