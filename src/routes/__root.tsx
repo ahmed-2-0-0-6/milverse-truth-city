@@ -16,6 +16,7 @@ import { VisualQualityProvider } from "@/lib/visual-quality";
 import { AtmosphereLayer } from "@/components/AtmosphereLayer";
 import { GlowCursor } from "@/components/GlowCursor";
 import { RouteWipe } from "@/components/RouteWipe";
+import { RankUpBeat } from "@/components/RankUpBeat";
 
 function NotFoundComponent() {
   return (
