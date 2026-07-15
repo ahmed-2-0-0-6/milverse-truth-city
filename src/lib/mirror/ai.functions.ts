@@ -42,7 +42,7 @@ export const generateContactReply = createServerFn({ method: "POST" })
     try {
       const { createLovableAiGatewayProvider } = await import("@/lib/ai-gateway.server");
       const gateway = createLovableAiGatewayProvider(key);
-      const model = gateway("google/gemini-3-flash-preview");
+      const model = gateway("google/gemini-3.1-pro-preview");
 
       const identity =
         data.truth === "REAL"
