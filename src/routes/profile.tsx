@@ -33,7 +33,8 @@ function ProfilePage() {
     };
   }, []);
 
-  const xp = useMemo(() => computeXp(profile, manualUnlocks, 0), [profile, manualUnlocks]);
+  const publishedCount = profile?.publishedCount ?? 0;
+  const xp = useMemo(() => computeXp(profile, manualUnlocks, publishedCount), [profile, manualUnlocks, publishedCount]);
   const rankInfo = useMemo(() => rankFromXp(xp), [xp]);
   const cal = profile ? calibrationLabel(profile) : { label: "Recruit", tone: "neutral" as const };
   const callsign = profile ? operatorCallsign(profile) : "———";
@@ -44,10 +45,11 @@ function ProfilePage() {
   const falseAlarms = profile?.falseAlarms ?? 0;
 
   function downloadCard() {
-    const svg = buildCardSvg({
+    renderProfileCardPng({
       callsign,
       rank: rankInfo.current.name,
       rankCode: rankInfo.current.code,
+      tagline: rankInfo.current.tagline,
       xp,
       calibration: cal.label,
       correct,
@@ -55,14 +57,17 @@ function ProfilePage() {
       missed,
       falseAlarms,
       manualPct,
+      designed: publishedCount,
+    }).then((blob) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `milverse-${callsign.toLowerCase()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     });
-    const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `milverse-${callsign.toLowerCase()}.svg`;
-    a.click();
-    URL.revokeObjectURL(url);
   }
 
   return (
