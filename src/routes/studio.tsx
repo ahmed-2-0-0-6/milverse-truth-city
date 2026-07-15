@@ -323,7 +323,7 @@ function Studio() {
         )}
 
         {step === 5 && (
-          <Section title="PREVIEW & PUBLISH" hint="Play-test once before you publish for others.">
+          <Section title="PREVIEW & PUBLISH" hint="Play-test once, then pick a lane. Both lanes run an AI safety check before anything is saved.">
             <div className="rounded-lg border border-border bg-card p-4 text-sm">
               <div className="font-mono text-[10px] tracking-widest text-primary">PREVIEW</div>
               <div className="mt-2"><b>{draft.personaName}</b> — {draft.relationship}</div>
@@ -331,14 +331,26 @@ function Studio() {
               <div className="mt-3 italic text-muted-foreground">"{draft.opener}"</div>
             </div>
             {error && <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">{error}</div>}
-            <div className="flex gap-2">
-              <button onClick={playtest} className="flex-1 rounded-md border border-primary/50 bg-primary/10 py-3 font-mono text-xs tracking-widest text-primary hover:bg-primary/20">
-                <Sparkles className="inline h-3.5 w-3.5 mr-1.5" /> PLAY-TEST
+            <button onClick={playtest} className="w-full rounded-md border border-primary/50 bg-primary/10 py-3 font-mono text-xs tracking-widest text-primary hover:bg-primary/20">
+              <Sparkles className="inline h-3.5 w-3.5 mr-1.5" /> PLAY-TEST ONCE
+            </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button onClick={() => void publish("private")} disabled={publishing} className="rounded-md border-2 border-primary/60 bg-card py-4 px-4 text-left disabled:opacity-50 hover:border-primary transition">
+                <div className="font-mono text-[10px] tracking-widest text-primary">PRIVATE CASE</div>
+                <div className="mt-1 text-sm font-semibold">Share by code only</div>
+                <div className="mt-1 text-xs text-muted-foreground">Playable by anyone with the code. Never appears on any public shelf.</div>
+                <div className="mt-3 font-mono text-[10px] tracking-widest text-primary">{publishing ? "…" : "PUBLISH PRIVATELY →"}</div>
               </button>
-              <button onClick={publish} disabled={publishing} className="flex-1 rounded-md bg-primary py-3 font-mono text-xs tracking-widest text-primary-foreground disabled:opacity-50">
-                {publishing ? "PUBLISHING…" : "PUBLISH"}
+              <button onClick={() => void publish("community")} disabled={publishing} className="rounded-md border-2 border-caution/60 bg-card py-4 px-4 text-left disabled:opacity-50 hover:border-caution transition">
+                <div className="font-mono text-[10px] tracking-widest text-caution">SUBMIT TO COMMUNITY LIBRARY</div>
+                <div className="mt-1 text-sm font-semibold">Human review, then public</div>
+                <div className="mt-1 text-xs text-muted-foreground">Sent to the moderation queue. Only human-approved cases appear on the Community shelf, marked "Human-reviewed ✓".</div>
+                <div className="mt-3 font-mono text-[10px] tracking-widest text-caution">{publishing ? "…" : "SUBMIT FOR REVIEW →"}</div>
               </button>
             </div>
+            <p className="text-[10px] font-mono tracking-widest text-muted-foreground text-center">
+              AI SAFETY GATE · NO HATE · NO REAL PEOPLE · NO PII · NO POLITICAL ATTACKS
+            </p>
           </Section>
         )}
 
