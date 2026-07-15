@@ -495,7 +495,12 @@ function MessageRow({
               {m.text}
             </div>
           )}
-          <VoiceNote voice={m.voice} fromPlayer={isPlayer} />
+          <VoiceNote
+            voice={m.voice}
+            fromPlayer={isPlayer}
+            speakerName={scenario.claimedIdentity}
+            speakerVoiceDesc={scenario.persona.voice}
+          />
         </div>
       ) : (
         <div
