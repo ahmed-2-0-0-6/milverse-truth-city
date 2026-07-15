@@ -99,3 +99,32 @@ export function unlockedMaxTier(p: TrustProfile): TierId {
 export function tierWins(p: TrustProfile, tier: TierId): number {
   return p.history.filter((h) => h.tier === tier && h.result === "correct").length;
 }
+
+/** Field rank from cases played + correct verdicts. Cosmetic only. */
+export function operatorRank(p: TrustProfile): { rank: string; code: string; next: string | null; progress: number } {
+  const c = p.correctVerdicts;
+  const tiers: { code: string; rank: string; min: number }[] = [
+    { code: "R-01", rank: "Recruit",   min: 0  },
+    { code: "OP-02", rank: "Operator",  min: 3  },
+    { code: "SP-03", rank: "Specialist", min: 8 },
+    { code: "AN-04", rank: "Analyst",   min: 16 },
+    { code: "HD-05", rank: "Handler",   min: 28 },
+  ];
+  let idx = 0;
+  for (let i = 0; i < tiers.length; i++) if (c >= tiers[i].min) idx = i;
+  const cur = tiers[idx];
+  const nxt = tiers[idx + 1] ?? null;
+  const progress = nxt ? Math.min(1, (c - cur.min) / (nxt.min - cur.min)) : 1;
+  return { rank: cur.rank, code: cur.code, next: nxt ? nxt.rank : null, progress };
+}
+
+/** Short callsign derived from playerId — persistent, no PII. */
+export function operatorCallsign(p: TrustProfile): string {
+  const alpha = "ALPHA BRAVO CHARLIE DELTA ECHO FOXTROT GOLF HOTEL INDIA JULIET KILO LIMA MIKE NOVEMBER OSCAR PAPA QUEBEC ROMEO SIERRA TANGO UNIFORM VICTOR WHISKEY XRAY YANKEE ZULU".split(" ");
+  // stable hash from playerId
+  let h = 0;
+  for (let i = 0; i < p.playerId.length; i++) h = (h * 31 + p.playerId.charCodeAt(i)) >>> 0;
+  const word = alpha[h % alpha.length];
+  const num = (h >> 8) % 900 + 100;
+  return `${word}-${num}`;
+}
