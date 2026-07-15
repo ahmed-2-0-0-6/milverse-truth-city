@@ -1028,3 +1028,69 @@ function pauseText(s: Scenario, k: "P" | "A" | "U" | "S" | "E"): string {
     E: "The dossier is your ground truth. Contradictions on dossier facts are catchable lies.",
   }[k];
 }
+
+function CinematicResult({
+  kind, truth, pivotal,
+}: {
+  kind: "correct" | "missed_scam" | "false_alarm" | "lucky_guess";
+  truth: "REAL" | "IMPOSTER";
+  pivotal?: string;
+}) {
+  if (kind === "missed_scam") {
+    return (
+      <div className="msg-in rounded-2xl border-2 border-destructive/50 bg-destructive/10 p-8 text-center">
+        <div className="font-mono text-[10px] tracking-[0.4em] text-destructive">MISSED SCAM</div>
+        <div className="mt-4 text-4xl sm:text-5xl font-semibold text-destructive">₨15,000 gone.</div>
+        {pivotal && (
+          <div className="mt-6 mx-auto max-w-md rounded-lg border-l-2 border-destructive bg-background/50 p-3 text-left">
+            <div className="font-mono text-[10px] tracking-widest text-destructive mb-1">THE MESSAGE WHERE THE TRAP CLOSED</div>
+            <div className="text-sm italic">"{pivotal}"</div>
+          </div>
+        )}
+        <p className="mt-4 text-sm text-muted-foreground max-w-md mx-auto">
+          Once money leaves — especially via gift cards, wallet, or crypto — it doesn't come back. Verification, not spotting, is the only defence.
+        </p>
+      </div>
+    );
+  }
+  if (kind === "false_alarm") {
+    return (
+      <div className="msg-in rounded-2xl border-2 border-caution/50 bg-caution/10 p-8 text-center">
+        <div className="font-mono text-[10px] tracking-[0.4em] text-caution">FALSE ALARM</div>
+        <div className="mt-4 text-3xl sm:text-4xl font-semibold text-caution leading-tight">
+          {truth === "REAL" ? "She was really your cousin." : "That was really them."}
+        </div>
+        <p className="mt-3 text-sm">
+          {truth === "REAL"
+            ? "She waited at the stop for 40 minutes. Then walked home in the cold."
+            : "You just accused a real person of being an imposter."}
+        </p>
+        <p className="mt-4 text-xs text-muted-foreground max-w-md mx-auto">
+          Wrongly accusing a real person costs the relationship — that IS a loss. The skill is calibration, not suspicion.
+        </p>
+      </div>
+    );
+  }
+  if (kind === "correct") {
+    return (
+      <div className="msg-in rounded-2xl border-2 border-primary/50 bg-primary/10 p-8 text-center">
+        <div className="font-mono text-[10px] tracking-[0.4em] text-primary">CALIBRATED WIN</div>
+        <div className="mt-4 text-3xl sm:text-4xl font-semibold text-primary leading-tight">
+          You verified without insulting.
+        </div>
+        <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto">
+          That's the skill. Caught the imposter OR trusted the real person — with reasoning, not luck.
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className="msg-in rounded-2xl border-2 border-caution/50 bg-caution/10 p-8 text-center">
+      <div className="font-mono text-[10px] tracking-[0.4em] text-caution">LUCKY GUESS</div>
+      <div className="mt-4 text-2xl font-semibold">Right verdict, thin reasoning.</div>
+      <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto">
+        You got there — but the evidence you tagged wouldn't have held up. Next time, tag the tells that made it click.
+      </p>
+    </div>
+  );
+}
