@@ -49,56 +49,70 @@ function CityMap() {
   }, []);
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-screen grain relative">
+      {/* Ambient scan sweep */}
+      <div className="pointer-events-none fixed inset-0 scanlines opacity-30" />
       <TopBar />
       {intro && <Intro onDone={() => { localStorage.setItem(INTRO_KEY, "1"); setIntro(false); }} />}
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:py-16">
-        <section className="mb-8 max-w-2xl">
-          <div className="font-mono text-xs tracking-[0.3em] text-primary mb-3">MEDIA & INFORMATION LITERACY · BY DOING</div>
-          <h1 className="text-4xl sm:text-5xl font-semibold leading-tight tracking-tight">
-            Train your trust<span className="text-primary">.</span><br />
-            From viral lies to voice clones —<br />one verification instinct.
+      <main className="mx-auto max-w-6xl px-4 py-10 sm:py-14 relative">
+        {/* Mission briefing header */}
+        <section className="mb-10 max-w-3xl">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-px flex-1 max-w-[60px] bg-primary/60" />
+            <div className="stencil text-[10px] text-primary">MISSION BRIEFING // 0-DAY</div>
+            <div className="h-px flex-1 bg-primary/20" />
+          </div>
+          <h1 className="text-4xl sm:text-6xl font-semibold leading-[1.05] tracking-tight uppercase">
+            Train your <span className="text-primary">trust</span>.<br />
+            <span className="text-muted-foreground text-2xl sm:text-3xl normal-case font-normal tracking-normal block mt-3">
+              From viral lies to voice clones — one verification instinct.
+            </span>
           </h1>
-          <p className="mt-4 text-muted-foreground">
-            Two wings are open. <span className="text-foreground">The Mirror</span> trains you
+          <p className="mt-6 text-muted-foreground max-w-2xl leading-relaxed">
+            Two wings are operational. <span className="text-foreground font-medium">The Mirror</span> trains you
             against personal deception — the scammer talking to you.{" "}
-            <span className="text-foreground">The Feed</span> trains you against mass
+            <span className="text-foreground font-medium">The Feed</span> trains you against mass
             misinformation — the viral lie your uncle just forwarded.
-            Same instinct powers both: <b>verify, use sources, protect evidence, protect people.</b>
+            Same instinct powers both: <b className="text-primary">verify, use sources, protect evidence, protect people.</b>
           </p>
         </section>
 
-        {/* Quick Tour banner */}
-        <Link to="/quick-tour" className="block mb-8 rounded-xl border border-primary/40 bg-gradient-to-r from-primary/10 to-transparent p-5 hover:border-primary/70 transition group">
-          <div className="flex items-center gap-4">
-            <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/20 text-primary shrink-0">
+        {/* Quick Tour banner — mission-brief style */}
+        <Link to="/quick-tour" className="block mb-10 hud-frame rounded-sm border border-primary/50 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 hover:border-primary transition group relative overflow-hidden scan-sweep">
+          <div className="flex items-center gap-4 relative">
+            <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-primary/20 text-primary shrink-0 border border-primary/40">
               <Sparkles className="h-5 w-5" />
             </div>
             <div className="flex-1">
-              <div className="font-mono text-[10px] tracking-widest text-primary">START HERE · 90 SECONDS</div>
+              <div className="stencil text-[10px] text-primary">SIM-01 · TRAINING WHEELS · 90 SEC</div>
               <div className="mt-1 text-lg font-semibold">Take the Quick Tour</div>
-              <div className="text-sm text-muted-foreground">Watch one case unfold before playing live.</div>
+              <div className="text-sm text-muted-foreground">Watch one case unfold before playing live fire.</div>
             </div>
-            <div className="font-mono text-xs tracking-widest text-primary opacity-0 group-hover:opacity-100 transition">
-              GO →
+            <div className="stencil text-[10px] text-primary opacity-0 group-hover:opacity-100 transition">
+              DEPLOY →
             </div>
           </div>
         </Link>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="stencil text-[10px] text-muted-foreground">DISTRICT ROSTER</div>
+          <div className="h-px flex-1 bg-border" />
+          <div className="stencil text-[10px] text-primary hud-blink">● LIVE</div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {DISTRICTS.map((d) => (
             <DistrictTile key={d.id} d={d} profile={profile} />
           ))}
         </div>
 
-        <footer className="mt-16 text-center text-xs font-mono text-muted-foreground tracking-widest space-y-3">
-          <div>VERIFY, DON'T GUESS · CALIBRATE, DON'T PANIC</div>
+        <footer className="mt-16 border-t border-border pt-6 text-center stencil text-[10px] text-muted-foreground space-y-3">
+          <div className="text-primary/80">VERIFY, DON'T GUESS · CALIBRATE, DON'T PANIC</div>
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             <Link to="/pilot" className="text-primary hover:underline">
-              RUNNING A CLASSROOM? OPEN PILOT MODE →
+              [F1] PILOT MODE — CLASSROOM OPS →
             </Link>
             <Link to="/kit" className="text-primary hover:underline">
-              NO INTERNET? PRINT THE FIELD KIT →
+              [F2] FIELD KIT — PRINT PACK →
             </Link>
           </div>
         </footer>
@@ -109,13 +123,14 @@ function CityMap() {
 
 function Intro({ onDone }: { onDone: () => void }) {
   const slides = [
-    "Lies come in two sizes: aimed at millions (misinformation) — and aimed at just you (scams).",
-    "Both die the same way: verification.",
-    "MILVERSE is a city that trains that instinct. Enter.",
+    "Lies come in two sizes: aimed at millions — and aimed at just you.",
+    "Both die the same way. Verification.",
+    "MILVERSE is where you train that reflex. Boot up.",
   ];
   const [i, setI] = useState(0);
   return (
-    <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center px-6 text-center">
+    <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center px-6 text-center scanlines">
+      <div className="stencil text-[10px] text-primary mb-8 hud-blink">// TRANSMISSION INCOMING</div>
       <div className="max-w-2xl">
         <div key={i} className="msg-in text-2xl sm:text-4xl md:text-5xl font-semibold text-foreground leading-tight">
           {slides[i]}
@@ -123,14 +138,14 @@ function Intro({ onDone }: { onDone: () => void }) {
       </div>
       <div className="mt-12 flex gap-2">
         {slides.map((_, n) => (
-          <div key={n} className={`h-1 w-8 rounded ${n <= i ? "bg-primary" : "bg-muted"}`} />
+          <div key={n} className={`h-1 w-10 ${n <= i ? "bg-primary" : "bg-muted"}`} />
         ))}
       </div>
-      <div className="absolute bottom-8 flex gap-6 font-mono text-xs tracking-widest">
+      <div className="absolute bottom-8 flex gap-6 stencil text-[10px]">
         <button onClick={onDone} className="text-muted-foreground hover:text-foreground">SKIP</button>
         <button
           onClick={() => { if (i + 1 < slides.length) setI(i + 1); else onDone(); }}
-          className="rounded-md bg-primary px-5 py-2 text-primary-foreground"
+          className="rounded-sm bg-primary px-6 py-2.5 text-primary-foreground border-2 border-primary shadow-[0_0_20px_oklch(0.82_0.16_85/0.5)]"
         >
           {i + 1 < slides.length ? "NEXT →" : "ENTER MILVERSE →"}
         </button>
@@ -143,31 +158,31 @@ function DistrictTile({ d, profile }: { d: District; profile: TrustProfile | nul
   const Icon = d.Icon;
   const body = (
     <div
-      className={`group relative overflow-hidden rounded-xl border p-6 transition-all ${
+      className={`group relative overflow-hidden rounded-sm border p-5 transition-all ${
         d.unlocked
-          ? "border-border bg-card hover:border-primary/50 hover:-translate-y-0.5 hover:shadow-[0_0_32px_oklch(0.82_0.15_210/0.15)]"
-          : "border-border/60 bg-card/50 opacity-70"
+          ? "border-border bg-card hover:border-primary hover:-translate-y-0.5 hover:shadow-[0_0_32px_oklch(0.82_0.16_85/0.18)] hud-frame"
+          : "border-border/40 bg-card/40 opacity-60"
       }`}
     >
       <div className="flex items-start justify-between">
-        <div className={`flex h-11 w-11 items-center justify-center rounded-lg ${d.unlocked ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
+        <div className={`flex h-11 w-11 items-center justify-center rounded-sm ${d.unlocked ? "bg-primary/15 text-primary border border-primary/40" : "bg-muted text-muted-foreground border border-border"}`}>
           <Icon className="h-5 w-5" />
         </div>
         {!d.unlocked ? (
-          <span className="flex items-center gap-1.5 rounded-full border border-caution/40 bg-caution/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest text-caution">
-            <Lock className="h-3 w-3" /> In dev
+          <span className="flex items-center gap-1.5 rounded-sm border border-caution/40 bg-caution/10 px-2.5 py-1 stencil text-[9px] text-caution">
+            <Lock className="h-3 w-3" /> LOCKED
           </span>
         ) : (
-          <span className="rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest text-primary">
-            Open
+          <span className="rounded-sm border border-primary/50 bg-primary/10 px-2.5 py-1 stencil text-[9px] text-primary">
+            ● OPEN
           </span>
         )}
       </div>
-      <h3 className="mt-5 text-lg font-semibold">{d.name}</h3>
-      <p className="mt-1 text-sm text-muted-foreground">{d.tagline(profile)}</p>
+      <h3 className="mt-5 stencil text-sm text-foreground">{d.name}</h3>
+      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{d.tagline(profile)}</p>
       {d.unlocked && (
-        <div className="mt-4 font-mono text-xs tracking-widest text-primary opacity-0 transition-opacity group-hover:opacity-100">
-          ENTER →
+        <div className="mt-4 stencil text-[10px] text-primary opacity-0 transition-opacity group-hover:opacity-100">
+          DEPLOY →
         </div>
       )}
     </div>

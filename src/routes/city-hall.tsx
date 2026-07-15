@@ -1,13 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { TopBar } from "@/components/TopBar";
-import { loadProfile, calibrationLabel, type TrustProfile } from "@/lib/mirror/profile";
+import {
+  loadProfile,
+  calibrationLabel,
+  operatorRank,
+  operatorCallsign,
+  type TrustProfile,
+} from "@/lib/mirror/profile";
 
 export const Route = createFileRoute("/city-hall")({
   head: () => ({
     meta: [
-      { title: "City Hall — MILVERSE" },
-      { name: "description", content: "Your Trust Calibration profile." },
+      { title: "Operator Dossier — MILVERSE" },
+      { name: "description", content: "Your Trust Calibration profile and field rank." },
     ],
   }),
   component: CityHall,
@@ -21,41 +27,68 @@ function CityHall() {
     return (
       <div>
         <TopBar />
-        <div className="p-8 text-muted-foreground">Loading…</div>
+        <div className="p-8 stencil text-xs text-muted-foreground">// LOADING DOSSIER…</div>
       </div>
     );
   }
 
   const cal = calibrationLabel(p);
-  // 2x2: x=missedScams, y=falseAlarms
+  const rank = operatorRank(p);
+  const call = operatorCallsign(p);
   const total = Math.max(1, p.casesPlayed);
   const missRate = p.missedScams / total;
   const faRate = p.falseAlarms / total;
 
   return (
     <div className="min-h-screen grain">
+      <div className="pointer-events-none fixed inset-0 scanlines opacity-30" />
       <TopBar />
-      <main className="mx-auto max-w-5xl px-4 py-10">
-        <div className="mb-8">
-          <div className="font-mono text-xs tracking-[0.3em] text-primary">CITY HALL</div>
-          <h1 className="mt-2 text-3xl font-semibold">Your Trust Calibration</h1>
-          <p className="mt-2 text-muted-foreground">
-            The goal isn't a single high score. The goal is to catch imposters
-            AND trust real people. Neither paranoid nor gullible.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Stat label="CASES" value={p.casesPlayed} />
-          <Stat label="POINTS" value={p.points} accent />
-          <Stat label="STATUS" value={cal.label} accent={cal.tone === "good"} />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="font-mono text-xs tracking-widest text-muted-foreground">
-              THE 2×2 · YOUR POSITION
+      <main className="mx-auto max-w-5xl px-4 py-10 relative">
+        <div className="mb-8 hud-frame border border-primary/30 bg-card/60 rounded-sm p-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="stencil text-[10px] text-primary">// OPERATOR DOSSIER · EYES ONLY</div>
+            <div className="h-px flex-1 bg-primary/20" />
+            <div className="stencil text-[10px] text-muted-foreground">{new Date().toISOString().slice(0, 10)}</div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div>
+              <div className="stencil text-[10px] text-muted-foreground">CALLSIGN</div>
+              <div className="text-3xl font-semibold text-primary tracking-wider">{call}</div>
             </div>
+            <div>
+              <div className="stencil text-[10px] text-muted-foreground">FIELD RANK</div>
+              <div className="text-2xl font-semibold text-foreground">{rank.rank}</div>
+              <div className="stencil text-[10px] text-muted-foreground mt-1">{rank.code}</div>
+            </div>
+            <div>
+              <div className="stencil text-[10px] text-muted-foreground mb-1">
+                {rank.next ? `PROGRESS → ${rank.next}` : "MAX RANK"}
+              </div>
+              <div className="h-2 w-full bg-muted rounded-sm overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-700 shadow-[0_0_12px_oklch(0.82_0.16_85/0.6)]"
+                  style={{ width: `${Math.round(rank.progress * 100)}%` }}
+                />
+              </div>
+              <div className="stencil text-[10px] text-muted-foreground mt-1">
+                {Math.round(rank.progress * 100)}%
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+          <Stat label="CASES RUN" value={p.casesPlayed} />
+          <Stat label="XP" value={p.points} accent />
+          <Stat label="CALIBRATION" value={cal.label.toUpperCase()} accent={cal.tone === "good"} />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="rounded-sm border border-border bg-card p-6 hud-frame">
+            <div className="stencil text-[10px] text-primary mb-4">
+              // THREAT MATRIX · YOUR POSITION
+            </div>
+
             <div className="mt-4 relative aspect-square max-w-xs mx-auto">
               <div className="grid grid-cols-2 gap-2 h-full">
                 <Quadrant label="CALIBRATED" active={missRate < 0.2 && faRate < 0.2} tone="good" />
@@ -66,7 +99,7 @@ function CityHall() {
               {/* Player dot: x = missRate (→ too trusting), y = faRate (→ too paranoid, inverted) */}
               {p.casesPlayed > 0 && (
                 <div
-                  className="absolute h-4 w-4 rounded-full bg-primary shadow-[0_0_16px_oklch(0.82_0.15_210)] transition-all duration-700 -translate-x-1/2 -translate-y-1/2 ring-2 ring-background"
+                  className="absolute h-4 w-4 rounded-full bg-primary shadow-[0_0_18px_oklch(0.82_0.16_85)] transition-all duration-700 -translate-x-1/2 -translate-y-1/2 ring-2 ring-background"
                   style={{
                     left: `${Math.min(0.95, Math.max(0.05, missRate * 2)) * 100}%`,
                     top: `${Math.min(0.95, Math.max(0.05, faRate * 2)) * 100}%`,
@@ -75,14 +108,14 @@ function CityHall() {
                 />
               )}
             </div>
-            <div className="mt-3 flex justify-between font-mono text-[9px] tracking-widest text-muted-foreground">
+            <div className="mt-3 flex justify-between stencil text-[9px] text-muted-foreground">
               <span>← FEWER MISSES</span>
               <span>MORE MISSES →</span>
             </div>
           </div>
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="font-mono text-xs tracking-widest text-muted-foreground mb-4">
-              FAILURE MODES
+          <div className="rounded-sm border border-border bg-card p-6 hud-frame">
+            <div className="stencil text-[10px] text-primary mb-4">
+              // FAILURE MODES · AFTER-ACTION
             </div>
             <Row label="Missed Scams" value={p.missedScams} tone="bad" />
             <Row label="False Alarms" value={p.falseAlarms} tone="bad" />
@@ -96,21 +129,21 @@ function CityHall() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 mb-8">
-          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-4">
-            RECENT CASES
+        <div className="rounded-sm border border-border bg-card p-6 mb-8 hud-frame">
+          <div className="stencil text-[10px] text-primary mb-4">
+            // MISSION LOG · LAST 10
           </div>
           {p.history.length === 0 ? (
             <div className="text-sm text-muted-foreground">
-              No cases yet.{" "}
+              No missions logged.{" "}
               <Link to="/mirror" className="text-primary underline-offset-4 hover:underline">
-                Enter The Mirror →
+                Deploy to The Mirror →
               </Link>
             </div>
           ) : (
-            <ul className="space-y-2">
+            <ul className="space-y-1.5">
               {p.history.slice().reverse().slice(0, 10).map((h, i) => (
-                <li key={i} className="flex items-center justify-between text-sm font-mono">
+                <li key={i} className="flex items-center justify-between text-sm font-mono border-l-2 border-border pl-3 py-1 hover:border-primary transition-colors">
                   <span className="text-muted-foreground">{h.caseId}</span>
                   <span
                     className={
@@ -132,9 +165,9 @@ function CityHall() {
 
         <Link
           to="/"
-          className="inline-flex font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
+          className="inline-flex stencil text-[10px] text-muted-foreground hover:text-primary transition"
         >
-          ← BACK TO CITY
+          ← RETURN TO OPS CENTER
         </Link>
       </main>
     </div>
@@ -143,9 +176,9 @@ function CityHall() {
 
 function Stat({ label, value, accent }: { label: string; value: string | number; accent?: boolean }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-6">
-      <div className="font-mono text-xs tracking-widest text-muted-foreground">{label}</div>
-      <div className={`mt-2 text-3xl font-semibold ${accent ? "text-primary" : ""}`}>{value}</div>
+    <div className="rounded-sm border border-border bg-card p-5 hud-frame">
+      <div className="stencil text-[10px] text-muted-foreground">{label}</div>
+      <div className={`mt-2 text-3xl font-semibold tracking-tight ${accent ? "text-primary" : ""}`}>{value}</div>
     </div>
   );
 }
