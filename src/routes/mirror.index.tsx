@@ -5,7 +5,7 @@ import { TopBar } from "@/components/TopBar";
 import { SCENARIOS, type TierId } from "@/lib/mirror/scenarios";
 import { loadProfile, unlockedMaxTier, tierWins, type TrustProfile } from "@/lib/mirror/profile";
 
-export const Route = createFileRoute("/mirror")({
+export const Route = createFileRoute("/mirror/")({
   head: () => ({
     meta: [
       { title: "The Mirror — Case Files — MILVERSE" },
