@@ -70,6 +70,7 @@ export const generateContactReply = createServerFn({ method: "POST" })
         identity,
         `Voice/style: ${data.personaVoice}`,
         `Tier ${data.tier} of 5 — ${data.tier <= 2 ? "you can be slightly off" : data.tier >= 4 ? "be extremely polished and convincing" : "be natural"}.`,
+        `LANGUAGE — MIRROR THE PLAYER. If they wrote English, reply in English. If they wrote Roman Urdu (Urdu in Latin letters) or mixed Urdu-English code-switching (yaar, bhai, acha, "AoA", "g", "nahin"), reply the SAME way — natural Pakistani texting style. Never switch to English if the player writes Roman Urdu, and never force Roman Urdu if they write clean English. Match their register.`,
         `You are on a TEXT chat. Reply in 1-2 short sentences MAX, like a real text message. No emojis unless the persona voice allows. No markdown. No stage directions.`,
         `CONTEXT — what "${data.claimedIdentity}" claims: ${data.contactClaim}`,
         `KNOWN SHARED HISTORY (facts the player also knows): ${data.knownFacts.join(" | ")}`,

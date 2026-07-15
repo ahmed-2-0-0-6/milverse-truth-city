@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import {
-  Eye, Newspaper, Store, Swords, Clapperboard, Library, Landmark, Lock,
+  Eye, Newspaper, Store, Swords, Clapperboard, Library, Landmark, Lock, Sparkles,
 } from "lucide-react";
 import { loadProfile, unlockedMaxTier, type TrustProfile } from "@/lib/mirror/profile";
 
@@ -24,18 +24,22 @@ const DISTRICTS: District[] = [
     id: "mirror", name: "The Mirror", Icon: Eye, unlocked: true, to: "/mirror",
     tagline: (p) => p ? `Tier ${unlockedMaxTier(p)} unlocked · flight simulator for scams` : "Flight simulator for scams",
   },
+  { id: "studio", name: "The Studio", Icon: Clapperboard, unlocked: true, to: "/studio", tagline: () => "Design a case. Share with friends." },
   { id: "feed", name: "The Feed", Icon: Newspaper, unlocked: false, tagline: () => "Spot misinformation in a scrolling feed." },
   { id: "market", name: "The Market", Icon: Store, unlocked: false, tagline: () => "Fake shops, phishing DMs, scam ads." },
   { id: "arena", name: "The Arena", Icon: Swords, unlocked: false, tagline: () => "Multiplayer. The Imposter Protocol." },
-  { id: "studio", name: "The Studio", Icon: Clapperboard, unlocked: false, tagline: () => "Survivors recreate scams. Forgery filter." },
   { id: "archive", name: "The Archive", Icon: Library, unlocked: false, tagline: () => "Progress Ladder. Survivor library." },
   { id: "hall", name: "City Hall", Icon: Landmark, unlocked: true, to: "/city-hall", tagline: () => "Your Trust Calibration." },
 ];
 
+const INTRO_KEY = "milverse.intro.seen";
+
 function CityMap() {
   const [profile, setProfile] = useState<TrustProfile | null>(null);
+  const [intro, setIntro] = useState(false);
   useEffect(() => {
     setProfile(loadProfile());
+    if (typeof window !== "undefined" && !localStorage.getItem(INTRO_KEY)) setIntro(true);
     const on = () => setProfile(loadProfile());
     window.addEventListener("milverse:profile", on);
     return () => window.removeEventListener("milverse:profile", on);
@@ -44,8 +48,9 @@ function CityMap() {
   return (
     <div className="min-h-screen grain">
       <TopBar />
+      {intro && <Intro onDone={() => { localStorage.setItem(INTRO_KEY, "1"); setIntro(false); }} />}
       <main className="mx-auto max-w-6xl px-4 py-10 sm:py-16">
-        <section className="mb-12 max-w-2xl">
+        <section className="mb-8 max-w-2xl">
           <div className="font-mono text-xs tracking-[0.3em] text-primary mb-3">WELCOME TO THE CITY</div>
           <h1 className="text-4xl sm:text-5xl font-semibold leading-tight tracking-tight">
             Survive the age of scams,<br />deepfakes, and misinformation
@@ -57,6 +62,23 @@ function CityMap() {
           </p>
         </section>
 
+        {/* Quick Tour banner */}
+        <Link to="/quick-tour" className="block mb-8 rounded-xl border border-primary/40 bg-gradient-to-r from-primary/10 to-transparent p-5 hover:border-primary/70 transition group">
+          <div className="flex items-center gap-4">
+            <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/20 text-primary shrink-0">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <div className="font-mono text-[10px] tracking-widest text-primary">START HERE · 90 SECONDS</div>
+              <div className="mt-1 text-lg font-semibold">Take the Quick Tour</div>
+              <div className="text-sm text-muted-foreground">Watch one case unfold before playing live.</div>
+            </div>
+            <div className="font-mono text-xs tracking-widest text-primary opacity-0 group-hover:opacity-100 transition">
+              GO →
+            </div>
+          </div>
+        </Link>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {DISTRICTS.map((d) => (
             <DistrictTile key={d.id} d={d} profile={profile} />
@@ -67,6 +89,38 @@ function CityMap() {
           SPOTTING IS DYING · VERIFYING IS FOREVER
         </footer>
       </main>
+    </div>
+  );
+}
+
+function Intro({ onDone }: { onDone: () => void }) {
+  const slides = [
+    "Scams evolved. The obvious red flags are gone.",
+    "You can't spot your way to safety anymore. You have to VERIFY.",
+    "MILVERSE is a city that trains that instinct. Enter.",
+  ];
+  const [i, setI] = useState(0);
+  return (
+    <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center px-6 text-center">
+      <div className="max-w-2xl">
+        <div key={i} className="msg-in text-2xl sm:text-4xl md:text-5xl font-semibold text-foreground leading-tight">
+          {slides[i]}
+        </div>
+      </div>
+      <div className="mt-12 flex gap-2">
+        {slides.map((_, n) => (
+          <div key={n} className={`h-1 w-8 rounded ${n <= i ? "bg-primary" : "bg-muted"}`} />
+        ))}
+      </div>
+      <div className="absolute bottom-8 flex gap-6 font-mono text-xs tracking-widest">
+        <button onClick={onDone} className="text-muted-foreground hover:text-foreground">SKIP</button>
+        <button
+          onClick={() => { if (i + 1 < slides.length) setI(i + 1); else onDone(); }}
+          className="rounded-md bg-primary px-5 py-2 text-primary-foreground"
+        >
+          {i + 1 < slides.length ? "NEXT →" : "ENTER MILVERSE →"}
+        </button>
+      </div>
     </div>
   );
 }

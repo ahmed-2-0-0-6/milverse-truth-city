@@ -54,13 +54,30 @@ function CityHall() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <div className="rounded-xl border border-border bg-card p-6">
             <div className="font-mono text-xs tracking-widest text-muted-foreground">
-              THE 2×2
+              THE 2×2 · YOUR POSITION
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-2 aspect-square max-w-xs mx-auto relative">
-              <Quadrant label="CALIBRATED" active={missRate < 0.2 && faRate < 0.2} tone="good" />
-              <Quadrant label="TOO PARANOID" active={faRate >= 0.4 && missRate < 0.2} tone="warn" />
-              <Quadrant label="TOO TRUSTING" active={missRate >= 0.4 && faRate < 0.2} tone="warn" />
-              <Quadrant label="MISCALIBRATED" active={missRate >= 0.2 && faRate >= 0.2} tone="bad" />
+            <div className="mt-4 relative aspect-square max-w-xs mx-auto">
+              <div className="grid grid-cols-2 gap-2 h-full">
+                <Quadrant label="CALIBRATED" active={missRate < 0.2 && faRate < 0.2} tone="good" />
+                <Quadrant label="TOO PARANOID" active={faRate >= 0.4 && missRate < 0.2} tone="warn" />
+                <Quadrant label="TOO TRUSTING" active={missRate >= 0.4 && faRate < 0.2} tone="warn" />
+                <Quadrant label="MISCALIBRATED" active={missRate >= 0.2 && faRate >= 0.2} tone="bad" />
+              </div>
+              {/* Player dot: x = missRate (→ too trusting), y = faRate (→ too paranoid, inverted) */}
+              {p.casesPlayed > 0 && (
+                <div
+                  className="absolute h-4 w-4 rounded-full bg-primary shadow-[0_0_16px_oklch(0.82_0.15_210)] transition-all duration-700 -translate-x-1/2 -translate-y-1/2 ring-2 ring-background"
+                  style={{
+                    left: `${Math.min(0.95, Math.max(0.05, missRate * 2)) * 100}%`,
+                    top: `${Math.min(0.95, Math.max(0.05, faRate * 2)) * 100}%`,
+                  }}
+                  title="You are here"
+                />
+              )}
+            </div>
+            <div className="mt-3 flex justify-between font-mono text-[9px] tracking-widest text-muted-foreground">
+              <span>← FEWER MISSES</span>
+              <span>MORE MISSES →</span>
             </div>
           </div>
           <div className="rounded-xl border border-border bg-card p-6">
