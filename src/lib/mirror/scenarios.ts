@@ -30,6 +30,8 @@ export interface Scenario {
   id: string;
   /** 6-char share code for citizen-designed cases (opt-in). */
   shareCode?: string;
+  /** Designer rank at time of publish — powers CITY DESIGNER prestige on citizen cases. */
+  designerRank?: string;
   title: string;
   teaser: string;
   channel: "text";
