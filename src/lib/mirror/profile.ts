@@ -100,15 +100,15 @@ export function tierWins(p: TrustProfile, tier: TierId): number {
   return p.history.filter((h) => h.tier === tier && h.result === "correct").length;
 }
 
-/** Field rank from cases played + correct verdicts. Cosmetic only. */
+/** Literacy level from cases played + correct verdicts. Cosmetic only. */
 export function operatorRank(p: TrustProfile): { rank: string; code: string; next: string | null; progress: number } {
   const c = p.correctVerdicts;
   const tiers: { code: string; rank: string; min: number }[] = [
-    { code: "R-01", rank: "Recruit",   min: 0  },
-    { code: "OP-02", rank: "Operator",  min: 3  },
-    { code: "SP-03", rank: "Specialist", min: 8 },
-    { code: "AN-04", rank: "Analyst",   min: 16 },
-    { code: "HD-05", rank: "Handler",   min: 28 },
+    { code: "L1", rank: "Reader",        min: 0  },
+    { code: "L2", rank: "Fact-checker",  min: 3  },
+    { code: "L3", rank: "Analyst",       min: 8  },
+    { code: "L4", rank: "Researcher",    min: 16 },
+    { code: "L5", rank: "Editor",        min: 28 },
   ];
   let idx = 0;
   for (let i = 0; i < tiers.length; i++) if (c >= tiers[i].min) idx = i;

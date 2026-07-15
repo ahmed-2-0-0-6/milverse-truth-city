@@ -55,11 +55,11 @@ function CityMap() {
       <TopBar />
       {intro && <Intro onDone={() => { localStorage.setItem(INTRO_KEY, "1"); setIntro(false); }} />}
       <main className="mx-auto max-w-6xl px-4 py-10 sm:py-14 relative">
-        {/* Mission briefing header */}
+        {/* Editorial masthead */}
         <section className="mb-10 max-w-3xl">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px flex-1 max-w-[60px] bg-primary/60" />
-            <div className="stencil text-[10px] text-primary">MISSION BRIEFING // 0-DAY</div>
+            <div className="stencil text-[10px] text-primary">MEDIA &amp; INFORMATION LITERACY · ISSUE 001</div>
             <div className="h-px flex-1 bg-primary/20" />
           </div>
           <h1 className="text-4xl sm:text-6xl font-semibold leading-[1.05] tracking-tight uppercase">
@@ -69,35 +69,35 @@ function CityMap() {
             </span>
           </h1>
           <p className="mt-6 text-muted-foreground max-w-2xl leading-relaxed">
-            Two wings are operational. <span className="text-foreground font-medium">The Mirror</span> trains you
+            Two labs are open. <span className="text-foreground font-medium">The Mirror</span> trains you
             against personal deception — the scammer talking to you.{" "}
             <span className="text-foreground font-medium">The Feed</span> trains you against mass
-            misinformation — the viral lie your uncle just forwarded.
+            misinformation — the viral post someone just forwarded.
             Same instinct powers both: <b className="text-primary">verify, use sources, protect evidence, protect people.</b>
           </p>
         </section>
 
-        {/* Quick Tour banner — mission-brief style */}
+        {/* Quick Tour banner */}
         <Link to="/quick-tour" className="block mb-10 hud-frame rounded-sm border border-primary/50 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 hover:border-primary transition group relative overflow-hidden scan-sweep">
           <div className="flex items-center gap-4 relative">
             <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-primary/20 text-primary shrink-0 border border-primary/40">
               <Sparkles className="h-5 w-5" />
             </div>
             <div className="flex-1">
-              <div className="stencil text-[10px] text-primary">SIM-01 · TRAINING WHEELS · 90 SEC</div>
+              <div className="stencil text-[10px] text-primary">GUIDED WALKTHROUGH · 90 SEC</div>
               <div className="mt-1 text-lg font-semibold">Take the Quick Tour</div>
-              <div className="text-sm text-muted-foreground">Watch one case unfold before playing live fire.</div>
+              <div className="text-sm text-muted-foreground">Watch one case unfold before you try a live one.</div>
             </div>
             <div className="stencil text-[10px] text-primary opacity-0 group-hover:opacity-100 transition">
-              DEPLOY →
+              START →
             </div>
           </div>
         </Link>
 
         <div className="mb-4 flex items-center gap-3">
-          <div className="stencil text-[10px] text-muted-foreground">DISTRICT ROSTER</div>
+          <div className="stencil text-[10px] text-muted-foreground">DISTRICTS</div>
           <div className="h-px flex-1 bg-border" />
-          <div className="stencil text-[10px] text-primary hud-blink">● LIVE</div>
+          <div className="stencil text-[10px] text-primary hud-blink">● OPEN</div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {DISTRICTS.map((d) => (
@@ -109,7 +109,7 @@ function CityMap() {
           <div className="text-primary/80">VERIFY, DON'T GUESS · CALIBRATE, DON'T PANIC</div>
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             <Link to="/pilot" className="text-primary hover:underline">
-              [F1] PILOT MODE — CLASSROOM OPS →
+              [F1] PILOT MODE — CLASSROOM DASHBOARD →
             </Link>
             <Link to="/kit" className="text-primary hover:underline">
               [F2] FIELD KIT — PRINT PACK →
@@ -125,12 +125,12 @@ function Intro({ onDone }: { onDone: () => void }) {
   const slides = [
     "Lies come in two sizes: aimed at millions — and aimed at just you.",
     "Both die the same way. Verification.",
-    "MILVERSE is where you train that reflex. Boot up.",
+    "MILVERSE is where you train that reflex. Let's open the first case.",
   ];
   const [i, setI] = useState(0);
   return (
-    <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center px-6 text-center scanlines">
-      <div className="stencil text-[10px] text-primary mb-8 hud-blink">// TRANSMISSION INCOMING</div>
+    <div className="fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center px-6 text-center scanlines">
+      <div className="stencil text-[10px] text-primary mb-8 hud-blink">// EDITORIAL BRIEFING</div>
       <div className="max-w-2xl">
         <div key={i} className="msg-in text-2xl sm:text-4xl md:text-5xl font-semibold text-foreground leading-tight">
           {slides[i]}
@@ -145,9 +145,9 @@ function Intro({ onDone }: { onDone: () => void }) {
         <button onClick={onDone} className="text-muted-foreground hover:text-foreground">SKIP</button>
         <button
           onClick={() => { if (i + 1 < slides.length) setI(i + 1); else onDone(); }}
-          className="rounded-sm bg-primary px-6 py-2.5 text-primary-foreground border-2 border-primary shadow-[0_0_20px_oklch(0.82_0.16_85/0.5)]"
+          className="rounded-sm bg-primary px-6 py-2.5 text-primary-foreground border-2 border-primary shadow-[0_4px_20px_oklch(0.60_0.19_258/0.35)]"
         >
-          {i + 1 < slides.length ? "NEXT →" : "ENTER MILVERSE →"}
+          {i + 1 < slides.length ? "NEXT →" : "ENTER THE LAB →"}
         </button>
       </div>
     </div>
@@ -182,7 +182,7 @@ function DistrictTile({ d, profile }: { d: District; profile: TrustProfile | nul
       <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{d.tagline(profile)}</p>
       {d.unlocked && (
         <div className="mt-4 stencil text-[10px] text-primary opacity-0 transition-opacity group-hover:opacity-100">
-          DEPLOY →
+          OPEN →
         </div>
       )}
     </div>
