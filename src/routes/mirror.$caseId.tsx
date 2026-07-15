@@ -17,6 +17,9 @@ import { tick, tensionCue } from "@/lib/mirror/audio";
 import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
+import { TacticStamp } from "@/components/TacticStamp";
+import { TacticFlash } from "@/components/TacticFlash";
+import { tacticForMirror } from "@/lib/mirror/tactics";
 
 
 export const Route = createFileRoute("/mirror/$caseId")({
@@ -168,6 +171,8 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
   const prevMeter = useRef<number>(state.meter);
   const aiFailCount = useRef<number>(0);
   const [aiDown, setAiDown] = useState(false);
+  const tacticFlashed = useRef<boolean>(false);
+  const [tacticFlash, setTacticFlash] = useState<null | ReturnType<typeof tacticForMirror>>(null);
 
   useEffect(() => {
     const opener: Message = { role: "contact", kind: "text", text: scenario.opener, ts: Date.now() };
