@@ -271,7 +271,19 @@ export const SCENARIOS: Scenario[] = [
       { id: "e7", label: "Knew the bank's name", correct: false, explain: "Public info." },
       ...VOICE_CHIPS,
     ],
+    inspiredBy: {
+      patternName: "Bank fraud-department impersonation",
+      country: "Pakistan",
+      year: "2020–2024",
+      whatHappened: "Callers pose as the bank's fraud team warning of a suspicious transaction, then walk the victim through \"securing\" the account — which really means handing over the OTP that authorises the theft.",
+      prevention: [
+        "Banks never ask for OTP, PIN, or full card number on a call.",
+        "Hang up and call the number printed on your card yourself.",
+        "Urgency + secrecy on a \"security\" call is the scam signature.",
+      ],
+    },
   },
+
 
   /* ── T3 IMPOSTER — bank fraud dept (knows your name + txn) ─ */
   {
