@@ -402,7 +402,7 @@ function StationNode({
         x={labelX} y={9}
         textAnchor={labelSide < 0 ? "end" : "start"}
         fontSize={7.5}
-        fill={isFuture ? "oklch(0.5 0.02 260)" : "oklch(0.985 0.003 250)"}
+        fill={isFuture ? "oklch(0.5 0.02 260)" : "oklch(0.22 0.06 265)"}
       >
         {truncate(s.scenario.title, 22)}
       </text>
