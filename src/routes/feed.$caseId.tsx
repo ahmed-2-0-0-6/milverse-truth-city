@@ -31,6 +31,8 @@ function FeedPlay() {
   const [outcome, setOutcome] = useState<FeedOutcome | null>(null);
   const [verdict, setVerdict] = useState<FeedVerdict | null>(null);
   const [finalReply, setFinalReply] = useState("");
+  const [conclusion, setConclusion] = useState("");
+
 
   useEffect(() => {
     if (phase === "sim" && messages.length === 0) {
@@ -57,11 +59,15 @@ function FeedPlay() {
       {phase === "verdict" && (
         <VerdictScreen
           scenario={scenario}
+          state={state}
           finalReply={finalReply}
           setFinalReply={setFinalReply}
           verdict={verdict}
           setVerdict={setVerdict}
+          conclusion={conclusion}
+          setConclusion={setConclusion}
           onConfirm={() => {
+
             if (!verdict) return;
             const oc = gradeVerdict(scenario, state, verdict, finalReply);
             setOutcome(oc);
@@ -106,8 +112,9 @@ function FeedPlay() {
         />
       )}
       {phase === "debrief" && outcome && (
-        <Debrief scenario={scenario} outcome={outcome} state={state} />
+        <Debrief scenario={scenario} outcome={outcome} state={state} verdict={verdict} conclusion={conclusion} finalReply={finalReply} />
       )}
+
     </div>
   );
 }
@@ -331,25 +338,57 @@ function ForwardCard({ scenario }: { scenario: FeedScenario }) {
 
 /* ─────────── VERDICT ─────────── */
 function VerdictScreen({
-  scenario, verdict, setVerdict, finalReply, setFinalReply, onConfirm,
+  scenario, state, verdict, setVerdict, finalReply, setFinalReply, conclusion, setConclusion, onConfirm,
 }: {
   scenario: FeedScenario;
+  state: FeedState;
   verdict: FeedVerdict | null;
   setVerdict: (v: FeedVerdict) => void;
   finalReply: string;
   setFinalReply: (s: string) => void;
+  conclusion: string;
+  setConclusion: (s: string) => void;
   onConfirm: () => void;
 }) {
   const tone = classifyTone(finalReply);
   const toneColor =
     tone === "rude" ? "text-destructive" : tone === "respectful" ? "text-primary" : "text-muted-foreground";
+  const usedActions = scenario.actions.filter((a) => state.actionsUsed.includes(a.id));
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
-      <div className="font-mono text-xs tracking-[0.3em] text-caution">DELIVER YOUR VERDICT</div>
-      <h1 className="mt-2 text-2xl font-semibold">Is the claim TRUE, FALSE, or MISLEADING?</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
+      <div className="font-mono text-xs tracking-[0.3em] text-caution">INVESTIGATION BOARD</div>
+      <h1 className="mt-2 text-2xl font-semibold">Assemble the case. Deliver the verdict.</h1>
+
+      <section className="mt-5 rounded-xl border border-border bg-card p-4 space-y-3">
+        <div className="font-mono text-[10px] tracking-widest text-muted-foreground">
+          CASE FILE · AUTO-COLLECTED
+        </div>
+        <div>
+          <div className="font-mono text-[10px] tracking-widest text-primary mb-1.5">
+            THE CLAIM
+          </div>
+          <p className="text-xs italic border-l-2 border-primary/40 pl-2.5">"{scenario.opener}"</p>
+        </div>
+        <div>
+          <div className="font-mono text-[10px] tracking-widest text-caution mb-1.5">
+            VERIFICATION STEPS USED · {usedActions.length}/{scenario.actions.length}
+          </div>
+          {usedActions.length === 0 ? (
+            <p className="text-xs text-muted-foreground">No toolkit actions used — you're calling this cold.</p>
+          ) : (
+            <ul className="text-xs text-muted-foreground space-y-1">
+              {usedActions.map((a) => (
+                <li key={a.id}>· {a.label}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+
+      <p className="mt-6 text-sm text-muted-foreground">
         MISLEADING = the core is true but the framing (photo, date, context) is not. That's the most common type.
       </p>
+
       <div className="mt-5 grid grid-cols-3 gap-2">
         {(["TRUE", "MISLEADING", "FALSE"] as FeedVerdict[]).map((v) => (
           <button
@@ -384,6 +423,20 @@ function VerdictScreen({
         </div>
       </div>
 
+      <div className="mt-6">
+        <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">
+          INVESTIGATOR'S CONCLUSION · OPTIONAL
+        </div>
+        <textarea
+          value={conclusion}
+          onChange={(e) => setConclusion(e.target.value.slice(0, 300))}
+          rows={2}
+          placeholder="In one line: why this verdict? (max 300 chars)"
+          className="w-full rounded-md border border-input bg-background p-3 text-sm outline-none focus:border-primary"
+        />
+        <div className="mt-1 text-right font-mono text-[10px] text-muted-foreground">{conclusion.length}/300</div>
+      </div>
+
       <button
         onClick={onConfirm}
         disabled={!verdict || !finalReply.trim()}
@@ -396,13 +449,29 @@ function VerdictScreen({
 }
 
 /* ─────────── DEBRIEF ─────────── */
-function Debrief({ scenario, outcome, state }: { scenario: FeedScenario; outcome: FeedOutcome; state: FeedState }) {
+function Debrief({ scenario, outcome, state, verdict, conclusion, finalReply }: { scenario: FeedScenario; outcome: FeedOutcome; state: FeedState; verdict: FeedVerdict | null; conclusion: string; finalReply: string }) {
+
   const navigate = useNavigate();
   const Icon = outcome.result === "correct" ? CheckCircle2 : outcome.result === "pyrrhic" ? Heart : AlertTriangle;
   const border =
     outcome.result === "correct" ? "border-primary bg-primary/10 text-primary" :
     outcome.result === "pyrrhic" ? "border-caution bg-caution/10 text-caution" :
     "border-destructive bg-destructive/10 text-destructive";
+
+  // 4-axis stars (each 0, 0.5, or 1) → total 0–4
+  const tone = classifyTone(finalReply);
+  const correctVerdict = verdict === scenario.verdict;
+  const total = scenario.actions.length || 1;
+  const usedRatio = state.actionsUsed.length / total;
+  const starDecision = correctVerdict ? (outcome.result === "pyrrhic" ? 0.5 : 1) : 0;
+  const starEvidence = usedRatio >= 0.6 ? 1 : usedRatio >= 0.3 ? 0.5 : 0;
+  const starVerification = state.actionsUsed.length >= 2 ? 1 : state.actionsUsed.length >= 1 ? 0.5 : 0;
+  const starReasoning =
+    (tone === "respectful" ? 1 : tone === "neutral" ? 0.5 : 0) +
+    (conclusion.trim().length >= 20 ? 0.25 : 0);
+  const clampedReasoning = Math.min(1, starReasoning);
+  const stars = starDecision + starEvidence + starVerification + clampedReasoning;
+
   return (
     <main className="mx-auto max-w-2xl px-4 py-8 space-y-4">
       <div className={`rounded-xl border-2 p-6 ${border}`}>
@@ -411,6 +480,29 @@ function Debrief({ scenario, outcome, state }: { scenario: FeedScenario; outcome
         <div className="mt-1 text-xl font-semibold">{outcome.headline}</div>
         <p className="mt-2 text-sm">{outcome.detail}</p>
       </div>
+
+      <section className="rounded-xl border border-border bg-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground">
+            INVESTIGATOR RATING
+          </div>
+          <div className="font-mono text-lg text-primary">{stars.toFixed(1)} / 4.0</div>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <FeedStarAxis label="Decision" value={starDecision} />
+          <FeedStarAxis label="Evidence" value={starEvidence} />
+          <FeedStarAxis label="Verification" value={starVerification} />
+          <FeedStarAxis label="Reasoning" value={clampedReasoning} />
+        </div>
+      </section>
+
+      {conclusion.trim() && (
+        <div className="rounded-xl border border-border bg-card p-6">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">YOUR CONCLUSION</div>
+          <p className="text-sm italic border-l-2 border-primary pl-3">"{conclusion.trim()}"</p>
+        </div>
+      )}
+
 
       <div className="rounded-xl border border-border bg-card p-6">
         <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">WHAT'S ACTUALLY TRUE</div>
@@ -439,5 +531,16 @@ function Debrief({ scenario, outcome, state }: { scenario: FeedScenario; outcome
         </button>
       </div>
     </main>
+  );
+}
+
+function FeedStarAxis({ label, value }: { label: string; value: number }) {
+  const filled = value >= 1 ? "★" : value >= 0.5 ? "⯪" : "☆";
+  const tone = value >= 1 ? "text-primary" : value >= 0.5 ? "text-caution" : "text-muted-foreground/40";
+  return (
+    <div className="rounded-md border border-border bg-background/50 p-3 text-center">
+      <div className={`text-2xl ${tone}`}>{filled}</div>
+      <div className="mt-1 font-mono text-[10px] tracking-widest text-muted-foreground">{label}</div>
+    </div>
   );
 }

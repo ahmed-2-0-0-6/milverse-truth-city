@@ -271,7 +271,19 @@ export const SCENARIOS: Scenario[] = [
       { id: "e7", label: "Knew the bank's name", correct: false, explain: "Public info." },
       ...VOICE_CHIPS,
     ],
+    inspiredBy: {
+      patternName: "Bank fraud-department impersonation",
+      country: "Pakistan",
+      year: "2020–2024",
+      whatHappened: "Callers pose as the bank's fraud team warning of a suspicious transaction, then walk the victim through \"securing\" the account — which really means handing over the OTP that authorises the theft.",
+      prevention: [
+        "Banks never ask for OTP, PIN, or full card number on a call.",
+        "Hang up and call the number printed on your card yourself.",
+        "Urgency + secrecy on a \"security\" call is the scam signature.",
+      ],
+    },
   },
+
 
   /* ── T3 IMPOSTER — bank fraud dept (knows your name + txn) ─ */
   {
@@ -532,7 +544,19 @@ export const SCENARIOS: Scenario[] = [
       { id: "e6", label: "Mentioned a famous TV show", correct: false, explain: "Public — everyone knows Jeeto Pakistan." },
       ...VOICE_CHIPS,
     ],
+    inspiredBy: {
+      patternName: "TV lucky-draw prize / advance-fee scam",
+      country: "Pakistan",
+      year: "2019–2024",
+      whatHappened: "Callers impersonate Jeeto Pakistan or similar shows, announce a huge prize, and ask for a small \"processing fee\" or CNIC details to release it. There is no prize — only the fee, collected from thousands.",
+      prevention: [
+        "You cannot win a draw you never entered.",
+        "No legitimate prize requires an upfront fee.",
+        "Never share CNIC or wallet PIN over an unsolicited call.",
+      ],
+    },
   },
+
 
   /* ── T2 IMPOSTER — THE WRONG TRANSACTION ─────────────────── */
   {
@@ -591,7 +615,19 @@ export const SCENARIOS: Scenario[] = [
       { id: "e6", label: "She knew my wallet number", correct: false, explain: "Public on your OLX listing." },
       ...VOICE_CHIPS,
     ],
+    inspiredBy: {
+      patternName: "\"Wrong transaction\" wallet reversal scam",
+      country: "Pakistan",
+      year: "2021–2024",
+      whatHappened: "A stranger claims they sent money to your JazzCash/EasyPaisa by mistake and pleads for a reversal. The \"proof\" screenshot is fake; sending it back is a real out-of-pocket loss.",
+      prevention: [
+        "Check the wallet balance in the app — never trust their screenshot.",
+        "Tell them to file a reversal with the wallet provider directly.",
+        "Never send money based on someone else's urgency.",
+      ],
+    },
   },
+
 
   /* ── T2 IMPOSTER — THE ONLINE BUYER (military officer) ───── */
   {
@@ -654,7 +690,19 @@ export const SCENARIOS: Scenario[] = [
       { id: "e7", label: "Knew Rawalpindi cantt exists", correct: false, explain: "Public — anyone can name a cantonment." },
       ...VOICE_CHIPS,
     ],
+    inspiredBy: {
+      patternName: "OLX / online-buyer QR-code reversal scam",
+      country: "Pakistan",
+      year: "2022–2024",
+      whatHappened: "A \"buyer\" agrees the seller's price, then sends a QR or payment request. Scanning it debits — not credits — the seller's wallet. Framed as \"just confirming, bhai.\"",
+      prevention: [
+        "You never scan anyone's QR to receive money — QRs pay outward.",
+        "Ask them to send funds first; confirm in your own app.",
+        "Refuse screen-sharing or OTP requests during a sale.",
+      ],
+    },
   },
+
 
   /* ── T2 IMPOSTER — THE DREAM JOB (paid task 1) ──────────── */
   {
@@ -717,7 +765,19 @@ export const SCENARIOS: Scenario[] = [
       { id: "e7", label: "The videos were real YouTube videos", correct: false, explain: "The task existing does not make the employer real." },
       ...VOICE_CHIPS,
     ],
+    inspiredBy: {
+      patternName: "Task-based job scam / commission trap",
+      country: "Pakistan",
+      year: "2023–2024",
+      whatHappened: "\"Remote earning\" recruiters promise easy per-task pay, get small payouts flowing, then require a refundable \"deposit\" to unlock bigger tasks. The deposit — and the applicant — vanish.",
+      prevention: [
+        "No legitimate employer asks the employee to pay to work.",
+        "Verify the company on official registries, not links they send.",
+        "Small early payouts are the bait — walk before the deposit ask.",
+      ],
+    },
   },
+
 
   /* ── T3 REAL — THE STRANDED COUSIN (paranoia test) ────── */
   {
@@ -776,7 +836,19 @@ export const SCENARIOS: Scenario[] = [
       { id: "e7", label: "Got a fact slightly wrong at first", correct: false, explain: "Imperfect memory is HUMAN. Perfect recall would be suspicious." },
       ...CLEAN_VOICE_CHIPS,
     ],
+    inspiredBy: {
+      patternName: "Stranded relative / SIM-swap impersonation",
+      country: "Pakistan",
+      year: "2022–2024",
+      whatHappened: "Scammers pose as a relative stuck in another city — phone stolen, wallet lost — texting from a fresh number. Family sends emergency funds before anyone thinks to call the real person.",
+      prevention: [
+        "Call the person on their known number before sending money.",
+        "Ask a question only the real relative would know.",
+        "Verify with a second family member out-of-band.",
+      ],
+    },
   },
+
 
   /* ── T4 REAL — THE STRESSED SISTER (paranoia test) ───────── */
   {
