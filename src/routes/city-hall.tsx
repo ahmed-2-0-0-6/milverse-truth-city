@@ -1,0 +1,171 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { TopBar } from "@/components/TopBar";
+import { loadProfile, calibrationLabel, type TrustProfile } from "@/lib/mirror/profile";
+
+export const Route = createFileRoute("/city-hall")({
+  head: () => ({
+    meta: [
+      { title: "City Hall — MILVERSE" },
+      { name: "description", content: "Your Trust Calibration profile." },
+    ],
+  }),
+  component: CityHall,
+});
+
+function CityHall() {
+  const [p, setP] = useState<TrustProfile | null>(null);
+  useEffect(() => setP(loadProfile()), []);
+
+  if (!p) {
+    return (
+      <div>
+        <TopBar />
+        <div className="p-8 text-muted-foreground">Loading…</div>
+      </div>
+    );
+  }
+
+  const cal = calibrationLabel(p);
+  // 2x2: x=missedScams, y=falseAlarms
+  const total = Math.max(1, p.casesPlayed);
+  const missRate = p.missedScams / total;
+  const faRate = p.falseAlarms / total;
+
+  return (
+    <div className="min-h-screen grain">
+      <TopBar />
+      <main className="mx-auto max-w-5xl px-4 py-10">
+        <div className="mb-8">
+          <div className="font-mono text-xs tracking-[0.3em] text-primary">CITY HALL</div>
+          <h1 className="mt-2 text-3xl font-semibold">Your Trust Calibration</h1>
+          <p className="mt-2 text-muted-foreground">
+            The goal isn't a single high score. The goal is to catch imposters
+            AND trust real people. Neither paranoid nor gullible.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <Stat label="CASES" value={p.casesPlayed} />
+          <Stat label="POINTS" value={p.points} accent />
+          <Stat label="STATUS" value={cal.label} accent={cal.tone === "good"} />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div className="rounded-xl border border-border bg-card p-6">
+            <div className="font-mono text-xs tracking-widest text-muted-foreground">
+              THE 2×2
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-2 aspect-square max-w-xs mx-auto relative">
+              <Quadrant label="CALIBRATED" active={missRate < 0.2 && faRate < 0.2} tone="good" />
+              <Quadrant label="TOO PARANOID" active={faRate >= 0.4 && missRate < 0.2} tone="warn" />
+              <Quadrant label="TOO TRUSTING" active={missRate >= 0.4 && faRate < 0.2} tone="warn" />
+              <Quadrant label="MISCALIBRATED" active={missRate >= 0.2 && faRate >= 0.2} tone="bad" />
+            </div>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-6">
+            <div className="font-mono text-xs tracking-widest text-muted-foreground mb-4">
+              FAILURE MODES
+            </div>
+            <Row label="Missed Scams" value={p.missedScams} tone="bad" />
+            <Row label="False Alarms" value={p.falseAlarms} tone="bad" />
+            <Row label="Correct Verdicts" value={p.correctVerdicts} tone="good" />
+            <Row label="Lucky Guesses" value={p.luckyGuesses} tone="warn" />
+            <div className="mt-4 pt-4 border-t border-border">
+              <Row label="Strong Probes" value={p.strongProbesTotal} tone="good" />
+              <Row label="Weak Probes" value={p.weakProbesTotal} tone="warn" />
+              <Row label="Wasted Pressure" value={p.wastedPressureTotal} tone="bad" />
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-border bg-card p-6 mb-8">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-4">
+            RECENT CASES
+          </div>
+          {p.history.length === 0 ? (
+            <div className="text-sm text-muted-foreground">
+              No cases yet.{" "}
+              <Link to="/mirror" className="text-primary underline-offset-4 hover:underline">
+                Enter The Mirror →
+              </Link>
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {p.history.slice().reverse().slice(0, 10).map((h, i) => (
+                <li key={i} className="flex items-center justify-between text-sm font-mono">
+                  <span className="text-muted-foreground">{h.caseId}</span>
+                  <span
+                    className={
+                      h.result === "correct"
+                        ? "text-primary"
+                        : h.result === "lucky_guess"
+                          ? "text-caution"
+                          : "text-destructive"
+                    }
+                  >
+                    {h.result.replace("_", " ").toUpperCase()} · {h.points > 0 ? "+" : ""}
+                    {h.points}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <Link
+          to="/"
+          className="inline-flex font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
+        >
+          ← BACK TO CITY
+        </Link>
+      </main>
+    </div>
+  );
+}
+
+function Stat({ label, value, accent }: { label: string; value: string | number; accent?: boolean }) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-6">
+      <div className="font-mono text-xs tracking-widest text-muted-foreground">{label}</div>
+      <div className={`mt-2 text-3xl font-semibold ${accent ? "text-primary" : ""}`}>{value}</div>
+    </div>
+  );
+}
+
+function Row({ label, value, tone }: { label: string; value: number; tone: "good" | "warn" | "bad" }) {
+  const c =
+    tone === "good" ? "text-primary" : tone === "warn" ? "text-caution" : "text-destructive";
+  return (
+    <div className="flex items-center justify-between py-1.5 text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className={`font-mono ${c}`}>{value}</span>
+    </div>
+  );
+}
+
+function Quadrant({
+  label,
+  active,
+  tone,
+}: {
+  label: string;
+  active: boolean;
+  tone: "good" | "warn" | "bad";
+}) {
+  const toneBorder =
+    tone === "good" ? "border-primary" : tone === "warn" ? "border-caution" : "border-destructive";
+  const toneBg =
+    tone === "good" ? "bg-primary/15" : tone === "warn" ? "bg-caution/15" : "bg-destructive/15";
+  const toneText =
+    tone === "good" ? "text-primary" : tone === "warn" ? "text-caution" : "text-destructive";
+  return (
+    <div
+      className={`flex items-center justify-center rounded-md border p-2 text-center font-mono text-[10px] tracking-widest ${
+        active ? `${toneBorder} ${toneBg} ${toneText}` : "border-border text-muted-foreground/60"
+      }`}
+    >
+      {label}
+    </div>
+  );
+}
