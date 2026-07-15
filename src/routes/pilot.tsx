@@ -219,42 +219,72 @@ function PilotPage() {
           </p>
         </div>
 
-        {!active ? (
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <button
-              onClick={create}
-              className="rounded-xl border border-primary/40 bg-primary/10 p-6 text-left hover:border-primary transition"
-            >
-              <Plus className="h-5 w-5 text-primary mb-3" />
-              <div className="font-semibold">Create a new group</div>
-              <div className="mt-1 text-sm text-muted-foreground">
-                Generates a 5-character code you can read out loud.
-              </div>
+        {sample && (
+          <div className="mt-6 rounded-xl border-2 border-dashed border-caution/60 bg-caution/5 p-4 flex items-center justify-between gap-3">
+            <div>
+              <div className="font-mono text-[10px] tracking-widest text-caution">SAMPLE DATA · FOR DEMONSTRATION</div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                You are viewing a synthetic pilot group ({SAMPLE_ENTRIES.length} entries, 3 devices).
+                Real group codes still work — leave this view to return to live data.
+              </p>
+            </div>
+            <button onClick={() => setSample(false)} className="rounded-md border border-caution/50 bg-caution/10 px-3 py-1.5 text-[10px] font-mono tracking-widest text-caution shrink-0">
+              EXIT SAMPLE
             </button>
-            <div className="rounded-xl border border-border bg-card p-6">
-              <Users className="h-5 w-5 text-primary mb-3" />
-              <div className="font-semibold">Join an existing group</div>
-              <div className="mt-3 flex gap-2">
-                <input
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase())}
-                  onKeyDown={(e) => e.key === "Enter" && join()}
-                  placeholder="CODE"
-                  maxLength={6}
-                  className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm font-mono tracking-widest outline-none focus:border-primary"
-                />
-                <button
-                  onClick={join}
-                  disabled={code.trim().length < 4}
-                  className="rounded-md bg-primary px-4 text-primary-foreground text-xs font-mono tracking-widest disabled:opacity-40"
-                >
-                  JOIN
-                </button>
+          </div>
+        )}
+
+        {!active && !sample ? (
+          <>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              <button
+                onClick={create}
+                className="rounded-xl border border-primary/40 bg-primary/10 p-6 text-left hover:border-primary transition"
+              >
+                <Plus className="h-5 w-5 text-primary mb-3" />
+                <div className="font-semibold">Create a new group</div>
+                <div className="mt-1 text-sm text-muted-foreground">
+                  Generates a 5-character code you can read out loud.
+                </div>
+              </button>
+              <div className="rounded-xl border border-border bg-card p-6">
+                <Users className="h-5 w-5 text-primary mb-3" />
+                <div className="font-semibold">Join an existing group</div>
+                <div className="mt-3 flex gap-2">
+                  <input
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.toUpperCase())}
+                    onKeyDown={(e) => e.key === "Enter" && join()}
+                    placeholder="CODE"
+                    maxLength={6}
+                    className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm font-mono tracking-widest outline-none focus:border-primary"
+                  />
+                  <button
+                    onClick={join}
+                    disabled={code.trim().length < 4}
+                    className="rounded-md bg-primary px-4 text-primary-foreground text-xs font-mono tracking-widest disabled:opacity-40"
+                  >
+                    JOIN
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+            <button
+              onClick={() => setSample(true)}
+              className="mt-4 w-full rounded-xl border border-dashed border-caution/60 bg-caution/5 p-4 text-center text-xs font-mono tracking-widest text-caution hover:bg-caution/10 transition"
+            >
+              VIEW SAMPLE DASHBOARD — SEE THE BEFORE/AFTER STORY
+            </button>
+          </>
         ) : (
+          <></>
+        )}
+        {(active || sample) && (
           <>
+            {!sample && active && (
+            <div className="mt-8 rounded-xl border border-primary/40 bg-primary/5 p-6">
+              <div className="flex items-center justify-between">
+                <div className="font-mono text-[10px] tracking-widest text-primary">ACTIVE GROUP</div>
             <div className="mt-8 rounded-xl border border-primary/40 bg-primary/5 p-6">
               <div className="flex items-center justify-between">
                 <div className="font-mono text-[10px] tracking-widest text-primary">ACTIVE GROUP</div>
