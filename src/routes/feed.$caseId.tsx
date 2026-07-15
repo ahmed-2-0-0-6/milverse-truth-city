@@ -423,6 +423,20 @@ function VerdictScreen({
         </div>
       </div>
 
+      <div className="mt-6">
+        <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">
+          INVESTIGATOR'S CONCLUSION · OPTIONAL
+        </div>
+        <textarea
+          value={conclusion}
+          onChange={(e) => setConclusion(e.target.value.slice(0, 300))}
+          rows={2}
+          placeholder="In one line: why this verdict? (max 300 chars)"
+          className="w-full rounded-md border border-input bg-background p-3 text-sm outline-none focus:border-primary"
+        />
+        <div className="mt-1 text-right font-mono text-[10px] text-muted-foreground">{conclusion.length}/300</div>
+      </div>
+
       <button
         onClick={onConfirm}
         disabled={!verdict || !finalReply.trim()}
@@ -435,7 +449,8 @@ function VerdictScreen({
 }
 
 /* ─────────── DEBRIEF ─────────── */
-function Debrief({ scenario, outcome, state }: { scenario: FeedScenario; outcome: FeedOutcome; state: FeedState }) {
+function Debrief({ scenario, outcome, state, verdict, conclusion, finalReply }: { scenario: FeedScenario; outcome: FeedOutcome; state: FeedState; verdict: FeedVerdict | null; conclusion: string; finalReply: string }) {
+
   const navigate = useNavigate();
   const Icon = outcome.result === "correct" ? CheckCircle2 : outcome.result === "pyrrhic" ? Heart : AlertTriangle;
   const border =
