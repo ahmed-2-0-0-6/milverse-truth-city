@@ -395,6 +395,8 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 m={m}
                 pinned={pins.includes(i)}
                 onPin={m.role === "contact" ? () => togglePin(i) : undefined}
+                speakerName={scenario.claimedIdentity}
+                speakerVoiceDesc={scenario.persona.voice}
               />
             ))}
             {typing && <TypingBubble name={scenario.claimedIdentity} />}
