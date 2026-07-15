@@ -395,6 +395,8 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 m={m}
                 pinned={pins.includes(i)}
                 onPin={m.role === "contact" ? () => togglePin(i) : undefined}
+                speakerName={scenario.claimedIdentity}
+                speakerVoiceDesc={scenario.persona.voice}
               />
             ))}
             {typing && <TypingBubble name={scenario.claimedIdentity} />}
@@ -458,8 +460,8 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
 }
 
 function MessageRow({
-  m, pinned, onPin,
-}: { m: Message; pinned: boolean; onPin?: () => void }) {
+  m, pinned, onPin, speakerName, speakerVoiceDesc,
+}: { m: Message; pinned: boolean; onPin?: () => void; speakerName?: string; speakerVoiceDesc?: string }) {
   if (m.role === "system") {
     return (
       <div className="msg-in flex justify-center">
@@ -495,7 +497,12 @@ function MessageRow({
               {m.text}
             </div>
           )}
-          <VoiceNote voice={m.voice} fromPlayer={isPlayer} />
+          <VoiceNote
+            voice={m.voice}
+            fromPlayer={isPlayer}
+            speakerName={speakerName}
+            speakerVoiceDesc={speakerVoiceDesc}
+          />
         </div>
       ) : (
         <div
