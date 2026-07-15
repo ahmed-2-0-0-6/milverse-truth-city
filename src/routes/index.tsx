@@ -91,8 +91,13 @@ function CityMap() {
           ))}
         </div>
 
-        <footer className="mt-16 text-center text-xs font-mono text-muted-foreground tracking-widest">
-          SPOTTING IS DYING · VERIFYING IS FOREVER
+        <footer className="mt-16 text-center text-xs font-mono text-muted-foreground tracking-widest space-y-3">
+          <div>SPOTTING IS DYING · VERIFYING IS FOREVER</div>
+          <div>
+            <Link to="/kit" className="text-primary hover:underline">
+              NO INTERNET? PRINT THE FIELD KIT →
+            </Link>
+          </div>
         </footer>
       </main>
     </div>

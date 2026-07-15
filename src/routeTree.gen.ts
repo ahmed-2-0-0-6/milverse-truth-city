@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as QuickTourRouteImport } from './routes/quick-tour'
+import { Route as KitRouteImport } from './routes/kit'
 import { Route as CityHallRouteImport } from './routes/city-hall'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MirrorIndexRouteImport } from './routes/mirror.index'
@@ -26,6 +27,11 @@ const StudioRoute = StudioRouteImport.update({
 const QuickTourRoute = QuickTourRouteImport.update({
   id: '/quick-tour',
   path: '/quick-tour',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KitRoute = KitRouteImport.update({
+  id: '/kit',
+  path: '/kit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CityHallRoute = CityHallRouteImport.update({
@@ -62,6 +68,7 @@ const FeedCaseIdRoute = FeedCaseIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/city-hall': typeof CityHallRoute
+  '/kit': typeof KitRoute
   '/quick-tour': typeof QuickTourRoute
   '/studio': typeof StudioRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/city-hall': typeof CityHallRoute
+  '/kit': typeof KitRoute
   '/quick-tour': typeof QuickTourRoute
   '/studio': typeof StudioRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/city-hall': typeof CityHallRoute
+  '/kit': typeof KitRoute
   '/quick-tour': typeof QuickTourRoute
   '/studio': typeof StudioRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/city-hall'
+    | '/kit'
     | '/quick-tour'
     | '/studio'
     | '/feed/$caseId'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/city-hall'
+    | '/kit'
     | '/quick-tour'
     | '/studio'
     | '/feed/$caseId'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/city-hall'
+    | '/kit'
     | '/quick-tour'
     | '/studio'
     | '/feed/$caseId'
@@ -126,6 +138,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CityHallRoute: typeof CityHallRoute
+  KitRoute: typeof KitRoute
   QuickTourRoute: typeof QuickTourRoute
   StudioRoute: typeof StudioRoute
   FeedCaseIdRoute: typeof FeedCaseIdRoute
@@ -148,6 +161,13 @@ declare module '@tanstack/react-router' {
       path: '/quick-tour'
       fullPath: '/quick-tour'
       preLoaderRoute: typeof QuickTourRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kit': {
+      id: '/kit'
+      path: '/kit'
+      fullPath: '/kit'
+      preLoaderRoute: typeof KitRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/city-hall': {
@@ -198,6 +218,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CityHallRoute: CityHallRoute,
+  KitRoute: KitRoute,
   QuickTourRoute: QuickTourRoute,
   StudioRoute: StudioRoute,
   FeedCaseIdRoute: FeedCaseIdRoute,
