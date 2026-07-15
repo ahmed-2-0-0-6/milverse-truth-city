@@ -654,7 +654,19 @@ export const SCENARIOS: Scenario[] = [
       { id: "e7", label: "Knew Rawalpindi cantt exists", correct: false, explain: "Public — anyone can name a cantonment." },
       ...VOICE_CHIPS,
     ],
+    inspiredBy: {
+      patternName: "OLX / online-buyer QR-code reversal scam",
+      country: "Pakistan",
+      year: "2022–2024",
+      whatHappened: "A \"buyer\" agrees the seller's price, then sends a QR or payment request. Scanning it debits — not credits — the seller's wallet. Framed as \"just confirming, bhai.\"",
+      prevention: [
+        "You never scan anyone's QR to receive money — QRs pay outward.",
+        "Ask them to send funds first; confirm in your own app.",
+        "Refuse screen-sharing or OTP requests during a sale.",
+      ],
+    },
   },
+
 
   /* ── T2 IMPOSTER — THE DREAM JOB (paid task 1) ──────────── */
   {
