@@ -1,6 +1,8 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "@fontsource/bebas-neue/400.css";
+@import "@fontsource-variable/space-grotesk";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -284,6 +286,42 @@
   100% { transform: scale(1.18) translate(-1.5%, -1.5%); }
 }
 .kenburns { animation: kenburns 14s ease-in-out infinite alternate; will-change: transform; }
+
+/* Slow fog drift for district headers */
+@keyframes fog-drift {
+  0%   { background-position: 0% 50%, 100% 50%; }
+  100% { background-position: 100% 50%, 0% 50%; }
+}
+.fog-drift { animation: fog-drift 22s ease-in-out infinite alternate; }
+
+/* Occasional neon flicker for district titles */
+@keyframes neon-flicker {
+  0%, 92%, 100% { opacity: 1; text-shadow: 0 0 24px currentColor, 0 0 6px currentColor; }
+  93%           { opacity: 0.55; }
+  94%           { opacity: 1; }
+  95%           { opacity: 0.75; }
+  96%           { opacity: 1; }
+}
+.neon-flicker { animation: neon-flicker 6s ease-in-out infinite; }
+
+/* Case-card evidence texture (folder paper + redaction + stain) */
+.evidence-thumb {
+  position: relative;
+  background:
+    radial-gradient(60% 40% at 30% 20%, rgba(120,90,40,0.18), transparent 65%),
+    radial-gradient(30% 30% at 78% 78%, rgba(80,50,20,0.22), transparent 70%),
+    linear-gradient(180deg, #0d1218 0%, #06090d 100%);
+}
+.evidence-thumb::before {
+  content: ""; position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 2px 2px; opacity: 0.5; pointer-events: none;
+}
+.evidence-thumb::after {
+  content: ""; position: absolute; left: 12%; right: 22%; top: 46%; height: 10px;
+  background: #000; opacity: 0.85; pointer-events: none;
+  box-shadow: 0 22px 0 -1px rgba(0,0,0,0.75);
+}
 
 /* Finale beat — city surge */
 @keyframes finale-surge {
