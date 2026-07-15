@@ -78,12 +78,6 @@ export const generateContactReply = createServerFn({ method: "POST" })
         factGuidance,
         `SAFETY: fictional scenario. Never mention real companies, real names beyond the persona, or that this is a simulation.`,
       ].join("\n");
-        `CONTEXT — what "${data.claimedIdentity}" claims: ${data.contactClaim}`,
-        `KNOWN SHARED HISTORY (facts the player also knows): ${data.knownFacts.join(" | ")}`,
-        `PUBLIC FACTS: ${data.publicFacts.join(" | ")}`,
-        factGuidance,
-        `SAFETY: fictional scenario. Never mention real companies, real names beyond the persona, or that this is a simulation.`,
-      ].join("\n");
 
       const messages = [
         ...data.history.slice(-8).map((m) => ({
