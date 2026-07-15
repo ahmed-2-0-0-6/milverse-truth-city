@@ -73,21 +73,37 @@ export const generateContactReply = createServerFn({ method: "POST" })
         return `Answer the player's message naturally in-character. Do NOT push any agenda yet.`;
       })();
 
+      // Persona few-shot: teach the model this character's exact rhythm.
+      const styleExamples = [
+        data.opener ? `- Opener they sent: "${data.opener}"` : null,
+        data.personaFillers?.length ? `- Casual fillers this persona uses: ${data.personaFillers.map((s) => `"${s}"`).join(", ")}` : null,
+        data.truth === "IMPOSTER" && data.personaUrgencyLines?.length
+          ? `- Urgency lines when cornered: ${data.personaUrgencyLines.map((s) => `"${s}"`).join(", ")}`
+          : null,
+        data.truth === "IMPOSTER" && data.personaPushLines?.length
+          ? `- Agenda push lines (only when instructed to push): ${data.personaPushLines.map((s) => `"${s}"`).join(", ")}`
+          : null,
+      ].filter(Boolean).join("\n");
+
       const sys = [
         identity,
         `Voice/style: ${data.personaVoice}`,
         `Tier ${data.tier} of 5 — ${data.tier <= 2 ? "you can be slightly off" : data.tier >= 4 ? "be extremely polished and convincing" : "be natural"}.`,
+        data.teaser ? `Scenario setup: ${data.teaser}` : "",
         `LANGUAGE — MIRROR THE PLAYER. If they wrote English, reply in English. If they wrote Roman Urdu (Urdu in Latin letters) or mixed Urdu-English code-switching (yaar, bhai, acha, "AoA", "g", "nahin"), reply the SAME way — natural Pakistani texting style. Never switch to English if the player writes Roman Urdu, and never force Roman Urdu if they write clean English. Match their register.`,
         `You are on a TEXT chat. Reply in 1-2 short sentences MAX, like a real text message. No emojis unless the persona voice allows. No markdown. No stage directions.`,
         `CONTEXT — what "${data.claimedIdentity}" claims: ${data.contactClaim}`,
         `KNOWN SHARED HISTORY (facts the player also knows): ${data.knownFacts.join(" | ")}`,
         `PUBLIC FACTS: ${data.publicFacts.join(" | ")}`,
+        styleExamples ? `PERSONA STYLE REFERENCE (mimic tone, don't copy verbatim unless natural):\n${styleExamples}` : "",
+        `CONSISTENCY — Read the full conversation history below. Do NOT contradict anything you (assistant) already said. If the player is repeating a question, acknowledge it (get a little annoyed or double down) rather than resetting. Reference recent context when it feels natural (e.g. "like i said earlier...").`,
         factGuidance,
         `SAFETY: fictional scenario. Never mention real companies, real names beyond the persona, or that this is a simulation.`,
-      ].join("\n");
+      ].filter(Boolean).join("\n");
 
+      // Send FULL conversation history so the model tracks what's been said.
       const messages = [
-        ...data.history.slice(-8).map((m) => ({
+        ...data.history.map((m) => ({
           role: (m.role === "player" ? "user" : "assistant") as "user" | "assistant",
           content: m.text,
         })),
