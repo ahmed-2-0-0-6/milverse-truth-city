@@ -123,13 +123,14 @@ function CityMap() {
 
 function Intro({ onDone }: { onDone: () => void }) {
   const slides = [
-    "Lies come in two sizes: aimed at millions (misinformation) — and aimed at just you (scams).",
-    "Both die the same way: verification.",
-    "MILVERSE is a city that trains that instinct. Enter.",
+    "Lies come in two sizes: aimed at millions — and aimed at just you.",
+    "Both die the same way. Verification.",
+    "MILVERSE is where you train that reflex. Boot up.",
   ];
   const [i, setI] = useState(0);
   return (
-    <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center px-6 text-center">
+    <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center px-6 text-center scanlines">
+      <div className="stencil text-[10px] text-primary mb-8 hud-blink">// TRANSMISSION INCOMING</div>
       <div className="max-w-2xl">
         <div key={i} className="msg-in text-2xl sm:text-4xl md:text-5xl font-semibold text-foreground leading-tight">
           {slides[i]}
@@ -137,14 +138,14 @@ function Intro({ onDone }: { onDone: () => void }) {
       </div>
       <div className="mt-12 flex gap-2">
         {slides.map((_, n) => (
-          <div key={n} className={`h-1 w-8 rounded ${n <= i ? "bg-primary" : "bg-muted"}`} />
+          <div key={n} className={`h-1 w-10 ${n <= i ? "bg-primary" : "bg-muted"}`} />
         ))}
       </div>
-      <div className="absolute bottom-8 flex gap-6 font-mono text-xs tracking-widest">
+      <div className="absolute bottom-8 flex gap-6 stencil text-[10px]">
         <button onClick={onDone} className="text-muted-foreground hover:text-foreground">SKIP</button>
         <button
           onClick={() => { if (i + 1 < slides.length) setI(i + 1); else onDone(); }}
-          className="rounded-md bg-primary px-5 py-2 text-primary-foreground"
+          className="rounded-sm bg-primary px-6 py-2.5 text-primary-foreground border-2 border-primary shadow-[0_0_20px_oklch(0.82_0.16_85/0.5)]"
         >
           {i + 1 < slides.length ? "NEXT →" : "ENTER MILVERSE →"}
         </button>
@@ -157,31 +158,31 @@ function DistrictTile({ d, profile }: { d: District; profile: TrustProfile | nul
   const Icon = d.Icon;
   const body = (
     <div
-      className={`group relative overflow-hidden rounded-xl border p-6 transition-all ${
+      className={`group relative overflow-hidden rounded-sm border p-5 transition-all ${
         d.unlocked
-          ? "border-border bg-card hover:border-primary/50 hover:-translate-y-0.5 hover:shadow-[0_0_32px_oklch(0.82_0.15_210/0.15)]"
-          : "border-border/60 bg-card/50 opacity-70"
+          ? "border-border bg-card hover:border-primary hover:-translate-y-0.5 hover:shadow-[0_0_32px_oklch(0.82_0.16_85/0.18)] hud-frame"
+          : "border-border/40 bg-card/40 opacity-60"
       }`}
     >
       <div className="flex items-start justify-between">
-        <div className={`flex h-11 w-11 items-center justify-center rounded-lg ${d.unlocked ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
+        <div className={`flex h-11 w-11 items-center justify-center rounded-sm ${d.unlocked ? "bg-primary/15 text-primary border border-primary/40" : "bg-muted text-muted-foreground border border-border"}`}>
           <Icon className="h-5 w-5" />
         </div>
         {!d.unlocked ? (
-          <span className="flex items-center gap-1.5 rounded-full border border-caution/40 bg-caution/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest text-caution">
-            <Lock className="h-3 w-3" /> In dev
+          <span className="flex items-center gap-1.5 rounded-sm border border-caution/40 bg-caution/10 px-2.5 py-1 stencil text-[9px] text-caution">
+            <Lock className="h-3 w-3" /> LOCKED
           </span>
         ) : (
-          <span className="rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest text-primary">
-            Open
+          <span className="rounded-sm border border-primary/50 bg-primary/10 px-2.5 py-1 stencil text-[9px] text-primary">
+            ● OPEN
           </span>
         )}
       </div>
-      <h3 className="mt-5 text-lg font-semibold">{d.name}</h3>
-      <p className="mt-1 text-sm text-muted-foreground">{d.tagline(profile)}</p>
+      <h3 className="mt-5 stencil text-sm text-foreground">{d.name}</h3>
+      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{d.tagline(profile)}</p>
       {d.unlocked && (
-        <div className="mt-4 font-mono text-xs tracking-widest text-primary opacity-0 transition-opacity group-hover:opacity-100">
-          ENTER →
+        <div className="mt-4 stencil text-[10px] text-primary opacity-0 transition-opacity group-hover:opacity-100">
+          DEPLOY →
         </div>
       )}
     </div>
