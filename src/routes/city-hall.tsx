@@ -12,8 +12,8 @@ import {
 export const Route = createFileRoute("/city-hall")({
   head: () => ({
     meta: [
-      { title: "Operator Dossier — MILVERSE" },
-      { name: "description", content: "Your Trust Calibration profile and field rank." },
+      { title: "Reader Profile — MILVERSE" },
+      { name: "description", content: "Your Trust Calibration profile and media-literacy level." },
     ],
   }),
   component: CityHall,
@@ -27,7 +27,7 @@ function CityHall() {
     return (
       <div>
         <TopBar />
-        <div className="p-8 stencil text-xs text-muted-foreground">// LOADING DOSSIER…</div>
+        <div className="p-8 stencil text-xs text-muted-foreground">// LOADING PROFILE…</div>
       </div>
     );
   }
@@ -46,17 +46,17 @@ function CityHall() {
       <main className="mx-auto max-w-5xl px-4 py-10 relative">
         <div className="mb-8 hud-frame border border-primary/30 bg-card/60 rounded-sm p-6">
           <div className="flex items-center gap-3 mb-3">
-            <div className="stencil text-[10px] text-primary">// OPERATOR DOSSIER · EYES ONLY</div>
+            <div className="stencil text-[10px] text-primary">// READER PROFILE · SESSION</div>
             <div className="h-px flex-1 bg-primary/20" />
             <div className="stencil text-[10px] text-muted-foreground">{new Date().toISOString().slice(0, 10)}</div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div>
-              <div className="stencil text-[10px] text-muted-foreground">CALLSIGN</div>
+              <div className="stencil text-[10px] text-muted-foreground">HANDLE</div>
               <div className="text-3xl font-semibold text-primary tracking-wider">{call}</div>
             </div>
             <div>
-              <div className="stencil text-[10px] text-muted-foreground">FIELD RANK</div>
+              <div className="stencil text-[10px] text-muted-foreground">LITERACY LEVEL</div>
               <div className="text-2xl font-semibold text-foreground">{rank.rank}</div>
               <div className="stencil text-[10px] text-muted-foreground mt-1">{rank.code}</div>
             </div>
@@ -86,7 +86,7 @@ function CityHall() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="rounded-sm border border-border bg-card p-6 hud-frame">
             <div className="stencil text-[10px] text-primary mb-4">
-              // THREAT MATRIX · YOUR POSITION
+              // CALIBRATION MATRIX · YOUR POSITION
             </div>
 
             <div className="mt-4 relative aspect-square max-w-xs mx-auto">
@@ -115,7 +115,7 @@ function CityHall() {
           </div>
           <div className="rounded-sm border border-border bg-card p-6 hud-frame">
             <div className="stencil text-[10px] text-primary mb-4">
-              // FAILURE MODES · AFTER-ACTION
+              // FAILURE MODES · POST-CASE REVIEW
             </div>
             <Row label="Missed Scams" value={p.missedScams} tone="bad" />
             <Row label="False Alarms" value={p.falseAlarms} tone="bad" />
@@ -131,13 +131,13 @@ function CityHall() {
 
         <div className="rounded-sm border border-border bg-card p-6 mb-8 hud-frame">
           <div className="stencil text-[10px] text-primary mb-4">
-            // MISSION LOG · LAST 10
+            // CASE LOG · LAST 10
           </div>
           {p.history.length === 0 ? (
             <div className="text-sm text-muted-foreground">
-              No missions logged.{" "}
+              No cases logged yet.{" "}
               <Link to="/mirror" className="text-primary underline-offset-4 hover:underline">
-                Deploy to The Mirror →
+                Open The Mirror →
               </Link>
             </div>
           ) : (
@@ -167,7 +167,7 @@ function CityHall() {
           to="/"
           className="inline-flex stencil text-[10px] text-muted-foreground hover:text-primary transition"
         >
-          ← RETURN TO OPS CENTER
+          ← BACK TO HOME
         </Link>
       </main>
     </div>

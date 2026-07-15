@@ -49,14 +49,14 @@ export function TopBar() {
           <div>
             <div className="stencil text-sm text-foreground leading-none">MILVERSE</div>
             <div className="stencil text-[9px] text-primary/70 mt-0.5 hidden sm:block">
-              OPS CENTER · CLASSIFIED
+              MEDIA &amp; INFORMATION LITERACY LAB
             </div>
           </div>
         </Link>
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center gap-2 stencil text-[10px] text-muted-foreground border border-border rounded px-2.5 py-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-primary hud-blink" />
-            <span>CALLSIGN</span>
+            <span>HANDLE</span>
             <span className="text-foreground">{call}</span>
           </div>
           <button
@@ -72,7 +72,7 @@ export function TopBar() {
             className={`flex items-center gap-2 rounded border px-2.5 py-1.5 stencil text-[10px] transition-colors hover:bg-accent ${toneClass}`}
           >
             {rank && <span className="opacity-70">{rank.code}</span>}
-            <span className="hidden sm:inline text-foreground/90">{rank?.rank ?? "RECRUIT"}</span>
+            <span className="hidden sm:inline text-foreground/90">{rank?.rank ?? "READER"}</span>
             <span className="text-muted-foreground">·</span>
             <span className="opacity-80">{cal.label.toUpperCase()}</span>
           </Link>
