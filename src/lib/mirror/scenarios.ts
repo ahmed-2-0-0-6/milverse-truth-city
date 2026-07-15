@@ -717,7 +717,19 @@ export const SCENARIOS: Scenario[] = [
       { id: "e7", label: "The videos were real YouTube videos", correct: false, explain: "The task existing does not make the employer real." },
       ...VOICE_CHIPS,
     ],
+    inspiredBy: {
+      patternName: "Task-based job scam / commission trap",
+      country: "Pakistan",
+      year: "2023–2024",
+      whatHappened: "\"Remote earning\" recruiters promise easy per-task pay, get small payouts flowing, then require a refundable \"deposit\" to unlock bigger tasks. The deposit — and the applicant — vanish.",
+      prevention: [
+        "No legitimate employer asks the employee to pay to work.",
+        "Verify the company on official registries, not links they send.",
+        "Small early payouts are the bait — walk before the deposit ask.",
+      ],
+    },
   },
+
 
   /* ── T3 REAL — THE STRANDED COUSIN (paranoia test) ────── */
   {
