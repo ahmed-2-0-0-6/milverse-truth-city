@@ -25,6 +25,8 @@ export interface TrustProfile {
   weakProbesTotal: number;
   wastedPressureTotal: number;
   points: number;
+  /** Studio publishes (private + community). Additive XP layer only. */
+  publishedCount: number;
   history: HistoryEntry[];
 }
 
@@ -43,6 +45,7 @@ function newProfile(): TrustProfile {
     weakProbesTotal: 0,
     wastedPressureTotal: 0,
     points: 0,
+    publishedCount: 0,
     history: [],
   };
 }
