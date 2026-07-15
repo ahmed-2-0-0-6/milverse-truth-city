@@ -72,6 +72,15 @@ export function saveProfile(p: TrustProfile) {
   localStorage.setItem(KEY, JSON.stringify(p));
 }
 
+/** Additive XP-layer helper — increments Studio publish counter and pings listeners. */
+export function incrementPublishedCount(): number {
+  const p = loadProfile();
+  p.publishedCount = (p.publishedCount ?? 0) + 1;
+  saveProfile(p);
+  window.dispatchEvent(new Event("milverse:profile"));
+  return p.publishedCount;
+}
+
 export function calibrationLabel(p: TrustProfile): {
   label: string;
   tone: "good" | "warn" | "bad" | "neutral";
