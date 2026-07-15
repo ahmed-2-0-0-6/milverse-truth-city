@@ -195,6 +195,8 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
     return () => clearInterval(interval);
   }, [scenario, state, ended, typing]);
 
+  const aiReply = useServerFn(generateContactReply);
+
   async function send() {
     const text = input.trim();
     if (!text || ended || typing) return;
@@ -206,17 +208,53 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
     setInput("");
     setTyping(true);
 
-    const delay = 550 + Math.random() * 900;
-    await new Promise((r) => setTimeout(r, delay));
-
     const next = { ...state, factProbes: { ...state.factProbes } };
     const reply = respond(scenario, next, text);
     next.internalNotes.push(reply.internalNote);
 
+    // Try AI for a more natural reply — fall back to deterministic on failure.
+    let replyText = reply.text;
+    if (!reply.voice && reply.intent !== "left") {
+      try {
+        const fact = reply.factId ? scenario.facts.find((f) => f.id === reply.factId) : undefined;
+        const history = messages
+          .filter((m) => m.role !== "system")
+          .map((m) => ({ role: m.role as "player" | "contact", text: m.text }));
+        const ai = await aiReply({
+          data: {
+            scenarioTitle: scenario.title,
+            tier: scenario.tier,
+            truth: scenario.truth,
+            claimedIdentity: scenario.claimedIdentity,
+            personaVoice: scenario.persona.voice,
+            agenda: scenario.agenda,
+            contactClaim: scenario.dossier.contactClaim,
+            knownFacts: scenario.dossier.knownFacts,
+            publicFacts: scenario.dossier.publicFacts,
+            factTruth: fact?.truth ?? null,
+            factKnownToImposter: fact ? !!fact.isKnownToImposter : null,
+            isDeflection: reply.intent === "deflection",
+            isContradiction: reply.intent === "contradiction",
+            isPush: reply.intent === "push",
+            isUrgency: reply.intent === "escalation",
+            meter: reply.meter,
+            meterType: reply.meterType,
+            turnCount: next.turnCount,
+            history,
+            playerMessage: text,
+            fallback: reply.text,
+          },
+        });
+        if (ai?.text) replyText = ai.text;
+      } catch (e) {
+        console.error("[mirror] ai reply failed, using fallback:", e);
+      }
+    }
+
     const contactMsg: Message = {
       role: "contact",
       kind: reply.voice ? "voice" : "text",
-      text: reply.text,
+      text: replyText,
       ts: Date.now(),
       factId: reply.factId,
       isTell: reply.isTell,
@@ -232,6 +270,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
       setEndReason("contact_left");
     }
   }
+
 
   function togglePin(idx: number) {
     setPins((prev) => {
