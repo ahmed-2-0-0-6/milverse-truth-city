@@ -274,10 +274,15 @@ function Sim({
         ) : (
           <div className="p-4">
             <Toolbelt
-              actions={scenario.actions}
-              format={scenario.format ?? "whatsapp"}
+              scenario={scenario}
               used={state.actionsUsed}
               onUse={doAction}
+              onGrade={(_kind, quality) => {
+                if (quality === "strong" && scenario.tacticId && !tacticFlashed.current) {
+                  tacticFlashed.current = true;
+                  setTacticFlash(scenario.tacticId);
+                }
+              }}
             />
           </div>
         )}
