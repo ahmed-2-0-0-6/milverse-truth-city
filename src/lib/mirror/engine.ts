@@ -378,7 +378,9 @@ export function respond(
     internalNote: note,
     isTell,
     tellExplanation,
+    intent: impIntent,
   };
+
 }
 
 /* ── Verify Out-of-Band ────────────────────────────────────── */
@@ -434,6 +436,7 @@ export function idleNudge(scenario: Scenario, state: EngineState): EngineReply |
       meterType: "composure",
       internalNote: "Imposter idle-nudge (case timer).",
       isTell: false,
+      intent: "escalation",
     };
   } else {
     state.meter = Math.max(0, state.meter - 2);
@@ -443,6 +446,8 @@ export function idleNudge(scenario: Scenario, state: EngineState): EngineReply |
       meterType: "patience",
       internalNote: "Real idle-nudge (case timer).",
       isTell: false,
+      intent: "filler",
     };
   }
 }
+
