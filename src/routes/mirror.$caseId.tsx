@@ -498,8 +498,8 @@ function MessageRow({
           <VoiceNote
             voice={m.voice}
             fromPlayer={isPlayer}
-            speakerName={scenario.claimedIdentity}
-            speakerVoiceDesc={scenario.persona.voice}
+            speakerName={speakerName}
+            speakerVoiceDesc={speakerVoiceDesc}
           />
         </div>
       ) : (
