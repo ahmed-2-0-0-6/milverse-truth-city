@@ -147,7 +147,7 @@ function PilotPage() {
   // Before/after per-device calibration: FIRST 3 vs LAST 3 completed cases.
   const beforeAfter = useMemo(() => {
     const byDevice = new Map<string, CloudEntry[]>();
-    cloud.forEach((c) => {
+    effectiveCloud.forEach((c) => {
       const list = byDevice.get(c.device_id) ?? [];
       list.push(c);
       byDevice.set(c.device_id, list);
@@ -157,12 +157,11 @@ function PilotPage() {
       const n = list.length;
       const miss = list.filter((e) => e.result === "missed_scam").length / n;
       const fa = list.filter((e) => e.result === "false_alarm" || e.result === "pyrrhic").length / n;
-      // Calibration score: 100 - (miss+fa)*100. Higher = better.
       return Math.max(0, Math.round(100 - (miss + fa) * 100));
     };
     let sumBefore = 0, sumAfter = 0, count = 0;
     byDevice.forEach((entries) => {
-      if (entries.length < 4) return; // need enough to compare
+      if (entries.length < 4) return;
       const first3 = entries.slice(0, 3);
       const last3 = entries.slice(-3);
       const b = scoreOf(first3);
@@ -178,7 +177,7 @@ function PilotPage() {
       after: Math.round(sumAfter / count),
       devices: count,
     };
-  }, [cloud]);
+  }, [effectiveCloud]);
 
   function exportCsv() {
     const rows = [
