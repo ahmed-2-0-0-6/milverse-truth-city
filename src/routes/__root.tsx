@@ -15,6 +15,7 @@ import { BadgeToast } from "@/components/BadgeToast";
 import { VisualQualityProvider } from "@/lib/visual-quality";
 import { AtmosphereLayer } from "@/components/AtmosphereLayer";
 import { GlowCursor } from "@/components/GlowCursor";
+import { RouteWipe } from "@/components/RouteWipe";
 
 function NotFoundComponent() {
   return (
