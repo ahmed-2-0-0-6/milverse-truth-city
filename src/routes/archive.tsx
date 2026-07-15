@@ -143,11 +143,12 @@ function ArchivePage() {
           <ShelfSection title="MILVERSE OFFICIAL" tone="primary" note="New official missions released regularly — covering global and emerging information threats.">
             <SpineGrid>
               {officials.map((s) => (
-                <SpineCard key={s.id} scenario={s} to={`/mirror/${s.id}`} />
+                <SpineCard key={s.id} scenario={s} />
               ))}
             </SpineGrid>
             {officials.length === 0 && <EmptyRow msg="Nothing matches those filters." />}
           </ShelfSection>
+
         )}
 
         {shelf === "community" && (
@@ -269,9 +270,9 @@ function EmptyRow({ msg }: { msg: string }) {
   return <div className="rounded-sm border border-dashed border-border p-6 text-sm text-muted-foreground text-center">{msg}</div>;
 }
 
-function SpineCard({ scenario, to }: { scenario: Scenario; to: string }) {
+function SpineCard({ scenario }: { scenario: Scenario }) {
   return (
-    <Link to={to as "/mirror/$caseId"} className="group folder-card hover:border-primary">
+    <Link to="/mirror/$caseId" params={{ caseId: scenario.id }} className="group folder-card hover:border-primary">
       <div className="folder-tab bg-primary/15 text-primary">T{scenario.tier} · {scenario.truth === "IMPOSTER" ? "DECEPTION" : "LEGIT"}</div>
       <div className="folder-body">
         <div className="text-sm font-semibold group-hover:text-primary">{scenario.title}</div>
@@ -281,6 +282,7 @@ function SpineCard({ scenario, to }: { scenario: Scenario; to: string }) {
     </Link>
   );
 }
+
 
 function ClosedFile({ entry, onOpen }: { entry: HistoryEntry; onOpen: () => void }) {
   const scenario = SCENARIOS.find((s) => s.id === entry.caseId);
