@@ -29,9 +29,9 @@ const DISTRICTS: District[] = [
     tagline: () => "Mass deception. Verify the claim without breaking the relationship.",
   },
   { id: "studio", name: "The Studio", Icon: Clapperboard, unlocked: true, to: "/studio", tagline: () => "Design a case. Share with friends." },
-  { id: "market", name: "The Market", Icon: Store, unlocked: false, tagline: () => "Fake shops and scam ads — verify the seller, not the price." },
-  { id: "arena", name: "The Arena", Icon: Swords, unlocked: false, tagline: () => "Multiplayer sources duel — whose evidence wins?" },
-  { id: "archive", name: "The Archive", Icon: Library, unlocked: false, tagline: () => "Survivor stories and the anatomy of past lies." },
+  { id: "market", name: "The Market", Icon: Store, unlocked: false, tagline: () => "Scam ads and fake shops training. Verify the seller — not the price." },
+  { id: "arena", name: "The Arena", Icon: Swords, unlocked: false, tagline: () => "Human-vs-human imposter duels. Play the mask, or spot it." },
+  { id: "archive", name: "The Archive", Icon: Library, unlocked: false, tagline: () => "Community case library. Every survivor story, indexed and playable." },
   { id: "hall", name: "City Hall", Icon: Landmark, unlocked: true, to: "/city-hall", tagline: () => "Your Trust Calibration — one chart, every district." },
 ];
 
@@ -114,6 +114,9 @@ function CityMap() {
             <Link to="/kit" className="text-primary hover:underline">
               [F2] FIELD KIT — PRINT PACK →
             </Link>
+          </div>
+          <div className="pt-2 text-muted-foreground/80 normal-case tracking-normal">
+            No accounts. No tracking. Pilot data is anonymous.
           </div>
         </footer>
       </main>

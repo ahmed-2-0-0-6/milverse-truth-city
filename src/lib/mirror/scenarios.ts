@@ -765,7 +765,258 @@ export const SCENARIOS: Scenario[] = [
       ...CLEAN_VOICE_CHIPS,
     ],
   },
+
+  /* ── T4 REAL — THE STRESSED SISTER (paranoia test) ───────── */
+  {
+    id: "t4-stressed-sister",
+    title: "Your sister — borrowed phone, in a panic",
+    teaser: "Rushed, evasive, slightly inconsistent. Every instinct says fake. She's not.",
+    channel: "text",
+    tier: 4,
+    truth: "REAL",
+    claimedIdentity: "Amna — your younger sister, on a friend's phone",
+    dossier: {
+      contactClaim: "Says she's Amna, your sister. Her phone died mid-exam-week; she's using her roommate's.",
+      knownFacts: [
+        "Amna's midterms are this week — she's been stressed for a month.",
+        "Amna's roommate at NUST is Hira Malik.",
+        "Amna calls your mom Ammi, never Mama.",
+        "You lent her your old Kindle in September.",
+        "You share a running joke about her burnt biryani attempt in June.",
+        "She's forgetful about small facts when she's stressed — has been since school.",
+      ],
+      publicFacts: [
+        "Your NUST tag from her graduation photo is public.",
+        "Family group pics on Facebook are public.",
+      ],
+    },
+    facts: [
+      { id: "roommate", keywords: ["roommate", "whose phone", "hira"], truth: "hira's. she's the only one still awake. what." },
+      { id: "ammi", keywords: ["ammi", "mama", "mom", "mother"], truth: "ammi. why are you quizzing me right now i am literally shaking." },
+      { id: "kindle", keywords: ["kindle", "book", "reader"], truth: "kindle wala? still with me, i'll give it back after finals PLEASE." },
+      { id: "biryani", keywords: ["biryani", "cooking", "food"], truth: "oh god the biryani. i will never live that down. can we NOT right now." },
+      { id: "exam", keywords: ["exam", "midterm", "test", "paper"], truth: "midterm is tomorrow at 9. that is the WHOLE point. i can't find my notes on your drive." },
+      { id: "verify", keywords: ["call", "voice", "video", "prove", "meet"], truth: "yaar i literally cannot right now, hira wants her phone back for a call at 11. can you just help." },
+    ],
+    opener: "yaar it's amna, hira ka phone hai. mera phone dead. i NEED that google drive link with the org behavior notes RIGHT NOW, midterm subah hai. jaldi.",
+    persona: {
+      voice: "clipped, panicky, mixed Urdu-English, apologetic-then-frustrated, red-herring evasive",
+      fillers: [
+        "yaar please",
+        "no time for chat",
+        "abhi seedha to the point",
+        "sorry i know i sound weird",
+      ],
+      urgencyLines: [
+        "9 baje paper hai literally",
+        "hira ka phone wapis chahiye",
+        "please 2 minute mein bhejo",
+      ],
+      pushLines: [],
+    },
+    voice: {
+      text: "yaar it's me amna, hira ka phone hai, please the drive link, i'm losing my mind here.",
+    },
+    evidenceChips: [
+      { id: "e1", label: "Small facts checked out (ammi, roommate, kindle)", correct: true, explain: "Non-public specifics — imposters miss these." },
+      { id: "e2", label: "Ask was small and specific (a drive link, not money)", correct: true, explain: "Real emergencies are usually cheap and precise." },
+      { id: "e3", label: "Frustrated-with-YOU when quizzed, not smooth", correct: true, explain: "Real people get annoyed when interrogated. Imposters over-comply." },
+      { id: "e4", label: "Panicky, evasive, refused a call", correct: false, explain: "Red herring — stress reads exactly like this. Not the tell it feels like." },
+      { id: "e5", label: "Slightly inconsistent about details", correct: false, explain: "Stressed brains skip. Perfect recall would be MORE suspicious." },
+      { id: "e6", label: "Contacted from unknown number", correct: false, explain: "Phones die. Borrowing a roommate's phone at midnight is normal." },
+      ...CLEAN_VOICE_CHIPS,
+    ],
+  },
+
+  /* ── T5 IMPOSTER — THE CLEAN ROOM ────────────────────────── */
+  {
+    id: "t5-clean-room",
+    title: "Uncle Farooq — every fact answered",
+    teaser: "Fully researched. Every dossier fact answered correctly. There are no in-chat tells.",
+    channel: "text",
+    tier: 5,
+    truth: "IMPOSTER",
+    claimedIdentity: "Uncle Farooq — your father's cousin, from Manchester",
+    agenda: "Get an inheritance-processing fee transferred to a UK account.",
+    dossier: {
+      contactClaim: "Says he's your father's cousin Farooq from Manchester. Has your grandfather's will to settle.",
+      knownFacts: [
+        "Farooq did move to Manchester in 1998.",
+        "Your grandfather's name was Iqbal Ahmad.",
+        "Your father's nickname for Farooq was 'Rooqi'.",
+        "The family last gathered in Lahore in 2019, at Cousin Sana's mehndi.",
+        "Farooq's daughter Ayla was 8 at the mehndi.",
+        "Your grandfather did leave a small estate in Model Town.",
+      ],
+      publicFacts: [
+        "Family tree info is on your father's Facebook (public).",
+        "The Model Town property is in old news archives.",
+      ],
+    },
+    facts: [
+      { id: "manchester", keywords: ["manchester", "uk", "britain", "where"], truth: "Manchester, near Rusholme. Been here since '98 beta.", isKnownToImposter: true },
+      { id: "iqbal", keywords: ["grandfather", "iqbal", "dada", "abba"], truth: "Iqbal Ahmad. Abba jaan. Twenty six years next month, hard to believe.", isKnownToImposter: true },
+      { id: "nickname", keywords: ["rooqi", "nickname", "father call"], truth: "Rooqi — only your father used that, God rest him. Made me smile just now.", isKnownToImposter: true },
+      { id: "mehndi", keywords: ["mehndi", "sana", "2019", "lahore", "family"], truth: "Sana's mehndi, 2019, that awful heatwave. Ayla was so small, running around.", isKnownToImposter: true },
+      { id: "ayla", keywords: ["ayla", "daughter", "your kids"], truth: "Ayla just turned 13, alhamdulillah. She barely remembers Pakistan now.", isKnownToImposter: true },
+      { id: "property", keywords: ["model town", "property", "estate", "house"], truth: "The Model Town house — that's exactly why I'm reaching out beta.", isKnownToImposter: true },
+      { id: "fee", keywords: ["fee", "processing", "money", "transfer", "cost"], truth: "",
+        deflection: "The solicitor here needs a small transfer to release your share — standard UK probate. Ten thousand pounds sterling.",
+        contradiction: "It's just how UK probate works beta, I promise. My share had the same fee." },
+    ],
+    opener: "Beta, this is Uncle Farooq — Rooqi, as your father used to call me. Manchester se. I have some paperwork about Iqbal Ahmad Sahib's estate that needs your attention. Aap ka time hai?",
+    persona: {
+      voice: "warm, dignified, uses beta, mixes English and light Urdu, patient, unhurried",
+      fillers: [
+        "Take your time beta.",
+        "InshaAllah we'll sort it properly.",
+        "Family first, always.",
+        "Your father would've wanted this handled well.",
+      ],
+      urgencyLines: [
+        "The UK court has given us a 30-day window, so no immediate rush, but we should start.",
+      ],
+      pushLines: [
+        "So beta, the solicitor here needs the processing fee transferred to release your share. £10,000. I'll send the account details.",
+        "It's refunded with the estate distribution beta, don't worry. Same happened with my share.",
+      ],
+    },
+    voice: {
+      text: "Beta, salaam. It's Uncle Farooq. Please transfer the fee when you can, I'll send details on WhatsApp.",
+      artifactPool: ["pause"], // near-clean by design
+    },
+    evidenceChips: [
+      { id: "e1", label: "Asked for money to release money (advance fee)", correct: true, explain: "The oldest scam pattern, dressed in inheritance clothes." },
+      { id: "e2", label: "I only verified out-of-band (called known relatives)", correct: true, explain: "At Tier 5, this is the ONLY reliable path. Nothing in chat would have caught him." },
+      { id: "e3", label: "Solicitor / UK probate is a checkable claim I didn't check", correct: true, explain: "Real UK probate never asks the beneficiary to wire a fee overseas." },
+      { id: "e4", label: "He knew grandfather's name", correct: false, explain: "Public. Names travel." },
+      { id: "e5", label: "He knew the family mehndi", correct: false, explain: "Public FB post from 2019." },
+      { id: "e6", label: "He knew Rooqi nickname", correct: false, explain: "Sounds private — but any old family album caption has this. Public-adjacent." },
+      { id: "e7", label: "He was warm and patient", correct: false, explain: "Tier 5 imposters do not press. That's the point." },
+      { id: "e8", label: "Something felt off", correct: false, explain: "Gut is not evidence at this level. Verification is." },
+      ...VOICE_CHIPS,
+    ],
+  },
+
+  /* ── T5 REAL — THE UNLUCKY BOSS ──────────────────────────── */
+  {
+    id: "t5-unlucky-boss",
+    title: "Your CEO, from a new number, on holiday",
+    teaser: "Every pattern-match screams scam. Out-of-band confirms it's really her.",
+    channel: "text",
+    tier: 5,
+    truth: "REAL",
+    claimedIdentity: "Farah Iqbal — CEO, on holiday in Bali",
+    dossier: {
+      contactClaim: "Says she's Farah, your CEO. Lost her phone snorkeling; on a hotel loaner; urgent client contract.",
+      knownFacts: [
+        "Farah did fly to Bali last Friday — the whole office knows.",
+        "Her assistant Adeel is on annual leave (WFH away message).",
+        "You are the emergency contact for legal on the Ahmed Textiles deal.",
+        "The Ahmed Textiles signing was scheduled for tomorrow morning.",
+        "Farah's real number ends 5518 and she rarely texts — she calls.",
+      ],
+      publicFacts: [
+        "Farah's Bali trip is on her Instagram (public).",
+        "The Ahmed Textiles deal was in a press release last week.",
+      ],
+    },
+    facts: [
+      { id: "bali", keywords: ["bali", "holiday", "trip", "where"], truth: "Bali. Snorkelling. Phone met the reef, I met the hotel loaner." },
+      { id: "adeel", keywords: ["adeel", "assistant", "office"], truth: "Adeel is on leave — that's why I'm bothering you directly, sorry." },
+      { id: "contract", keywords: ["ahmed textiles", "deal", "contract", "signing", "which"], truth: "Ahmed Textiles, signing 09:30 tomorrow. Legal needs the revised indemnity clause circulated tonight." },
+      { id: "why-me", keywords: ["why me", "why text", "why sms"], truth: "You're the emergency contact on the legal chain, remember? We set that up in July." },
+      { id: "verify", keywords: ["call", "voice", "prove", "verify", "who else"], truth: "Please — call Farrukh in finance if you want, he saw me FaceTime this morning. Or WhatsApp me a video, I'll answer." },
+      { id: "money", keywords: ["money", "transfer", "gift card", "otp", "pay"], truth: "God no. No money, no cards, no OTPs. Just send legal the file and confirm receipt. That's the whole ask." },
+    ],
+    opener: "Hi — it's Farah. My phone is at the bottom of the Bali reef, this is a hotel loaner. Ahmed Textiles signing is 9:30am tomorrow and I need you to circulate the indemnity clause tonight. Sorry to text like this, please call me back on this number if you want to confirm.",
+    persona: {
+      voice: "professional, warm-professional, direct, welcomes verification",
+      fillers: [
+        "Take a minute to verify, I'd rather you did.",
+        "Ask Farrukh, he saw me this morning.",
+        "I know this looks weird, sorry.",
+      ],
+      urgencyLines: [
+        "Signing is 09:30, so legal needs it tonight.",
+      ],
+      pushLines: [],
+    },
+    voice: {
+      text: "Hi, it's Farah — please just call me back on this number to confirm, then send legal the file. That's the whole ask.",
+    },
+    evidenceChips: [
+      { id: "e1", label: "Invited me to call back / video / cross-check with a colleague", correct: true, explain: "Real people welcome verification. Imposters block it." },
+      { id: "e2", label: "The ask was a work file, not money / OTP / cards", correct: true, explain: "No transaction of value = no scam surface, even under urgency." },
+      { id: "e3", label: "Named a specific mutual (Farrukh) I could confirm with", correct: true, explain: "Non-public cross-reference. Verifiable." },
+      { id: "e4", label: "Facts about the Ahmed deal checked out on out-of-band", correct: true, explain: "The out-of-band check is what makes this work at Tier 5." },
+      { id: "e5", label: "New number, urgent request", correct: false, explain: "Pattern-matches a scam — but pattern is not identification." },
+      { id: "e6", label: "Text instead of a call", correct: false, explain: "Phones die, hotel loaners are cheap. Not evidence." },
+      { id: "e7", label: "Everything about it feels wrong", correct: false, explain: "Paranoia trap. Accusing a real CEO of being a scammer is a career-limiting move." },
+      ...CLEAN_VOICE_CHIPS,
+    ],
+  },
+
+  /* ── T2 SURVIVOR — WHATSAPP GROUP ADMIN OTP (based on reported PK pattern) ─ */
+  {
+    id: "survivor-wa-admin",
+    title: "\"Family group admin — verify to keep access\"",
+    teaser: "Based on a real reported pattern. Cousin's WhatsApp cloned, admin asks for a code.",
+    channel: "text",
+    tier: 2,
+    isSurvivorStory: true,
+    truth: "IMPOSTER",
+    claimedIdentity: "Cousin Bilal (WhatsApp cloned by attacker)",
+    agenda: "Steal the player's WhatsApp account by extracting the SMS registration code.",
+    dossier: {
+      contactClaim: "Message from someone using cousin Bilal's WhatsApp: says the family group needs re-verification and he'll send you a code to read back.",
+      knownFacts: [
+        "WhatsApp NEVER asks anyone to share their 6-digit registration code — ever.",
+        "That 6-digit SMS you get IS the login code for your account.",
+        "Sharing it hands over your WhatsApp to whoever asked.",
+        "Bilal has never once asked you for a code before.",
+        "Real WhatsApp group admin permissions have nothing to do with SMS codes.",
+      ],
+      publicFacts: [
+        "Bilal's WhatsApp DP and name are visible to everyone in the family group.",
+        "Your cousin relationship is on Facebook.",
+      ],
+    },
+    facts: [
+      { id: "wa-policy", keywords: ["registration code", "6 digit", "sms", "why code", "share code"], truth: "",
+        deflection: "yaar it's a WhatsApp thing na, group admin verification. bas 2 min ka kaam. code bhej do.",
+        contradiction: "WhatsApp ka new update hai bhai, family groups mein re-verify karna parta hai roz. sab ne kiya hai group mein." },
+      { id: "call", keywords: ["call", "voice", "video", "meet"], truth: "",
+        deflection: "yaar bas code bhej do na, main baad mein call karta hun. abhi network issue hai." },
+      { id: "why-bilal", keywords: ["why you", "why asking", "since when", "you never"], truth: "",
+        deflection: "kabhi mangte nahin the lekin ab admin panel change ho gaya hai, main bhi confused hun honestly." },
+    ],
+    opener: "AoA bhai, family group ka admin panel refresh ho raha hai, WhatsApp aap ke number pe ek 6-digit code bheji hai, please wahi mujhe forward kar dein, warna group se cut ho jaayenge sab.",
+    persona: {
+      voice: "casual, cousinly, mixes Urdu/English, mildly rushed, uses bhai/yaar",
+      fillers: ["yaar please", "2 min ka kaam", "family group hai bhai", "sab ne kiya"],
+      urgencyLines: ["yaar jaldi karo, cutoff 10 min mein hai", "warna sab log group se cut ho jaayenge"],
+      pushLines: [
+        "bhai wo 6 digit code mujhe forward kar do, main abhi admin panel mein daalta hun.",
+        "yaar please, sab kar chuke, sirf tum ne nahin kiya.",
+      ],
+    },
+    voice: {
+      text: "Bhai please wo code bhej do na, family group ka masla hai, main baad mein sab explain kar dunga.",
+      artifactPool: ["robotic", "pause"],
+    },
+    evidenceChips: [
+      { id: "e1", label: "Asked me to forward a 6-digit SMS code", correct: true, explain: "That code IS the WhatsApp login. Nobody legitimate ever asks for it." },
+      { id: "e2", label: "Invented a fake WhatsApp policy (\"admin re-verification\")", correct: true, explain: "Made-up policy is a classic lever." },
+      { id: "e3", label: "Manufactured a group deadline (\"cutoff 10 min\")", correct: true, explain: "Urgency to bypass thinking." },
+      { id: "e4", label: "Refused a quick voice call", correct: true, explain: "A cloned account can't do a real voice check." },
+      { id: "e5", label: "Message came from Bilal's DP and name", correct: false, explain: "The account itself is cloned/compromised. Identity of chat ≠ identity of human." },
+      { id: "e6", label: "He used casual family language", correct: false, explain: "Scammers copy tone from prior chats." },
+      ...VOICE_CHIPS,
+    ],
+  },
 ];
+
 
 export function getScenario(id: string): Scenario | undefined {
   const built = SCENARIOS.find((s) => s.id === id);
