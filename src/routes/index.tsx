@@ -89,10 +89,11 @@ function CityMap() {
         </div>
       </section>
 
-      <Marquee />
-
       {/* ── SCROLL STORY ── */}
       <ScrollStory />
+
+      <Marquee />
+
 
       {/* ── ENTER THE CITY (interactive map / list) ── */}
       <section id="enter" className="relative pt-16 pb-6 px-4">
