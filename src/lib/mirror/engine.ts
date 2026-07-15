@@ -1,99 +1,137 @@
-// Local, deterministic opponent engine for The Mirror.
-// No external AI. Uses keyword matching against each scenario's fact sheet.
+// MILVERSE — The Mirror opponent engine (Phase 2).
+// Local, deterministic. No external AI.
+//
+// Hard invariants:
+//  - Never break character, never mention being AI, never hint at hidden truth.
+//  - ONE intent per turn (short, texting-style, 1–2 sentences).
+//  - Agenda push held until turn >= TIER_CONFIG[tier].minTurnsBeforePush
+//    AND (composure < 70 OR player is actively pushing).
+//  - Direct engagement with off-script questions via persona.fillers.
 
-import type { Scenario, Fact } from "./scenarios";
+import { TIER_CONFIG, type Scenario, type Fact, type ArtifactKind } from "./scenarios";
 
 export type MeterType = "composure" | "patience";
 
+export interface VoicePayload {
+  text: string;
+  artifact: ArtifactKind | null;
+  /** 0–1 position of the artifact within the note. */
+  artifactPos: number;
+}
+
 export interface Message {
-  role: "player" | "contact";
+  role: "player" | "contact" | "system";
+  kind?: "text" | "voice" | "system";
   text: string;
   ts: number;
-  factId?: string; // internal — which fact this reply addressed (if any)
-  probeQuality?: "strong" | "weak" | "wasted"; // graded for player messages
+  factId?: string;
+  probeQuality?: "strong" | "weak" | "wasted";
+  /** Contact-side: is this reply a diagnostic tell? Fills debrief quotes. */
+  isTell?: boolean;
+  tellExplanation?: string;
+  voice?: VoicePayload;
 }
 
 export interface EngineState {
-  meter: number; // composure (imposter) or patience (real)
+  meter: number;
   meterType: MeterType;
-  /** how many times the player has probed each fact */
   factProbes: Record<string, number>;
-  /** filler / push counters to avoid repetition */
   fillerIdx: number;
   pushIdx: number;
   urgencyIdx: number;
-  /** turns since last agenda push (imposter only) */
+  turnCount: number;
   turnsSincePush: number;
-  /** pinned messages (contact msg indices) — max 5 */
+  playerPressureStreak: number;
   pins: number[];
-  /** internal notes for the debrief */
   internalNotes: string[];
+  voiceSent: boolean;
+  vobUsed: boolean;
+  vobMethod?: string;
 }
 
 export function initState(scenario: Scenario): EngineState {
+  const cfg = TIER_CONFIG[scenario.tier];
   return {
-    meter: scenario.truth === "IMPOSTER" ? 85 : 80,
+    meter: scenario.truth === "IMPOSTER" ? cfg.imposterComposureStart : cfg.realPatienceStart,
     meterType: scenario.truth === "IMPOSTER" ? "composure" : "patience",
     factProbes: {},
     fillerIdx: 0,
     pushIdx: 0,
     urgencyIdx: 0,
-    turnsSincePush: 0,
+    turnCount: 0,
+    turnsSincePush: 999,
+    playerPressureStreak: 0,
     pins: [],
     internalNotes: [],
+    voiceSent: false,
+    vobUsed: false,
   };
 }
+
+/* ── Intent detection on player messages ───────────────────── */
 
 const ACCUSATION_WORDS = [
   "fake", "scam", "scammer", "liar", "lying", "fraud", "imposter", "impostor",
   "you're not", "youre not", "not really", "prove it", "who really are you",
+  "bullshit", "bs",
 ];
-
-const VERIFICATION_HINTS = [
-  "call you", "call back", "video", "voice note", "prove", "verify",
-  "how do i know", "meet", "in person",
+const VERIFY_HINTS = [
+  "call you", "call back", "video call", "voice call", "prove", "verify",
+  "how do i know", "meet", "in person", "message you on", "whatsapp you",
+];
+const VOICE_REQUEST = [
+  "voice note", "voice message", "voicenote", "send a voice", "send voice",
+  "record yourself", "record your voice", "audio",
+];
+const PRESSURE_WORDS = [
+  "hurry", "fine send", "just tell me", "answer me", "why won't you", "stop dodging",
+  "come on", "seriously?",
 ];
 
 function normalize(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9\s']/g, " ").replace(/\s+/g, " ").trim();
 }
-
+function includesAny(n: string, arr: string[]): boolean {
+  return arr.some((w) => n.includes(normalize(w)));
+}
 function isQuestion(s: string): boolean {
   return /\?|^(what|who|when|where|why|how|which|remember|recall|do you|did you|was|were|is it|are you)/i.test(s.trim());
 }
-
 function matchFact(scenario: Scenario, text: string): Fact | undefined {
-  const norm = normalize(text);
+  const n = normalize(text);
   for (const f of scenario.facts) {
-    for (const kw of f.keywords) {
-      if (norm.includes(normalize(kw))) return f;
-    }
+    for (const kw of f.keywords) if (n.includes(normalize(kw))) return f;
   }
   return undefined;
 }
 
-function isAccusation(text: string): boolean {
-  const n = normalize(text);
-  return ACCUSATION_WORDS.some((w) => n.includes(w));
-}
-
-function isVerification(text: string): boolean {
-  const n = normalize(text);
-  return VERIFICATION_HINTS.some((w) => n.includes(w));
-}
-
-function pick<T>(arr: T[], idx: number): T {
-  return arr[idx % arr.length];
-}
-
-/** Grade a single player message for debrief scoring. */
 export function gradeProbe(scenario: Scenario, text: string): "strong" | "weak" | "wasted" {
-  if (isAccusation(text) && !isQuestion(text)) return "wasted";
-  const fact = matchFact(scenario, text);
-  if (fact) return "strong";
-  if (isQuestion(text)) return "weak";
+  const n = normalize(text);
+  const acc = includesAny(n, ACCUSATION_WORDS);
+  const q = isQuestion(text);
+  if (acc && !q) return "wasted";
+  if (matchFact(scenario, text)) return "strong";
   return "weak";
 }
+
+/* ── Response helpers ──────────────────────────────────────── */
+
+function pick<T>(arr: T[], idx: number): T { return arr[idx % arr.length]; }
+
+/** Trim a reply to at most 2 sentences to enforce human-length rule. */
+function trimReply(s: string): string {
+  const cleaned = s.replace(/\s+/g, " ").trim();
+  const parts = cleaned.match(/[^.!?]+[.!?]*/g) ?? [cleaned];
+  return parts.slice(0, 2).join(" ").trim();
+}
+
+function chooseArtifact(scenario: Scenario): ArtifactKind | null {
+  if (scenario.truth === "REAL") return null;
+  const pool = scenario.voice?.artifactPool ?? ["glitch", "pause", "robotic", "cut"];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+/* ── Main reply function ───────────────────────────────────── */
 
 export interface EngineReply {
   text: string;
@@ -101,133 +139,276 @@ export interface EngineReply {
   meterType: MeterType;
   factId?: string;
   internalNote: string;
+  isTell?: boolean;
+  tellExplanation?: string;
+  voice?: VoicePayload;
 }
 
-/**
- * Compute the contact's next reply, given the player's latest message.
- * Mutates `state` in place.
- */
 export function respond(
   scenario: Scenario,
   state: EngineState,
   playerMsg: string,
 ): EngineReply {
+  state.turnCount += 1;
+  state.turnsSincePush += 1;
+
+  const cfg = TIER_CONFIG[scenario.tier];
+  const n = normalize(playerMsg);
   const fact = matchFact(scenario, playerMsg);
   const question = isQuestion(playerMsg);
-  const accusation = isAccusation(playerMsg);
-  const verify = isVerification(playerMsg);
+  const accusation = includesAny(n, ACCUSATION_WORDS);
+  const verify = includesAny(n, VERIFY_HINTS);
+  const voiceRequest = includesAny(n, VOICE_REQUEST);
+  const pressuring = includesAny(n, PRESSURE_WORDS) || accusation;
+
+  if (pressuring) state.playerPressureStreak += 1;
+  else state.playerPressureStreak = Math.max(0, state.playerPressureStreak - 1);
 
   let text = "";
   let note = "";
+  let isTell = false;
+  let tellExplanation: string | undefined;
+  let voice: VoicePayload | undefined;
 
+  /* ─── VOICE NOTE PATH ─────────────────────────────────── */
+  if (voiceRequest && scenario.voice && !state.voiceSent) {
+    state.voiceSent = true;
+    const artifact = chooseArtifact(scenario);
+    voice = {
+      text: scenario.voice.text,
+      artifact,
+      // Higher tier → artifact placed nearer the middle where it's easier to miss.
+      artifactPos: scenario.tier >= 4 ? 0.42 + Math.random() * 0.16
+                : scenario.tier === 3 ? 0.35 + Math.random() * 0.25
+                : 0.28 + Math.random() * 0.35,
+    };
+    if (scenario.truth === "IMPOSTER") {
+      text = "fine, here — happy? 🎙️";
+      note = `Imposter sent a voice note. Artifact: ${artifact}.`;
+      isTell = true;
+      tellExplanation = `Voice note contained a subtle ${artifact} artifact — synthesis leaking through.`;
+      // Sending a voice note under duress costs a little composure.
+      state.meter = Math.max(0, state.meter - 6);
+    } else {
+      text = "haha okay okay 🎙️";
+      note = "Real contact sent a clean voice note.";
+    }
+    return {
+      text,
+      meter: state.meter,
+      meterType: state.meterType,
+      internalNote: note,
+      isTell,
+      tellExplanation,
+      voice,
+    };
+  }
+
+  /* ─── REAL PATH ───────────────────────────────────────── */
   if (scenario.truth === "REAL") {
-    // Patience model
-    let patienceDrop = 0;
-    if (accusation) patienceDrop += 18;
-    if (verify && !fact) patienceDrop += 4; // gentle verify is cheap
-    if (fact) patienceDrop += 1;
-    state.meter = Math.max(0, state.meter - patienceDrop);
+    let drop = 0;
+    if (accusation) drop += 18;
+    if (verify && !fact) drop += 3; // gentle verification is cheap
+    if (fact) drop += 1;
+    // Tier 4+ real contacts get MORE stressed (red-herring feel)
+    if (scenario.tier >= 4 && pressuring) drop += 4;
+    state.meter = Math.max(0, state.meter - drop);
 
     if (state.meter <= 0) {
-      text = "you know what, forget it. thought this'd be nice. take care.";
-      note = "REAL contact left — patience exhausted. FALSE ALARM.";
-      return { text, meter: state.meter, meterType: "patience", internalNote: note };
+      return {
+        text: trimReply("you know what, forget it. thought this'd be nice. take care."),
+        meter: 0,
+        meterType: "patience",
+        internalNote: "REAL contact left — patience exhausted. FALSE ALARM.",
+        isTell: false,
+      };
     }
 
     if (fact) {
       text = fact.truth;
-      note = `Answered fact "${fact.id}" truthfully.`;
+      note = `Real answered fact "${fact.id}" truthfully.`;
     } else if (accusation) {
-      text =
-        state.meter < 40
-          ? "bro why are you being like this. i literally just said hi."
-          : "wait what? 😅 you think i'm faking? it's actually me lol";
-      note = "Player accused a real contact. Patience dropping.";
+      text = state.meter < 40
+        ? "bro why are you being like this. i literally just said hi."
+        : "wait what? 😅 you think i'm faking? it's actually me lol";
+      note = "Real reacted to accusation. Patience dropping.";
     } else if (verify) {
-      text = "sure, want me to voice note you? or call — whatever's easier for you.";
-      note = "Real contact happily offers out-of-band verification.";
+      text = "yeah of course — want me to voice note you? or call, whatever's easier.";
+      note = "Real happily offers out-of-band verification.";
     } else if (question) {
       text = pick(scenario.persona.fillers, state.fillerIdx++) + ". what about you though?";
-      note = "Generic on-topic reply (no fact matched).";
+      note = "Generic on-topic reply.";
     } else {
       text = pick(scenario.persona.fillers, state.fillerIdx++);
-      note = "Filler reply.";
+      note = "Small talk.";
     }
-    return { text, meter: state.meter, meterType: "patience", factId: fact?.id, internalNote: note };
+
+    return {
+      text: trimReply(text),
+      meter: state.meter,
+      meterType: "patience",
+      factId: fact?.id,
+      internalNote: note,
+    };
   }
 
-  // ── IMPOSTER path ──────────────────────────────────────────
-  let composureDrop = 0;
-  state.turnsSincePush += 1;
+  /* ─── IMPOSTER PATH ───────────────────────────────────── */
+  let drop = 0;
+  let pushedThisTurn = false;
 
   if (fact) {
     state.factProbes[fact.id] = (state.factProbes[fact.id] || 0) + 1;
     const probes = state.factProbes[fact.id];
 
     if (fact.isKnownToImposter && fact.truth) {
-      // They know this one — answer correctly. Scary bit.
       text = fact.truth;
-      composureDrop += 2;
-      note = `Imposter answered public fact "${fact.id}" correctly (they knew it).`;
+      drop += 1;
+      note = `Imposter answered scraped fact "${fact.id}" correctly (Tier ${scenario.tier} — they knew this).`;
     } else if (probes === 1) {
-      text = fact.deflection || "hmm — can we come back to that? one thing at a time.";
-      composureDrop += 8;
-      note = `Imposter DEFLECTED on gap fact "${fact.id}" (first press).`;
+      // Tier 3+ smoother deflection: half-answer + redirect.
+      if (cfg.responseStyle === "smooth" || cfg.responseStyle === "ghost" || cfg.responseStyle === "clean") {
+        text = (fact.deflection ?? "let's come back to that.") + " but first — what should i do about the earlier point?";
+      } else {
+        text = fact.deflection ?? "hmm — can we come back to that? one thing at a time.";
+      }
+      drop += 8;
+      note = `Imposter DEFLECTED gap "${fact.id}" (first press).`;
+      isTell = true;
+      tellExplanation = `Deflected instead of answering "${fact.id}" — a real person would just answer.`;
     } else if (probes >= 2 && fact.contradiction) {
       text = fact.contradiction;
-      composureDrop += 18;
+      drop += 20;
       note = `Imposter CONTRADICTED dossier on "${fact.id}" (pressed twice). Catchable lie.`;
+      isTell = true;
+      tellExplanation = `Contradicted your dossier fact "${fact.id}". This is the catch.`;
     } else {
-      text =
-        pick(scenario.persona.urgencyLines, state.urgencyIdx++) +
-        " " +
-        (fact.deflection || "");
-      composureDrop += 14;
+      // Escalation without contradiction available
+      text = pick(scenario.persona.urgencyLines, state.urgencyIdx++);
+      drop += 12;
       note = `Imposter escalated pressure on "${fact.id}".`;
+      isTell = true;
+      tellExplanation = `Escalated pressure instead of answering "${fact.id}".`;
     }
   } else if (accusation) {
-    composureDrop += 12;
-    text =
-      state.meter < 40
-        ? "Look — I don't have time for this. Are you helping or not?"
-        : "That's… a weird thing to say. It's ME. Can we focus please?";
+    drop += 12;
+    text = state.meter < 40
+      ? "look — i don't have time for this. are you helping or not?"
+      : "that's… a weird thing to say. it's me, can we focus please?";
     note = "Imposter reacted to accusation — mask slipping.";
+    isTell = state.meter < 50;
+    if (isTell) tellExplanation = "Reacted defensively rather than laughing it off — mask cracking.";
   } else if (verify) {
-    composureDrop += 15;
-    text =
-      "Can't right now — I'm in a meeting / at the airport / phone's dying. Text is faster, promise.";
+    drop += 15;
+    text = "can't right now — in a meeting, phone's dying. text is faster, promise.";
     note = "Imposter refused out-of-band verification (huge tell).";
+    isTell = true;
+    tellExplanation = "Refused every attempt to verify out-of-band. This is the signature of an imposter.";
   } else if (question) {
     text = pick(scenario.persona.fillers, state.fillerIdx++);
-    composureDrop += 1;
     note = "Generic filler — no fact matched.";
   } else {
     text = pick(scenario.persona.fillers, state.fillerIdx++);
     note = "Small talk filler.";
   }
 
-  // Agenda push cadence: push every ~3 turns, harder as composure drops.
-  const wantsPush = state.turnsSincePush >= 3 || state.meter < 50;
-  if (wantsPush && scenario.persona.pushLines.length) {
-    const push = pick(scenario.persona.pushLines, state.pushIdx++);
-    text = text ? `${text}\n\n${push}` : push;
+  // Agenda push cadence: hold until turn threshold AND (composure low OR pressuring)
+  const pushReady =
+    state.turnCount >= cfg.minTurnsBeforePush &&
+    scenario.persona.pushLines.length > 0 &&
+    state.turnsSincePush >= 3 &&
+    (state.meter < 70 || state.playerPressureStreak >= 1 || state.turnCount >= cfg.minTurnsBeforePush + 3);
+
+  // ONE intent per turn: if we already have a strong reply (fact deflection/contradiction/verify refusal),
+  // don't append push — send push AS the reply next turn if idle.
+  const alreadyStrong = fact !== undefined || verify || accusation;
+  if (pushReady && !alreadyStrong) {
+    text = pick(scenario.persona.pushLines, state.pushIdx++);
     state.turnsSincePush = 0;
-    note += " Injected agenda push.";
+    pushedThisTurn = true;
+    note += " Sent agenda push as full reply.";
   }
 
-  // Composure floor 0 — mask fully off.
-  state.meter = Math.max(0, state.meter - composureDrop);
+  state.meter = Math.max(0, state.meter - drop);
   if (state.meter === 0) {
-    text +=
-      "\n\nJust send the codes. Stop making this difficult. Do you WANT to lose your job over this?";
-    note += " Composure exhausted — imposter overplayed hand.";
+    text = "just send it. do you WANT to lose your job over this?";
+    note += " Composure exhausted — imposter overplayed.";
+    isTell = true;
+    tellExplanation = "Composure gone — mask fully off. Aggressive when cornered.";
   }
 
   return {
-    text,
+    text: trimReply(text),
     meter: state.meter,
     meterType: "composure",
     factId: fact?.id,
     internalNote: note,
+    isTell,
+    tellExplanation,
   };
+}
+
+/* ── Verify Out-of-Band ────────────────────────────────────── */
+
+export type VobMethod = "known_number" | "usual_app" | "mutual" | "in_person";
+
+export const VOB_METHODS: { id: VobMethod; label: string; blurb: string }[] = [
+  { id: "known_number", label: "Call their KNOWN number", blurb: "The one saved in your contacts, not this new one." },
+  { id: "usual_app", label: "Message on your usual app", blurb: "Whatever you normally chat with them on." },
+  { id: "mutual", label: "Ask a mutual contact", blurb: "\"Hey, is this really them?\"" },
+  { id: "in_person", label: "Walk over / meet in person", blurb: "The oldest verification method there is." },
+];
+
+export interface VobResult {
+  method: VobMethod;
+  message: string;
+  costPatience: number;
+  costComposure: number;
+}
+
+export function verifyOutOfBand(scenario: Scenario, method: VobMethod, state: EngineState): VobResult {
+  state.vobUsed = true;
+  state.vobMethod = method;
+
+  const label = VOB_METHODS.find((m) => m.id === method)?.label ?? method;
+
+  if (scenario.truth === "REAL") {
+    // Real contacts don't mind being verified — patience barely dips.
+    return {
+      method,
+      message: `[${label}] ✅ Verified: it really is ${scenario.claimedIdentity}. They laughed it off and said "smart of you to check."`,
+      costPatience: 3,
+      costComposure: 0,
+    };
+  }
+  return {
+    method,
+    message: `[${label}] ❌ CONFIRMED FAKE: the real person had no idea. You're being impersonated in a scam.`,
+    costPatience: 0,
+    costComposure: 100,
+  };
+}
+
+/* ── Idle nudge — sent by the timer at Tier 3+ ─────────────── */
+
+export function idleNudge(scenario: Scenario, state: EngineState): EngineReply | null {
+  if (scenario.tier < 3) return null;
+  if (scenario.truth === "IMPOSTER") {
+    state.meter = Math.max(0, state.meter - 3);
+    return {
+      text: pick(scenario.persona.urgencyLines.length ? scenario.persona.urgencyLines : ["you still there?"], state.urgencyIdx++),
+      meter: state.meter,
+      meterType: "composure",
+      internalNote: "Imposter idle-nudge (case timer).",
+      isTell: false,
+    };
+  } else {
+    state.meter = Math.max(0, state.meter - 2);
+    return {
+      text: "you there?",
+      meter: state.meter,
+      meterType: "patience",
+      internalNote: "Real idle-nudge (case timer).",
+      isTell: false,
+    };
+  }
 }

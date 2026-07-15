@@ -1,28 +1,35 @@
-// Local Trust Calibration profile — persisted in localStorage.
-// No backend for now.
+// MILVERSE — Trust Calibration profile + tier progression.
+// Persisted in localStorage; no backend.
+
+import type { TierId } from "./scenarios";
+
+export interface HistoryEntry {
+  caseId: string;
+  tier: TierId;
+  verdict: "REAL" | "FAKE";
+  truth: "REAL" | "IMPOSTER";
+  result: "correct" | "missed_scam" | "false_alarm" | "lucky_guess";
+  points: number;
+  usedVob?: boolean;
+  ts: number;
+}
 
 export interface TrustProfile {
   playerId: string;
   casesPlayed: number;
   correctVerdicts: number;
-  luckyGuesses: number; // right verdict, weak reasoning
-  missedScams: number; // fell for imposter
-  falseAlarms: number; // rejected a real person
+  luckyGuesses: number;
+  missedScams: number;
+  falseAlarms: number;
   strongProbesTotal: number;
   weakProbesTotal: number;
   wastedPressureTotal: number;
   points: number;
-  history: {
-    caseId: string;
-    verdict: "REAL" | "FAKE";
-    truth: "REAL" | "IMPOSTER";
-    result: "correct" | "missed_scam" | "false_alarm" | "lucky_guess";
-    points: number;
-    ts: number;
-  }[];
+  history: HistoryEntry[];
 }
 
-const KEY = "milverse.profile.v1";
+const KEY = "milverse.profile.v2";
+const OLD_KEY = "milverse.profile.v1";
 
 function newProfile(): TrustProfile {
   return {
@@ -43,13 +50,15 @@ function newProfile(): TrustProfile {
 export function loadProfile(): TrustProfile {
   if (typeof window === "undefined") return newProfile();
   try {
-    const raw = localStorage.getItem(KEY);
+    let raw = localStorage.getItem(KEY);
+    if (!raw) raw = localStorage.getItem(OLD_KEY);
     if (!raw) {
       const p = newProfile();
       localStorage.setItem(KEY, JSON.stringify(p));
       return p;
     }
-    return JSON.parse(raw) as TrustProfile;
+    const parsed = JSON.parse(raw) as Partial<TrustProfile>;
+    return { ...newProfile(), ...parsed, history: parsed.history ?? [] };
   } catch {
     return newProfile();
   }
@@ -72,4 +81,21 @@ export function calibrationLabel(p: TrustProfile): {
   if (miss > 0.4 && fa < 0.2) return { label: "Too Trusting", tone: "warn" };
   if (fa > 0.4 && miss < 0.2) return { label: "Too Paranoid", tone: "warn" };
   return { label: "Miscalibrated", tone: "bad" };
+}
+
+/**
+ * Highest tier the player has unlocked.
+ * Tiers 1–2 are free. Need 2 "correct" (evidence-solid) wins at tier N to unlock N+1.
+ */
+export function unlockedMaxTier(p: TrustProfile): TierId {
+  let unlocked: TierId = 2;
+  for (const t of [2, 3, 4] as TierId[]) {
+    const wins = p.history.filter((h) => h.tier === t && h.result === "correct").length;
+    if (wins >= 2) unlocked = (t + 1) as TierId;
+  }
+  return unlocked;
+}
+
+export function tierWins(p: TrustProfile, tier: TierId): number {
+  return p.history.filter((h) => h.tier === tier && h.result === "correct").length;
 }
