@@ -111,13 +111,27 @@ function FeedPlay() {
             });
             window.dispatchEvent(new Event("milverse:profile"));
             checkAndAwardBadges(p);
-            setPhase("debrief");
+            setPhase("reveal");
           }}
+        />
+      )}
+      {phase === "reveal" && outcome && (
+        <VerdictMoment
+          caseTitle={scenario.opener.slice(0, 140)}
+          caseId={scenario.id}
+          stampLabel={verdict ?? "UNVERIFIED"}
+          outcome={
+            (outcome.result === "correct" ? "correct"
+              : outcome.result === "missed_fake" ? "missed_scam"
+              : "false_alarm") as CalibrationOutcome
+          }
+          onDone={() => setPhase("debrief")}
         />
       )}
       {phase === "debrief" && outcome && (
         <Debrief scenario={scenario} outcome={outcome} state={state} verdict={verdict} conclusion={conclusion} finalReply={finalReply} />
       )}
+
 
     </div>
   );
