@@ -533,3 +533,14 @@ function Debrief({ scenario, outcome, state, verdict, conclusion, finalReply }: 
     </main>
   );
 }
+
+function FeedStarAxis({ label, value }: { label: string; value: number }) {
+  const filled = value >= 1 ? "★" : value >= 0.5 ? "⯪" : "☆";
+  const tone = value >= 1 ? "text-primary" : value >= 0.5 ? "text-caution" : "text-muted-foreground/40";
+  return (
+    <div className="rounded-md border border-border bg-background/50 p-3 text-center">
+      <div className={`text-2xl ${tone}`}>{filled}</div>
+      <div className="mt-1 font-mono text-[10px] tracking-widest text-muted-foreground">{label}</div>
+    </div>
+  );
+}
