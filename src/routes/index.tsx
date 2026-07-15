@@ -32,7 +32,8 @@ function preferredDefaultView(): "map" | "list" {
 }
 
 function CityMap() {
-  const [booted, setBooted] = useState(false);
+  const { mode } = useVisualMode();
+  const [booted, setBooted] = useState(mode !== "cinematic");
   const [intro, setIntro] = useState(false);
   const [view, setView] = useState<"map" | "list">("map");
 
@@ -40,6 +41,10 @@ function CityMap() {
     setView(preferredDefaultView());
     if (typeof window !== "undefined" && !localStorage.getItem(INTRO_KEY)) setIntro(true);
   }, []);
+
+  useEffect(() => {
+    if (mode !== "cinematic") setBooted(true);
+  }, [mode]);
 
   const setViewPersist = (v: "map" | "list") => {
     setView(v);
