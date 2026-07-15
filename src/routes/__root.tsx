@@ -140,6 +140,7 @@ function RootComponent() {
         <AtmosphereLayer />
         <GlowCursor />
         <RouteWipe />
+        <RankUpBeat />
       </VisualQualityProvider>
     </QueryClientProvider>
   );
