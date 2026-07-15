@@ -1,17 +1,20 @@
-// MILVERSE — Pilot Mode: session/local group aggregation.
-// Zero backend. Group code lives in localStorage; cases played while a group is
-// active are also appended to a per-group log so a facilitator can open the
-// dashboard on the same device (or paste an exported JSON blob from students).
+// MILVERSE — Pilot Mode: local aggregation + fire-and-forget backend sync.
+// Zero backend REQUIREMENT: everything still works offline. When a group code
+// is active and the network is available, we also insert into pilot_entries
+// so a real classroom on multiple devices aggregates on the dashboard.
 
 export interface PilotEntry {
   wing: "mirror" | "feed";
   caseId: string;
+  tier?: 1 | 2 | 3 | 4 | 5;
   result: "correct" | "missed_scam" | "false_alarm" | "lucky_guess" | "pyrrhic";
   points: number;
+  probeStats?: { strong: number; weak: number; wasted: number };
   ts: number;
 }
 
 const ACTIVE_KEY = "milverse.pilot.active";
+const DEVICE_KEY = "milverse.pilot.device";
 
 export function getActiveGroup(): string | null {
   if (typeof window === "undefined") return null;
@@ -23,6 +26,17 @@ export function setActiveGroup(code: string | null) {
   if (!code) localStorage.removeItem(ACTIVE_KEY);
   else localStorage.setItem(ACTIVE_KEY, code.toUpperCase());
   window.dispatchEvent(new Event("milverse:pilot"));
+}
+
+/** Persistent per-device anonymous UUID for pilot aggregation. No PII. */
+export function getDeviceId(): string {
+  if (typeof window === "undefined") return "server";
+  let id = localStorage.getItem(DEVICE_KEY);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(DEVICE_KEY, id);
+  }
+  return id;
 }
 
 function key(code: string) {
@@ -37,6 +51,8 @@ export function loadPilotLog(code: string): PilotEntry[] {
   } catch { return []; }
 }
 
+/** Fire-and-forget: always write to localStorage. If a group is active, also
+ *  try to sync to the cloud so multi-device classrooms aggregate. Silent on failure. */
 export function logPilotEntry(entry: PilotEntry) {
   if (typeof window === "undefined") return;
   const code = getActiveGroup();
@@ -45,6 +61,27 @@ export function logPilotEntry(entry: PilotEntry) {
   list.push(entry);
   localStorage.setItem(key(code), JSON.stringify(list));
   window.dispatchEvent(new Event("milverse:pilot"));
+
+  // Fire-and-forget cloud sync — offline callers get local-only behavior.
+  void (async () => {
+    try {
+      const { logPilotEntryToCloud } = await import("@/lib/pilot.functions");
+      await logPilotEntryToCloud({
+        data: {
+          groupCode: code,
+          deviceId: getDeviceId(),
+          wing: entry.wing,
+          caseId: entry.caseId,
+          tier: entry.tier,
+          result: entry.result,
+          points: entry.points,
+          probeStats: entry.probeStats,
+        },
+      });
+    } catch {
+      // silent — local log is source of truth if cloud is down
+    }
+  })();
 }
 
 /** Random 5-char group code, avoiding ambiguous chars. */

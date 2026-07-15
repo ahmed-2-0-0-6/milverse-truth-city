@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { z } from "zod";
+import { sanitizeReply } from "./sanitize";
+
 
 const InputSchema = z.object({
   scenarioTitle: z.string(),
@@ -93,9 +95,10 @@ export const generateContactReply = createServerFn({ method: "POST" })
         messages,
       });
 
-      const text = (result.text || "").trim().replace(/^["']|["']$/g, "");
-      if (!text) return { text: data.fallback, source: "fallback" as const };
-      return { text, source: "ai" as const };
+      const raw = (result.text || "").trim();
+      const clean = sanitizeReply(raw);
+      if (!clean) return { text: data.fallback, source: "fallback" as const };
+      return { text: clean, source: "ai" as const };
     } catch (err) {
       console.error("[ai] generateContactReply failed:", err);
       return { text: data.fallback, source: "fallback" as const };

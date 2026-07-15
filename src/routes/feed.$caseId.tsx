@@ -7,6 +7,7 @@ import {
   type FeedMessage, type FeedState, type FeedOutcome,
 } from "@/lib/feed/engine";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
+import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
 import { Send, Search, Forward, Heart, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
 
@@ -98,6 +99,7 @@ function FeedPlay() {
               ts: Date.now(),
             });
             window.dispatchEvent(new Event("milverse:profile"));
+            checkAndAwardBadges(p);
             setPhase("debrief");
           }}
         />

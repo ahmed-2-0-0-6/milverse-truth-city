@@ -8,6 +8,7 @@ import {
   operatorCallsign,
   type TrustProfile,
 } from "@/lib/mirror/profile";
+import { BADGES, loadEarnedBadges } from "@/lib/mirror/badges";
 
 export const Route = createFileRoute("/city-hall")({
   head: () => ({
@@ -21,7 +22,18 @@ export const Route = createFileRoute("/city-hall")({
 
 function CityHall() {
   const [p, setP] = useState<TrustProfile | null>(null);
-  useEffect(() => setP(loadProfile()), []);
+  const [earned, setEarned] = useState<string[]>([]);
+  useEffect(() => {
+    setP(loadProfile());
+    setEarned(loadEarnedBadges());
+    const on = () => { setP(loadProfile()); setEarned(loadEarnedBadges()); };
+    window.addEventListener("milverse:profile", on);
+    window.addEventListener("milverse:badge", on);
+    return () => {
+      window.removeEventListener("milverse:profile", on);
+      window.removeEventListener("milverse:badge", on);
+    };
+  }, []);
 
   if (!p) {
     return (
@@ -126,6 +138,36 @@ function CityHall() {
               <Row label="Weak Probes" value={p.weakProbesTotal} tone="warn" />
               <Row label="Wasted Pressure" value={p.wastedPressureTotal} tone="bad" />
             </div>
+          </div>
+        </div>
+
+        <div className="rounded-sm border border-border bg-card p-6 mb-6 hud-frame">
+          <div className="stencil text-[10px] text-primary mb-4">
+            // BADGE CASE · {earned.length}/{BADGES.length} EARNED
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {BADGES.map((b) => {
+              const has = earned.includes(b.id);
+              return (
+                <div
+                  key={b.id}
+                  className={`rounded-md border p-3 flex items-center gap-3 transition ${
+                    has
+                      ? "border-primary/50 bg-primary/5"
+                      : "border-border/50 bg-muted/30 opacity-50"
+                  }`}
+                  title={b.blurb}
+                >
+                  <div className={`text-2xl ${has ? "" : "grayscale"}`}>{b.emoji}</div>
+                  <div className="min-w-0">
+                    <div className={`text-sm font-semibold truncate ${has ? "text-foreground" : "text-muted-foreground"}`}>
+                      {b.name}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground line-clamp-2">{b.blurb}</div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 

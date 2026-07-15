@@ -1,0 +1,75 @@
+// MILVERSE — anonymous pilot aggregation via Lovable Cloud.
+// Each student logs their own device's outcomes to a group code.
+// Facilitator dashboard aggregates by group code.
+
+import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
+import { z } from "zod";
+import type { Database } from "@/integrations/supabase/types";
+
+function serverClient() {
+  const url = process.env.SUPABASE_URL!;
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
+  return createClient<Database>(url, key, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    global: {
+      fetch: (input, init) => {
+        const h = new Headers(init?.headers);
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+        h.set("apikey", key);
+        return fetch(input, { ...init, headers: h });
+      },
+    },
+  });
+}
+
+const CODE_RE = /^[A-Z0-9]{4,6}$/;
+
+export const logPilotEntryToCloud = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    z.object({
+      groupCode: z.string().regex(CODE_RE),
+      deviceId: z.string().min(8).max(64),
+      wing: z.enum(["mirror", "feed"]),
+      caseId: z.string().max(120),
+      tier: z.number().int().min(1).max(5).optional(),
+      result: z.enum(["correct", "missed_scam", "false_alarm", "lucky_guess", "pyrrhic"]),
+      points: z.number().int(),
+      probeStats: z.object({
+        strong: z.number().int().min(0).default(0),
+        weak: z.number().int().min(0).default(0),
+        wasted: z.number().int().min(0).default(0),
+      }).partial().optional(),
+    }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const supabase = serverClient();
+    const { error } = await supabase.from("pilot_entries").insert({
+      group_code: data.groupCode,
+      device_id: data.deviceId,
+      wing: data.wing,
+      case_id: data.caseId,
+      tier: data.tier ?? null,
+      result: data.result,
+      points: data.points,
+      probe_stats: (data.probeStats ?? null) as never,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const fetchPilotGroup = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z.object({ groupCode: z.string().regex(CODE_RE) }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const supabase = serverClient();
+    const { data: rows, error } = await supabase
+      .from("pilot_entries")
+      .select("device_id, wing, case_id, tier, result, points, probe_stats, created_at")
+      .eq("group_code", data.groupCode)
+      .order("created_at", { ascending: true })
+      .limit(5000);
+    if (error) throw new Error(error.message);
+    return { entries: rows ?? [] };
+  });

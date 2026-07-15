@@ -14,7 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      citizen_cases: {
+        Row: {
+          created_at: string
+          device_id: string | null
+          id: string
+          scenario_config: Json
+          share_code: string
+        }
+        Insert: {
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          scenario_config: Json
+          share_code: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          scenario_config?: Json
+          share_code?: string
+        }
+        Relationships: []
+      }
+      pilot_entries: {
+        Row: {
+          case_id: string
+          created_at: string
+          device_id: string
+          group_code: string
+          id: string
+          points: number
+          probe_stats: Json | null
+          result: string
+          tier: number | null
+          wing: string
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          device_id: string
+          group_code: string
+          id?: string
+          points: number
+          probe_stats?: Json | null
+          result: string
+          tier?: number | null
+          wing: string
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          device_id?: string
+          group_code?: string
+          id?: string
+          points?: number
+          probe_stats?: Json | null
+          result?: string
+          tier?: number | null
+          wing?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

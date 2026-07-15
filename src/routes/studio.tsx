@@ -1,9 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { TopBar } from "@/components/TopBar";
 import { saveCitizenCase } from "@/lib/mirror/scenarios";
 import type { Scenario, EvidenceChip } from "@/lib/mirror/scenarios";
+import { publishCitizenCase } from "@/lib/citizen.functions";
+import { getDeviceId } from "@/lib/pilot";
 import { Clapperboard, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
@@ -55,13 +59,17 @@ const URL_RE = /(https?:\/\/|www\.)[\w./?=&%-]+/i;
 
 function validate(d: Draft): string | null {
   if (!d.personaName.trim()) return "Persona name is required.";
+  if (d.personaName.trim().length < 2) return "Persona name is too short.";
   if (!d.relationship.trim()) return "Describe the relationship to the target.";
   if (!d.opener.trim()) return "Opening message is required.";
-  const filled = d.facts.filter((f) => f.text.trim());
-  if (filled.length < 5) return "Fill in all 5 dossier facts.";
+  if (d.opener.trim().length < 20) return "Opening message should be at least 20 characters — set the scene.";
+  const filled = d.facts.filter((f) => f.text.trim().length >= 6);
+  if (filled.length < 4) return "Add at least 4 real dossier facts (each 6+ characters).";
   if (d.truth === "IMPOSTER") {
+    if (!d.agenda) return "Pick what the imposter wants (their agenda).";
+    if (d.agenda === "custom" && !d.agendaCustom.trim()) return "Describe the custom agenda in one line.";
     const gaps = filled.filter((f) => f.isGap).length;
-    if (gaps < 2) return "Mark 2–3 private facts as KNOWLEDGE GAPS.";
+    if (gaps < 2) return "Mark at least 2 private facts as KNOWLEDGE GAPS — the imposter needs something to slip on.";
   }
   const all = [d.personaName, d.relationship, d.opener, d.agendaCustom, ...d.facts.map((f) => f.text)].join(" ");
   if (PHONE_RE.test(all)) return "No real phone numbers in any field.";
@@ -74,6 +82,14 @@ function validate(d: Draft): string | null {
   if (realNames.some((n) => low.includes(n))) return "No real public figures — only fictional personas.";
   return null;
 }
+
+function generateShareCode(): string {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let out = "";
+  for (let i = 0; i < 6; i++) out += alphabet[Math.floor(Math.random() * alphabet.length)];
+  return out;
+}
+
 
 function buildScenario(d: Draft): Scenario {
   const id = `citizen-${Math.random().toString(36).slice(2, 8)}`;
@@ -110,6 +126,7 @@ function buildScenario(d: Draft): Scenario {
 
   return {
     id,
+    shareCode: generateShareCode(),
     title: `${d.personaName} — ${d.relationship}`,
     teaser: d.opener.slice(0, 80) + (d.opener.length > 80 ? "…" : ""),
     channel: "text",
@@ -143,11 +160,7 @@ function buildScenario(d: Draft): Scenario {
       pushLines: d.truth === "IMPOSTER" ? [`can you help me with ${agendaText[d.agenda]}?`] : [],
     },
     evidenceChips: chips,
-  };
-}
-
-function shareCode(id: string): string {
-  return id.replace("citizen-", "").slice(0, 6).toUpperCase();
+  } as Scenario & { shareCode: string };
 }
 
 function Studio() {
@@ -155,14 +168,25 @@ function Studio() {
   const [step, setStep] = useState(1);
   const [draft, setDraft] = useState<Draft>(BLANK);
   const [error, setError] = useState<string | null>(null);
+  const [publishing, setPublishing] = useState(false);
+  const publishFn = useServerFn(publishCitizenCase);
 
-  function publish() {
+  async function publish() {
     const err = validate(draft);
     if (err) { setError(err); return; }
+    setPublishing(true);
+    setError(null);
     const s = buildScenario(draft);
+    const code = (s as Scenario & { shareCode: string }).shareCode;
     saveCitizenCase(s);
-    const code = shareCode(s.id);
-    alert(`Published! Share code: ${code}\n\nA friend can enter this on Case Files to play your case.`);
+    try {
+      await publishFn({ data: { shareCode: code, scenario: s as unknown as Record<string, unknown>, deviceId: getDeviceId() } as never });
+      alert(`Published to the cloud!\n\nShare code: ${code}\n\nAnyone on any device can enter this code on Case Files to play your case.`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Cloud sync failed.";
+      alert(`Saved locally — cloud sync failed:\n${msg}\n\nShare code (local only): ${code}`);
+    }
+    setPublishing(false);
     navigate({ to: "/mirror/$caseId", params: { caseId: s.id } });
   }
 
@@ -305,8 +329,8 @@ function Studio() {
               <button onClick={playtest} className="flex-1 rounded-md border border-primary/50 bg-primary/10 py-3 font-mono text-xs tracking-widest text-primary hover:bg-primary/20">
                 <Sparkles className="inline h-3.5 w-3.5 mr-1.5" /> PLAY-TEST
               </button>
-              <button onClick={publish} className="flex-1 rounded-md bg-primary py-3 font-mono text-xs tracking-widest text-primary-foreground">
-                PUBLISH
+              <button onClick={publish} disabled={publishing} className="flex-1 rounded-md bg-primary py-3 font-mono text-xs tracking-widest text-primary-foreground disabled:opacity-50">
+                {publishing ? "PUBLISHING…" : "PUBLISH"}
               </button>
             </div>
           </Section>
