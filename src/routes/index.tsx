@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { TopBar } from "@/components/TopBar";
-import { TransitMap } from "@/components/TransitMap";
+import { CityWorld } from "@/components/CityWorld";
+import { CityList } from "@/components/CityList";
 import { Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -9,12 +10,35 @@ export const Route = createFileRoute("/")({
 });
 
 const INTRO_KEY = "milverse.intro.seen";
+const VIEW_KEY = "milverse.world.view";
+
+/** Pick the safest default view: list if reduced-motion, save-data, or very narrow screen. */
+function preferredDefaultView(): "map" | "list" {
+  if (typeof window === "undefined") return "map";
+  try {
+    const stored = localStorage.getItem(VIEW_KEY);
+    if (stored === "map" || stored === "list") return stored;
+  } catch {}
+  const prefersReduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  // @ts-expect-error saveData is non-standard
+  const saveData = navigator.connection?.saveData === true;
+  const narrow = window.innerWidth < 360;
+  return prefersReduce || saveData || narrow ? "list" : "map";
+}
 
 function CityMap() {
   const [intro, setIntro] = useState(false);
+  const [view, setView] = useState<"map" | "list">("map");
+
   useEffect(() => {
+    setView(preferredDefaultView());
     if (typeof window !== "undefined" && !localStorage.getItem(INTRO_KEY)) setIntro(true);
   }, []);
+
+  const setViewPersist = (v: "map" | "list") => {
+    setView(v);
+    try { localStorage.setItem(VIEW_KEY, v); } catch {}
+  };
 
   return (
     <div className="min-h-screen grain relative">
@@ -23,17 +47,17 @@ function CityMap() {
       {intro && <Intro onDone={() => { localStorage.setItem(INTRO_KEY, "1"); setIntro(false); }} />}
 
       <main className="relative">
-        {/* Compact kinetic header (shrunk from the old masthead) */}
-        <section className="mx-auto max-w-6xl px-4 pt-6 pb-3">
+        {/* Compact kinetic header */}
+        <section className="mx-auto max-w-6xl px-4 pt-4 pb-3">
           <div className="flex items-center gap-3 mb-3">
             <div className="h-px flex-1 max-w-[60px] bg-primary/60" />
-            <div className="stencil text-[10px] text-primary">MILVERSE TRANSIT · ISSUE 001</div>
+            <div className="stencil text-[10px] text-primary">MILVERSE · CITY OF VERIFICATION</div>
             <div className="h-px flex-1 bg-primary/20" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-semibold leading-tight tracking-tight uppercase">
             Train your <span className="text-primary">trust</span>.
             <span className="text-muted-foreground text-sm sm:text-base normal-case font-normal tracking-normal block mt-1">
-              Ride the lines. Clear the stations. From viral lies to voice clones — one verification instinct.
+              Drag the city. Zoom the quarters. Clear the stations.
             </span>
           </h1>
 
@@ -49,12 +73,14 @@ function CityMap() {
           </Link>
         </section>
 
-        {/* Transit map surface */}
-        <section className="px-4">
-          <TransitMap />
+        {/* World / List */}
+        <section className="mx-auto max-w-6xl px-3 sm:px-4">
+          {view === "map"
+            ? <CityWorld onSwitchToList={() => setViewPersist("list")} />
+            : <CityList onSwitchToMap={() => setViewPersist("map")} />}
         </section>
 
-        <footer className="mx-auto max-w-6xl px-4 mt-4 border-t border-border pt-6 pb-10 text-center stencil text-[10px] text-muted-foreground space-y-3">
+        <footer className="mx-auto max-w-6xl px-4 mt-6 border-t border-border pt-6 pb-10 text-center stencil text-[10px] text-muted-foreground space-y-3">
           <div className="text-primary/80">VERIFY, DON'T GUESS · CALIBRATE, DON'T PANIC</div>
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             <Link to="/pilot" className="text-primary hover:underline">[F1] PILOT MODE — CLASSROOM DASHBOARD →</Link>
@@ -76,7 +102,7 @@ function Intro({ onDone }: { onDone: () => void }) {
   const slides = [
     "Lies come in two sizes: aimed at millions — and aimed at just you.",
     "Both die the same way. Verification.",
-    "MILVERSE is the transit map for training that reflex. Ride the lines.",
+    "MILVERSE is a city built for that reflex. Time to fly in.",
   ];
   const [i, setI] = useState(0);
   return (
@@ -98,7 +124,7 @@ function Intro({ onDone }: { onDone: () => void }) {
           onClick={() => { if (i + 1 < slides.length) setI(i + 1); else onDone(); }}
           className="rounded-sm bg-primary px-6 py-2.5 text-primary-foreground border-2 border-primary shadow-[0_4px_20px_oklch(0.60_0.19_258/0.35)]"
         >
-          {i + 1 < slides.length ? "NEXT →" : "BOARD THE MAP →"}
+          {i + 1 < slides.length ? "NEXT →" : "ENTER THE CITY →"}
         </button>
       </div>
     </div>
