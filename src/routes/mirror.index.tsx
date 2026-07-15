@@ -6,6 +6,7 @@ import { TopBar } from "@/components/TopBar";
 import { SCENARIOS, loadCitizenCases, saveCitizenCase, type TierId, type Scenario } from "@/lib/mirror/scenarios";
 import { loadProfile, unlockedMaxTier, tierWins, type TrustProfile } from "@/lib/mirror/profile";
 import { fetchCitizenCase } from "@/lib/citizen.functions";
+import { RecommendedStrip } from "@/components/RecommendedStrip";
 
 export const Route = createFileRoute("/mirror/")({
   head: () => ({
@@ -118,6 +119,10 @@ function CaseFiles() {
           </button>
           {codeErr && <span className="text-xs text-destructive">{codeErr}</span>}
         </div>
+
+        <RecommendedStrip />
+
+
 
 
         {tiers.map((tier) => {

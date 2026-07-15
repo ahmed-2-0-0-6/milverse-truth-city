@@ -10,19 +10,27 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudioRouteImport } from './routes/studio'
+import { Route as ReviewRouteImport } from './routes/review'
 import { Route as QuickTourRouteImport } from './routes/quick-tour'
 import { Route as PilotRouteImport } from './routes/pilot'
 import { Route as KitRouteImport } from './routes/kit'
 import { Route as CityHallRouteImport } from './routes/city-hall'
+import { Route as ArchiveRouteImport } from './routes/archive'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MirrorIndexRouteImport } from './routes/mirror.index'
 import { Route as FeedIndexRouteImport } from './routes/feed.index'
 import { Route as MirrorCaseIdRouteImport } from './routes/mirror.$caseId'
 import { Route as FeedCaseIdRouteImport } from './routes/feed.$caseId'
+import { Route as ArchiveSubmitRouteImport } from './routes/archive.submit'
 
 const StudioRoute = StudioRouteImport.update({
   id: '/studio',
   path: '/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReviewRoute = ReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QuickTourRoute = QuickTourRouteImport.update({
@@ -43,6 +51,11 @@ const KitRoute = KitRouteImport.update({
 const CityHallRoute = CityHallRouteImport.update({
   id: '/city-hall',
   path: '/city-hall',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArchiveRoute = ArchiveRouteImport.update({
+  id: '/archive',
+  path: '/archive',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -70,14 +83,22 @@ const FeedCaseIdRoute = FeedCaseIdRouteImport.update({
   path: '/feed/$caseId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ArchiveSubmitRoute = ArchiveSubmitRouteImport.update({
+  id: '/submit',
+  path: '/submit',
+  getParentRoute: () => ArchiveRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/archive': typeof ArchiveRouteWithChildren
   '/city-hall': typeof CityHallRoute
   '/kit': typeof KitRoute
   '/pilot': typeof PilotRoute
   '/quick-tour': typeof QuickTourRoute
+  '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
+  '/archive/submit': typeof ArchiveSubmitRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
   '/mirror/$caseId': typeof MirrorCaseIdRoute
   '/feed/': typeof FeedIndexRoute
@@ -85,11 +106,14 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/archive': typeof ArchiveRouteWithChildren
   '/city-hall': typeof CityHallRoute
   '/kit': typeof KitRoute
   '/pilot': typeof PilotRoute
   '/quick-tour': typeof QuickTourRoute
+  '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
+  '/archive/submit': typeof ArchiveSubmitRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
   '/mirror/$caseId': typeof MirrorCaseIdRoute
   '/feed': typeof FeedIndexRoute
@@ -98,11 +122,14 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/archive': typeof ArchiveRouteWithChildren
   '/city-hall': typeof CityHallRoute
   '/kit': typeof KitRoute
   '/pilot': typeof PilotRoute
   '/quick-tour': typeof QuickTourRoute
+  '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
+  '/archive/submit': typeof ArchiveSubmitRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
   '/mirror/$caseId': typeof MirrorCaseIdRoute
   '/feed/': typeof FeedIndexRoute
@@ -112,11 +139,14 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/archive'
     | '/city-hall'
     | '/kit'
     | '/pilot'
     | '/quick-tour'
+    | '/review'
     | '/studio'
+    | '/archive/submit'
     | '/feed/$caseId'
     | '/mirror/$caseId'
     | '/feed/'
@@ -124,11 +154,14 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/archive'
     | '/city-hall'
     | '/kit'
     | '/pilot'
     | '/quick-tour'
+    | '/review'
     | '/studio'
+    | '/archive/submit'
     | '/feed/$caseId'
     | '/mirror/$caseId'
     | '/feed'
@@ -136,11 +169,14 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/archive'
     | '/city-hall'
     | '/kit'
     | '/pilot'
     | '/quick-tour'
+    | '/review'
     | '/studio'
+    | '/archive/submit'
     | '/feed/$caseId'
     | '/mirror/$caseId'
     | '/feed/'
@@ -149,10 +185,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ArchiveRoute: typeof ArchiveRouteWithChildren
   CityHallRoute: typeof CityHallRoute
   KitRoute: typeof KitRoute
   PilotRoute: typeof PilotRoute
   QuickTourRoute: typeof QuickTourRoute
+  ReviewRoute: typeof ReviewRoute
   StudioRoute: typeof StudioRoute
   FeedCaseIdRoute: typeof FeedCaseIdRoute
   MirrorCaseIdRoute: typeof MirrorCaseIdRoute
@@ -167,6 +205,13 @@ declare module '@tanstack/react-router' {
       path: '/studio'
       fullPath: '/studio'
       preLoaderRoute: typeof StudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/review': {
+      id: '/review'
+      path: '/review'
+      fullPath: '/review'
+      preLoaderRoute: typeof ReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/quick-tour': {
@@ -195,6 +240,13 @@ declare module '@tanstack/react-router' {
       path: '/city-hall'
       fullPath: '/city-hall'
       preLoaderRoute: typeof CityHallRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/archive': {
+      id: '/archive'
+      path: '/archive'
+      fullPath: '/archive'
+      preLoaderRoute: typeof ArchiveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -232,15 +284,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedCaseIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/archive/submit': {
+      id: '/archive/submit'
+      path: '/submit'
+      fullPath: '/archive/submit'
+      preLoaderRoute: typeof ArchiveSubmitRouteImport
+      parentRoute: typeof ArchiveRoute
+    }
   }
 }
 
+interface ArchiveRouteChildren {
+  ArchiveSubmitRoute: typeof ArchiveSubmitRoute
+}
+
+const ArchiveRouteChildren: ArchiveRouteChildren = {
+  ArchiveSubmitRoute: ArchiveSubmitRoute,
+}
+
+const ArchiveRouteWithChildren =
+  ArchiveRoute._addFileChildren(ArchiveRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ArchiveRoute: ArchiveRouteWithChildren,
   CityHallRoute: CityHallRoute,
   KitRoute: KitRoute,
   PilotRoute: PilotRoute,
   QuickTourRoute: QuickTourRoute,
+  ReviewRoute: ReviewRoute,
   StudioRoute: StudioRoute,
   FeedCaseIdRoute: FeedCaseIdRoute,
   MirrorCaseIdRoute: MirrorCaseIdRoute,

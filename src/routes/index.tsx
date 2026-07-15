@@ -31,7 +31,7 @@ const DISTRICTS: District[] = [
   { id: "studio", name: "The Studio", Icon: Clapperboard, unlocked: true, to: "/studio", tagline: () => "Design a case. Share with friends." },
   { id: "market", name: "The Market", Icon: Store, unlocked: false, tagline: () => "Scam ads and fake shops training. Verify the seller — not the price." },
   { id: "arena", name: "The Arena", Icon: Swords, unlocked: false, tagline: () => "Human-vs-human imposter duels. Play the mask, or spot it." },
-  { id: "archive", name: "The Archive", Icon: Library, unlocked: false, tagline: () => "Community case library. Every survivor story, indexed and playable." },
+  { id: "archive", name: "The Archive", Icon: Library, unlocked: true, to: "/archive", tagline: () => "Official campaign + community library. Every survivor story, human-reviewed." },
   { id: "hall", name: "City Hall", Icon: Landmark, unlocked: true, to: "/city-hall", tagline: () => "Your Trust Calibration — one chart, every district." },
 ];
 
