@@ -462,8 +462,335 @@ export const SCENARIOS: Scenario[] = [
       ...VOICE_CHIPS,
     ],
   },
+  /* ── T1 IMPOSTER — THE PRIZE SMS ─────────────────────────── */
+  {
+    id: "pk-prize-sms",
+    title: "You've won ₨5 lakh in a lucky draw",
+    teaser: "A \"verification officer\" from a famous TV show texts.",
+    channel: "text",
+    tier: 1,
+    truth: "IMPOSTER",
+    claimedIdentity: "Officer Kamran — Jeeto Pakistan Verification Cell",
+    agenda: "Get a \"processing fee\" transfer to release the prize money.",
+    dossier: {
+      contactClaim: "Warm congratulations — you've won ₨500,000 in a lucky draw and he's here to release it.",
+      knownFacts: [
+        "You have NEVER entered any TV-show lucky draw.",
+        "Your family doesn't even watch Jeeto Pakistan.",
+        "You've never given your CNIC to a game show or draw.",
+        "Real prize draws don't need a fee to release winnings.",
+        "Your mobile wallet name and CNIC number are private.",
+      ],
+      publicFacts: [
+        "Your first name and mobile number are on OLX from an old listing.",
+        "Jeeto Pakistan is famous — anyone in the country knows the name.",
+      ],
+    },
+    facts: [
+      { id: "howEntered", keywords: ["entered", "signed up", "register", "how did i", "kaisay", "kesay", "kab"], truth: "",
+        deflection: "sir aap ka number auto-selected hua hai from a partner promotion, super lucky!",
+        contradiction: "you registered through the Zong promo last month sir, must have forgotten" },
+      { id: "fee", keywords: ["fee", "charge", "pay", "processing", "advance", "paisay", "kitne paise"], truth: "",
+        deflection: "sirf ₨2,500 refundable processing fee, sir. it's refunded with the prize on the same day, promise." },
+      { id: "cnic", keywords: ["cnic", "id", "shanakhti", "identity"], truth: "",
+        deflection: "sir aap ka CNIC last 4 digits bata dein, verification ke liye. bank standard hai." },
+      { id: "official", keywords: ["office", "address", "visit", "come to", "in person", "khud aa"], truth: "",
+        deflection: "sir head office Lahore mein hai, but everything happens on phone/JazzCash, that's the modern way." },
+    ],
+    opener: "MUBARAK HO 🎉 Sir aap ne Jeeto Pakistan ke lucky draw mein ₨5,00,000 jeet liye hain! Main Officer Kamran hoon, verification cell se. Aap ka time hai 2 minute?",
+    persona: {
+      voice: "warm, congratulatory, mixes Urdu and English, calls you 'sir', very polite",
+      fillers: ["MashaAllah sir aap bohat lucky hain", "sirf 2 minute ka kaam hai", "aap ki khushi humari khushi", "sir bilkul aaram se batayein"],
+      urgencyLines: ["sir prize sirf aaj release ho sakta hai", "sir line pe rahiye, itne saare log wait kar rahe hain"],
+      pushLines: [
+        "Sir bas ₨2,500 processing fee ka JazzCash kar dein is number pe, aur ₨5 lakh 5 minute mein aap ke account mein.",
+        "Sir jaldi karein, cutoff 6 baje hai — abhi transfer kar dein.",
+      ],
+    },
+    voice: {
+      text: "Assalam-o-alaikum sir, main Officer Kamran, Jeeto Pakistan se. Sir please processing fee bhej dein, prize aap ka intezaar kar raha hai.",
+      artifactPool: ["robotic", "pause"],
+    },
+    evidenceChips: [
+      { id: "e1", label: "Prize for a draw you never entered", correct: true, explain: "You cannot win a draw you didn't enter. Full stop." },
+      { id: "e2", label: "Asked for money to receive money", correct: true, explain: "The classic advance-fee scam pattern." },
+      { id: "e3", label: "Manufactured deadline", correct: true, explain: "\"Prize expires today\" is the pressure lever." },
+      { id: "e4", label: "Asked for CNIC", correct: true, explain: "Combined with the fee, that's identity + money theft." },
+      { id: "e5", label: "Very polite and warm", correct: false, explain: "Warmth is the mask, not evidence." },
+      { id: "e6", label: "Mentioned a famous TV show", correct: false, explain: "Public — everyone knows Jeeto Pakistan." },
+      ...VOICE_CHIPS,
+    ],
+  },
+
+  /* ── T2 IMPOSTER — THE WRONG TRANSACTION ─────────────────── */
+  {
+    id: "pk-wrong-txn",
+    title: "\"I sent ₨5,000 to your wallet by mistake\"",
+    teaser: "A stranger begs. Even forwards an official-looking SMS.",
+    channel: "text",
+    tier: 2,
+    truth: "IMPOSTER",
+    claimedIdentity: "Nadia — stranger, wrong number",
+    agenda: "Get you to send ₨5,000 back for money that never arrived.",
+    dossier: {
+      contactClaim: "Nadia claims she was topping up her brother's JazzCash and typed one wrong digit — sent to you.",
+      knownFacts: [
+        "Your JazzCash balance is unchanged — no ₨5,000 arrived.",
+        "JazzCash itself would send you a real notification for any deposit.",
+        "A \"forwarded confirmation SMS\" from another phone proves nothing — it's just text.",
+        "Real reversal happens through JazzCash support, not by you sending it back.",
+        "Your wallet number is on OLX and Facebook Marketplace — easy for a stranger to get.",
+      ],
+      publicFacts: [
+        "Your JazzCash-linked number is on your OLX listing.",
+        "The JazzCash brand and confirmation SMS format are public knowledge.",
+      ],
+    },
+    facts: [
+      { id: "balance", keywords: ["balance", "app", "check", "notification", "aya", "nahin aya", "receive"], truth: "",
+        deflection: "sir/madam yeh SMS main ne bheja hai screenshot, dekh lein — bank ke system mein aaj kal delay hai." },
+      { id: "sms", keywords: ["sms", "forward", "screenshot", "spoof", "kis se aya"], truth: "",
+        deflection: "confirmation SMS to JazzCash ka hi hai, main kyun jhooth bolungi, meri roz ki kamaayi thi." },
+      { id: "support", keywords: ["jazzcash support", "helpline", "1234", "customer care", "call"], truth: "",
+        deflection: "please na, helpline pe 40 min lagte hain, mera bhai wait kar raha hai admission fee ke liye." },
+      { id: "identity", keywords: ["your name", "who are you", "cnic", "pic", "aap kaun"], truth: "",
+        deflection: "meri picture bhej dun? Nadia hoon, Karachi se, please bas 5000 wapis kar dein." },
+    ],
+    opener: "Bhai please meri madad karein 🙏 main apne bhai ki JazzCash mein top-up kar rahi thi, ek digit galat likh diya aur ₨5000 aap ke number pe chala gaya. Please wapis bhej dein, meri poori kamaayi thi.",
+    persona: {
+      voice: "polite, emotional, almost crying, mixes Urdu/English, uses bhai/behen",
+      fillers: ["please bhai", "main ro rahi hoon sach mein", "aap Allah ke wastay", "meri saari mehnat"],
+      urgencyLines: ["bhai please jaldi", "mera bhai wait kar raha hai", "aap Allah ka wasta"],
+      pushLines: [
+        "Bhai please JazzCash kar dein is number pe ₨5000. Main aap ki bohat dua karungi.",
+        "Aap ke paas jo bhi confirmation lena hai le lein, bas paisay wapis bhej dein please.",
+      ],
+    },
+    voice: {
+      text: "Bhai please, main Nadia, meri saari kamaayi thi, please wapis bhej dein 5000.",
+      artifactPool: ["cut", "pause"],
+    },
+    evidenceChips: [
+      { id: "e1", label: "My wallet shows NO incoming transaction", correct: true, explain: "The dossier truth beats any forwarded SMS." },
+      { id: "e2", label: "A forwarded SMS is not proof of a deposit", correct: true, explain: "Text can be typed by anyone. Check the app itself." },
+      { id: "e3", label: "Refused to use official JazzCash reversal", correct: true, explain: "Real reversal doesn't need YOU to send money out." },
+      { id: "e4", label: "Emotional pressure (crying, kasam)", correct: true, explain: "Emotional urgency is a scam lever, even when soft." },
+      { id: "e5", label: "She sounded genuinely upset", correct: false, explain: "Distress is easy to fake and easy to feel. Not evidence." },
+      { id: "e6", label: "She knew my wallet number", correct: false, explain: "Public on your OLX listing." },
+      ...VOICE_CHIPS,
+    ],
+  },
+
+  /* ── T2 IMPOSTER — THE ONLINE BUYER (military officer) ───── */
+  {
+    id: "pk-online-buyer",
+    title: "\"Military officer\" wants your phone",
+    teaser: "Says he'll pay in advance so a courier can collect it.",
+    channel: "text",
+    tier: 2,
+    truth: "IMPOSTER",
+    claimedIdentity: "Major Bilal Ahmed — Army Corps of Signals, Rawalpindi",
+    agenda: "Get you to scan a QR / enter your PIN into a \"receive money\" link that actually debits your wallet.",
+    dossier: {
+      contactClaim: "Buyer for your OLX phone listing. Sends photo of a laminated ID card and a QR link.",
+      knownFacts: [
+        "Real JazzCash / EasyPaisa deposits arrive without you scanning anything.",
+        "You NEVER need to enter your wallet PIN to receive money — only to send.",
+        "Real military officers use their real names and don't rush strangers.",
+        "The ID card photo has no photo of a face, just \"Major B. Ahmed\" — a real ID has a clear photo.",
+        "Cantonment courier does not \"pre-collect\" before payment clears in your app.",
+      ],
+      publicFacts: [
+        "Your OLX phone listing is public.",
+        "Army ranks and general locations (Rawalpindi cantt) are public knowledge.",
+      ],
+    },
+    facts: [
+      { id: "pin", keywords: ["pin", "enter pin", "password", "code", "receive"], truth: "",
+        deflection: "sir it's a JazzCash Merchant Receive — you enter your PIN on your side, money comes to you. Standard.",
+        contradiction: "yes sir it's like an OTP — every transaction needs PIN both sides, main is army mein 15 saal se hun." },
+      { id: "qr", keywords: ["qr", "scan", "link", "click"], truth: "",
+        deflection: "sir QR sirf identify karta hai account — main to sender hun na, aap receiver, koi risk nahin." },
+      { id: "id", keywords: ["photo", "face", "picture", "id", "card"], truth: "",
+        deflection: "sir sensitive posting hai, face wali ID share nahin kar sakte, corps ka rule hai." },
+      { id: "courier", keywords: ["courier", "collect", "wait", "cash on", "call me"], truth: "",
+        deflection: "sir courier abhi road pe hai, aap PIN enter karte hi ₨90k aap ke wallet mein and he picks up in 20 min." },
+      { id: "callBack", keywords: ["call", "voice", "video", "in person"], truth: "",
+        deflection: "sir main duty pe hun, sirf text on this WhatsApp. Please cooperate karein, waqt kam hai." },
+    ],
+    opener: "AoA sir, main Major Bilal Ahmed, Corps of Signals Rawalpindi. Aap ka OLX pe iPhone dekha, ₨90,000 mein final? Main abhi advance kar deta hun, mera courier 30 min mein aa jayega collect karne.",
+    persona: {
+      voice: "formal, authoritative, uses 'sir', drops rank often, mildly offended if questioned",
+      fillers: ["sir main officer hun, jhooth nahin bolta", "military discipline sir", "quickly please, duty pe hun", "aap ka trust chahiye"],
+      urgencyLines: ["sir courier road pe hai already", "briefing mein jaana hai 20 min mein"],
+      pushLines: [
+        "Sir link pe click karein, apna JazzCash PIN daalein — ₨90k receive ho jayenge, courier phone le jayega.",
+        "Sir main officer hun, kya main aap ko dhoka dunga? Please PIN enter kar dein.",
+      ],
+    },
+    voice: {
+      text: "Sir, Major Bilal Ahmed here. Please cooperate, PIN enter kar dein aur transaction complete karein.",
+      artifactPool: ["robotic", "cut"],
+    },
+    evidenceChips: [
+      { id: "e1", label: "Asked me to enter my wallet PIN to RECEIVE", correct: true, explain: "You never enter a PIN to receive money. Only to send." },
+      { id: "e2", label: "Sent a QR / link for me to click", correct: true, explain: "That link IS the theft — signs the transfer against you." },
+      { id: "e3", label: "Weaponised rank / authority", correct: true, explain: "Authority pressure is a lever, not identification." },
+      { id: "e4", label: "Refused voice / video call", correct: true, explain: "A real buyer verifying a ₨90k transaction will happily call." },
+      { id: "e5", label: "ID card photo has no face", correct: true, explain: "Every real armed forces ID has a photo. This is a template." },
+      { id: "e6", label: "Sounded formal and disciplined", correct: false, explain: "Style is not evidence." },
+      { id: "e7", label: "Knew Rawalpindi cantt exists", correct: false, explain: "Public — anyone can name a cantonment." },
+      ...VOICE_CHIPS,
+    ],
+  },
+
+  /* ── T2 IMPOSTER — THE DREAM JOB (paid task 1) ──────────── */
+  {
+    id: "pk-dream-job",
+    title: "₨5,000/day for liking videos",
+    teaser: "Sends you REAL payment for task 1. Task 2 asks for a deposit.",
+    channel: "text",
+    tier: 2,
+    truth: "IMPOSTER",
+    claimedIdentity: "Sara — HR, \"Global Digital Boost\"",
+    agenda: "Get a \"refundable deposit\" of ₨15,000 for high-tier tasks after paying ₨500 for task one.",
+    dossier: {
+      contactClaim: "Recruiter offering ₨5,000/day for liking YouTube videos. Actually paid ₨500 already for task 1.",
+      knownFacts: [
+        "The ₨500 payment came from a random personal JazzCash account, not a registered company.",
+        "There is no registered Pakistani company called \"Global Digital Boost\" you can find on SECP.",
+        "Real jobs NEVER ask employees to pay a deposit — money flows from employer to employee.",
+        "No real company recruits via WhatsApp for a random gig with no interview.",
+        "Small early payments are BAIT — they exist to make later big asks feel safe.",
+      ],
+      publicFacts: [
+        "Your name and city are on your LinkedIn.",
+        "YouTube video links are public content.",
+      ],
+    },
+    facts: [
+      { id: "company", keywords: ["company", "registered", "secp", "office", "website", "linkedin"], truth: "",
+        deflection: "we are a Dubai-based team sir, PK office coming next quarter. website under construction.",
+        contradiction: "our company is registered on SECP as \"GDB Pvt Ltd\", google karein aap." },
+      { id: "deposit", keywords: ["deposit", "why pay", "refund", "money back", "advance"], truth: "",
+        deflection: "just ₨15,000 refundable security so we know you're serious. it comes back with day-2 payout, 100%." },
+      { id: "senderAccount", keywords: ["from where", "sender", "who paid", "personal account", "kis ka account"], truth: "",
+        deflection: "hmara accounts payable manager Ahmed apne personal se kar deta hai for speed, HR settles monthly." },
+      { id: "interview", keywords: ["interview", "call", "meet", "office"], truth: "",
+        deflection: "no interview needed for part-time tier, just performance-based. day 1 to aap ne prove kar diya na." },
+      { id: "hr", keywords: ["hr", "manager", "boss", "who is your"], truth: "",
+        deflection: "main hi HR hun, seedhi baat hoti hai, corporate red tape nahin." },
+    ],
+    opener: "Salam! Sara here from Global Digital Boost. Aap ke liye ek part-time opportunity hai: ₨5,000/day for liking 20 YouTube videos daily. Task 1 abhi try karein — proof send karein — 5 min ka kaam hai.",
+    persona: {
+      voice: "peppy, friendly, uses emojis, mixes Urdu/English, HR-speak",
+      fillers: ["super easy work 🎯", "sirf 5 min lagenge", "aap ki growth humari growth", "team mein welcome"],
+      urgencyLines: ["today's slot fill ho raha hai", "1 slot bacha hai bas"],
+      pushLines: [
+        "Aap ne day 1 crack kar liya! ₨500 already sent 🎉 Day 2 unlock karne ke liye ₨15,000 refundable deposit kar dein.",
+        "Deposit day-2 ke ₨5,000 ke saath refund ho jaata hai, standard practice hai worldwide.",
+      ],
+    },
+    voice: {
+      text: "Hi! Sara here, congrats on day one, please deposit karein and let's continue this journey together.",
+      artifactPool: ["pause", "robotic"],
+    },
+    evidenceChips: [
+      { id: "e1", label: "Asked for a \"refundable deposit\"", correct: true, explain: "The core scam. No real job asks employees to pay in." },
+      { id: "e2", label: "Payment came from a personal account", correct: true, explain: "Real companies pay through registered accounts." },
+      { id: "e3", label: "No verifiable company registration", correct: true, explain: "SECP lookup is your friend. No entity = no job." },
+      { id: "e4", label: "Small early payment made me trust it", correct: true, explain: "That payment IS the bait. Feels like proof; is investment for a bigger ask." },
+      { id: "e5", label: "No interview or documentation", correct: true, explain: "Real jobs paper-trail the hire." },
+      { id: "e6", label: "She was polite and friendly", correct: false, explain: "Style is not evidence." },
+      { id: "e7", label: "The videos were real YouTube videos", correct: false, explain: "The task existing does not make the employer real." },
+      ...VOICE_CHIPS,
+    ],
+  },
+
+  /* ── T3 REAL — THE STRANDED COUSIN (paranoia test) ────── */
+  {
+    id: "pk-stranded-cousin",
+    title: "Cousin stranded — needs mobile load",
+    teaser: "Unknown number. She's real. This is the paranoia test.",
+    channel: "text",
+    tier: 3,
+    truth: "REAL",
+    claimedIdentity: "Ayesha (cousin) — borrowed stranger's phone",
+    dossier: {
+      contactClaim: "Says she's your cousin Ayesha. Phone died, borrowed someone's — needs load and a pickup.",
+      knownFacts: [
+        "Your cousin Ayesha's phone frequently dies — she's forgetful.",
+        "You saw her on Wednesday last week at Nano's house, not Tuesday.",
+        "Her mother (your khala) is Auntie Saima.",
+        "She's lived in Gulberg since 2022.",
+        "She has a tiny scar above her left eyebrow from a bike fall in college.",
+        "You two share a running joke about her calling you \"driver-in-chief\".",
+      ],
+      publicFacts: [
+        "You post about your cousins occasionally.",
+        "Her name appears in tagged photos on your feed.",
+      ],
+    },
+    facts: [
+      { id: "day", keywords: ["last saw", "which day", "tuesday", "wednesday", "nano"], truth: "yaar tuesday tha? shit i thought wednesday. nano's ghar wala din. tum sahi ho — wednesday tha." },
+      { id: "khala", keywords: ["khala", "your mom", "your mother", "auntie saima"], truth: "ammi Saima. she'll actually kill me if she finds out my phone died again 😭" },
+      { id: "gulberg", keywords: ["where do you", "live", "gulberg", "address"], truth: "gulberg block E, since 2022, same place bhai." },
+      { id: "scar", keywords: ["scar", "eyebrow", "bike", "face"], truth: "haha yeah left eyebrow, still there, college wali bike fall." },
+      { id: "joke", keywords: ["nickname", "driver", "call me", "you call"], truth: "driver-in-chief 😂 tumhari izzat aaj bhi wahi hai for me yaar." },
+      { id: "verify", keywords: ["call", "voice", "video", "pick up", "prove"], truth: "haan yaar please khud aa jao ya call kar lo, is bandi ka phone hai, main wait kar rahi hun stop pe." },
+    ],
+    opener: "hi it's Ayesha!! yaar mera phone mar gaya, is aunty ka phone borrow kiya. main daewoo stop pe stuck hun, ₨100 load bhej do please, aur ho sake to pick up kar lo, uber ki app bhi nahin chal rahi.",
+    persona: {
+      voice: "stressed, short replies, mixes Urdu/English, apologetic, self-deprecating",
+      fillers: [
+        "yaar sorry sorry",
+        "phone marnay ki habit hai meri",
+        "abhi thand bhi lag rahi hai",
+        "please bas ₨100",
+      ],
+      urgencyLines: ["yaar 20 min ho gaye hain wait karte", "bas jaldi karo please"],
+      pushLines: [],
+    },
+    voice: {
+      text: "yaar it's Ayesha, is aunty ka phone hai, please jaldi aa jao, meri jaan nikli ja rahi hai stop pe.",
+    },
+    evidenceChips: [
+      { id: "e1", label: "Answered dossier facts naturally, self-corrected", correct: true, explain: "Getting Tuesday/Wednesday wrong and CORRECTING is very human. Imposters over-agree." },
+      { id: "e2", label: "Knew the private joke (driver-in-chief)", correct: true, explain: "That kind of non-public detail is real evidence." },
+      { id: "e3", label: "Offered voice / video / pickup willingly", correct: true, explain: "Real people welcome verification." },
+      { id: "e4", label: "The ask was tiny (₨100 load, not big money)", correct: true, explain: "Real emergencies are usually small and specific." },
+      { id: "e5", label: "Contacted from unknown number", correct: false, explain: "Phones die. Borrowing a stranger's phone is normal." },
+      { id: "e6", label: "Stressed / short replies", correct: false, explain: "Real stress reads exactly like this. Not evidence of fake." },
+      { id: "e7", label: "Got a fact slightly wrong at first", correct: false, explain: "Imperfect memory is HUMAN. Perfect recall would be suspicious." },
+      ...CLEAN_VOICE_CHIPS,
+    ],
+  },
 ];
 
 export function getScenario(id: string): Scenario | undefined {
-  return SCENARIOS.find((s) => s.id === id);
+  const built = SCENARIOS.find((s) => s.id === id);
+  if (built) return built;
+  // Citizen-designed cases from Studio
+  if (typeof window !== "undefined") {
+    try {
+      const raw = localStorage.getItem("milverse.citizen.cases");
+      const list = raw ? (JSON.parse(raw) as Scenario[]) : [];
+      return list.find((s) => s.id === id);
+    } catch { return undefined; }
+  }
+  return undefined;
+}
+
+export function loadCitizenCases(): Scenario[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem("milverse.citizen.cases");
+    return raw ? (JSON.parse(raw) as Scenario[]) : [];
+  } catch { return []; }
+}
+
+export function saveCitizenCase(s: Scenario) {
+  const list = loadCitizenCases().filter((x) => x.id !== s.id);
+  list.push(s);
+  localStorage.setItem("milverse.citizen.cases", JSON.stringify(list));
 }
