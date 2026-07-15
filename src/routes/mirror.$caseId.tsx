@@ -16,6 +16,7 @@ import { logPilotEntry } from "@/lib/pilot";
 import { tick, tensionCue } from "@/lib/mirror/audio";
 import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
+import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 
 
 export const Route = createFileRoute("/mirror/$caseId")({
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/mirror/$caseId")({
   component: CasePlay,
 });
 
-type Phase = "dossier" | "sim" | "verdict" | "debrief";
+type Phase = "dossier" | "sim" | "verdict" | "reveal" | "debrief";
 
 function CasePlay() {
   const { scenario } = Route.useLoaderData();
@@ -43,11 +44,36 @@ function CasePlay() {
           onEnd={() => setPhase("verdict")}
         />
       )}
-      {phase === "verdict" && <Verdict scenario={scenario} onDone={() => setPhase("debrief")} />}
+      {phase === "verdict" && <Verdict scenario={scenario} onDone={() => setPhase("reveal")} />}
+      {phase === "reveal" && <VerdictReveal scenario={scenario} onDone={() => setPhase("debrief")} />}
       {phase === "debrief" && <Debrief scenario={scenario} />}
     </div>
   );
 }
+
+function VerdictReveal({ scenario, onDone }: { scenario: Scenario; onDone: () => void }) {
+  const raw = useMemo(() => {
+    try {
+      const s = sessionStorage.getItem(VERDICT_KEY);
+      return s ? (JSON.parse(s) as { verdict: "REAL" | "FAKE" }) : null;
+    } catch { return null; }
+  }, []);
+  const truthLabel: "REAL" | "FAKE" = scenario.truth === "REAL" ? "REAL" : "FAKE";
+  const correct = raw?.verdict === truthLabel;
+  const outcome: CalibrationOutcome = correct
+    ? "correct"
+    : scenario.truth === "IMPOSTER" ? "missed_scam" : "false_alarm";
+  return (
+    <VerdictMoment
+      caseTitle={scenario.title || `Case ${scenario.id}`}
+      caseId={scenario.id}
+      stampLabel={raw?.verdict ?? "UNVERIFIED"}
+      outcome={outcome}
+      onDone={onDone}
+    />
+  );
+}
+
 
 /* ─────────────────────────── DOSSIER ─────────────────────────── */
 
