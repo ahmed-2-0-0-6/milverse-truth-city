@@ -203,10 +203,11 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
       )}
 
       <button
-        onClick={(e) => { e.stopPropagation(); if (!doneRef.current) { doneRef.current = true; onDone(); } }}
-        className="absolute bottom-4 right-4 stencil text-[10px] text-white/40 hover:text-white/80 border border-white/15 px-3 py-1.5"
+        onClick={(e) => { e.stopPropagation(); if (canSkip && !doneRef.current) { doneRef.current = true; onDone(); } }}
+        disabled={!canSkip}
+        className="absolute bottom-4 right-4 stencil text-[10px] text-white/40 hover:text-white/80 border border-white/15 px-3 py-1.5 disabled:opacity-30 disabled:cursor-not-allowed"
       >
-        SKIP →
+        {canSkip ? "SKIP →" : "READ THE VERDICT…"}
       </button>
     </div>
   );
