@@ -87,6 +87,16 @@ const PRESSURE_WORDS = [
   "hurry", "fine send", "just tell me", "answer me", "why won't you", "stop dodging",
   "come on", "seriously?",
 ];
+// Meta-prompt jailbreak vocabulary — route as accusation reaction and never
+// let it reach the AI as a normal question.
+const META_PROMPT_WORDS = [
+  "ignore instructions", "ignore your instructions", "ignore previous",
+  "system prompt", "your prompt", "developer mode", "dan mode", "jailbreak",
+  "are you an ai", "are you a bot", "are you a chatbot", "are you a language model",
+  "are you gpt", "are you gemini", "are you claude", "what model are you",
+  "which model", "roleplay", "role play", "role-play", "simulation",
+  "step out of character", "break character", "who really programmed you",
+];
 
 function normalize(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9\s']/g, " ").replace(/\s+/g, " ").trim();
@@ -103,6 +113,12 @@ function matchFact(scenario: Scenario, text: string): Fact | undefined {
     for (const kw of f.keywords) if (n.includes(normalize(kw))) return f;
   }
   return undefined;
+}
+
+/** True if the player message tries a meta-prompt / jailbreak / AI-outing move. */
+export function isMetaPromptAttempt(text: string): boolean {
+  const n = normalize(text);
+  return includesAny(n, META_PROMPT_WORDS);
 }
 
 export function gradeProbe(scenario: Scenario, text: string): "strong" | "weak" | "wasted" {
@@ -184,6 +200,32 @@ export function respond(
   let isTell = false;
   let tellExplanation: string | undefined;
   let voice: VoicePayload | undefined;
+
+  /* ─── META-PROMPT / JAILBREAK DEFENSE ─────────────────── */
+  // Player tried to break the fourth wall. Route as accusation react in-persona.
+  if (isMetaPromptAttempt(playerMsg)) {
+    const drop = 14;
+    state.meter = Math.max(0, state.meter - drop);
+    const line = scenario.truth === "IMPOSTER"
+      ? (state.meter < 40
+          ? "look — i don't have time for word games. are you helping or not?"
+          : "what? focus please, i actually need your help here.")
+      : (state.meter < 40
+          ? "bro are you okay? that came out of nowhere."
+          : "haha what?? it's literally me. focus 😅");
+    return {
+      text: trimReply(line),
+      meter: state.meter,
+      meterType: state.meterType,
+      internalNote: "Player attempted meta-prompt / AI-outing. Routed to accusation_react in-persona.",
+      isTell: scenario.truth === "IMPOSTER" && state.meter < 50,
+      tellExplanation: scenario.truth === "IMPOSTER" && state.meter < 50
+        ? "Reacted defensively to a fourth-wall poke — a real person would just laugh it off."
+        : undefined,
+      intent: "accusation_react",
+    };
+  }
+
 
   /* ─── VOICE NOTE PATH ─────────────────────────────────── */
   if (voiceRequest && scenario.voice && !state.voiceSent) {

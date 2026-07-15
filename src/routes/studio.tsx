@@ -171,7 +171,7 @@ function Studio() {
   const [publishing, setPublishing] = useState(false);
   const publishFn = useServerFn(publishCitizenCase);
 
-  async function publish() {
+  async function publish(lane: "private" | "community") {
     const err = validate(draft);
     if (err) { setError(err); return; }
     setPublishing(true);
@@ -180,11 +180,17 @@ function Studio() {
     const code = (s as Scenario & { shareCode: string }).shareCode;
     saveCitizenCase(s);
     try {
-      await publishFn({ data: { shareCode: code, scenario: s as unknown as Record<string, unknown>, deviceId: getDeviceId() } as never });
-      alert(`Published to the cloud!\n\nShare code: ${code}\n\nAnyone on any device can enter this code on Case Files to play your case.`);
+      const res = await publishFn({ data: { shareCode: code, scenario: s as unknown as Record<string, unknown>, deviceId: getDeviceId(), lane } as never }) as { lane: "private" | "community"; aiChecked: boolean };
+      if (res.lane === "community") {
+        alert(`Submitted to the Community Library — queued for human review.\n\nShare code (playable now for you & anyone you send it to): ${code}\n\nAI safety check: ${res.aiChecked ? "passed ✓" : "unavailable — will be reviewed manually"}`);
+      } else {
+        alert(`Published as a PRIVATE case.\n\nShare code: ${code}\n\nAnyone with this code can play it. It never appears on public shelves.\n\nAI safety check: ${res.aiChecked ? "passed ✓" : "unavailable — will be reviewed if you submit to the community later"}`);
+      }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Cloud sync failed.";
-      alert(`Saved locally — cloud sync failed:\n${msg}\n\nShare code (local only): ${code}`);
+      setError(msg);
+      setPublishing(false);
+      return;
     }
     setPublishing(false);
     navigate({ to: "/mirror/$caseId", params: { caseId: s.id } });

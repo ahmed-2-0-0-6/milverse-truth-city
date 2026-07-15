@@ -13,8 +13,10 @@ import { Route as StudioRouteImport } from './routes/studio'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as QuickTourRouteImport } from './routes/quick-tour'
 import { Route as PilotRouteImport } from './routes/pilot'
+import { Route as MarketRouteImport } from './routes/market'
 import { Route as KitRouteImport } from './routes/kit'
 import { Route as CityHallRouteImport } from './routes/city-hall'
+import { Route as ArenaRouteImport } from './routes/arena'
 import { Route as ArchiveRouteImport } from './routes/archive'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MirrorIndexRouteImport } from './routes/mirror.index'
@@ -43,6 +45,11 @@ const PilotRoute = PilotRouteImport.update({
   path: '/pilot',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketRoute = MarketRouteImport.update({
+  id: '/market',
+  path: '/market',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KitRoute = KitRouteImport.update({
   id: '/kit',
   path: '/kit',
@@ -51,6 +58,11 @@ const KitRoute = KitRouteImport.update({
 const CityHallRoute = CityHallRouteImport.update({
   id: '/city-hall',
   path: '/city-hall',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArenaRoute = ArenaRouteImport.update({
+  id: '/arena',
+  path: '/arena',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArchiveRoute = ArchiveRouteImport.update({
@@ -92,8 +104,10 @@ const ArchiveSubmitRoute = ArchiveSubmitRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/archive': typeof ArchiveRouteWithChildren
+  '/arena': typeof ArenaRoute
   '/city-hall': typeof CityHallRoute
   '/kit': typeof KitRoute
+  '/market': typeof MarketRoute
   '/pilot': typeof PilotRoute
   '/quick-tour': typeof QuickTourRoute
   '/review': typeof ReviewRoute
@@ -107,8 +121,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/archive': typeof ArchiveRouteWithChildren
+  '/arena': typeof ArenaRoute
   '/city-hall': typeof CityHallRoute
   '/kit': typeof KitRoute
+  '/market': typeof MarketRoute
   '/pilot': typeof PilotRoute
   '/quick-tour': typeof QuickTourRoute
   '/review': typeof ReviewRoute
@@ -123,8 +139,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/archive': typeof ArchiveRouteWithChildren
+  '/arena': typeof ArenaRoute
   '/city-hall': typeof CityHallRoute
   '/kit': typeof KitRoute
+  '/market': typeof MarketRoute
   '/pilot': typeof PilotRoute
   '/quick-tour': typeof QuickTourRoute
   '/review': typeof ReviewRoute
@@ -140,8 +158,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/archive'
+    | '/arena'
     | '/city-hall'
     | '/kit'
+    | '/market'
     | '/pilot'
     | '/quick-tour'
     | '/review'
@@ -155,8 +175,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/archive'
+    | '/arena'
     | '/city-hall'
     | '/kit'
+    | '/market'
     | '/pilot'
     | '/quick-tour'
     | '/review'
@@ -170,8 +192,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/archive'
+    | '/arena'
     | '/city-hall'
     | '/kit'
+    | '/market'
     | '/pilot'
     | '/quick-tour'
     | '/review'
@@ -186,8 +210,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ArchiveRoute: typeof ArchiveRouteWithChildren
+  ArenaRoute: typeof ArenaRoute
   CityHallRoute: typeof CityHallRoute
   KitRoute: typeof KitRoute
+  MarketRoute: typeof MarketRoute
   PilotRoute: typeof PilotRoute
   QuickTourRoute: typeof QuickTourRoute
   ReviewRoute: typeof ReviewRoute
@@ -228,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PilotRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/market': {
+      id: '/market'
+      path: '/market'
+      fullPath: '/market'
+      preLoaderRoute: typeof MarketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/kit': {
       id: '/kit'
       path: '/kit'
@@ -240,6 +273,13 @@ declare module '@tanstack/react-router' {
       path: '/city-hall'
       fullPath: '/city-hall'
       preLoaderRoute: typeof CityHallRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/arena': {
+      id: '/arena'
+      path: '/arena'
+      fullPath: '/arena'
+      preLoaderRoute: typeof ArenaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/archive': {
@@ -308,8 +348,10 @@ const ArchiveRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ArchiveRoute: ArchiveRouteWithChildren,
+  ArenaRoute: ArenaRoute,
   CityHallRoute: CityHallRoute,
   KitRoute: KitRoute,
+  MarketRoute: MarketRoute,
   PilotRoute: PilotRoute,
   QuickTourRoute: QuickTourRoute,
   ReviewRoute: ReviewRoute,

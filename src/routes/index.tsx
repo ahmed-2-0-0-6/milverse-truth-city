@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import {
-  Eye, Newspaper, Store, Swords, Clapperboard, Library, Landmark, Lock, Sparkles,
+  Eye, Newspaper, Store, Swords, Clapperboard, Library, Landmark, Sparkles, Compass,
 } from "lucide-react";
 import { loadProfile, unlockedMaxTier, type TrustProfile } from "@/lib/mirror/profile";
 
@@ -14,25 +14,25 @@ interface District {
   id: string;
   name: string;
   Icon: typeof Eye;
-  unlocked: boolean;
-  to?: string;
+  variant: "open" | "blueprint";
+  to: string;
   tagline: (p: TrustProfile | null) => string;
 }
 
 const DISTRICTS: District[] = [
   {
-    id: "mirror", name: "The Mirror", Icon: Eye, unlocked: true, to: "/mirror",
+    id: "mirror", name: "The Mirror", Icon: Eye, variant: "open", to: "/mirror",
     tagline: (p) => p ? `Tier ${unlockedMaxTier(p)} unlocked · verify the person on the other end` : "Personal deception. Verify the person on the other end.",
   },
   {
-    id: "feed", name: "The Feed", Icon: Newspaper, unlocked: true, to: "/feed",
+    id: "feed", name: "The Feed", Icon: Newspaper, variant: "open", to: "/feed",
     tagline: () => "Mass deception. Verify the claim without breaking the relationship.",
   },
-  { id: "studio", name: "The Studio", Icon: Clapperboard, unlocked: true, to: "/studio", tagline: () => "Design a case. Share with friends." },
-  { id: "market", name: "The Market", Icon: Store, unlocked: false, tagline: () => "Scam ads and fake shops training. Verify the seller — not the price." },
-  { id: "arena", name: "The Arena", Icon: Swords, unlocked: false, tagline: () => "Human-vs-human imposter duels. Play the mask, or spot it." },
-  { id: "archive", name: "The Archive", Icon: Library, unlocked: true, to: "/archive", tagline: () => "Official campaign + community library. Every survivor story, human-reviewed." },
-  { id: "hall", name: "City Hall", Icon: Landmark, unlocked: true, to: "/city-hall", tagline: () => "Your Trust Calibration — one chart, every district." },
+  { id: "studio", name: "The Studio", Icon: Clapperboard, variant: "open", to: "/studio", tagline: () => "Design a case. Share with friends." },
+  { id: "market", name: "The Market", Icon: Store, variant: "blueprint", to: "/market", tagline: () => "Blueprint — verify the seller, not the price. Vote on what opens next." },
+  { id: "arena", name: "The Arena", Icon: Swords, variant: "blueprint", to: "/arena", tagline: () => "Blueprint — human-vs-human imposter duels. Vote on what opens next." },
+  { id: "archive", name: "The Archive", Icon: Library, variant: "open", to: "/archive", tagline: () => "Official campaign + community library. Every survivor story, human-reviewed." },
+  { id: "hall", name: "City Hall", Icon: Landmark, variant: "open", to: "/city-hall", tagline: () => "Your Trust Calibration — one chart, every district." },
 ];
 
 const INTRO_KEY = "milverse.intro.seen";
@@ -118,6 +118,9 @@ function CityMap() {
           <div className="pt-2 text-muted-foreground/80 normal-case tracking-normal">
             No accounts. No tracking. Pilot data is anonymous.
           </div>
+          <div className="pt-1 text-muted-foreground/70 normal-case tracking-normal">
+            Works on any phone · No install · No account · Low-data friendly · Offline classroom kit available.
+          </div>
         </footer>
       </main>
     </div>
@@ -159,21 +162,22 @@ function Intro({ onDone }: { onDone: () => void }) {
 
 function DistrictTile({ d, profile }: { d: District; profile: TrustProfile | null }) {
   const Icon = d.Icon;
+  const isBlueprint = d.variant === "blueprint";
   const body = (
     <div
       className={`group relative overflow-hidden rounded-sm border p-5 transition-all ${
-        d.unlocked
-          ? "border-border bg-card hover:border-primary hover:-translate-y-0.5 hover:shadow-[0_0_32px_oklch(0.82_0.16_85/0.18)] hud-frame"
-          : "border-border/40 bg-card/40 opacity-60"
+        isBlueprint
+          ? "border-dashed border-primary/40 bg-primary/[0.02] hover:border-primary hover:bg-primary/[0.05] hud-frame"
+          : "border-border bg-card hover:border-primary hover:-translate-y-0.5 hover:shadow-[0_0_32px_oklch(0.82_0.16_85/0.18)] hud-frame"
       }`}
     >
       <div className="flex items-start justify-between">
-        <div className={`flex h-11 w-11 items-center justify-center rounded-sm ${d.unlocked ? "bg-primary/15 text-primary border border-primary/40" : "bg-muted text-muted-foreground border border-border"}`}>
+        <div className={`flex h-11 w-11 items-center justify-center rounded-sm ${isBlueprint ? "bg-primary/10 text-primary/80 border border-dashed border-primary/40" : "bg-primary/15 text-primary border border-primary/40"}`}>
           <Icon className="h-5 w-5" />
         </div>
-        {!d.unlocked ? (
-          <span className="flex items-center gap-1.5 rounded-sm border border-caution/40 bg-caution/10 px-2.5 py-1 stencil text-[9px] text-caution">
-            <Lock className="h-3 w-3" /> LOCKED
+        {isBlueprint ? (
+          <span className="flex items-center gap-1.5 rounded-sm border border-primary/40 bg-primary/5 px-2.5 py-1 stencil text-[9px] text-primary">
+            <Compass className="h-3 w-3" /> BLUEPRINT · VOTE
           </span>
         ) : (
           <span className="rounded-sm border border-primary/50 bg-primary/10 px-2.5 py-1 stencil text-[9px] text-primary">
@@ -183,15 +187,10 @@ function DistrictTile({ d, profile }: { d: District; profile: TrustProfile | nul
       </div>
       <h3 className="mt-5 stencil text-sm text-foreground">{d.name}</h3>
       <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{d.tagline(profile)}</p>
-      {d.unlocked && (
-        <div className="mt-4 stencil text-[10px] text-primary opacity-0 transition-opacity group-hover:opacity-100">
-          OPEN →
-        </div>
-      )}
+      <div className="mt-4 stencil text-[10px] text-primary opacity-0 transition-opacity group-hover:opacity-100">
+        {isBlueprint ? "OPEN BLUEPRINT →" : "OPEN →"}
+      </div>
     </div>
   );
-  if (d.unlocked && d.to) {
-    return <Link to={d.to as "/mirror"} className="block">{body}</Link>;
-  }
-  return body;
+  return <Link to={d.to as "/mirror"} className="block">{body}</Link>;
 }
