@@ -532,7 +532,19 @@ export const SCENARIOS: Scenario[] = [
       { id: "e6", label: "Mentioned a famous TV show", correct: false, explain: "Public — everyone knows Jeeto Pakistan." },
       ...VOICE_CHIPS,
     ],
+    inspiredBy: {
+      patternName: "TV lucky-draw prize / advance-fee scam",
+      country: "Pakistan",
+      year: "2019–2024",
+      whatHappened: "Callers impersonate Jeeto Pakistan or similar shows, announce a huge prize, and ask for a small \"processing fee\" or CNIC details to release it. There is no prize — only the fee, collected from thousands.",
+      prevention: [
+        "You cannot win a draw you never entered.",
+        "No legitimate prize requires an upfront fee.",
+        "Never share CNIC or wallet PIN over an unsolicited call.",
+      ],
+    },
   },
+
 
   /* ── T2 IMPOSTER — THE WRONG TRANSACTION ─────────────────── */
   {
