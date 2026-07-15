@@ -123,7 +123,9 @@ export function gradeVerdict(
     return {
       result: "correct",
       points: 100 + state.actionsUsed.length * 5,
-      headline: "You corrected them — and kept the relationship.",
+      headline: truth === "UNVERIFIED"
+        ? "You held the honest 'we cannot know' — and kept the relationship."
+        : "You corrected them — and kept the relationship.",
       detail:
         "This is what real media literacy looks like. Facts don't spread on their own — trusted people carry them. You stayed one of those trusted people.",
     };
@@ -134,9 +136,10 @@ export function gradeVerdict(
       points: -10,
       headline: "You were right. And you lost.",
       detail:
-        "You called the claim correctly, but you humiliated them doing it. They tuned you out — the false claim keeps spreading in their circle. Being right rudely means the lie survives. That's a loss.",
+        "You called it correctly, but you humiliated them doing it. They tuned you out — the false claim keeps spreading in their circle. Being right rudely means the lie survives. That's a loss.",
     };
   }
+  // Endorsed something not true as TRUE
   if (truth !== "TRUE" && playerVerdict === "TRUE") {
     return {
       result: "missed_fake",
@@ -146,6 +149,7 @@ export function gradeVerdict(
         "You endorsed something that wasn't true. This is how misinformation travels — one trusted person at a time.",
     };
   }
+  // Dismissed a TRUE claim
   if (truth === "TRUE" && playerVerdict !== "TRUE") {
     return {
       result: "false_alarm",
@@ -155,11 +159,21 @@ export function gradeVerdict(
         "You dismissed a real story as fake. Refusing to believe true things is the paranoia trap — it's the twin of being gullible, and it's just as dangerous.",
     };
   }
+  // UNVERIFIED cases — call it TRUE or FALSE is a false-certainty error.
+  if (truth === "UNVERIFIED") {
+    return {
+      result: "wrong",
+      points: -25,
+      headline: "False certainty in an UNVERIFIED case.",
+      detail:
+        "This claim cannot be confirmed or disproved. Calling it TRUE spreads unverifiable fear; calling it FALSE or MISLEADING invents certainty you don't have. UNVERIFIED is the honest verdict.",
+    };
+  }
   return {
     result: "wrong",
     points: -20,
     headline: "Not quite.",
     detail:
-      "Correct verdict category matters — TRUE / FALSE / MISLEADING each map to a different response. See the truth note below.",
+      "Correct verdict category matters — TRUE / FALSE / MISLEADING / UNVERIFIED each map to a different response. See the truth note below.",
   };
 }

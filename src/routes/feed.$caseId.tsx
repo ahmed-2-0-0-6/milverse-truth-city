@@ -389,8 +389,8 @@ function VerdictScreen({
         MISLEADING = the core is true but the framing (photo, date, context) is not. That's the most common type.
       </p>
 
-      <div className="mt-5 grid grid-cols-3 gap-2">
-        {(["TRUE", "MISLEADING", "FALSE"] as FeedVerdict[]).map((v) => (
+      <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2">
+        {(["TRUE", "MISLEADING", "FALSE", "UNVERIFIED"] as FeedVerdict[]).map((v) => (
           <button
             key={v}
             onClick={() => setVerdict(v)}
@@ -398,6 +398,7 @@ function VerdictScreen({
               verdict === v
                 ? v === "TRUE" ? "border-primary bg-primary/10 text-primary" :
                   v === "MISLEADING" ? "border-caution bg-caution/10 text-caution" :
+                  v === "UNVERIFIED" ? "border-muted-foreground bg-muted/40 text-foreground" :
                   "border-destructive bg-destructive/10 text-destructive"
                 : "border-border hover:border-primary/50"
             }`}
@@ -406,6 +407,9 @@ function VerdictScreen({
           </button>
         ))}
       </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        UNVERIFIED = the claim can neither be confirmed nor disproved. Refusing to forward fear you can't check is the correct move.
+      </p>
 
       <div className="mt-6">
         <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">
@@ -519,7 +523,7 @@ function Debrief({ scenario, outcome, state, verdict, conclusion, finalReply }: 
         <span className="font-mono">{state.actionsUsed.length} / {scenario.actions.length}</span>
       </div>
 
-      <RealCaseFile caseId={scenario.id} />
+      <RealCaseFile caseId={scenario.id} inline={scenario.inspiredBy} />
 
       <div className="flex gap-2">
 

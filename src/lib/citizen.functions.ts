@@ -57,18 +57,72 @@ function serverClient() {
   });
 }
 
+async function aiSafetyCheck(scenario: unknown): Promise<{ ok: boolean; reason?: string; checked: boolean }> {
+  const key = process.env.LOVABLE_API_KEY;
+  if (!key) return { ok: true, checked: false };
+  try {
+    const { generateText } = await import("ai");
+    const { createLovableAiGatewayProvider } = await import("@/lib/ai-gateway.server");
+    const gateway = createLovableAiGatewayProvider(key);
+    const model = gateway("google/gemini-3-flash-preview");
+    const prompt = `You are the safety reviewer for MILVERSE, a media-literacy training simulator. Judge this user-designed case CONFIG for publication.
+
+Reject if it contains ANY of:
+- hate speech, slurs, or harassment of a protected group
+- targeting or defaming a real, identifiable person (politician, celebrity, journalist, etc.)
+- sexual content
+- self-harm or suicide content
+- direct political attack content on a real party or leader
+- embedded personally-identifying information (real names beyond common first names, phone numbers, emails, URLs, addresses, CNIC)
+
+Fictional scam/misinfo tactics with fictional personas are ALLOWED — that is the entire point of MILVERSE. Do not reject for being about scams.
+
+Respond with STRICT JSON only, no prose, no markdown:
+{"ok": true} OR {"ok": false, "reason": "<one short friendly sentence explaining what to fix>"}
+
+CASE CONFIG:
+${JSON.stringify(scenario).slice(0, 6000)}`;
+    const result = await generateText({ model, prompt });
+    const raw = (result.text || "").trim().replace(/^```(json)?/i, "").replace(/```$/, "").trim();
+    let parsed: { ok?: boolean; reason?: string } = {};
+    try { parsed = JSON.parse(raw); } catch { return { ok: true, checked: false }; }
+    if (parsed.ok === false) return { ok: false, reason: parsed.reason || "Case flagged by safety review.", checked: true };
+    return { ok: true, checked: true };
+  } catch {
+    return { ok: true, checked: false };
+  }
+}
+
 export const publishCitizenCase = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z.object({
       shareCode: z.string().regex(CODE_RE),
       scenario: ScenarioConfig,
       deviceId: z.string().min(8).max(64).optional(),
+      lane: z.enum(["private", "community"]).default("private"),
     }).parse(input),
   )
   .handler(async ({ data }) => {
     const piiKind = scanForPii(data.scenario);
     if (piiKind) throw new Error(`Case rejected: contains ${piiKind}. Keep scenarios fully fictional.`);
 
+    // AI safety gate — both lanes.
+    const safety = await aiSafetyCheck(data.scenario);
+    if (!safety.ok) throw new Error(`Case rejected by safety review: ${safety.reason}`);
+
+    if (data.lane === "community") {
+      // Community lane → queue in moderation, don't publish to citizen_cases yet.
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { error } = await supabaseAdmin.from("story_submissions").insert({
+        story: { kind: "studio_case", scenario: data.scenario, shareCode: data.shareCode } as never,
+        status: "pending",
+        device_id: data.deviceId ?? null,
+      });
+      if (error) throw new Error(error.message);
+      return { ok: true, shareCode: data.shareCode, lane: "community" as const, aiChecked: safety.checked };
+    }
+
+    // Private lane → share-code only, never on public shelves.
     const supabase = serverClient();
     const { error } = await supabase.from("citizen_cases").insert({
       share_code: data.shareCode,
@@ -76,11 +130,10 @@ export const publishCitizenCase = createServerFn({ method: "POST" })
       device_id: data.deviceId ?? null,
     });
     if (error) {
-      // Duplicate code — extremely unlikely (36^6 space) but degrade gracefully.
       if (error.code === "23505") throw new Error("That share code is already taken. Publish again to mint a new one.");
       throw new Error(error.message);
     }
-    return { ok: true, shareCode: data.shareCode };
+    return { ok: true, shareCode: data.shareCode, lane: "private" as const, aiChecked: safety.checked };
   });
 
 export const fetchCitizenCase = createServerFn({ method: "GET" })

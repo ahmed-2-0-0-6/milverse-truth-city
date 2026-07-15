@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Play, Pause, Mic } from "lucide-react";
+import { Play, Pause, Mic, FileText, ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 import { playVoiceNote, waveformBars, inferGender, type PlaybackHandle } from "@/lib/mirror/voice";
 import type { VoicePayload } from "@/lib/mirror/engine";
 
@@ -10,9 +11,15 @@ interface Props {
   speakerVoiceDesc?: string;
 }
 
+function audioAvailable(): boolean {
+  if (typeof window === "undefined") return false;
+  return "speechSynthesis" in window || "AudioContext" in window || "webkitAudioContext" in (window as unknown as Record<string, unknown>);
+}
+
 export function VoiceNote({ voice, fromPlayer = false, speakerName, speakerVoiceDesc }: Props) {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [showTranscript, setShowTranscript] = useState(false);
   const handleRef = useRef<PlaybackHandle | null>(null);
   const bars = waveformBars(voice.text);
 
@@ -27,18 +34,31 @@ export function VoiceNote({ voice, fromPlayer = false, speakerName, speakerVoice
       setPlaying(false);
       return;
     }
+    if (!audioAvailable()) {
+      toast("Audio blocked by browser — tap again or read the transcript.", {
+        description: "Some browsers require a second tap to enable sound.",
+      });
+      setShowTranscript(true);
+      return;
+    }
     setProgress(0);
     setPlaying(true);
-    const gender = fromPlayer ? "neutral" : inferGender(speakerName, speakerVoiceDesc);
-    const h = playVoiceNote(voice.text, voice.artifact, voice.artifactPos, gender);
-    handleRef.current = h;
-    h.onProgress((t) => {
-      setProgress(t);
-      if (t >= 1) {
-        setPlaying(false);
-        handleRef.current = null;
-      }
-    });
+    try {
+      const gender = fromPlayer ? "neutral" : inferGender(speakerName, speakerVoiceDesc);
+      const h = playVoiceNote(voice.text, voice.artifact, voice.artifactPos, gender);
+      handleRef.current = h;
+      h.onProgress((t) => {
+        setProgress(t);
+        if (t >= 1) {
+          setPlaying(false);
+          handleRef.current = null;
+        }
+      });
+    } catch {
+      setPlaying(false);
+      toast("Audio blocked by browser — tap again or read the transcript.");
+      setShowTranscript(true);
+    }
   }
 
   const bg = fromPlayer
@@ -80,6 +100,20 @@ export function VoiceNote({ voice, fromPlayer = false, speakerName, speakerVoice
           </div>
         </div>
       </div>
+      <button
+        onClick={() => setShowTranscript((v) => !v)}
+        className={`mt-2 flex items-center gap-1 font-mono text-[10px] tracking-widest opacity-70 hover:opacity-100 ${fromPlayer ? "" : ""}`}
+        aria-expanded={showTranscript}
+      >
+        <FileText className="h-2.5 w-2.5" />
+        {showTranscript ? "HIDE TRANSCRIPT" : "READ TRANSCRIPT"}
+        <ChevronDown className={`h-2.5 w-2.5 transition-transform ${showTranscript ? "rotate-180" : ""}`} />
+      </button>
+      {showTranscript && (
+        <p className={`mt-1.5 text-xs italic leading-relaxed ${fromPlayer ? "text-primary-foreground/90" : "text-foreground/90"}`}>
+          "{voice.text}"
+        </p>
+      )}
     </div>
   );
 }

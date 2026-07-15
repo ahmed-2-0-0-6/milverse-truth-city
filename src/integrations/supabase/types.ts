@@ -41,6 +41,30 @@ export type Database = {
         }
         Relationships: []
       }
+      district_votes: {
+        Row: {
+          created_at: string
+          device_id: string | null
+          district: string
+          id: string
+          suggestion: string | null
+        }
+        Insert: {
+          created_at?: string
+          device_id?: string | null
+          district: string
+          id?: string
+          suggestion?: string | null
+        }
+        Update: {
+          created_at?: string
+          device_id?: string | null
+          district?: string
+          id?: string
+          suggestion?: string | null
+        }
+        Relationships: []
+      }
       pilot_entries: {
         Row: {
           case_id: string

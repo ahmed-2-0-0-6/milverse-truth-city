@@ -31,6 +31,33 @@ type CloudEntry = {
   created_at: string;
 };
 
+const SAMPLE_ENTRIES: CloudEntry[] = (() => {
+  // Deterministic ~24-entry synthetic group showing before/after calibration lift.
+  // Devices D1/D2/D3 each get 8 cases: shaky early, better late.
+  const now = Date.now();
+  const rows: CloudEntry[] = [];
+  const devices = ["SAMPLE-D1", "SAMPLE-D2", "SAMPLE-D3"];
+  const wings: ("mirror" | "feed")[] = ["mirror", "feed", "mirror", "feed", "mirror", "feed", "mirror", "feed"];
+  const cases = ["survivor-bankfraud", "flood-photo", "pk-prize-sms", "bank-rumor", "pk-wrong-txn", "unbelievable-true", "recalled-medicine", "job-circular"];
+  // Early results: mixed misses + false alarms. Later: mostly correct.
+  const arc: CloudEntry["result"][] = ["missed_scam", "false_alarm", "missed_scam", "correct", "correct", "correct", "correct", "correct"];
+  const pointsByResult: Record<CloudEntry["result"], number> = { correct: 105, missed_scam: -50, false_alarm: -30, lucky_guess: 25, pyrrhic: -10 };
+  devices.forEach((d, di) => {
+    for (let i = 0; i < 8; i++) {
+      // Slight variation per device so D3 lags a little behind.
+      const r = di === 2 && i < 4 ? (i % 2 === 0 ? "missed_scam" : "false_alarm") : arc[i];
+      rows.push({
+        device_id: d, wing: wings[i], case_id: cases[i],
+        tier: ((i % 3) + 1) as 1 | 2 | 3,
+        result: r, points: pointsByResult[r],
+        probe_stats: null,
+        created_at: new Date(now - (24 - (di * 8 + i)) * 60 * 60 * 1000).toISOString(),
+      });
+    }
+  });
+  return rows;
+})();
+
 function PilotPage() {
   const [active, setActive] = useState<string | null>(null);
   const [code, setCode] = useState("");
@@ -39,6 +66,7 @@ function PilotPage() {
   const [cloud, setCloud] = useState<CloudEntry[]>([]);
   const [cloudBusy, setCloudBusy] = useState(false);
   const [cloudErr, setCloudErr] = useState<string | null>(null);
+  const [sample, setSample] = useState(false);
   const fetchGroup = useServerFn(fetchPilotGroup);
 
   const refreshLocal = useCallback(() => {
@@ -48,6 +76,7 @@ function PilotPage() {
   }, []);
 
   const refreshCloud = useCallback(async () => {
+    if (sample) return;
     const g = getActiveGroup();
     if (!g) { setCloud([]); return; }
     setCloudBusy(true);
@@ -59,7 +88,7 @@ function PilotPage() {
       setCloudErr("Couldn't reach the pilot service — showing local data only.");
     }
     setCloudBusy(false);
-  }, [fetchGroup]);
+  }, [fetchGroup, sample]);
 
   useEffect(() => {
     refreshLocal();
@@ -90,11 +119,13 @@ function PilotPage() {
     setTimeout(() => setCopied(false), 1200);
   }
 
+  const effectiveCloud = sample ? SAMPLE_ENTRIES : cloud;
+
   // Prefer cloud data when it has more entries; otherwise fall back to local.
-  const preferCloud = cloud.length >= log.length && cloud.length > 0;
+  const preferCloud = effectiveCloud.length >= log.length && effectiveCloud.length > 0;
   const merged: PilotEntry[] = useMemo(() => {
     if (preferCloud) {
-      return cloud.map((c) => ({
+      return effectiveCloud.map((c) => ({
         wing: c.wing, caseId: c.case_id,
         tier: (c.tier ?? undefined) as PilotEntry["tier"],
         result: c.result, points: c.points,
@@ -102,21 +133,21 @@ function PilotPage() {
       }));
     }
     return log;
-  }, [preferCloud, cloud, log]);
+  }, [preferCloud, effectiveCloud, log]);
 
   const s = summarize(merged);
   const myDeviceId = getDeviceId();
   const players = useMemo(() => {
     const set = new Set<string>();
-    cloud.forEach((c) => set.add(c.device_id));
-    set.add(myDeviceId);
+    effectiveCloud.forEach((c) => set.add(c.device_id));
+    if (!sample) set.add(myDeviceId);
     return set.size;
-  }, [cloud, myDeviceId]);
+  }, [effectiveCloud, myDeviceId, sample]);
 
   // Before/after per-device calibration: FIRST 3 vs LAST 3 completed cases.
   const beforeAfter = useMemo(() => {
     const byDevice = new Map<string, CloudEntry[]>();
-    cloud.forEach((c) => {
+    effectiveCloud.forEach((c) => {
       const list = byDevice.get(c.device_id) ?? [];
       list.push(c);
       byDevice.set(c.device_id, list);
@@ -126,12 +157,11 @@ function PilotPage() {
       const n = list.length;
       const miss = list.filter((e) => e.result === "missed_scam").length / n;
       const fa = list.filter((e) => e.result === "false_alarm" || e.result === "pyrrhic").length / n;
-      // Calibration score: 100 - (miss+fa)*100. Higher = better.
       return Math.max(0, Math.round(100 - (miss + fa) * 100));
     };
     let sumBefore = 0, sumAfter = 0, count = 0;
     byDevice.forEach((entries) => {
-      if (entries.length < 4) return; // need enough to compare
+      if (entries.length < 4) return;
       const first3 = entries.slice(0, 3);
       const last3 = entries.slice(-3);
       const b = scoreOf(first3);
@@ -147,7 +177,7 @@ function PilotPage() {
       after: Math.round(sumAfter / count),
       devices: count,
     };
-  }, [cloud]);
+  }, [effectiveCloud]);
 
   function exportCsv() {
     const rows = [
@@ -189,75 +219,115 @@ function PilotPage() {
           </p>
         </div>
 
-        {!active ? (
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <button
-              onClick={create}
-              className="rounded-xl border border-primary/40 bg-primary/10 p-6 text-left hover:border-primary transition"
-            >
-              <Plus className="h-5 w-5 text-primary mb-3" />
-              <div className="font-semibold">Create a new group</div>
-              <div className="mt-1 text-sm text-muted-foreground">
-                Generates a 5-character code you can read out loud.
-              </div>
-            </button>
-            <div className="rounded-xl border border-border bg-card p-6">
-              <Users className="h-5 w-5 text-primary mb-3" />
-              <div className="font-semibold">Join an existing group</div>
-              <div className="mt-3 flex gap-2">
-                <input
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase())}
-                  onKeyDown={(e) => e.key === "Enter" && join()}
-                  placeholder="CODE"
-                  maxLength={6}
-                  className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm font-mono tracking-widest outline-none focus:border-primary"
-                />
-                <button
-                  onClick={join}
-                  disabled={code.trim().length < 4}
-                  className="rounded-md bg-primary px-4 text-primary-foreground text-xs font-mono tracking-widest disabled:opacity-40"
-                >
-                  JOIN
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="mt-8 rounded-xl border border-primary/40 bg-primary/5 p-6">
-              <div className="flex items-center justify-between">
-                <div className="font-mono text-[10px] tracking-widest text-primary">ACTIVE GROUP</div>
-                <button
-                  onClick={() => void refreshCloud()}
-                  disabled={cloudBusy}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-[10px] font-mono tracking-widest text-muted-foreground hover:text-foreground disabled:opacity-50"
-                  title="Refresh from cloud"
-                >
-                  <RefreshCw className={`h-3 w-3 ${cloudBusy ? "animate-spin" : ""}`} /> REFRESH
-                </button>
-              </div>
-              <div className="mt-2 flex flex-wrap items-center gap-3">
-                <div className="font-mono text-4xl tracking-widest text-foreground">{active}</div>
-                <button onClick={copy} className="inline-flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-mono tracking-widest text-primary">
-                  {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                  {copied ? "COPIED" : "COPY"}
-                </button>
-                <button onClick={leave} className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-mono tracking-widest text-muted-foreground hover:text-foreground">
-                  <LogOut className="h-3 w-3" /> LEAVE
-                </button>
-                {cloud.length > 0 && (
-                  <button onClick={exportCsv} className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-mono tracking-widest text-muted-foreground hover:text-foreground">
-                    <Download className="h-3 w-3" /> CSV
-                  </button>
-                )}
-              </div>
-              <p className="mt-3 text-sm text-muted-foreground">
-                Share the code so students can join on their own devices. Each device logs its
-                outcomes to group <span className="font-mono text-foreground">{active}</span>.
-                {cloudErr && <span className="block mt-1 text-caution text-xs">{cloudErr}</span>}
+        {sample && (
+          <div className="mt-6 rounded-xl border-2 border-dashed border-caution/60 bg-caution/5 p-4 flex items-center justify-between gap-3">
+            <div>
+              <div className="font-mono text-[10px] tracking-widest text-caution">SAMPLE DATA · FOR DEMONSTRATION</div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                You are viewing a synthetic pilot group ({SAMPLE_ENTRIES.length} entries, 3 devices).
+                Real group codes still work — leave this view to return to live data.
               </p>
             </div>
+            <button onClick={() => setSample(false)} className="rounded-md border border-caution/50 bg-caution/10 px-3 py-1.5 text-[10px] font-mono tracking-widest text-caution shrink-0">
+              EXIT SAMPLE
+            </button>
+          </div>
+        )}
+
+        {!active && !sample ? (
+          <>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              <button
+                onClick={create}
+                className="rounded-xl border border-primary/40 bg-primary/10 p-6 text-left hover:border-primary transition"
+              >
+                <Plus className="h-5 w-5 text-primary mb-3" />
+                <div className="font-semibold">Create a new group</div>
+                <div className="mt-1 text-sm text-muted-foreground">
+                  Generates a 5-character code you can read out loud.
+                </div>
+              </button>
+              <div className="rounded-xl border border-border bg-card p-6">
+                <Users className="h-5 w-5 text-primary mb-3" />
+                <div className="font-semibold">Join an existing group</div>
+                <div className="mt-3 flex gap-2">
+                  <input
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.toUpperCase())}
+                    onKeyDown={(e) => e.key === "Enter" && join()}
+                    placeholder="CODE"
+                    maxLength={6}
+                    className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm font-mono tracking-widest outline-none focus:border-primary"
+                  />
+                  <button
+                    onClick={join}
+                    disabled={code.trim().length < 4}
+                    className="rounded-md bg-primary px-4 text-primary-foreground text-xs font-mono tracking-widest disabled:opacity-40"
+                  >
+                    JOIN
+                  </button>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => setSample(true)}
+              className="mt-4 w-full rounded-xl border border-dashed border-caution/60 bg-caution/5 p-4 text-center text-xs font-mono tracking-widest text-caution hover:bg-caution/10 transition"
+            >
+              VIEW SAMPLE DASHBOARD — SEE THE BEFORE/AFTER STORY
+            </button>
+          </>
+        ) : (
+          <></>
+        )}
+        {(active || sample) && (
+          <>
+            {!sample && active && (
+              <div className="mt-8 rounded-xl border border-primary/40 bg-primary/5 p-6">
+                <div className="flex items-center justify-between">
+                  <div className="font-mono text-[10px] tracking-widest text-primary">ACTIVE GROUP</div>
+                  <button
+                    onClick={() => void refreshCloud()}
+                    disabled={cloudBusy}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-[10px] font-mono tracking-widest text-muted-foreground hover:text-foreground disabled:opacity-50"
+                    title="Refresh from cloud"
+                  >
+                    <RefreshCw className={`h-3 w-3 ${cloudBusy ? "animate-spin" : ""}`} /> REFRESH
+                  </button>
+                </div>
+                <div className="mt-2 flex flex-wrap items-center gap-3">
+                  <div className="font-mono text-4xl tracking-widest text-foreground">{active}</div>
+                  <button onClick={copy} className="inline-flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-mono tracking-widest text-primary">
+                    {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                    {copied ? "COPIED" : "COPY"}
+                  </button>
+                  <button onClick={leave} className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-mono tracking-widest text-muted-foreground hover:text-foreground">
+                    <LogOut className="h-3 w-3" /> LEAVE
+                  </button>
+                  {cloud.length > 0 && (
+                    <button onClick={exportCsv} className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-mono tracking-widest text-muted-foreground hover:text-foreground">
+                      <Download className="h-3 w-3" /> CSV
+                    </button>
+                  )}
+                </div>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Share the code so students can join on their own devices. Each device logs its
+                  outcomes to group <span className="font-mono text-foreground">{active}</span>.
+                  {cloudErr && <span className="block mt-1 text-caution text-xs">{cloudErr}</span>}
+                </p>
+              </div>
+            )}
+{sample && (
+  <div className="mt-8 relative rounded-xl border border-caution/40 bg-caution/5 p-6 overflow-hidden">
+    <div className="pointer-events-none absolute -right-6 top-3 rotate-12 stencil text-[10px] tracking-widest text-caution/40 border border-caution/40 px-2 py-0.5">
+      SAMPLE — NOT REAL DATA
+    </div>
+    <div className="font-mono text-[10px] tracking-widest text-caution">SAMPLE GROUP · MILV-SAMPLE</div>
+    <div className="mt-2 font-mono text-4xl tracking-widest text-foreground">SAMPLE</div>
+    <p className="mt-3 text-sm text-muted-foreground">
+      This is a synthetic pilot with 3 devices and 8 cases each — showing how a real classroom's before/after calibration story looks after two sessions.
+    </p>
+  </div>
+)}
 
             <div className="mt-8 grid gap-4 sm:grid-cols-5">
               <Stat label="PLAYERS" value={players} accent />
