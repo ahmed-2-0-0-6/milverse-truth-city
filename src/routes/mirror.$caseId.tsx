@@ -721,7 +721,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
 
         <div>
           <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-1.5">
-            DOSSIER · {scenario.dossier.name}
+            DOSSIER
           </div>
           <ul className="text-xs text-muted-foreground space-y-0.5">
             {scenario.dossier.publicFacts.slice(0, 3).map((f, i) => (
