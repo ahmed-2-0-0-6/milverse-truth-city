@@ -21,6 +21,7 @@ export type Database = {
           id: string
           scenario_config: Json
           share_code: string
+          source: string
         }
         Insert: {
           created_at?: string
@@ -28,6 +29,7 @@ export type Database = {
           id?: string
           scenario_config: Json
           share_code: string
+          source?: string
         }
         Update: {
           created_at?: string
@@ -35,6 +37,7 @@ export type Database = {
           id?: string
           scenario_config?: Json
           share_code?: string
+          source?: string
         }
         Relationships: []
       }
@@ -74,6 +77,45 @@ export type Database = {
           result?: string
           tier?: number | null
           wing?: string
+        }
+        Relationships: []
+      }
+      story_submissions: {
+        Row: {
+          country: string | null
+          created_at: string
+          device_id: string | null
+          id: string
+          published_share_code: string | null
+          reviewer_notes: string | null
+          status: string
+          story: Json
+          updated_at: string
+          year: number | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          published_share_code?: string | null
+          reviewer_notes?: string | null
+          status?: string
+          story: Json
+          updated_at?: string
+          year?: number | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          published_share_code?: string | null
+          reviewer_notes?: string | null
+          status?: string
+          story?: Json
+          updated_at?: string
+          year?: number | null
         }
         Relationships: []
       }
