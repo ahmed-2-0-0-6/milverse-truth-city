@@ -591,7 +591,19 @@ export const SCENARIOS: Scenario[] = [
       { id: "e6", label: "She knew my wallet number", correct: false, explain: "Public on your OLX listing." },
       ...VOICE_CHIPS,
     ],
+    inspiredBy: {
+      patternName: "\"Wrong transaction\" wallet reversal scam",
+      country: "Pakistan",
+      year: "2021–2024",
+      whatHappened: "A stranger claims they sent money to your JazzCash/EasyPaisa by mistake and pleads for a reversal. The \"proof\" screenshot is fake; sending it back is a real out-of-pocket loss.",
+      prevention: [
+        "Check the wallet balance in the app — never trust their screenshot.",
+        "Tell them to file a reversal with the wallet provider directly.",
+        "Never send money based on someone else's urgency.",
+      ],
+    },
   },
+
 
   /* ── T2 IMPOSTER — THE ONLINE BUYER (military officer) ───── */
   {
