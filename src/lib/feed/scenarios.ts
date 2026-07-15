@@ -61,6 +61,10 @@ export interface FeedScenario {
   opener: string;
   forward: FeedForward;
   actions: FeedAction[];
+  /** Optional dossier-truth answers for the Verification Toolbelt.
+   *  Each entry is what the tool WOULD return if used on this artifact.
+   *  Missing kinds render as WASTED turns with a teaching line. */
+  toolbelt?: Partial<Record<FeedToolKind, string>>;
   truthNote: string;
   respectfulScript: string;
   inspiredBy?: InspiredByCase;
