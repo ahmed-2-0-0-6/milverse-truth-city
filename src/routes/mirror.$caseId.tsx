@@ -243,6 +243,10 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
     setMessages((prev) => [...prev, playerMsg]);
     setInput("");
     setTyping(true);
+    if (grade === "strong" && !tacticFlashed.current) {
+      tacticFlashed.current = true;
+      setTacticFlash(tacticForMirror(scenario.id));
+    }
 
     const next = { ...state, factProbes: { ...state.factProbes } };
     const reply = respond(scenario, next, text);
@@ -362,6 +366,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-4 flex flex-col" style={{ minHeight: "calc(100vh - 57px)" }}>
+      <TacticFlash tacticId={tacticFlash} onDone={() => setTacticFlash(null)} />
       {/* Contact header */}
       <div className="rounded-t-xl border border-border border-b-0 bg-card px-4 py-3">
         <div className="flex items-center justify-between gap-3">
