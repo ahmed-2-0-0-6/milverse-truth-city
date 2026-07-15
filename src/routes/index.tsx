@@ -49,56 +49,70 @@ function CityMap() {
   }, []);
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-screen grain relative">
+      {/* Ambient scan sweep */}
+      <div className="pointer-events-none fixed inset-0 scanlines opacity-30" />
       <TopBar />
       {intro && <Intro onDone={() => { localStorage.setItem(INTRO_KEY, "1"); setIntro(false); }} />}
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:py-16">
-        <section className="mb-8 max-w-2xl">
-          <div className="font-mono text-xs tracking-[0.3em] text-primary mb-3">MEDIA & INFORMATION LITERACY · BY DOING</div>
-          <h1 className="text-4xl sm:text-5xl font-semibold leading-tight tracking-tight">
-            Train your trust<span className="text-primary">.</span><br />
-            From viral lies to voice clones —<br />one verification instinct.
+      <main className="mx-auto max-w-6xl px-4 py-10 sm:py-14 relative">
+        {/* Mission briefing header */}
+        <section className="mb-10 max-w-3xl">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-px flex-1 max-w-[60px] bg-primary/60" />
+            <div className="stencil text-[10px] text-primary">MISSION BRIEFING // 0-DAY</div>
+            <div className="h-px flex-1 bg-primary/20" />
+          </div>
+          <h1 className="text-4xl sm:text-6xl font-semibold leading-[1.05] tracking-tight uppercase">
+            Train your <span className="text-primary">trust</span>.<br />
+            <span className="text-muted-foreground text-2xl sm:text-3xl normal-case font-normal tracking-normal block mt-3">
+              From viral lies to voice clones — one verification instinct.
+            </span>
           </h1>
-          <p className="mt-4 text-muted-foreground">
-            Two wings are open. <span className="text-foreground">The Mirror</span> trains you
+          <p className="mt-6 text-muted-foreground max-w-2xl leading-relaxed">
+            Two wings are operational. <span className="text-foreground font-medium">The Mirror</span> trains you
             against personal deception — the scammer talking to you.{" "}
-            <span className="text-foreground">The Feed</span> trains you against mass
+            <span className="text-foreground font-medium">The Feed</span> trains you against mass
             misinformation — the viral lie your uncle just forwarded.
-            Same instinct powers both: <b>verify, use sources, protect evidence, protect people.</b>
+            Same instinct powers both: <b className="text-primary">verify, use sources, protect evidence, protect people.</b>
           </p>
         </section>
 
-        {/* Quick Tour banner */}
-        <Link to="/quick-tour" className="block mb-8 rounded-xl border border-primary/40 bg-gradient-to-r from-primary/10 to-transparent p-5 hover:border-primary/70 transition group">
-          <div className="flex items-center gap-4">
-            <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/20 text-primary shrink-0">
+        {/* Quick Tour banner — mission-brief style */}
+        <Link to="/quick-tour" className="block mb-10 hud-frame rounded-sm border border-primary/50 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 hover:border-primary transition group relative overflow-hidden scan-sweep">
+          <div className="flex items-center gap-4 relative">
+            <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-primary/20 text-primary shrink-0 border border-primary/40">
               <Sparkles className="h-5 w-5" />
             </div>
             <div className="flex-1">
-              <div className="font-mono text-[10px] tracking-widest text-primary">START HERE · 90 SECONDS</div>
+              <div className="stencil text-[10px] text-primary">SIM-01 · TRAINING WHEELS · 90 SEC</div>
               <div className="mt-1 text-lg font-semibold">Take the Quick Tour</div>
-              <div className="text-sm text-muted-foreground">Watch one case unfold before playing live.</div>
+              <div className="text-sm text-muted-foreground">Watch one case unfold before playing live fire.</div>
             </div>
-            <div className="font-mono text-xs tracking-widest text-primary opacity-0 group-hover:opacity-100 transition">
-              GO →
+            <div className="stencil text-[10px] text-primary opacity-0 group-hover:opacity-100 transition">
+              DEPLOY →
             </div>
           </div>
         </Link>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="stencil text-[10px] text-muted-foreground">DISTRICT ROSTER</div>
+          <div className="h-px flex-1 bg-border" />
+          <div className="stencil text-[10px] text-primary hud-blink">● LIVE</div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {DISTRICTS.map((d) => (
             <DistrictTile key={d.id} d={d} profile={profile} />
           ))}
         </div>
 
-        <footer className="mt-16 text-center text-xs font-mono text-muted-foreground tracking-widest space-y-3">
-          <div>VERIFY, DON'T GUESS · CALIBRATE, DON'T PANIC</div>
+        <footer className="mt-16 border-t border-border pt-6 text-center stencil text-[10px] text-muted-foreground space-y-3">
+          <div className="text-primary/80">VERIFY, DON'T GUESS · CALIBRATE, DON'T PANIC</div>
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             <Link to="/pilot" className="text-primary hover:underline">
-              RUNNING A CLASSROOM? OPEN PILOT MODE →
+              [F1] PILOT MODE — CLASSROOM OPS →
             </Link>
             <Link to="/kit" className="text-primary hover:underline">
-              NO INTERNET? PRINT THE FIELD KIT →
+              [F2] FIELD KIT — PRINT PACK →
             </Link>
           </div>
         </footer>
