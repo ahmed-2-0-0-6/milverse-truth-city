@@ -776,7 +776,19 @@ export const SCENARIOS: Scenario[] = [
       { id: "e7", label: "Got a fact slightly wrong at first", correct: false, explain: "Imperfect memory is HUMAN. Perfect recall would be suspicious." },
       ...CLEAN_VOICE_CHIPS,
     ],
+    inspiredBy: {
+      patternName: "Stranded relative / SIM-swap impersonation",
+      country: "Pakistan",
+      year: "2022–2024",
+      whatHappened: "Scammers pose as a relative stuck in another city — phone stolen, wallet lost — texting from a fresh number. Family sends emergency funds before anyone thinks to call the real person.",
+      prevention: [
+        "Call the person on their known number before sending money.",
+        "Ask a question only the real relative would know.",
+        "Verify with a second family member out-of-band.",
+      ],
+    },
   },
+
 
   /* ── T4 REAL — THE STRESSED SISTER (paranoia test) ───────── */
   {
