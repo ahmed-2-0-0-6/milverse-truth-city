@@ -24,13 +24,26 @@ const TIER_NAMES: Record<TierId, string> = {
 };
 
 function CaseFiles() {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<TrustProfile | null>(null);
+  const [citizen, setCitizen] = useState<Scenario[]>([]);
+  const [code, setCode] = useState("");
+  const [codeErr, setCodeErr] = useState<string | null>(null);
   useEffect(() => {
     setProfile(loadProfile());
+    setCitizen(loadCitizenCases());
     const on = () => setProfile(loadProfile());
     window.addEventListener("milverse:profile", on);
     return () => window.removeEventListener("milverse:profile", on);
   }, []);
+
+  function openCode() {
+    const c = code.trim().toLowerCase();
+    if (!c) return;
+    const target = citizen.find((s) => s.id.replace("citizen-", "").toLowerCase().startsWith(c));
+    if (!target) { setCodeErr("No case with that code on this device."); return; }
+    navigate({ to: "/mirror/$caseId", params: { caseId: target.id } });
+  }
 
   const maxTier = profile ? unlockedMaxTier(profile) : 2;
   const tiers: TierId[] = [1, 2, 3, 4, 5];
@@ -42,14 +55,34 @@ function CaseFiles() {
         <Link to="/" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">
           ← CITY
         </Link>
-        <div className="mt-4 mb-8 max-w-2xl">
+        <div className="mt-4 mb-4 max-w-2xl">
           <div className="font-mono text-xs tracking-[0.3em] text-primary">THE MIRROR · TEXT CHANNEL</div>
           <h1 className="mt-2 text-3xl sm:text-4xl font-semibold">Case Files</h1>
           <p className="mt-3 text-muted-foreground">
             Live, unscripted conversations. Your job is not to spot red flags — it's to{" "}
             <span className="text-foreground">verify</span>. Win two cases in a tier to unlock the next.
           </p>
+          <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-caution/30 bg-caution/10 px-3 py-1 text-[11px] font-mono tracking-widest text-caution">
+            🇵🇰 SCENARIOS ROOTED IN REAL REPORTED SCAM PATTERNS FROM PAKISTAN
+          </div>
         </div>
+
+        {/* Share code entry */}
+        <div className="mb-8 flex flex-wrap items-center gap-2">
+          <input
+            value={code}
+            onChange={(e) => { setCode(e.target.value); setCodeErr(null); }}
+            onKeyDown={(e) => e.key === "Enter" && openCode()}
+            placeholder="Enter 6-char share code…"
+            className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary font-mono uppercase tracking-widest w-64"
+            maxLength={6}
+          />
+          <button onClick={openCode} className="rounded-md border border-primary/50 bg-primary/10 px-4 py-2 text-xs font-mono tracking-widest text-primary hover:bg-primary/20">
+            OPEN CASE
+          </button>
+          {codeErr && <span className="text-xs text-destructive">{codeErr}</span>}
+        </div>
+
 
         {tiers.map((tier) => {
           const cases = SCENARIOS.filter((s) => s.tier === tier);
