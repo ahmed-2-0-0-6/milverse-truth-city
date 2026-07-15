@@ -810,7 +810,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
   const verdictRaw = useMemo(() => {
     try {
       const raw = sessionStorage.getItem(VERDICT_KEY);
-      return raw ? (JSON.parse(raw) as { verdict: "REAL" | "FAKE"; picked: string[] }) : null;
+      return raw ? (JSON.parse(raw) as { verdict: "REAL" | "FAKE"; picked: string[]; conclusion?: string }) : null;
     } catch { return null; }
   }, []);
 
