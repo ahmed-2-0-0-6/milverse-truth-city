@@ -37,7 +37,6 @@ export function TopBar() {
   }, []);
 
   const cal = profile ? calibrationLabel(profile) : { label: "STANDBY", tone: "neutral" as const };
-  const rank = profile ? operatorRank(profile) : null;
   const call = profile ? operatorCallsign(profile) : "———";
   const xp = computeXp(profile, manualUnlocks, profile?.publishedCount ?? 0);
   const noirRank = rankFromXp(xp);
