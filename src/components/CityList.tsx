@@ -43,10 +43,11 @@ export function CityList({ onSwitchToMap }: { onSwitchToMap: () => void }) {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 p-2 border-b border-border">
         <LandmarkTile to="/city-hall" Icon={LandmarkIcon} label="City Hall" />
         <LandmarkTile to="/studio" Icon={Clapperboard} label="Studio" />
-        <LandmarkTile to="/archive" Icon={Library} label="Archive" />
+        <LandmarkTile to="/archive" Icon={Library} label="Archive · City Library" badge={profile?.history?.length ? `${new Set(profile.history.map((h) => h.caseId)).size} ON SHELF` : undefined} />
         <LandmarkTile to="/market" Icon={Store} label="Market · Blueprint" muted />
         <LandmarkTile to="/arena" Icon={Swords} label="Arena · Blueprint" muted />
       </div>
+
 
       <DistrictSection
         color={MIRROR_COLOR}
@@ -76,17 +77,19 @@ export function CityList({ onSwitchToMap }: { onSwitchToMap: () => void }) {
   );
 }
 
-function LandmarkTile({ to, Icon, label, muted }: { to: string; Icon: typeof Eye; label: string; muted?: boolean }) {
+function LandmarkTile({ to, Icon, label, muted, badge }: { to: string; Icon: typeof Eye; label: string; muted?: boolean; badge?: string }) {
   return (
     <Link
       to={to as "/city-hall"}
       className={`flex items-center gap-2 rounded-sm border p-2 text-sm ${muted ? "border-dashed border-primary/30 text-muted-foreground" : "border-border hover:border-primary"}`}
     >
       <Icon className="h-4 w-4 text-primary" />
-      <span>{label}</span>
+      <span className="flex-1 truncate">{label}</span>
+      {badge && <span className="stencil text-[9px] text-primary shrink-0">{badge}</span>}
     </Link>
   );
 }
+
 
 function DistrictSection({
   color, Icon, title, subtitle, done, total, stations, played, recIds, routePrefix,

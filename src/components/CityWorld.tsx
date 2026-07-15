@@ -705,12 +705,14 @@ function LandmarkNode({ l, onClick }: { l: WorldLandmark; onClick: () => void })
       {/* roof */}
       {!isScaffold && <rect x={-52} y={-58} width={104} height={12} fill={stroke} opacity={0.4} />}
       {/* label plate */}
-      <rect x={-70} y={54} width={140} height={22} rx={2} fill="#0b1224" stroke={stroke} strokeWidth={1} />
+      <rect x={-70} y={54} width={140} height={l.id === "archive" ? 34 : 22} rx={2} fill="#0b1224" stroke={stroke} strokeWidth={1} />
       <text y={70} textAnchor="middle" fontSize={13} className="stencil" fill={stroke}>{l.label}</text>
+      {l.id === "archive" && <text y={83} textAnchor="middle" fontSize={9} className="stencil" fill={stroke} opacity={0.75}>CITY LIBRARY</text>}
       {isScaffold && <text y={-4} textAnchor="middle" fontSize={11} className="stencil" fill={stroke}>BLUEPRINT</text>}
     </g>
   );
 }
+
 
 /* ── station node ───────────────────────────────────────────── */
 function StationNode({
