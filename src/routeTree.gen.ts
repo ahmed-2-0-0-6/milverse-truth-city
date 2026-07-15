@@ -14,8 +14,8 @@ import { Route as QuickTourRouteImport } from './routes/quick-tour'
 import { Route as CityHallRouteImport } from './routes/city-hall'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MirrorIndexRouteImport } from './routes/mirror.index'
-import { Route as FeedIndexRouteImport } from './routes/feed.index'
 import { Route as MirrorCaseIdRouteImport } from './routes/mirror.$caseId'
+import { Route as FeedIndexRouteImport } from './routes/feed.index'
 import { Route as FeedCaseIdRouteImport } from './routes/feed.$caseId'
 
 const StudioRoute = StudioRouteImport.update({
@@ -43,14 +43,14 @@ const MirrorIndexRoute = MirrorIndexRouteImport.update({
   path: '/mirror/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FeedIndexRoute = FeedIndexRouteImport.update({
-  id: '/feed/',
-  path: '/feed/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const MirrorCaseIdRoute = MirrorCaseIdRouteImport.update({
   id: '/mirror/$caseId',
   path: '/mirror/$caseId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedIndexRoute = FeedIndexRouteImport.update({
+  id: '/feed/',
+  path: '/feed/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeedCaseIdRoute = FeedCaseIdRouteImport.update({
@@ -65,8 +65,8 @@ export interface FileRoutesByFullPath {
   '/quick-tour': typeof QuickTourRoute
   '/studio': typeof StudioRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
-  '/mirror/$caseId': typeof MirrorCaseIdRoute
   '/feed/': typeof FeedIndexRoute
+  '/mirror/$caseId': typeof MirrorCaseIdRoute
   '/mirror/': typeof MirrorIndexRoute
 }
 export interface FileRoutesByTo {
@@ -75,8 +75,8 @@ export interface FileRoutesByTo {
   '/quick-tour': typeof QuickTourRoute
   '/studio': typeof StudioRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
-  '/mirror/$caseId': typeof MirrorCaseIdRoute
   '/feed': typeof FeedIndexRoute
+  '/mirror/$caseId': typeof MirrorCaseIdRoute
   '/mirror': typeof MirrorIndexRoute
 }
 export interface FileRoutesById {
@@ -86,8 +86,8 @@ export interface FileRoutesById {
   '/quick-tour': typeof QuickTourRoute
   '/studio': typeof StudioRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
-  '/mirror/$caseId': typeof MirrorCaseIdRoute
   '/feed/': typeof FeedIndexRoute
+  '/mirror/$caseId': typeof MirrorCaseIdRoute
   '/mirror/': typeof MirrorIndexRoute
 }
 export interface FileRouteTypes {
@@ -98,8 +98,8 @@ export interface FileRouteTypes {
     | '/quick-tour'
     | '/studio'
     | '/feed/$caseId'
-    | '/mirror/$caseId'
     | '/feed/'
+    | '/mirror/$caseId'
     | '/mirror/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -108,8 +108,8 @@ export interface FileRouteTypes {
     | '/quick-tour'
     | '/studio'
     | '/feed/$caseId'
-    | '/mirror/$caseId'
     | '/feed'
+    | '/mirror/$caseId'
     | '/mirror'
   id:
     | '__root__'
@@ -118,8 +118,8 @@ export interface FileRouteTypes {
     | '/quick-tour'
     | '/studio'
     | '/feed/$caseId'
-    | '/mirror/$caseId'
     | '/feed/'
+    | '/mirror/$caseId'
     | '/mirror/'
   fileRoutesById: FileRoutesById
 }
@@ -129,8 +129,8 @@ export interface RootRouteChildren {
   QuickTourRoute: typeof QuickTourRoute
   StudioRoute: typeof StudioRoute
   FeedCaseIdRoute: typeof FeedCaseIdRoute
-  MirrorCaseIdRoute: typeof MirrorCaseIdRoute
   FeedIndexRoute: typeof FeedIndexRoute
+  MirrorCaseIdRoute: typeof MirrorCaseIdRoute
   MirrorIndexRoute: typeof MirrorIndexRoute
 }
 
@@ -171,18 +171,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MirrorIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/feed/': {
-      id: '/feed/'
-      path: '/feed'
-      fullPath: '/feed/'
-      preLoaderRoute: typeof FeedIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/mirror/$caseId': {
       id: '/mirror/$caseId'
       path: '/mirror/$caseId'
       fullPath: '/mirror/$caseId'
       preLoaderRoute: typeof MirrorCaseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed/': {
+      id: '/feed/'
+      path: '/feed'
+      fullPath: '/feed/'
+      preLoaderRoute: typeof FeedIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feed/$caseId': {
@@ -201,8 +201,8 @@ const rootRouteChildren: RootRouteChildren = {
   QuickTourRoute: QuickTourRoute,
   StudioRoute: StudioRoute,
   FeedCaseIdRoute: FeedCaseIdRoute,
-  MirrorCaseIdRoute: MirrorCaseIdRoute,
   FeedIndexRoute: FeedIndexRoute,
+  MirrorCaseIdRoute: MirrorCaseIdRoute,
   MirrorIndexRoute: MirrorIndexRoute,
 }
 export const routeTree = rootRouteImport
