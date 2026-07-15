@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { MessageSquare, ShieldAlert, Lock, CheckCircle2 } from "lucide-react";
+import { MessageSquare, ShieldAlert, Lock, CheckCircle2, Sparkles, Users } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
-import { SCENARIOS, type TierId } from "@/lib/mirror/scenarios";
+import { SCENARIOS, loadCitizenCases, type TierId, type Scenario } from "@/lib/mirror/scenarios";
 import { loadProfile, unlockedMaxTier, tierWins, type TrustProfile } from "@/lib/mirror/profile";
 
 export const Route = createFileRoute("/mirror/")({
