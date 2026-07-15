@@ -61,6 +61,10 @@ export interface FeedScenario {
   opener: string;
   forward: FeedForward;
   actions: FeedAction[];
+  /** Optional dossier-truth answers for the Verification Toolbelt.
+   *  Each entry is what the tool WOULD return if used on this artifact.
+   *  Missing kinds render as WASTED turns with a teaching line. */
+  toolbelt?: Partial<Record<FeedToolKind, string>>;
   truthNote: string;
   respectfulScript: string;
   inspiredBy?: InspiredByCase;
@@ -924,7 +928,17 @@ for (const s of FEED_SCENARIOS) {
   for (const a of s.actions) {
     if (!a.tool) a.tool = "check_source";
   }
+  // Derive Toolbelt dossier answers from the authored actions. This is the
+  // single source of truth — Toolbelt UI reads only from here (and never
+  // manufactures verdicts). Missing kinds stay undefined = WASTED turn.
+  if (!s.toolbelt) s.toolbelt = {};
+  for (const a of s.actions) {
+    const k = (a.tool ?? "check_source") as FeedToolKind;
+    // Prefer decisive answers; keep first-seen otherwise.
+    if (a.decisive || !s.toolbelt[k]) s.toolbelt[k] = a.result;
+  }
 }
+
 
 export function getFeedScenario(id: string): FeedScenario | undefined {
 
