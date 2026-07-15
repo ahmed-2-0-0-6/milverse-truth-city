@@ -31,6 +31,33 @@ type CloudEntry = {
   created_at: string;
 };
 
+const SAMPLE_ENTRIES: CloudEntry[] = (() => {
+  // Deterministic ~24-entry synthetic group showing before/after calibration lift.
+  // Devices D1/D2/D3 each get 8 cases: shaky early, better late.
+  const now = Date.now();
+  const rows: CloudEntry[] = [];
+  const devices = ["SAMPLE-D1", "SAMPLE-D2", "SAMPLE-D3"];
+  const wings: ("mirror" | "feed")[] = ["mirror", "feed", "mirror", "feed", "mirror", "feed", "mirror", "feed"];
+  const cases = ["survivor-bankfraud", "flood-photo", "pk-prize-sms", "bank-rumor", "pk-wrong-txn", "unbelievable-true", "recalled-medicine", "job-circular"];
+  // Early results: mixed misses + false alarms. Later: mostly correct.
+  const arc: CloudEntry["result"][] = ["missed_scam", "false_alarm", "missed_scam", "correct", "correct", "correct", "correct", "correct"];
+  const pointsByResult: Record<CloudEntry["result"], number> = { correct: 105, missed_scam: -50, false_alarm: -30, lucky_guess: 25, pyrrhic: -10 };
+  devices.forEach((d, di) => {
+    for (let i = 0; i < 8; i++) {
+      // Slight variation per device so D3 lags a little behind.
+      const r = di === 2 && i < 4 ? (i % 2 === 0 ? "missed_scam" : "false_alarm") : arc[i];
+      rows.push({
+        device_id: d, wing: wings[i], case_id: cases[i],
+        tier: ((i % 3) + 1) as 1 | 2 | 3,
+        result: r, points: pointsByResult[r],
+        probe_stats: null,
+        created_at: new Date(now - (24 - (di * 8 + i)) * 60 * 60 * 1000).toISOString(),
+      });
+    }
+  });
+  return rows;
+})();
+
 function PilotPage() {
   const [active, setActive] = useState<string | null>(null);
   const [code, setCode] = useState("");
@@ -39,6 +66,7 @@ function PilotPage() {
   const [cloud, setCloud] = useState<CloudEntry[]>([]);
   const [cloudBusy, setCloudBusy] = useState(false);
   const [cloudErr, setCloudErr] = useState<string | null>(null);
+  const [sample, setSample] = useState(false);
   const fetchGroup = useServerFn(fetchPilotGroup);
 
   const refreshLocal = useCallback(() => {
@@ -48,6 +76,7 @@ function PilotPage() {
   }, []);
 
   const refreshCloud = useCallback(async () => {
+    if (sample) return;
     const g = getActiveGroup();
     if (!g) { setCloud([]); return; }
     setCloudBusy(true);
@@ -59,7 +88,7 @@ function PilotPage() {
       setCloudErr("Couldn't reach the pilot service — showing local data only.");
     }
     setCloudBusy(false);
-  }, [fetchGroup]);
+  }, [fetchGroup, sample]);
 
   useEffect(() => {
     refreshLocal();
