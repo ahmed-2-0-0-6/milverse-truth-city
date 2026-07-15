@@ -466,8 +466,8 @@ function ScaffoldZone({ x, y, label, code, onOpen }: { x: number; y: number; lab
       <line x1={0} y1={0} x2={50} y2={38} stroke="oklch(0.60 0.19 258 / 0.5)" strokeWidth={0.5} strokeDasharray="2 2" />
       <line x1={50} y1={0} x2={0} y2={38} stroke="oklch(0.60 0.19 258 / 0.5)" strokeWidth={0.5} strokeDasharray="2 2" />
       <text x={25} y={17} textAnchor="middle" fontSize={7} className="stencil" fill="oklch(0.60 0.19 258)">{code}</text>
-      <text x={25} y={27} textAnchor="middle" fontSize={5.5} className="stencil" fill="oklch(0.985 0.003 250)">BLUEPRINT</text>
-      <text x={25} y={48} textAnchor="middle" fontSize={6.5} className="stencil" fill="oklch(0.985 0.003 250)">{label}</text>
+      <text x={25} y={27} textAnchor="middle" fontSize={5.5} className="stencil" fill="oklch(0.60 0.19 258)">BLUEPRINT</text>
+      <text x={25} y={48} textAnchor="middle" fontSize={6.5} className="stencil" fill="oklch(0.22 0.06 265)">{label}</text>
     </g>
   );
 }
