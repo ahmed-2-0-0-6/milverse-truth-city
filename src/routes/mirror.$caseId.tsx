@@ -866,10 +866,28 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     }
     points += strong * 5 - wasted * 5;
 
+    // 4-axis stars (each 0, 0.5, or 1) → total 0-4
+    const starVerdict = correctVerdict ? 1 : 0;
+    const starEvidence =
+      pickedCorrect >= 2 && pickedRedHerring <= 1 ? 1 :
+      pickedCorrect >= 1 && pickedRedHerring <= 2 ? 0.5 : 0;
+    const starProbing =
+      strong >= 2 && wasted === 0 ? 1 :
+      strong >= 1 && wasted <= 1 ? 0.5 : 0;
+    // Verification axis: at Tier 4-5, VOB is the right call; at low tiers,
+    // strong in-band reasoning also counts.
+    const starVerification =
+      usedVob ? 1 :
+      scenario.tier <= 2 && correctVerdict && pickedCorrect >= 2 ? 1 :
+      scenario.tier === 3 && correctVerdict && pickedCorrect >= 2 ? 0.5 : 0;
+    const stars = starVerdict + starEvidence + starProbing + starVerification;
+
     return {
       correctVerdict, pickedCorrect, pickedRedHerring, strong, weak, wasted,
       points, resultKind, truthLabel, tells, voiceArtifact, usedVob,
+      stars, starVerdict, starEvidence, starProbing, starVerification,
     };
+
   }, [scenario, sim, verdictRaw]);
 
   const savedRef = useRef(false);
