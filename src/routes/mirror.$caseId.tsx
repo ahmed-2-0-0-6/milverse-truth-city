@@ -644,6 +644,16 @@ function loadSim(): StoredSim | null {
 function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void }) {
   const [verdict, setVerdict] = useState<"REAL" | "FAKE" | null>(null);
   const [picked, setPicked] = useState<string[]>([]);
+  const [conclusion, setConclusion] = useState("");
+
+  const sim = useMemo(() => loadSim(), []);
+  const pinIdxs: number[] = (sim?.state as EngineState & { pins?: number[] })?.pins ?? [];
+  const pinnedMsgs = pinIdxs
+    .map((i) => sim?.messages[i])
+    .filter((m): m is Message => !!m);
+  const voiceMsg = sim?.messages.find((m) => m.kind === "voice");
+  const vobArtifact = sim?.vobArtifact;
+  const usedVob = sim?.endReason === "vob_used";
 
   function toggle(id: string) {
     setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
@@ -651,18 +661,75 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
 
   function submit() {
     if (!verdict) return;
-    sessionStorage.setItem(VERDICT_KEY, JSON.stringify({ verdict, picked }));
+    sessionStorage.setItem(
+      VERDICT_KEY,
+      JSON.stringify({ verdict, picked, conclusion: conclusion.trim().slice(0, 300) })
+    );
     onDone();
   }
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
-      <div className="font-mono text-xs tracking-[0.3em] text-caution">MAKE THE CALL</div>
-      <h1 className="mt-2 text-2xl font-semibold">Real, or imposter?</h1>
+      <div className="font-mono text-xs tracking-[0.3em] text-caution">INVESTIGATION BOARD</div>
+      <h1 className="mt-2 text-2xl font-semibold">Pin the evidence. Make the call.</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Then tag <span className="text-foreground">why</span>. Some chips are genuine tells; some are
-        red herrings.
+        Everything you flagged during the chat is here. Now assemble the picture.
       </p>
+
+      {/* Auto-populated evidence pane */}
+      <section className="mt-6 rounded-xl border border-border bg-card p-4 space-y-3">
+        <div className="font-mono text-[10px] tracking-widest text-muted-foreground">
+          CASE FILE · AUTO-COLLECTED
+        </div>
+
+        {pinnedMsgs.length > 0 && (
+          <div>
+            <div className="font-mono text-[10px] tracking-widest text-caution mb-1.5">
+              PINNED MESSAGES · {pinnedMsgs.length}
+            </div>
+            <ul className="space-y-1.5">
+              {pinnedMsgs.map((m, i) => (
+                <li key={i} className="rounded-md border-l-2 border-caution bg-caution/5 pl-2.5 py-1.5 text-xs italic">
+                  "{m.text || "[voice note]"}"
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {voiceMsg && (
+          <div>
+            <div className="font-mono text-[10px] tracking-widest text-primary mb-1.5">
+              VOICE NOTE
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Artifact detected: <span className="text-foreground">{ARTIFACT_LABEL(voiceMsg.voice?.artifact ?? null)}</span>
+            </div>
+          </div>
+        )}
+
+        {usedVob && (
+          <div>
+            <div className="font-mono text-[10px] tracking-widest text-primary mb-1.5">
+              OUT-OF-BAND VERIFICATION
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {vobArtifact ? `Result: ${vobArtifact}` : "You verified through a trusted channel."}
+            </div>
+          </div>
+        )}
+
+        <div>
+          <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-1.5">
+            DOSSIER
+          </div>
+          <ul className="text-xs text-muted-foreground space-y-0.5">
+            {scenario.dossier.publicFacts.slice(0, 3).map((f, i) => (
+              <li key={i}>· {f}</li>
+            ))}
+          </ul>
+        </div>
+      </section>
 
       <div className="mt-6 grid grid-cols-2 gap-3">
         <button
@@ -706,16 +773,34 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
         </div>
       </div>
 
+      {/* Investigator's conclusion */}
+      <div className="mt-8">
+        <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">
+          INVESTIGATOR'S CONCLUSION · OPTIONAL
+        </div>
+        <textarea
+          value={conclusion}
+          onChange={(e) => setConclusion(e.target.value.slice(0, 300))}
+          placeholder="In one line: why do you believe this? (max 300 chars)"
+          rows={3}
+          className="w-full rounded-md border border-border bg-background p-3 text-sm placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none"
+        />
+        <div className="mt-1 text-right font-mono text-[10px] text-muted-foreground">
+          {conclusion.length}/300
+        </div>
+      </div>
+
       <button
         onClick={submit}
         disabled={!verdict}
-        className="mt-8 w-full rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground disabled:opacity-40"
+        className="mt-6 w-full rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground disabled:opacity-40"
       >
         SUBMIT VERDICT
       </button>
     </main>
   );
 }
+
 
 /* ─────────────────────────── DEBRIEF ─────────────────────────── */
 
@@ -725,7 +810,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
   const verdictRaw = useMemo(() => {
     try {
       const raw = sessionStorage.getItem(VERDICT_KEY);
-      return raw ? (JSON.parse(raw) as { verdict: "REAL" | "FAKE"; picked: string[] }) : null;
+      return raw ? (JSON.parse(raw) as { verdict: "REAL" | "FAKE"; picked: string[]; conclusion?: string }) : null;
     } catch { return null; }
   }, []);
 
@@ -733,6 +818,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     if (!verdictRaw || !sim) return null;
     const truthLabel: "REAL" | "FAKE" = scenario.truth === "REAL" ? "REAL" : "FAKE";
     const correctVerdict = verdictRaw.verdict === truthLabel;
+
 
     const correctChipIds = scenario.evidenceChips.filter((c) => c.correct).map((c) => c.id);
     const pickedCorrect = verdictRaw.picked.filter((id) => correctChipIds.includes(id)).length;
@@ -780,10 +866,28 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     }
     points += strong * 5 - wasted * 5;
 
+    // 4-axis stars (each 0, 0.5, or 1) → total 0-4
+    const starVerdict = correctVerdict ? 1 : 0;
+    const starEvidence =
+      pickedCorrect >= 2 && pickedRedHerring <= 1 ? 1 :
+      pickedCorrect >= 1 && pickedRedHerring <= 2 ? 0.5 : 0;
+    const starProbing =
+      strong >= 2 && wasted === 0 ? 1 :
+      strong >= 1 && wasted <= 1 ? 0.5 : 0;
+    // Verification axis: at Tier 4-5, VOB is the right call; at low tiers,
+    // strong in-band reasoning also counts.
+    const starVerification =
+      usedVob ? 1 :
+      scenario.tier <= 2 && correctVerdict && pickedCorrect >= 2 ? 1 :
+      scenario.tier === 3 && correctVerdict && pickedCorrect >= 2 ? 0.5 : 0;
+    const stars = starVerdict + starEvidence + starProbing + starVerification;
+
     return {
       correctVerdict, pickedCorrect, pickedRedHerring, strong, weak, wasted,
       points, resultKind, truthLabel, tells, voiceArtifact, usedVob,
+      stars, starVerdict, starEvidence, starProbing, starVerification,
     };
+
   }, [scenario, sim, verdictRaw]);
 
   const savedRef = useRef(false);
@@ -876,6 +980,37 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           </p>
         )}
       </div>
+
+      {/* 4-axis star scoring */}
+      <section className="rounded-xl border border-border bg-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground">
+            INVESTIGATOR RATING
+          </div>
+          <div className="font-mono text-lg text-primary">
+            {result.stars.toFixed(1)} / 4.0
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <StarAxis label="Verdict" value={result.starVerdict} />
+          <StarAxis label="Evidence" value={result.starEvidence} />
+          <StarAxis label="Probing" value={result.starProbing} />
+          <StarAxis label="Verification" value={result.starVerification} />
+        </div>
+      </section>
+
+      {/* Investigator's conclusion */}
+      {verdictRaw.conclusion && (
+        <section className="rounded-xl border border-border bg-card p-6">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">
+            YOUR CONCLUSION
+          </div>
+          <p className="text-sm italic border-l-2 border-primary pl-3">
+            "{verdictRaw.conclusion}"
+          </p>
+        </section>
+      )}
+
 
       {/* Quoted tells from THIS conversation */}
       {result.tells.length > 0 && (
@@ -1013,7 +1148,19 @@ function Debrief({ scenario }: { scenario: Scenario }) {
   );
 }
 
+function StarAxis({ label, value }: { label: string; value: number }) {
+  const filled = value >= 1 ? "★" : value >= 0.5 ? "⯪" : "☆";
+  const tone = value >= 1 ? "text-primary" : value >= 0.5 ? "text-caution" : "text-muted-foreground/40";
+  return (
+    <div className="rounded-md border border-border bg-background/50 p-3 text-center">
+      <div className={`text-2xl ${tone}`}>{filled}</div>
+      <div className="mt-1 font-mono text-[10px] tracking-widest text-muted-foreground">{label}</div>
+    </div>
+  );
+}
+
 function ProbeStat({ n, label, tone }: { n: number; label: string; tone: "good" | "warn" | "bad" }) {
+
   const c = tone === "good" ? "text-primary border-primary/40 bg-primary/10"
     : tone === "warn" ? "text-caution border-caution/40 bg-caution/10"
     : "text-destructive border-destructive/40 bg-destructive/10";
