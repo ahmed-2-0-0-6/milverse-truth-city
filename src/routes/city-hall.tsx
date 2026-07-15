@@ -99,7 +99,7 @@ function CityHall() {
               {/* Player dot: x = missRate (→ too trusting), y = faRate (→ too paranoid, inverted) */}
               {p.casesPlayed > 0 && (
                 <div
-                  className="absolute h-4 w-4 rounded-full bg-primary shadow-[0_0_16px_oklch(0.82_0.15_210)] transition-all duration-700 -translate-x-1/2 -translate-y-1/2 ring-2 ring-background"
+                  className="absolute h-4 w-4 rounded-full bg-primary shadow-[0_0_18px_oklch(0.82_0.16_85)] transition-all duration-700 -translate-x-1/2 -translate-y-1/2 ring-2 ring-background"
                   style={{
                     left: `${Math.min(0.95, Math.max(0.05, missRate * 2)) * 100}%`,
                     top: `${Math.min(0.95, Math.max(0.05, faRate * 2)) * 100}%`,
@@ -108,14 +108,14 @@ function CityHall() {
                 />
               )}
             </div>
-            <div className="mt-3 flex justify-between font-mono text-[9px] tracking-widest text-muted-foreground">
+            <div className="mt-3 flex justify-between stencil text-[9px] text-muted-foreground">
               <span>← FEWER MISSES</span>
               <span>MORE MISSES →</span>
             </div>
           </div>
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="font-mono text-xs tracking-widest text-muted-foreground mb-4">
-              FAILURE MODES
+          <div className="rounded-sm border border-border bg-card p-6 hud-frame">
+            <div className="stencil text-[10px] text-primary mb-4">
+              // FAILURE MODES · AFTER-ACTION
             </div>
             <Row label="Missed Scams" value={p.missedScams} tone="bad" />
             <Row label="False Alarms" value={p.falseAlarms} tone="bad" />
@@ -129,21 +129,21 @@ function CityHall() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 mb-8">
-          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-4">
-            RECENT CASES
+        <div className="rounded-sm border border-border bg-card p-6 mb-8 hud-frame">
+          <div className="stencil text-[10px] text-primary mb-4">
+            // MISSION LOG · LAST 10
           </div>
           {p.history.length === 0 ? (
             <div className="text-sm text-muted-foreground">
-              No cases yet.{" "}
+              No missions logged.{" "}
               <Link to="/mirror" className="text-primary underline-offset-4 hover:underline">
-                Enter The Mirror →
+                Deploy to The Mirror →
               </Link>
             </div>
           ) : (
-            <ul className="space-y-2">
+            <ul className="space-y-1.5">
               {p.history.slice().reverse().slice(0, 10).map((h, i) => (
-                <li key={i} className="flex items-center justify-between text-sm font-mono">
+                <li key={i} className="flex items-center justify-between text-sm font-mono border-l-2 border-border pl-3 py-1 hover:border-primary transition-colors">
                   <span className="text-muted-foreground">{h.caseId}</span>
                   <span
                     className={
@@ -165,9 +165,9 @@ function CityHall() {
 
         <Link
           to="/"
-          className="inline-flex font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
+          className="inline-flex stencil text-[10px] text-muted-foreground hover:text-primary transition"
         >
-          ← BACK TO CITY
+          ← RETURN TO OPS CENTER
         </Link>
       </main>
     </div>
