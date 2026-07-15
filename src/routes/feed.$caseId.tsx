@@ -59,11 +59,15 @@ function FeedPlay() {
       {phase === "verdict" && (
         <VerdictScreen
           scenario={scenario}
+          state={state}
           finalReply={finalReply}
           setFinalReply={setFinalReply}
           verdict={verdict}
           setVerdict={setVerdict}
+          conclusion={conclusion}
+          setConclusion={setConclusion}
           onConfirm={() => {
+
             if (!verdict) return;
             const oc = gradeVerdict(scenario, state, verdict, finalReply);
             setOutcome(oc);
