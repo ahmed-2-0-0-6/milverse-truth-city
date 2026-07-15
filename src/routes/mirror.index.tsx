@@ -177,7 +177,46 @@ function CaseFiles() {
             </section>
           );
         })}
+
+        {/* Citizen Cases shelf */}
+        <section className="mt-4 mb-10">
+          <div className="mb-3 flex flex-wrap items-center gap-x-3">
+            <div className="flex items-center gap-2 font-mono text-[11px] tracking-widest text-primary">
+              <Users className="h-3.5 w-3.5" /> CITIZEN CASES
+            </div>
+            <Link to="/studio" className="ml-auto font-mono text-[10px] tracking-widest text-primary hover:underline">
+              <Sparkles className="inline h-3 w-3 mr-1" />DESIGN ONE →
+            </Link>
+          </div>
+          {citizen.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
+              No citizen cases yet — be the first designer.{" "}
+              <Link to="/studio" className="text-primary underline">Open The Studio →</Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {citizen.map((s) => (
+                <Link key={s.id} to="/mirror/$caseId" params={{ caseId: s.id }} className="group rounded-xl border border-primary/30 bg-card p-6 hover:border-primary/60 transition">
+                  <div className="flex items-start justify-between">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 text-primary">
+                      <MessageSquare className="h-5 w-5" />
+                    </div>
+                    <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[9px] font-mono tracking-widest text-primary">
+                      DESIGNED BY A CITIZEN
+                    </span>
+                  </div>
+                  <h3 className="mt-4 text-base font-semibold">{s.title}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{s.teaser}</p>
+                  <div className="mt-3 font-mono text-[10px] tracking-widest text-muted-foreground">
+                    CODE: {s.id.replace("citizen-", "").toUpperCase().slice(0, 6)}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
       </main>
+
     </div>
   );
 }
