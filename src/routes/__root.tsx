@@ -83,13 +83,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "MILVERSE is a media-literacy city where you learn to spot scams, deepfakes, and misinformation by DOING — not by reading tips.",
       },
-      { property: "og:title", content: "MILVERSE" },
+      { property: "og:title", content: "MILVERSE — Survive the age of scams" },
       {
         property: "og:description",
-        content: "A flight simulator for scams. Learn by playing.",
+        content: "MILVERSE is a media-literacy city where you learn to spot scams, deepfakes, and misinformation by DOING — not by reading tips.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "MILVERSE — Survive the age of scams" },
+      { name: "twitter:description", content: "MILVERSE is a media-literacy city where you learn to spot scams, deepfakes, and misinformation by DOING — not by reading tips." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2d5a6420-ffd9-4775-8625-21924b3f113e/id-preview-9a528e14--b1bda37d-f290-471e-8242-1f3cfcf0f7d7.lovable.app-1784092810821.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2d5a6420-ffd9-4775-8625-21924b3f113e/id-preview-9a528e14--b1bda37d-f290-471e-8242-1f3cfcf0f7d7.lovable.app-1784092810821.png" },
     ],
     links: [
       {
