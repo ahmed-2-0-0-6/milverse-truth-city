@@ -128,7 +128,7 @@ export function playVoiceNote(
 
     const synth = window.speechSynthesis;
     synth.cancel();
-    const v = pickVoice();
+    const v = pickVoice(gender);
 
     // Artifact: "pause" splits utterance in two with a long silence between.
     if (artifact === "pause") {
