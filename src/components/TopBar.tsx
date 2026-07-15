@@ -4,7 +4,6 @@ import { Volume2, VolumeX, BookOpen } from "lucide-react";
 import {
   loadProfile,
   calibrationLabel,
-  operatorRank,
   operatorCallsign,
   type TrustProfile,
 } from "@/lib/mirror/profile";
