@@ -457,6 +457,21 @@ function Debrief({ scenario, outcome, state, verdict, conclusion, finalReply }: 
     outcome.result === "correct" ? "border-primary bg-primary/10 text-primary" :
     outcome.result === "pyrrhic" ? "border-caution bg-caution/10 text-caution" :
     "border-destructive bg-destructive/10 text-destructive";
+
+  // 4-axis stars (each 0, 0.5, or 1) → total 0–4
+  const tone = classifyTone(finalReply);
+  const correctVerdict = verdict === scenario.verdict;
+  const total = scenario.actions.length || 1;
+  const usedRatio = state.actionsUsed.length / total;
+  const starDecision = correctVerdict ? (outcome.result === "pyrrhic" ? 0.5 : 1) : 0;
+  const starEvidence = usedRatio >= 0.6 ? 1 : usedRatio >= 0.3 ? 0.5 : 0;
+  const starVerification = state.actionsUsed.length >= 2 ? 1 : state.actionsUsed.length >= 1 ? 0.5 : 0;
+  const starReasoning =
+    (tone === "respectful" ? 1 : tone === "neutral" ? 0.5 : 0) +
+    (conclusion.trim().length >= 20 ? 0.25 : 0);
+  const clampedReasoning = Math.min(1, starReasoning);
+  const stars = starDecision + starEvidence + starVerification + clampedReasoning;
+
   return (
     <main className="mx-auto max-w-2xl px-4 py-8 space-y-4">
       <div className={`rounded-xl border-2 p-6 ${border}`}>
@@ -465,6 +480,29 @@ function Debrief({ scenario, outcome, state, verdict, conclusion, finalReply }: 
         <div className="mt-1 text-xl font-semibold">{outcome.headline}</div>
         <p className="mt-2 text-sm">{outcome.detail}</p>
       </div>
+
+      <section className="rounded-xl border border-border bg-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground">
+            INVESTIGATOR RATING
+          </div>
+          <div className="font-mono text-lg text-primary">{stars.toFixed(1)} / 4.0</div>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <FeedStarAxis label="Decision" value={starDecision} />
+          <FeedStarAxis label="Evidence" value={starEvidence} />
+          <FeedStarAxis label="Verification" value={starVerification} />
+          <FeedStarAxis label="Reasoning" value={clampedReasoning} />
+        </div>
+      </section>
+
+      {conclusion.trim() && (
+        <div className="rounded-xl border border-border bg-card p-6">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">YOUR CONCLUSION</div>
+          <p className="text-sm italic border-l-2 border-primary pl-3">"{conclusion.trim()}"</p>
+        </div>
+      )}
+
 
       <div className="rounded-xl border border-border bg-card p-6">
         <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">WHAT'S ACTUALLY TRUE</div>
