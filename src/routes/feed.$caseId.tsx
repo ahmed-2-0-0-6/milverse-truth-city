@@ -10,6 +10,7 @@ import { loadProfile, saveProfile } from "@/lib/mirror/profile";
 import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
 import { Send, Search, Forward, Heart, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
+import { RealCaseFile } from "@/components/RealCaseFile";
 
 export const Route = createFileRoute("/feed/$caseId")({
   loader: ({ params }) => {
@@ -426,7 +427,10 @@ function Debrief({ scenario, outcome, state }: { scenario: FeedScenario; outcome
         <span className="font-mono">{state.actionsUsed.length} / {scenario.actions.length}</span>
       </div>
 
+      <RealCaseFile caseId={scenario.id} />
+
       <div className="flex gap-2">
+
         <button onClick={() => navigate({ to: "/feed" })} className="flex-1 rounded-md bg-primary py-3 font-mono text-xs tracking-widest text-primary-foreground">
           BACK TO THE FEED
         </button>

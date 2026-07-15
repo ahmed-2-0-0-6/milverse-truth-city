@@ -15,6 +15,7 @@ import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
 import { tick, tensionCue } from "@/lib/mirror/audio";
 import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer } from "lucide-react";
+import { RealCaseFile } from "@/components/RealCaseFile";
 
 
 export const Route = createFileRoute("/mirror/$caseId")({
@@ -989,6 +990,10 @@ function Debrief({ scenario }: { scenario: Scenario }) {
         <PauseRow letter="S" title="Story / emotion" body={pauseText(scenario, "S")} />
         <PauseRow letter="E" title="Evidence" body={pauseText(scenario, "E")} />
       </section>
+
+      <RealCaseFile caseId={scenario.id} inline={scenario.inspiredBy} />
+
+
 
       <div className="flex gap-3">
         <Link

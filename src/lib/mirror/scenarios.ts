@@ -58,6 +58,16 @@ export interface Scenario {
     artifactPool?: ArtifactKind[];
   };
   evidenceChips: EvidenceChip[];
+  /** Tag community-origin cases so the UI can render the right shelf. */
+  source?: "official" | "user_designed" | "community_story";
+  /** Optional "inspired by a real case" block, shown at the end of the debrief. */
+  inspiredBy?: {
+    patternName: string;
+    country: string;
+    year: string;
+    whatHappened: string;
+    prevention: string[];
+  };
 }
 
 /* Tier tuning used by the engine. */
