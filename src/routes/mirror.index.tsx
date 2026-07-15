@@ -113,8 +113,8 @@ function CaseFiles() {
             className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary font-mono uppercase tracking-widest w-64"
             maxLength={6}
           />
-          <button onClick={openCode} className="rounded-md border border-primary/50 bg-primary/10 px-4 py-2 text-xs font-mono tracking-widest text-primary hover:bg-primary/20">
-            OPEN CASE
+          <button onClick={openCode} disabled={codeBusy} className="rounded-md border border-primary/50 bg-primary/10 px-4 py-2 text-xs font-mono tracking-widest text-primary hover:bg-primary/20 disabled:opacity-50">
+            {codeBusy ? "LOOKING UP…" : "OPEN CASE"}
           </button>
           {codeErr && <span className="text-xs text-destructive">{codeErr}</span>}
         </div>
