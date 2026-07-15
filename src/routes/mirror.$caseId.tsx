@@ -1017,6 +1017,8 @@ function Debrief({ scenario }: { scenario: Scenario }) {
         )}
       </div>
 
+      <TacticStamp tacticId={tacticForMirror(scenario.id)} />
+
       {/* 4-axis star scoring */}
       <section className="rounded-xl border border-border bg-card p-6">
         <div className="flex items-center justify-between mb-4">
