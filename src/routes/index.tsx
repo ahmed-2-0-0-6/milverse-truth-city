@@ -1,119 +1,64 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { TopBar } from "@/components/TopBar";
-import {
-  Eye, Newspaper, Store, Swords, Clapperboard, Library, Landmark, Sparkles, Compass,
-} from "lucide-react";
-import { loadProfile, unlockedMaxTier, type TrustProfile } from "@/lib/mirror/profile";
+import { TransitMap } from "@/components/TransitMap";
+import { Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: CityMap,
 });
 
-interface District {
-  id: string;
-  name: string;
-  Icon: typeof Eye;
-  variant: "open" | "blueprint";
-  to: string;
-  tagline: (p: TrustProfile | null) => string;
-}
-
-const DISTRICTS: District[] = [
-  {
-    id: "mirror", name: "The Mirror", Icon: Eye, variant: "open", to: "/mirror",
-    tagline: (p) => p ? `Tier ${unlockedMaxTier(p)} unlocked · verify the person on the other end` : "Personal deception. Verify the person on the other end.",
-  },
-  {
-    id: "feed", name: "The Feed", Icon: Newspaper, variant: "open", to: "/feed",
-    tagline: () => "Mass deception. Verify the claim without breaking the relationship.",
-  },
-  { id: "studio", name: "The Studio", Icon: Clapperboard, variant: "open", to: "/studio", tagline: () => "Design a case. Share with friends." },
-  { id: "market", name: "The Market", Icon: Store, variant: "blueprint", to: "/market", tagline: () => "Blueprint — verify the seller, not the price. Vote on what opens next." },
-  { id: "arena", name: "The Arena", Icon: Swords, variant: "blueprint", to: "/arena", tagline: () => "Blueprint — human-vs-human imposter duels. Vote on what opens next." },
-  { id: "archive", name: "The Archive", Icon: Library, variant: "open", to: "/archive", tagline: () => "Official campaign + community library. Every survivor story, human-reviewed." },
-  { id: "hall", name: "City Hall", Icon: Landmark, variant: "open", to: "/city-hall", tagline: () => "Your Trust Calibration — one chart, every district." },
-];
-
 const INTRO_KEY = "milverse.intro.seen";
 
 function CityMap() {
-  const [profile, setProfile] = useState<TrustProfile | null>(null);
   const [intro, setIntro] = useState(false);
   useEffect(() => {
-    setProfile(loadProfile());
     if (typeof window !== "undefined" && !localStorage.getItem(INTRO_KEY)) setIntro(true);
-    const on = () => setProfile(loadProfile());
-    window.addEventListener("milverse:profile", on);
-    return () => window.removeEventListener("milverse:profile", on);
   }, []);
 
   return (
     <div className="min-h-screen grain relative">
-      {/* Ambient scan sweep */}
       <div className="pointer-events-none fixed inset-0 scanlines opacity-30" />
       <TopBar />
       {intro && <Intro onDone={() => { localStorage.setItem(INTRO_KEY, "1"); setIntro(false); }} />}
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:py-14 relative">
-        {/* Editorial masthead */}
-        <section className="mb-10 max-w-3xl">
-          <div className="flex items-center gap-3 mb-4">
+
+      <main className="relative">
+        {/* Compact kinetic header (shrunk from the old masthead) */}
+        <section className="mx-auto max-w-6xl px-4 pt-6 pb-3">
+          <div className="flex items-center gap-3 mb-3">
             <div className="h-px flex-1 max-w-[60px] bg-primary/60" />
-            <div className="stencil text-[10px] text-primary">MEDIA &amp; INFORMATION LITERACY · ISSUE 001</div>
+            <div className="stencil text-[10px] text-primary">MILVERSE TRANSIT · ISSUE 001</div>
             <div className="h-px flex-1 bg-primary/20" />
           </div>
-          <h1 className="text-4xl sm:text-6xl font-semibold leading-[1.05] tracking-tight uppercase">
-            Train your <span className="text-primary">trust</span>.<br />
-            <span className="text-muted-foreground text-2xl sm:text-3xl normal-case font-normal tracking-normal block mt-3">
-              From viral lies to voice clones — one verification instinct.
+          <h1 className="text-2xl sm:text-3xl font-semibold leading-tight tracking-tight uppercase">
+            Train your <span className="text-primary">trust</span>.
+            <span className="text-muted-foreground text-sm sm:text-base normal-case font-normal tracking-normal block mt-1">
+              Ride the lines. Clear the stations. From viral lies to voice clones — one verification instinct.
             </span>
           </h1>
-          <p className="mt-6 text-muted-foreground max-w-2xl leading-relaxed">
-            Two labs are open. <span className="text-foreground font-medium">The Mirror</span> trains you
-            against personal deception — the scammer talking to you.{" "}
-            <span className="text-foreground font-medium">The Feed</span> trains you against mass
-            misinformation — the viral post someone just forwarded.
-            Same instinct powers both: <b className="text-primary">verify, use sources, protect evidence, protect people.</b>
-          </p>
-        </section>
 
-        {/* Quick Tour banner */}
-        <Link to="/quick-tour" className="block mb-10 hud-frame rounded-sm border border-primary/50 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 hover:border-primary transition group relative overflow-hidden scan-sweep">
-          <div className="flex items-center gap-4 relative">
-            <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-primary/20 text-primary shrink-0 border border-primary/40">
-              <Sparkles className="h-5 w-5" />
+          <Link to="/quick-tour" className="mt-4 flex items-center gap-3 rounded-sm border border-primary/50 bg-gradient-to-r from-primary/10 to-transparent p-3 hover:border-primary transition group">
+            <div className="flex h-9 w-9 items-center justify-center rounded-sm bg-primary/20 text-primary border border-primary/40 shrink-0">
+              <Sparkles className="h-4 w-4" />
             </div>
             <div className="flex-1">
               <div className="stencil text-[10px] text-primary">GUIDED WALKTHROUGH · 90 SEC</div>
-              <div className="mt-1 text-lg font-semibold">Take the Quick Tour</div>
-              <div className="text-sm text-muted-foreground">Watch one case unfold before you try a live one.</div>
+              <div className="text-sm font-medium">Take the Quick Tour</div>
             </div>
-            <div className="stencil text-[10px] text-primary opacity-0 group-hover:opacity-100 transition">
-              START →
-            </div>
-          </div>
-        </Link>
+            <div className="stencil text-[10px] text-primary opacity-0 group-hover:opacity-100 transition">START →</div>
+          </Link>
+        </section>
 
-        <div className="mb-4 flex items-center gap-3">
-          <div className="stencil text-[10px] text-muted-foreground">DISTRICTS</div>
-          <div className="h-px flex-1 bg-border" />
-          <div className="stencil text-[10px] text-primary hud-blink">● OPEN</div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {DISTRICTS.map((d) => (
-            <DistrictTile key={d.id} d={d} profile={profile} />
-          ))}
-        </div>
+        {/* Transit map surface */}
+        <section className="px-4">
+          <TransitMap />
+        </section>
 
-        <footer className="mt-16 border-t border-border pt-6 text-center stencil text-[10px] text-muted-foreground space-y-3">
+        <footer className="mx-auto max-w-6xl px-4 mt-4 border-t border-border pt-6 pb-10 text-center stencil text-[10px] text-muted-foreground space-y-3">
           <div className="text-primary/80">VERIFY, DON'T GUESS · CALIBRATE, DON'T PANIC</div>
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-            <Link to="/pilot" className="text-primary hover:underline">
-              [F1] PILOT MODE — CLASSROOM DASHBOARD →
-            </Link>
-            <Link to="/kit" className="text-primary hover:underline">
-              [F2] FIELD KIT — PRINT PACK →
-            </Link>
+            <Link to="/pilot" className="text-primary hover:underline">[F1] PILOT MODE — CLASSROOM DASHBOARD →</Link>
+            <Link to="/kit" className="text-primary hover:underline">[F2] FIELD KIT — PRINT PACK →</Link>
           </div>
           <div className="pt-2 text-muted-foreground/80 normal-case tracking-normal">
             No accounts. No tracking. Pilot data is anonymous.
@@ -131,7 +76,7 @@ function Intro({ onDone }: { onDone: () => void }) {
   const slides = [
     "Lies come in two sizes: aimed at millions — and aimed at just you.",
     "Both die the same way. Verification.",
-    "MILVERSE is where you train that reflex. Let's open the first case.",
+    "MILVERSE is the transit map for training that reflex. Ride the lines.",
   ];
   const [i, setI] = useState(0);
   return (
@@ -153,44 +98,9 @@ function Intro({ onDone }: { onDone: () => void }) {
           onClick={() => { if (i + 1 < slides.length) setI(i + 1); else onDone(); }}
           className="rounded-sm bg-primary px-6 py-2.5 text-primary-foreground border-2 border-primary shadow-[0_4px_20px_oklch(0.60_0.19_258/0.35)]"
         >
-          {i + 1 < slides.length ? "NEXT →" : "ENTER THE LAB →"}
+          {i + 1 < slides.length ? "NEXT →" : "BOARD THE MAP →"}
         </button>
       </div>
     </div>
   );
-}
-
-function DistrictTile({ d, profile }: { d: District; profile: TrustProfile | null }) {
-  const Icon = d.Icon;
-  const isBlueprint = d.variant === "blueprint";
-  const body = (
-    <div
-      className={`group relative overflow-hidden rounded-sm border p-5 transition-all ${
-        isBlueprint
-          ? "border-dashed border-primary/40 bg-primary/[0.02] hover:border-primary hover:bg-primary/[0.05] hud-frame"
-          : "border-border bg-card hover:border-primary hover:-translate-y-0.5 hover:shadow-[0_0_32px_oklch(0.82_0.16_85/0.18)] hud-frame"
-      }`}
-    >
-      <div className="flex items-start justify-between">
-        <div className={`flex h-11 w-11 items-center justify-center rounded-sm ${isBlueprint ? "bg-primary/10 text-primary/80 border border-dashed border-primary/40" : "bg-primary/15 text-primary border border-primary/40"}`}>
-          <Icon className="h-5 w-5" />
-        </div>
-        {isBlueprint ? (
-          <span className="flex items-center gap-1.5 rounded-sm border border-primary/40 bg-primary/5 px-2.5 py-1 stencil text-[9px] text-primary">
-            <Compass className="h-3 w-3" /> BLUEPRINT · VOTE
-          </span>
-        ) : (
-          <span className="rounded-sm border border-primary/50 bg-primary/10 px-2.5 py-1 stencil text-[9px] text-primary">
-            ● OPEN
-          </span>
-        )}
-      </div>
-      <h3 className="mt-5 stencil text-sm text-foreground">{d.name}</h3>
-      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{d.tagline(profile)}</p>
-      <div className="mt-4 stencil text-[10px] text-primary opacity-0 transition-opacity group-hover:opacity-100">
-        {isBlueprint ? "OPEN BLUEPRINT →" : "OPEN →"}
-      </div>
-    </div>
-  );
-  return <Link to={d.to as "/mirror"} className="block">{body}</Link>;
 }
