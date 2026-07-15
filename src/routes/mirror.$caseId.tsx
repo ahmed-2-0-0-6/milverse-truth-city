@@ -1,16 +1,16 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TopBar } from "@/components/TopBar";
+import { VoiceNote } from "@/components/VoiceNote";
 import { getScenario, type EvidenceChip, type Scenario } from "@/lib/mirror/scenarios";
 import {
-  initState,
-  respond,
-  gradeProbe,
-  type EngineState,
-  type Message,
+  initState, respond, gradeProbe, idleNudge, verifyOutOfBand,
+  VOB_METHODS, type EngineState, type Message, type VobMethod,
 } from "@/lib/mirror/engine";
+import { ARTIFACT_LABEL } from "@/lib/mirror/voice";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
-import { FileText, Pin, StickyNote, Send, Phone } from "lucide-react";
+import { tick, tensionCue } from "@/lib/mirror/audio";
+import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer } from "lucide-react";
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
@@ -32,11 +32,12 @@ function CasePlay() {
       <TopBar />
       {phase === "dossier" && <Dossier scenario={scenario} onStart={() => setPhase("sim")} />}
       {phase === "sim" && (
-        <Simulation scenario={scenario} onCall={() => setPhase("verdict")} sharedKey={scenario.id} />
+        <Simulation
+          scenario={scenario}
+          onEnd={() => setPhase("verdict")}
+        />
       )}
-      {phase === "verdict" && (
-        <Verdict scenario={scenario} onDone={() => setPhase("debrief")} />
-      )}
+      {phase === "verdict" && <Verdict scenario={scenario} onDone={() => setPhase("debrief")} />}
       {phase === "debrief" && <Debrief scenario={scenario} />}
     </div>
   );
@@ -47,23 +48,18 @@ function CasePlay() {
 function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => void }) {
   return (
     <main className="mx-auto max-w-2xl px-4 py-10">
-      <Link
-        to="/mirror"
-        className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
-      >
+      <Link to="/mirror" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">
         ← CASE FILES
       </Link>
 
       <div className="mt-6 rounded-xl border border-caution/30 bg-caution/5 p-6">
         <div className="flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-caution">
-          <FileText className="h-4 w-4" /> CASE DOSSIER · CLASSIFIED
+          <FileText className="h-4 w-4" /> CASE DOSSIER · TIER {scenario.tier}
         </div>
         <h1 className="mt-4 text-2xl font-semibold">{scenario.title}</h1>
 
         <section className="mt-6">
-          <div className="font-mono text-[11px] tracking-widest text-muted-foreground">
-            WHO IS CONTACTING YOU
-          </div>
+          <div className="font-mono text-[11px] tracking-widest text-muted-foreground">WHO IS CONTACTING YOU</div>
           <p className="mt-1 text-sm">{scenario.dossier.contactClaim}</p>
         </section>
 
@@ -112,23 +108,18 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
 /* ────────────────────────── SIMULATION ───────────────────────── */
 
 const SIM_KEY = "milverse.sim.current";
+const VERDICT_KEY = "milverse.verdict";
 
 interface StoredSim {
   caseId: string;
   messages: Message[];
   state: EngineState;
   ended: boolean;
-  endReason?: "contact_left" | "player_called";
+  endReason?: "contact_left" | "vob_used";
+  vobArtifact?: string | null;
 }
 
-function Simulation({
-  scenario,
-  onCall,
-}: {
-  scenario: Scenario;
-  onCall: () => void;
-  sharedKey: string;
-}) {
+function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [state, setState] = useState<EngineState>(() => initState(scenario));
   const [input, setInput] = useState("");
@@ -136,46 +127,83 @@ function Simulation({
   const [pins, setPins] = useState<number[]>([]);
   const [tab, setTab] = useState<"chat" | "notes">("chat");
   const [ended, setEnded] = useState(false);
-  const [endReason, setEndReason] = useState<"contact_left" | null>(null);
+  const [endReason, setEndReason] = useState<"contact_left" | "vob_used" | null>(null);
+  const [showVob, setShowVob] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
+  const lastActivity = useRef<number>(Date.now());
+  const nudged = useRef<boolean>(false);
+  const criticalCued = useRef<boolean>(false);
+  const prevMeter = useRef<number>(state.meter);
 
-  // Kick off with opener.
   useEffect(() => {
-    const opener: Message = {
-      role: "contact",
-      text: scenario.opener,
-      ts: Date.now(),
-    };
+    const opener: Message = { role: "contact", kind: "text", text: scenario.opener, ts: Date.now() };
     setMessages([opener]);
   }, [scenario.id]);
 
-  // Persist for verdict/debrief phase.
+  // Persist for verdict/debrief.
   useEffect(() => {
     const stored: StoredSim = {
       caseId: scenario.id,
       messages,
-      state,
+      state: { ...state, pins },
       ended,
       endReason: endReason ?? undefined,
     };
     sessionStorage.setItem(SIM_KEY, JSON.stringify(stored));
-  }, [messages, state, ended, endReason, scenario.id]);
+  }, [messages, state, pins, ended, endReason, scenario.id]);
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
   }, [messages, typing]);
 
+  // Sound design: tick on meter change; tension cue when critical (<30).
+  useEffect(() => {
+    if (state.meter !== prevMeter.current) {
+      tick();
+      prevMeter.current = state.meter;
+    }
+    if (state.meter < 30 && !criticalCued.current) {
+      criticalCued.current = true;
+      tensionCue();
+    } else if (state.meter >= 50) {
+      criticalCued.current = false;
+    }
+  }, [state.meter]);
+
+  // Case timer (Tier 3+): after 25s idle, contact nudges.
+  useEffect(() => {
+    if (scenario.tier < 3 || ended) return;
+    const interval = setInterval(() => {
+      if (ended || typing) return;
+      const idle = (Date.now() - lastActivity.current) / 1000;
+      if (idle >= 25 && !nudged.current) {
+        nudged.current = true;
+        const next = { ...state, factProbes: { ...state.factProbes } };
+        const reply = idleNudge(scenario, next);
+        if (reply) {
+          setState(next);
+          setMessages((prev) => [
+            ...prev,
+            { role: "contact", kind: "text", text: reply.text, ts: Date.now() },
+          ]);
+        }
+      }
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [scenario, state, ended, typing]);
+
   async function send() {
     const text = input.trim();
     if (!text || ended || typing) return;
+    lastActivity.current = Date.now();
+    nudged.current = false;
     const grade = gradeProbe(scenario, text);
-    const playerMsg: Message = { role: "player", text, ts: Date.now(), probeQuality: grade };
+    const playerMsg: Message = { role: "player", kind: "text", text, ts: Date.now(), probeQuality: grade };
     setMessages((prev) => [...prev, playerMsg]);
     setInput("");
     setTyping(true);
 
-    // Simulate think time (500–1400ms).
-    const delay = 550 + Math.random() * 850;
+    const delay = 550 + Math.random() * 900;
     await new Promise((r) => setTimeout(r, delay));
 
     const next = { ...state, factProbes: { ...state.factProbes } };
@@ -184,15 +212,18 @@ function Simulation({
 
     const contactMsg: Message = {
       role: "contact",
+      kind: reply.voice ? "voice" : "text",
       text: reply.text,
       ts: Date.now(),
       factId: reply.factId,
+      isTell: reply.isTell,
+      tellExplanation: reply.tellExplanation,
+      voice: reply.voice,
     };
     setState(next);
     setMessages((prev) => [...prev, contactMsg]);
     setTyping(false);
 
-    // Real contact walked out?
     if (scenario.truth === "REAL" && next.meter <= 0) {
       setEnded(true);
       setEndReason("contact_left");
@@ -207,49 +238,52 @@ function Simulation({
     });
   }
 
-  // Persist pins in sim too.
-  useEffect(() => {
-    const raw = sessionStorage.getItem(SIM_KEY);
-    if (!raw) return;
-    try {
-      const s: StoredSim = JSON.parse(raw);
-      s.state.pins = pins;
-      sessionStorage.setItem(SIM_KEY, JSON.stringify(s));
-    } catch {}
-  }, [pins]);
+  function useVob(method: VobMethod) {
+    const next = { ...state, factProbes: { ...state.factProbes } };
+    const result = verifyOutOfBand(scenario, method, next);
+    setState(next);
+    setMessages((prev) => [
+      ...prev,
+      { role: "system", kind: "system", text: result.message, ts: Date.now() },
+    ]);
+    setShowVob(false);
+    setEnded(true);
+    setEndReason("vob_used");
+  }
 
   const meterColor =
-    state.meterType === "composure"
-      ? state.meter > 60
-        ? "bg-primary"
-        : state.meter > 30
-          ? "bg-caution"
-          : "bg-destructive"
-      : state.meter > 60
-        ? "bg-primary"
-        : state.meter > 30
-          ? "bg-caution"
-          : "bg-destructive";
+    state.meter > 60 ? "bg-primary" : state.meter > 30 ? "bg-caution" : "bg-destructive";
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-4 flex flex-col" style={{ minHeight: "calc(100vh - 57px)" }}>
       {/* Contact header */}
       <div className="rounded-t-xl border border-border border-b-0 bg-card px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="text-sm font-semibold">{scenario.claimedIdentity}</div>
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-sm font-semibold truncate">{scenario.claimedIdentity}</div>
             <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-              CLAIMED IDENTITY · UNVERIFIED
+              CLAIMED · TIER {scenario.tier} · {scenario.tier >= 3 && <span className="text-caution">TIMED</span>}
             </div>
           </div>
-          <button
-            onClick={onCall}
-            disabled={messages.length < 2}
-            className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-1.5 text-xs font-mono tracking-widest text-destructive transition-colors hover:bg-destructive/20 disabled:opacity-40"
-          >
-            <Phone className="inline h-3 w-3 mr-1" />
-            MAKE THE CALL
-          </button>
+          <div className="flex gap-1.5">
+            <button
+              onClick={() => setShowVob(true)}
+              disabled={ended || messages.length < 2}
+              className="rounded-md border border-primary/50 bg-primary/10 px-2.5 py-1.5 text-[10px] font-mono tracking-widest text-primary transition-colors hover:bg-primary/20 disabled:opacity-40"
+              title="Verify this contact through another channel"
+            >
+              <ShieldCheck className="inline h-3 w-3 mr-1" />
+              VERIFY
+            </button>
+            <button
+              onClick={onEnd}
+              disabled={messages.length < 2}
+              className="rounded-md border border-destructive/50 bg-destructive/10 px-2.5 py-1.5 text-[10px] font-mono tracking-widest text-destructive transition-colors hover:bg-destructive/20 disabled:opacity-40"
+            >
+              <Phone className="inline h-3 w-3 mr-1" />
+              CALL IT
+            </button>
+          </div>
         </div>
         {/* meter */}
         <div className="mt-3">
@@ -258,10 +292,7 @@ function Simulation({
             <span>{Math.round(state.meter)}</span>
           </div>
           <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-            <div
-              className={`h-full transition-all duration-500 ${meterColor}`}
-              style={{ width: `${state.meter}%` }}
-            />
+            <div className={`h-full transition-all duration-500 ${meterColor}`} style={{ width: `${state.meter}%` }} />
           </div>
         </div>
         {/* tabs */}
@@ -271,9 +302,7 @@ function Simulation({
               key={t}
               onClick={() => setTab(t)}
               className={`rounded px-3 py-1 font-mono text-[10px] tracking-widest transition ${
-                tab === t
-                  ? "bg-primary/15 text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                tab === t ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {t === "chat" ? "CHAT" : `NOTES · ${pins.length}/5`}
@@ -287,7 +316,7 @@ function Simulation({
         {tab === "chat" ? (
           <div ref={scroller} className="h-full overflow-y-auto p-4 space-y-3">
             {messages.map((m, i) => (
-              <MessageBubble
+              <MessageRow
                 key={i}
                 m={m}
                 pinned={pins.includes(i)}
@@ -298,6 +327,11 @@ function Simulation({
             {ended && endReason === "contact_left" && (
               <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-center text-xs font-mono tracking-widest text-destructive">
                 CONTACT LEFT THE CHAT — MAKE YOUR CALL
+              </div>
+            )}
+            {ended && endReason === "vob_used" && (
+              <div className="mt-4 rounded-md border border-primary/40 bg-primary/10 p-3 text-center text-xs font-mono tracking-widest text-primary">
+                VERIFICATION COMPLETE — MAKE YOUR CALL
               </div>
             )}
           </div>
@@ -313,7 +347,7 @@ function Simulation({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
-            placeholder={ended ? "Chat ended." : "Type anything you want to ask…"}
+            placeholder={ended ? "Chat ended — make your call." : "Type anything you want to ask…"}
             disabled={ended || typing}
             className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary disabled:opacity-50"
           />
@@ -326,23 +360,36 @@ function Simulation({
           </button>
         </div>
         <div className="mt-2 flex items-center justify-between font-mono text-[10px] tracking-widest text-muted-foreground">
-          <span>LONG-PRESS / CLICK PIN ICON TO MARK SUSPICIOUS</span>
+          <span>ASK FOR A "VOICE NOTE" · CLICK PIN TO FLAG</span>
           <span>{messages.filter((m) => m.role === "player").length} SENT</span>
         </div>
       </div>
+
+      {showVob && (
+        <VobModal
+          onClose={() => setShowVob(false)}
+          onPick={useVob}
+          tier={scenario.tier}
+        />
+      )}
     </main>
   );
 }
 
-function MessageBubble({
-  m,
-  pinned,
-  onPin,
-}: {
-  m: Message;
-  pinned: boolean;
-  onPin?: () => void;
-}) {
+function MessageRow({
+  m, pinned, onPin,
+}: { m: Message; pinned: boolean; onPin?: () => void }) {
+  if (m.role === "system") {
+    return (
+      <div className="msg-in flex justify-center">
+        <div className="max-w-[90%] rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-center font-mono text-[11px] leading-relaxed text-primary">
+          <Timer className="inline h-3 w-3 mr-1" />
+          {m.text}
+        </div>
+      </div>
+    );
+  }
+
   const isPlayer = m.role === "player";
   return (
     <div className={`msg-in flex ${isPlayer ? "justify-end" : "justify-start"} gap-2`}>
@@ -357,17 +404,31 @@ function MessageBubble({
           <Pin className={`h-3.5 w-3.5 ${pinned ? "fill-current" : ""}`} />
         </button>
       )}
-      <div
-        className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${
-          isPlayer
-            ? "bg-primary text-primary-foreground rounded-br-sm"
-            : pinned
-              ? "bg-caution/15 border border-caution/40 rounded-bl-sm"
-              : "bg-card border border-border rounded-bl-sm"
-        }`}
-      >
-        {m.text}
-      </div>
+
+      {m.kind === "voice" && m.voice ? (
+        <div className="flex flex-col gap-1">
+          {m.text && (
+            <div className={`max-w-[80%] rounded-2xl px-3 py-1.5 text-xs italic ${
+              isPlayer ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-card border border-border rounded-bl-sm text-muted-foreground"
+            }`}>
+              {m.text}
+            </div>
+          )}
+          <VoiceNote voice={m.voice} fromPlayer={isPlayer} />
+        </div>
+      ) : (
+        <div
+          className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${
+            isPlayer
+              ? "bg-primary text-primary-foreground rounded-br-sm"
+              : pinned
+                ? "bg-caution/15 border border-caution/40 rounded-bl-sm"
+                : "bg-card border border-border rounded-bl-sm"
+          }`}
+        >
+          {m.text}
+        </div>
+      )}
     </div>
   );
 }
@@ -382,24 +443,54 @@ function TypingBubble({ name }: { name: string }) {
           <span className="typing-dot h-1.5 w-1.5 rounded-full bg-muted-foreground" />
         </div>
       </div>
-      <span className="font-mono text-[10px] text-muted-foreground tracking-widest">
-        {name} is typing…
-      </span>
+      <span className="font-mono text-[10px] text-muted-foreground tracking-widest">{name} is typing…</span>
+    </div>
+  );
+}
+
+function VobModal({
+  onClose, onPick, tier,
+}: { onClose: () => void; onPick: (m: VobMethod) => void; tier: number }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-background/70 backdrop-blur p-4">
+      <div className="w-full max-w-md rounded-xl border border-border bg-card p-5 shadow-2xl">
+        <div className="flex items-start justify-between mb-3">
+          <div>
+            <div className="font-mono text-[10px] tracking-[0.3em] text-primary">
+              VERIFY ANOTHER WAY
+            </div>
+            <h2 className="mt-1 text-lg font-semibold">Out-of-band verification</h2>
+          </div>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <p className="text-xs text-muted-foreground mb-4">
+          The oldest, most reliable defence. {tier <= 3
+            ? "Small point fee at this tier — but a real contact won't mind if you're polite."
+            : "At this tier, in-band tells are unreliable. This is often the only winning move."}
+        </p>
+        <ul className="space-y-2">
+          {VOB_METHODS.map((m) => (
+            <li key={m.id}>
+              <button
+                onClick={() => onPick(m.id)}
+                className="w-full text-left rounded-md border border-border p-3 transition hover:border-primary/50 hover:bg-accent"
+              >
+                <div className="text-sm font-semibold">{m.label}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">{m.blurb}</div>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
 
 function NotesTab({
-  scenario,
-  messages,
-  pins,
-  onUnpin,
-}: {
-  scenario: Scenario;
-  messages: Message[];
-  pins: number[];
-  onUnpin: (i: number) => void;
-}) {
+  scenario, messages, pins, onUnpin,
+}: { scenario: Scenario; messages: Message[]; pins: number[]; onUnpin: (i: number) => void }) {
   return (
     <div className="h-full overflow-y-auto p-4 space-y-6">
       <section>
@@ -407,26 +498,18 @@ function NotesTab({
           <StickyNote className="h-3 w-3" /> DOSSIER
         </div>
         <p className="mt-2 text-xs text-muted-foreground">{scenario.dossier.contactClaim}</p>
-        <div className="mt-3 font-mono text-[10px] tracking-widest text-muted-foreground">
-          KNOWN
-        </div>
+        <div className="mt-3 font-mono text-[10px] tracking-widest text-muted-foreground">KNOWN</div>
         <ul className="mt-1 space-y-1 text-xs">
           {scenario.dossier.knownFacts.map((f, i) => (
             <li key={i} className="flex gap-2">
-              <span className="text-primary shrink-0">·</span>
-              <span>{f}</span>
+              <span className="text-primary shrink-0">·</span><span>{f}</span>
             </li>
           ))}
         </ul>
-        <div className="mt-3 font-mono text-[10px] tracking-widest text-muted-foreground">
-          PUBLIC
-        </div>
+        <div className="mt-3 font-mono text-[10px] tracking-widest text-muted-foreground">PUBLIC</div>
         <ul className="mt-1 space-y-1 text-xs text-muted-foreground">
           {scenario.dossier.publicFacts.map((f, i) => (
-            <li key={i} className="flex gap-2">
-              <span className="shrink-0">·</span>
-              <span>{f}</span>
-            </li>
+            <li key={i} className="flex gap-2"><span className="shrink-0">·</span><span>{f}</span></li>
           ))}
         </ul>
       </section>
@@ -437,17 +520,14 @@ function NotesTab({
         </div>
         {pins.length === 0 ? (
           <p className="mt-2 text-xs text-muted-foreground">
-            Pin any contact message you find suspicious — they'll show up here for
-            side-by-side comparison against the dossier.
+            Pin any contact message you find suspicious — they'll show up here for side-by-side
+            comparison against the dossier.
           </p>
         ) : (
           <ul className="mt-2 space-y-2">
             {pins.map((i) => (
-              <li
-                key={i}
-                className="rounded-md border border-caution/40 bg-caution/10 p-2 text-xs whitespace-pre-wrap"
-              >
-                {messages[i]?.text}
+              <li key={i} className="rounded-md border border-caution/40 bg-caution/10 p-2 text-xs whitespace-pre-wrap">
+                {messages[i]?.text || "[voice note]"}
                 <button
                   onClick={() => onUnpin(i)}
                   className="mt-1 block font-mono text-[9px] tracking-widest text-caution/70 hover:text-caution"
@@ -469,9 +549,7 @@ function loadSim(): StoredSim | null {
   try {
     const raw = sessionStorage.getItem(SIM_KEY);
     return raw ? (JSON.parse(raw) as StoredSim) : null;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void }) {
@@ -484,11 +562,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
 
   function submit() {
     if (!verdict) return;
-    // Persist verdict for debrief.
-    sessionStorage.setItem(
-      "milverse.verdict",
-      JSON.stringify({ verdict, picked }),
-    );
+    sessionStorage.setItem(VERDICT_KEY, JSON.stringify({ verdict, picked }));
     onDone();
   }
 
@@ -497,36 +571,28 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
       <div className="font-mono text-xs tracking-[0.3em] text-caution">MAKE THE CALL</div>
       <h1 className="mt-2 text-2xl font-semibold">Real, or imposter?</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Then tag <span className="text-foreground">why</span>. Some chips are
-        genuine tells for this case; some are red herrings.
+        Then tag <span className="text-foreground">why</span>. Some chips are genuine tells; some are
+        red herrings.
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-3">
         <button
           onClick={() => setVerdict("REAL")}
           className={`rounded-xl border-2 p-6 text-center font-mono tracking-widest transition ${
-            verdict === "REAL"
-              ? "border-primary bg-primary/10 text-primary"
-              : "border-border hover:border-primary/50"
+            verdict === "REAL" ? "border-primary bg-primary/10 text-primary" : "border-border hover:border-primary/50"
           }`}
         >
           <div className="text-lg">REAL</div>
-          <div className="mt-1 text-[10px] text-muted-foreground">
-            This is who they claim
-          </div>
+          <div className="mt-1 text-[10px] text-muted-foreground">This is who they claim</div>
         </button>
         <button
           onClick={() => setVerdict("FAKE")}
           className={`rounded-xl border-2 p-6 text-center font-mono tracking-widest transition ${
-            verdict === "FAKE"
-              ? "border-destructive bg-destructive/10 text-destructive"
-              : "border-border hover:border-destructive/50"
+            verdict === "FAKE" ? "border-destructive bg-destructive/10 text-destructive" : "border-border hover:border-destructive/50"
           }`}
         >
           <div className="text-lg">FAKE</div>
-          <div className="mt-1 text-[10px] text-muted-foreground">
-            This is an imposter
-          </div>
+          <div className="mt-1 text-[10px] text-muted-foreground">This is an imposter</div>
         </button>
       </div>
 
@@ -569,36 +635,50 @@ function Debrief({ scenario }: { scenario: Scenario }) {
   const sim = useMemo(() => loadSim(), []);
   const verdictRaw = useMemo(() => {
     try {
-      const raw = sessionStorage.getItem("milverse.verdict");
+      const raw = sessionStorage.getItem(VERDICT_KEY);
       return raw ? (JSON.parse(raw) as { verdict: "REAL" | "FAKE"; picked: string[] }) : null;
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   }, []);
 
   const result = useMemo(() => {
-    if (!verdictRaw) return null;
+    if (!verdictRaw || !sim) return null;
     const truthLabel: "REAL" | "FAKE" = scenario.truth === "REAL" ? "REAL" : "FAKE";
     const correctVerdict = verdictRaw.verdict === truthLabel;
 
-    // Evidence grading
-    const correctChips = scenario.evidenceChips.filter((c) => c.correct).map((c) => c.id);
-    const pickedCorrect = verdictRaw.picked.filter((id) => correctChips.includes(id)).length;
-    const pickedRedHerring = verdictRaw.picked.filter((id) => !correctChips.includes(id)).length;
-    const totalCorrect = correctChips.length;
+    const correctChipIds = scenario.evidenceChips.filter((c) => c.correct).map((c) => c.id);
+    const pickedCorrect = verdictRaw.picked.filter((id) => correctChipIds.includes(id)).length;
+    const pickedRedHerring = verdictRaw.picked.filter((id) => !correctChipIds.includes(id)).length;
 
-    // Probe grading
-    const playerMsgs = (sim?.messages ?? []).filter((m) => m.role === "player");
+    const playerMsgs = sim.messages.filter((m) => m.role === "player");
     const strong = playerMsgs.filter((m) => m.probeQuality === "strong").length;
     const weak = playerMsgs.filter((m) => m.probeQuality === "weak").length;
     const wasted = playerMsgs.filter((m) => m.probeQuality === "wasted").length;
+
+    // Quoted tells from the contact.
+    const tells = sim.messages
+      .filter((m) => m.role === "contact" && m.isTell)
+      .slice(0, 4);
+
+    // Voice note (if any) — pull artifact from message
+    const voiceMsg = sim.messages.find((m) => m.kind === "voice");
+    const voiceArtifact = voiceMsg?.voice?.artifact ?? null;
+
+    const usedVob = sim.state?.vobUsed === true;
 
     // Scoring
     let points = 0;
     let resultKind: "correct" | "missed_scam" | "false_alarm" | "lucky_guess";
     if (correctVerdict) {
-      const reasoningOk = pickedCorrect >= Math.min(2, totalCorrect) && pickedRedHerring <= 1;
-      if (reasoningOk) {
+      const reasoningOk = pickedCorrect >= 2 && pickedRedHerring <= 1;
+      if (usedVob) {
+        // VOB at low tiers = discounted. At Tier 4-5 it's the intended path.
+        points = scenario.tier >= 4 ? 90 : 45;
+        resultKind = reasoningOk ? "correct" : "lucky_guess";
+      } else if (scenario.tier === 5) {
+        // In-band verdict at Tier 5 is a lucky guess.
+        points = 50;
+        resultKind = "lucky_guess";
+      } else if (reasoningOk) {
         points = 100 + pickedCorrect * 20 - pickedRedHerring * 10;
         resultKind = "correct";
       } else {
@@ -612,23 +692,14 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     points += strong * 5 - wasted * 5;
 
     return {
-      correctVerdict,
-      pickedCorrect,
-      pickedRedHerring,
-      totalCorrect,
-      strong,
-      weak,
-      wasted,
-      points,
-      resultKind,
-      truthLabel,
+      correctVerdict, pickedCorrect, pickedRedHerring, strong, weak, wasted,
+      points, resultKind, truthLabel, tells, voiceArtifact, usedVob,
     };
   }, [scenario, sim, verdictRaw]);
 
-  // Persist to profile ONCE on mount.
   const savedRef = useRef(false);
   useEffect(() => {
-    if (!result || savedRef.current) return;
+    if (!result || !verdictRaw || savedRef.current) return;
     savedRef.current = true;
     const p = loadProfile();
     p.casesPlayed += 1;
@@ -645,15 +716,17 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     if (result.resultKind === "false_alarm") p.falseAlarms += 1;
     p.history.push({
       caseId: scenario.id,
-      verdict: verdictRaw!.verdict,
+      tier: scenario.tier,
+      verdict: verdictRaw.verdict,
       truth: scenario.truth,
       result: result.resultKind,
       points: result.points,
+      usedVob: result.usedVob,
       ts: Date.now(),
     });
     saveProfile(p);
     window.dispatchEvent(new Event("milverse:profile"));
-  }, [result, scenario.id, verdictRaw]);
+  }, [result, scenario.id, scenario.tier, scenario.truth, verdictRaw]);
 
   if (!result || !verdictRaw) {
     return (
@@ -665,31 +738,77 @@ function Debrief({ scenario }: { scenario: Scenario }) {
   }
 
   const verdictTone =
-    result.resultKind === "correct"
-      ? "text-primary border-primary/40 bg-primary/5"
-      : result.resultKind === "lucky_guess"
-        ? "text-caution border-caution/40 bg-caution/5"
-        : "text-destructive border-destructive/40 bg-destructive/5";
+    result.resultKind === "correct" ? "text-primary border-primary/40 bg-primary/5"
+    : result.resultKind === "lucky_guess" ? "text-caution border-caution/40 bg-caution/5"
+    : "text-destructive border-destructive/40 bg-destructive/5";
 
-  const truthHeadline =
-    scenario.truth === "REAL"
-      ? "This person was REAL."
-      : "This was an IMPOSTER.";
+  const truthHeadline = scenario.truth === "REAL" ? "This person was REAL." : "This was an IMPOSTER.";
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8 space-y-6">
       <div className={`rounded-xl border-2 p-6 ${verdictTone}`}>
-        <div className="font-mono text-xs tracking-[0.3em] opacity-80">DEBRIEF</div>
+        <div className="font-mono text-xs tracking-[0.3em] opacity-80">DEBRIEF · TIER {scenario.tier}</div>
         <h1 className="mt-2 text-2xl font-semibold">{truthHeadline}</h1>
         <p className="mt-1 text-sm opacity-90">
           You said <b>{verdictRaw.verdict}</b> · Result:{" "}
           <b>{result.resultKind.replace("_", " ").toUpperCase()}</b>
+          {result.usedVob && <> · <b>OUT-OF-BAND VERIFIED</b></>}
         </p>
         <div className="mt-3 font-mono text-2xl">
-          {result.points >= 0 ? "+" : ""}
-          {result.points} pts
+          {result.points >= 0 ? "+" : ""}{result.points} pts
         </div>
+        {scenario.tier === 5 && !result.usedVob && result.correctVerdict && (
+          <p className="mt-3 text-xs opacity-90 border-t border-current/20 pt-3">
+            Correct — but at Tier 5, in-band tells are unreliable. Verifying out-of-band would have
+            been the safer read. <b>Spotting is dying. Verifying is forever.</b>
+          </p>
+        )}
       </div>
+
+      {/* Quoted tells from THIS conversation */}
+      {result.tells.length > 0 && (
+        <section className="rounded-xl border border-border bg-card p-6">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
+            WHAT THEY SAID · TELLS FROM YOUR CHAT
+          </div>
+          <ul className="space-y-3">
+            {result.tells.map((t, i) => (
+              <li key={i} className="rounded-md border-l-2 border-caution bg-caution/5 pl-3 py-2">
+                <div className="text-sm italic">"{t.text || "[voice note]"}"</div>
+                {t.tellExplanation && (
+                  <div className="mt-1.5 text-xs text-muted-foreground">
+                    <span className="font-mono text-[10px] tracking-widest text-caution mr-1.5">→</span>
+                    {t.tellExplanation}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Voice note breakdown */}
+      {result.voiceArtifact !== undefined && sim?.messages.some((m) => m.kind === "voice") && (
+        <section className="rounded-xl border border-border bg-card p-6">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
+            VOICE NOTE ANALYSIS
+          </div>
+          <p className="text-sm">
+            <span className="font-mono text-[11px] tracking-widest text-primary mr-2">ARTIFACT</span>
+            {ARTIFACT_LABEL(result.voiceArtifact)}
+          </p>
+          {result.voiceArtifact === null ? (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Clean recording — the pacing and ambience were natural. Consistent with a real note.
+            </p>
+          ) : (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Higher tiers make this artifact subtler. Careful second listens catch it — first
+              listens usually don't.
+            </p>
+          )}
+        </section>
+      )}
 
       {/* Evidence breakdown */}
       <section className="rounded-xl border border-border bg-card p-6">
@@ -700,14 +819,12 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           {scenario.evidenceChips.map((c) => {
             const picked = verdictRaw.picked.includes(c.id);
             if (!picked && !c.correct) return null;
-            const tone = c.correct
-              ? "border-primary/40 bg-primary/5 text-primary"
+            const tone = c.correct ? "border-primary/40 bg-primary/5 text-primary"
               : "border-destructive/40 bg-destructive/5 text-destructive";
             return (
               <li key={c.id} className={`rounded-md border p-2.5 ${picked ? tone : "border-border/60 opacity-60"}`}>
                 <div className="text-xs font-semibold">
-                  {picked ? (c.correct ? "✓ " : "✗ ") : "· "}
-                  {c.label}
+                  {picked ? (c.correct ? "✓ " : "✗ ") : "· "}{c.label}
                 </div>
                 <div className="mt-1 text-[11px] opacity-80">{c.explain}</div>
               </li>
@@ -730,12 +847,9 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           {(sim?.messages ?? [])
             .filter((m) => m.role === "player")
             .map((m, i) => {
-              const c =
-                m.probeQuality === "strong"
-                  ? "border-l-primary text-foreground"
-                  : m.probeQuality === "wasted"
-                    ? "border-l-destructive text-muted-foreground"
-                    : "border-l-caution text-muted-foreground";
+              const c = m.probeQuality === "strong" ? "border-l-primary text-foreground"
+                : m.probeQuality === "wasted" ? "border-l-destructive text-muted-foreground"
+                : "border-l-caution text-muted-foreground";
               return (
                 <li key={i} className={`border-l-2 pl-3 py-1 text-xs ${c}`}>
                   <span className="font-mono text-[10px] tracking-widest opacity-70 mr-2">
@@ -784,12 +898,9 @@ function Debrief({ scenario }: { scenario: Scenario }) {
 }
 
 function ProbeStat({ n, label, tone }: { n: number; label: string; tone: "good" | "warn" | "bad" }) {
-  const c =
-    tone === "good"
-      ? "text-primary border-primary/40 bg-primary/10"
-      : tone === "warn"
-        ? "text-caution border-caution/40 bg-caution/10"
-        : "text-destructive border-destructive/40 bg-destructive/10";
+  const c = tone === "good" ? "text-primary border-primary/40 bg-primary/10"
+    : tone === "warn" ? "text-caution border-caution/40 bg-caution/10"
+    : "text-destructive border-destructive/40 bg-destructive/10";
   return (
     <div className={`rounded-md border p-3 ${c}`}>
       <div className="text-2xl font-mono">{n}</div>
@@ -815,18 +926,18 @@ function PauseRow({ letter, title, body }: { letter: string; title: string; body
 function pauseText(s: Scenario, k: "P" | "A" | "U" | "S" | "E"): string {
   if (s.truth === "REAL") {
     return {
-      P: "There was no time pressure — that's the signature of a real conversation.",
-      A: "You could have called them back on a known number to fully confirm. Verification isn't rude.",
-      U: "Nothing they claimed contradicted the dossier — every fact checked out.",
-      S: "The emotional tone was casual, not manufactured. No manipulation of feeling.",
-      E: "Evidence pointed to REAL. Accusing them costs the relationship — that's a False Alarm.",
+      P: "There was no manufactured urgency — the signature of a real conversation.",
+      A: "Verification would have confirmed this cleanly. A real contact welcomes it.",
+      U: "Every checkable claim aligned with your dossier.",
+      S: "Emotional tone was casual (or genuinely stressed, at higher tiers) — not weaponised.",
+      E: "Evidence pointed to REAL. Accusing them costs the relationship — a False Alarm.",
     }[k];
   }
   return {
     P: "Look for manufactured urgency — countdowns, deadlines, \"before EOD.\" That's the lever.",
-    A: "They resisted every attempt to move out-of-band. A real contact welcomes verification.",
-    U: "Claims that couldn't be checked (\"reverse OTP,\" \"temp SIM\"). Made-up policy is a red flag.",
-    S: "Emotional escalation, appeals to authority, or guilt. The story is a tool, not a fact.",
-    E: "The dossier is your ground truth. A contradicted fact = a catchable lie.",
+    A: "They resisted every out-of-band verification. A real contact welcomes it.",
+    U: "Claims you couldn't check (\"reverse OTP,\" \"security app,\" \"temp SIM\") — made-up policy is a red flag.",
+    S: "Emotional escalation, guilt, or authority. The story is a tool, not a fact.",
+    E: "The dossier is your ground truth. Contradictions on dossier facts are catchable lies.",
   }[k];
 }
