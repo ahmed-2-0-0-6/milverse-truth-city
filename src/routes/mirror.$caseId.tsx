@@ -17,6 +17,9 @@ import { tick, tensionCue } from "@/lib/mirror/audio";
 import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
+import { TacticStamp } from "@/components/TacticStamp";
+import { TacticFlash } from "@/components/TacticFlash";
+import { tacticForMirror } from "@/lib/mirror/tactics";
 
 
 export const Route = createFileRoute("/mirror/$caseId")({
@@ -168,6 +171,8 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
   const prevMeter = useRef<number>(state.meter);
   const aiFailCount = useRef<number>(0);
   const [aiDown, setAiDown] = useState(false);
+  const tacticFlashed = useRef<boolean>(false);
+  const [tacticFlash, setTacticFlash] = useState<null | ReturnType<typeof tacticForMirror>>(null);
 
   useEffect(() => {
     const opener: Message = { role: "contact", kind: "text", text: scenario.opener, ts: Date.now() };
@@ -238,6 +243,10 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
     setMessages((prev) => [...prev, playerMsg]);
     setInput("");
     setTyping(true);
+    if (grade === "strong" && !tacticFlashed.current) {
+      tacticFlashed.current = true;
+      setTacticFlash(tacticForMirror(scenario.id));
+    }
 
     const next = { ...state, factProbes: { ...state.factProbes } };
     const reply = respond(scenario, next, text);
@@ -357,6 +366,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-4 flex flex-col" style={{ minHeight: "calc(100vh - 57px)" }}>
+      <TacticFlash tacticId={tacticFlash} onDone={() => setTacticFlash(null)} />
       {/* Contact header */}
       <div className="rounded-t-xl border border-border border-b-0 bg-card px-4 py-3">
         <div className="flex items-center justify-between gap-3">
@@ -1006,6 +1016,8 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           </p>
         )}
       </div>
+
+      <TacticStamp tacticId={tacticForMirror(scenario.id)} />
 
       {/* 4-axis star scoring */}
       <section className="rounded-xl border border-border bg-card p-6">

@@ -64,6 +64,7 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
   const { mode } = useVisualMode();
   const grade = GRADES[outcome];
   const [stage, setStage] = useState<"enter" | "stamp" | "reveal" | "trail">("enter");
+  const [canSkip, setCanSkip] = useState(false);
   const doneRef = useRef(false);
 
   // Deterministic dust particles per case — no re-shuffle on rerender.
@@ -85,9 +86,10 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
     }
     const t1 = window.setTimeout(() => { setStage("stamp"); playThud(); }, 380);
     const t2 = window.setTimeout(() => { setStage("reveal"); playSting(grade.sting); }, 900);
+    const tSkip = window.setTimeout(() => setCanSkip(true), 1500);
     const t3 = window.setTimeout(() => { setStage("trail"); }, 2500);
     const t4 = window.setTimeout(() => { if (!doneRef.current) { doneRef.current = true; onDone(); } }, 3200);
-    return () => { [t1,t2,t3,t4].forEach(clearTimeout); };
+    return () => { [t1,t2,tSkip,t3,t4].forEach(clearTimeout); };
   }, [mode, grade.sting, onDone]);
 
   if (mode !== "cinematic") return null;
@@ -97,7 +99,7 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
       className="fixed inset-0 z-[300] flex items-center justify-center overflow-hidden select-none"
       style={{ background: "radial-gradient(circle at 50% 45%, rgba(10,14,22,0.92) 0%, rgba(0,0,0,0.98) 60%, #000 100%)" }}
       aria-live="polite"
-      onClick={() => { if (!doneRef.current) { doneRef.current = true; onDone(); } }}
+      onClick={() => { if (canSkip && !doneRef.current) { doneRef.current = true; onDone(); } }}
     >
       {/* Spotlight cone */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden style={{
@@ -201,10 +203,11 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
       )}
 
       <button
-        onClick={(e) => { e.stopPropagation(); if (!doneRef.current) { doneRef.current = true; onDone(); } }}
-        className="absolute bottom-4 right-4 stencil text-[10px] text-white/40 hover:text-white/80 border border-white/15 px-3 py-1.5"
+        onClick={(e) => { e.stopPropagation(); if (canSkip && !doneRef.current) { doneRef.current = true; onDone(); } }}
+        disabled={!canSkip}
+        className="absolute bottom-4 right-4 stencil text-[10px] text-white/40 hover:text-white/80 border border-white/15 px-3 py-1.5 disabled:opacity-30 disabled:cursor-not-allowed"
       >
-        SKIP →
+        {canSkip ? "SKIP →" : "READ THE VERDICT…"}
       </button>
     </div>
   );

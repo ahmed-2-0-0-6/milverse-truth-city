@@ -14,6 +14,7 @@ import { RealCaseFile } from "@/components/RealCaseFile";
 import { FormatFrame } from "@/components/feed/FormatFrame";
 import { Toolbelt } from "@/components/feed/Toolbelt";
 import { TacticStamp } from "@/components/TacticStamp";
+import { TacticFlash } from "@/components/TacticFlash";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 
 export const Route = createFileRoute("/feed/$caseId")({
@@ -181,6 +182,8 @@ function Sim({
 }) {
   const [tab, setTab] = useState<"chat" | "toolkit">("chat");
   const [input, setInput] = useState("");
+  const [tacticFlash, setTacticFlash] = useState<typeof scenario.tacticId | null>(null);
+  const tacticFlashed = useRef(false);
   const scroller = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -211,6 +214,10 @@ function Sim({
       { role: "system", text: `🔎 You: ${a.label}`, ts: Date.now(), isAction: true },
       { role: "system", text: r.snippet, ts: Date.now() + 1, isAction: true },
     ]);
+    if (a.decisive && scenario.tacticId && !tacticFlashed.current) {
+      tacticFlashed.current = true;
+      setTacticFlash(scenario.tacticId);
+    }
     setTab("chat");
   }
 
@@ -219,6 +226,7 @@ function Sim({
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-4 flex flex-col" style={{ minHeight: "calc(100vh - 57px)" }}>
+      <TacticFlash tacticId={tacticFlash ?? null} onDone={() => setTacticFlash(null)} />
       <div className="rounded-t-xl border border-border border-b-0 bg-card px-4 py-3">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
