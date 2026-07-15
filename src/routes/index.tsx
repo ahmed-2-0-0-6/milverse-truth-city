@@ -4,6 +4,7 @@ import { TopBar } from "@/components/TopBar";
 import { CityWorld } from "@/components/CityWorld";
 import { CityList } from "@/components/CityList";
 import { Sparkles } from "lucide-react";
+import { CityHero3D } from "@/components/city3d/CityHero3D";
 
 export const Route = createFileRoute("/")({
   component: CityMap,
