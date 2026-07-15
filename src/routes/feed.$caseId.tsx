@@ -338,25 +338,57 @@ function ForwardCard({ scenario }: { scenario: FeedScenario }) {
 
 /* ─────────── VERDICT ─────────── */
 function VerdictScreen({
-  scenario, verdict, setVerdict, finalReply, setFinalReply, onConfirm,
+  scenario, state, verdict, setVerdict, finalReply, setFinalReply, conclusion, setConclusion, onConfirm,
 }: {
   scenario: FeedScenario;
+  state: FeedState;
   verdict: FeedVerdict | null;
   setVerdict: (v: FeedVerdict) => void;
   finalReply: string;
   setFinalReply: (s: string) => void;
+  conclusion: string;
+  setConclusion: (s: string) => void;
   onConfirm: () => void;
 }) {
   const tone = classifyTone(finalReply);
   const toneColor =
     tone === "rude" ? "text-destructive" : tone === "respectful" ? "text-primary" : "text-muted-foreground";
+  const usedActions = scenario.actions.filter((a) => state.actionsUsed.includes(a.id));
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
-      <div className="font-mono text-xs tracking-[0.3em] text-caution">DELIVER YOUR VERDICT</div>
-      <h1 className="mt-2 text-2xl font-semibold">Is the claim TRUE, FALSE, or MISLEADING?</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
+      <div className="font-mono text-xs tracking-[0.3em] text-caution">INVESTIGATION BOARD</div>
+      <h1 className="mt-2 text-2xl font-semibold">Assemble the case. Deliver the verdict.</h1>
+
+      <section className="mt-5 rounded-xl border border-border bg-card p-4 space-y-3">
+        <div className="font-mono text-[10px] tracking-widest text-muted-foreground">
+          CASE FILE · AUTO-COLLECTED
+        </div>
+        <div>
+          <div className="font-mono text-[10px] tracking-widest text-primary mb-1.5">
+            THE CLAIM
+          </div>
+          <p className="text-xs italic border-l-2 border-primary/40 pl-2.5">"{scenario.opener}"</p>
+        </div>
+        <div>
+          <div className="font-mono text-[10px] tracking-widest text-caution mb-1.5">
+            VERIFICATION STEPS USED · {usedActions.length}/{scenario.actions.length}
+          </div>
+          {usedActions.length === 0 ? (
+            <p className="text-xs text-muted-foreground">No toolkit actions used — you're calling this cold.</p>
+          ) : (
+            <ul className="text-xs text-muted-foreground space-y-1">
+              {usedActions.map((a) => (
+                <li key={a.id}>· {a.label}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+
+      <p className="mt-6 text-sm text-muted-foreground">
         MISLEADING = the core is true but the framing (photo, date, context) is not. That's the most common type.
       </p>
+
       <div className="mt-5 grid grid-cols-3 gap-2">
         {(["TRUE", "MISLEADING", "FALSE"] as FeedVerdict[]).map((v) => (
           <button
