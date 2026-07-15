@@ -57,6 +57,8 @@ function CityHall() {
       <div className="pointer-events-none fixed inset-0 scanlines opacity-30" />
       <TopBar />
       <main className="mx-auto max-w-5xl px-4 py-10 relative">
+        <RecommendedStrip />
+
         <div className="mb-8 hud-frame border border-primary/30 bg-card/60 rounded-sm p-6">
           <div className="flex items-center gap-3 mb-3">
             <div className="stencil text-[10px] text-primary">// READER PROFILE · SESSION</div>
