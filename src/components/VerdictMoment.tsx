@@ -64,6 +64,7 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
   const { mode } = useVisualMode();
   const grade = GRADES[outcome];
   const [stage, setStage] = useState<"enter" | "stamp" | "reveal" | "trail">("enter");
+  const [canSkip, setCanSkip] = useState(false);
   const doneRef = useRef(false);
 
   // Deterministic dust particles per case — no re-shuffle on rerender.
@@ -85,9 +86,10 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
     }
     const t1 = window.setTimeout(() => { setStage("stamp"); playThud(); }, 380);
     const t2 = window.setTimeout(() => { setStage("reveal"); playSting(grade.sting); }, 900);
+    const tSkip = window.setTimeout(() => setCanSkip(true), 1500);
     const t3 = window.setTimeout(() => { setStage("trail"); }, 2500);
     const t4 = window.setTimeout(() => { if (!doneRef.current) { doneRef.current = true; onDone(); } }, 3200);
-    return () => { [t1,t2,t3,t4].forEach(clearTimeout); };
+    return () => { [t1,t2,tSkip,t3,t4].forEach(clearTimeout); };
   }, [mode, grade.sting, onDone]);
 
   if (mode !== "cinematic") return null;
