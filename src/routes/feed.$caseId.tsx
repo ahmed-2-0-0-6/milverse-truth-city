@@ -14,6 +14,7 @@ import { RealCaseFile } from "@/components/RealCaseFile";
 import { FormatFrame } from "@/components/feed/FormatFrame";
 import { Toolbelt } from "@/components/feed/Toolbelt";
 import { TacticStamp } from "@/components/TacticStamp";
+import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 
 export const Route = createFileRoute("/feed/$caseId")({
   loader: ({ params }) => {
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/feed/$caseId")({
   component: FeedPlay,
 });
 
-type Phase = "brief" | "sim" | "verdict" | "debrief";
+type Phase = "brief" | "sim" | "verdict" | "reveal" | "debrief";
 
 function FeedPlay() {
   const { scenario } = Route.useLoaderData();
