@@ -408,6 +408,13 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
       </div>
 
       {/* Composer */}
+      {aiDown && (
+        <div className="my-2 rounded-md border border-caution/40 bg-caution/10 p-3 text-xs">
+          <div className="font-mono text-[10px] tracking-widest text-caution mb-1">CONNECTION UNSTABLE</div>
+          The contact keeps freezing.{" "}
+          <Link to="/quick-tour" className="text-primary underline">Try the Quick Tour instead →</Link>
+        </div>
+      )}
       <div className="rounded-b-xl border border-border border-t-0 bg-card p-3">
         <div className="flex gap-2">
           <input
