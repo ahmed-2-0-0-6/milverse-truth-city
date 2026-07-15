@@ -329,8 +329,8 @@ function Studio() {
               <button onClick={playtest} className="flex-1 rounded-md border border-primary/50 bg-primary/10 py-3 font-mono text-xs tracking-widest text-primary hover:bg-primary/20">
                 <Sparkles className="inline h-3.5 w-3.5 mr-1.5" /> PLAY-TEST
               </button>
-              <button onClick={publish} className="flex-1 rounded-md bg-primary py-3 font-mono text-xs tracking-widest text-primary-foreground">
-                PUBLISH
+              <button onClick={publish} disabled={publishing} className="flex-1 rounded-md bg-primary py-3 font-mono text-xs tracking-widest text-primary-foreground disabled:opacity-50">
+                {publishing ? "PUBLISHING…" : "PUBLISH"}
               </button>
             </div>
           </Section>
