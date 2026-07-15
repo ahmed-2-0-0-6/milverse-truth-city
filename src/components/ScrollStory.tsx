@@ -1,0 +1,205 @@
+// LAYER-7 — Scroll-driven story beats. GSAP ScrollTrigger + horizontal districts.
+// Lazy imports GSAP; respects reduced-motion (renders static).
+import { useEffect, useRef } from "react";
+import mirrorArt from "@/assets/district-mirror.jpg";
+import feedArt from "@/assets/district-feed.jpg";
+import studioArt from "@/assets/district-studio.jpg";
+import archiveArt from "@/assets/district-archive.jpg";
+import cleanroomArt from "@/assets/district-cleanroom.jpg";
+
+const DISTRICTS = [
+  { key: "mirror", label: "THE MIRROR", tag: "Verify people", art: mirrorArt, glow: "34,211,238" },
+  { key: "feed", label: "THE FEED", tag: "Verify claims", art: feedArt, glow: "245,185,66" },
+  { key: "studio", label: "THE STUDIO", tag: "Author cases", art: studioArt, glow: "245,185,66" },
+  { key: "archive", label: "THE ARCHIVE", tag: "Living memory", art: archiveArt, glow: "34,211,238" },
+  { key: "cleanroom", label: "CLEAN ROOM", tag: "Calibrate", art: cleanroomArt, glow: "34,211,238" },
+];
+
+const BEATS = [
+  { headline: "Every day, someone in your family gets a message.", sub: "It's already happened this week. Maybe today." },
+  { headline: "It looks real. It sounds real.", sub: "Perfect grammar. Familiar face. Small ask." },
+  { headline: "Spotting fakes is dying. Verifying is forever.", sub: "You can't out-see a machine. You can out-verify one." },
+  { headline: "Welcome to MILVERSE.", sub: "Train your trust.", finale: true },
+];
+
+export function ScrollStory() {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const horizontalRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    let cleanup: (() => void) | undefined;
+    let cancelled = false;
+
+    (async () => {
+      const gsapMod = await import("gsap");
+      const stMod = await import("gsap/ScrollTrigger");
+      if (cancelled) return;
+      const gsap = gsapMod.default;
+      const ScrollTrigger = stMod.ScrollTrigger;
+      gsap.registerPlugin(ScrollTrigger);
+
+      const ctx = gsap.context(() => {
+        // Beat pins + reveals
+        gsap.utils.toArray<HTMLElement>(".story-beat").forEach((el) => {
+          gsap.from(el.querySelectorAll(".beat-line"), {
+            yPercent: 40,
+            opacity: 0,
+            duration: 0.9,
+            ease: "power3.out",
+            stagger: 0.12,
+            scrollTrigger: { trigger: el, start: "top 70%", end: "bottom top", toggleActions: "play none none reverse" },
+          });
+          gsap.to(el.querySelector(".beat-bg"), {
+            yPercent: -20,
+            ease: "none",
+            scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: 0.6 },
+          });
+        });
+
+        // Horizontal district gallery
+        const track = trackRef.current;
+        const wrap = horizontalRef.current;
+        if (track && wrap && window.innerWidth >= 768) {
+          const distance = track.scrollWidth - window.innerWidth + 32;
+          gsap.to(track, {
+            x: -distance,
+            ease: "none",
+            scrollTrigger: {
+              trigger: wrap,
+              start: "top top",
+              end: () => `+=${distance}`,
+              pin: true,
+              scrub: 0.6,
+              invalidateOnRefresh: true,
+              anticipatePin: 1,
+            },
+          });
+        }
+
+        // Numbers count up
+        gsap.utils.toArray<HTMLElement>(".count-num").forEach((el) => {
+          const target = Number(el.dataset.target || "0");
+          const obj = { v: 0 };
+          gsap.to(obj, {
+            v: target,
+            duration: 1.4,
+            ease: "power2.out",
+            scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" },
+            onUpdate: () => { el.textContent = Math.round(obj.v).toLocaleString(); },
+          });
+        });
+      }, rootRef);
+
+      cleanup = () => { ctx.revert(); ScrollTrigger.getAll().forEach((t) => t.kill()); };
+    })();
+
+    return () => { cancelled = true; cleanup?.(); };
+  }, []);
+
+  return (
+    <div ref={rootRef} className="scrollstory relative">
+      {/* Story beats */}
+      {BEATS.map((b, i) => (
+        <section key={i} className={`story-beat relative min-h-[85vh] flex items-center justify-center overflow-hidden px-6 ${b.finale ? "finale-beat" : ""}`}>
+          <div className="beat-bg absolute inset-0 -z-10" aria-hidden>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/[0.04] to-transparent" />
+            <div className="absolute inset-0 opacity-30" style={{
+              backgroundImage: "radial-gradient(rgba(255,255,255,0.25) 1px, transparent 1px)",
+              backgroundSize: "3px 3px",
+            }} />
+          </div>
+          <div className="relative max-w-4xl text-center">
+            <div className="stencil text-[10px] text-cyan-300/70 mb-6">BEAT · 0{i + 1} / 04</div>
+            <h2 className="beat-line text-4xl sm:text-6xl md:text-7xl font-black leading-[0.95] tracking-tight text-white"
+                style={{ fontFamily: '"Bebas Neue", "Space Grotesk", sans-serif' }}>
+              {highlight(b.headline)}
+            </h2>
+            <p className="beat-line mt-6 text-base sm:text-lg text-white/60 max-w-xl mx-auto">{b.sub}</p>
+            {b.finale && (
+              <div className="beat-line mt-10 grid grid-cols-3 gap-4 max-w-xl mx-auto">
+                <Stat label="CASES" value={128} />
+                <Stat label="VERIFIED" value={4212} />
+                <Stat label="PILOTS" value={37} />
+              </div>
+            )}
+          </div>
+        </section>
+      ))}
+
+      {/* Horizontal district gallery */}
+      <div ref={horizontalRef} className="relative hidden md:block overflow-hidden">
+        <div className="absolute top-8 left-1/2 -translate-x-1/2 stencil text-[10px] text-cyan-300/70 z-10">
+          THE DISTRICTS · SCROLL →
+        </div>
+        <div ref={trackRef} className="flex gap-6 pl-8 pr-8 h-screen items-center will-change-transform">
+          {DISTRICTS.map((d) => (
+            <div key={d.key} className="relative shrink-0 w-[78vw] max-w-[720px] aspect-[4/5] rounded-sm overflow-hidden border border-white/10"
+                 style={{ boxShadow: `0 30px 80px -20px rgba(${d.glow},0.35)` }}>
+              <img src={d.art} alt="" loading="lazy" width={1536} height={1024}
+                   className="absolute inset-0 h-full w-full object-cover kenburns" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+              <div className="absolute inset-0 opacity-20 mix-blend-overlay" style={{
+                backgroundImage: "radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px)", backgroundSize: "3px 3px",
+              }} />
+              <div className="absolute bottom-0 left-0 right-0 p-8">
+                <div className="stencil text-[10px] mb-2" style={{ color: `rgb(${d.glow})` }}>{d.tag}</div>
+                <h3 className="text-5xl font-black text-white tracking-tight" style={{ fontFamily: '"Bebas Neue", sans-serif', textShadow: `0 0 24px rgba(${d.glow},0.45)` }}>
+                  {d.label}
+                </h3>
+              </div>
+              <div className="absolute top-4 right-4 stencil text-[9px] text-white/50 border border-white/20 px-2 py-1">
+                DIST · 0{DISTRICTS.indexOf(d) + 1}
+              </div>
+            </div>
+          ))}
+          <div className="shrink-0 w-8" />
+        </div>
+      </div>
+
+      {/* Mobile district stack */}
+      <div className="md:hidden px-4 py-12 space-y-4">
+        <div className="stencil text-[10px] text-cyan-300/70 text-center">THE DISTRICTS</div>
+        {DISTRICTS.map((d) => (
+          <div key={d.key} className="relative aspect-[16/10] overflow-hidden rounded-sm border border-white/10">
+            <img src={d.art} alt="" loading="lazy" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-4">
+              <div className="stencil text-[9px]" style={{ color: `rgb(${d.glow})` }}>{d.tag}</div>
+              <h3 className="text-3xl font-black text-white" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>{d.label}</h3>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="border border-white/10 bg-white/[0.03] p-3">
+      <div className="count-num text-3xl font-black text-cyan-300 tabular-nums" data-target={value} style={{ fontFamily: '"Bebas Neue", sans-serif' }}>0</div>
+      <div className="stencil text-[9px] text-white/50 mt-1">{label}</div>
+    </div>
+  );
+}
+
+function highlight(text: string) {
+  // Wrap key words with treatments
+  const map: Record<string, string> = {
+    trust: "word-glow",
+    fake: "word-glitch",
+    fakes: "word-glitch",
+    verify: "word-underline",
+    verifying: "word-underline",
+    MILVERSE: "word-glow",
+  };
+  return text.split(/(\s+)/).map((tok, i) => {
+    const clean = tok.replace(/[^a-zA-Z]/g, "");
+    const cls = map[clean.toLowerCase()] || map[clean];
+    if (cls) return <span key={i} className={cls}>{tok}</span>;
+    return <span key={i}>{tok}</span>;
+  });
+}
