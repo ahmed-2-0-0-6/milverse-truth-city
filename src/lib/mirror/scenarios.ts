@@ -28,6 +28,8 @@ export type ArtifactKind = "pause" | "robotic" | "glitch" | "cut";
 
 export interface Scenario {
   id: string;
+  /** 6-char share code for citizen-designed cases (opt-in). */
+  shareCode?: string;
   title: string;
   teaser: string;
   channel: "text";
