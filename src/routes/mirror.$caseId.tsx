@@ -214,44 +214,67 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
     const reply = respond(scenario, next, text);
     next.internalNotes.push(reply.internalNote);
 
-    // Try AI for a more natural reply — fall back to deterministic on failure.
+    // Try AI (with one silent retry + in-fiction cover) — fall back to deterministic on repeated failure.
     let replyText = reply.text;
     if (!reply.voice && reply.intent !== "left") {
-      try {
-        const fact = reply.factId ? scenario.facts.find((f) => f.id === reply.factId) : undefined;
-        const history = messages
-          .filter((m) => m.role !== "system")
-          .map((m) => ({ role: m.role as "player" | "contact", text: m.text }));
-        const ai = await aiReply({
-          data: {
-            scenarioTitle: scenario.title,
-            tier: scenario.tier,
-            truth: scenario.truth,
-            claimedIdentity: scenario.claimedIdentity,
-            personaVoice: scenario.persona.voice,
-            agenda: scenario.agenda,
-            contactClaim: scenario.dossier.contactClaim,
-            knownFacts: scenario.dossier.knownFacts,
-            publicFacts: scenario.dossier.publicFacts,
-            factTruth: fact?.truth ?? null,
-            factKnownToImposter: fact ? !!fact.isKnownToImposter : null,
-            isDeflection: reply.intent === "deflection",
-            isContradiction: reply.intent === "contradiction",
-            isPush: reply.intent === "push",
-            isUrgency: reply.intent === "escalation",
-            meter: reply.meter,
-            meterType: reply.meterType,
-            turnCount: next.turnCount,
-            history,
-            playerMessage: text,
-            fallback: reply.text,
-          },
-        });
-        if (ai?.text) replyText = ai.text;
-      } catch (e) {
-        console.error("[mirror] ai reply failed, using fallback:", e);
+      const fact = reply.factId ? scenario.facts.find((f) => f.id === reply.factId) : undefined;
+      const history = messages
+        .filter((m) => m.role !== "system")
+        .map((m) => ({ role: m.role as "player" | "contact", text: m.text }));
+      const aiPayload = {
+        scenarioTitle: scenario.title,
+        tier: scenario.tier,
+        truth: scenario.truth,
+        claimedIdentity: scenario.claimedIdentity,
+        personaVoice: scenario.persona.voice,
+        agenda: scenario.agenda,
+        contactClaim: scenario.dossier.contactClaim,
+        knownFacts: scenario.dossier.knownFacts,
+        publicFacts: scenario.dossier.publicFacts,
+        factTruth: fact?.truth ?? null,
+        factKnownToImposter: fact ? !!fact.isKnownToImposter : null,
+        isDeflection: reply.intent === "deflection",
+        isContradiction: reply.intent === "contradiction",
+        isPush: reply.intent === "push",
+        isUrgency: reply.intent === "escalation",
+        meter: reply.meter,
+        meterType: reply.meterType,
+        turnCount: next.turnCount,
+        history,
+        playerMessage: text,
+        fallback: reply.text,
+      };
+      let ok = false;
+      for (let attempt = 0; attempt < 2 && !ok; attempt++) {
+        try {
+          const ai = await aiReply({ data: aiPayload });
+          if (ai?.text && ai.source === "ai") {
+            replyText = ai.text;
+            aiFailCount.current = 0;
+            ok = true;
+          } else if (ai?.text) {
+            // gateway fell back — treat as failure for retry accounting
+            replyText = ai.text;
+            ok = true;
+          }
+        } catch (e) {
+          console.error("[mirror] ai reply attempt failed:", attempt, e);
+          if (attempt === 0) {
+            // In-fiction cover message: send a small placeholder before retry
+            setMessages((prev) => [
+              ...prev,
+              { role: "contact", kind: "text", text: "signal issue, one sec", ts: Date.now() },
+            ]);
+            await new Promise((r) => setTimeout(r, 800));
+          }
+        }
+      }
+      if (!ok) {
+        aiFailCount.current += 1;
+        if (aiFailCount.current >= 3) setAiDown(true);
       }
     }
+
 
     const contactMsg: Message = {
       role: "contact",
