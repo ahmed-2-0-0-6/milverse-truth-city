@@ -1148,7 +1148,19 @@ function Debrief({ scenario }: { scenario: Scenario }) {
   );
 }
 
+function StarAxis({ label, value }: { label: string; value: number }) {
+  const filled = value >= 1 ? "★" : value >= 0.5 ? "⯪" : "☆";
+  const tone = value >= 1 ? "text-primary" : value >= 0.5 ? "text-caution" : "text-muted-foreground/40";
+  return (
+    <div className="rounded-md border border-border bg-background/50 p-3 text-center">
+      <div className={`text-2xl ${tone}`}>{filled}</div>
+      <div className="mt-1 font-mono text-[10px] tracking-widest text-muted-foreground">{label}</div>
+    </div>
+  );
+}
+
 function ProbeStat({ n, label, tone }: { n: number; label: string; tone: "good" | "warn" | "bad" }) {
+
   const c = tone === "good" ? "text-primary border-primary/40 bg-primary/10"
     : tone === "warn" ? "text-caution border-caution/40 bg-caution/10"
     : "text-destructive border-destructive/40 bg-destructive/10";
