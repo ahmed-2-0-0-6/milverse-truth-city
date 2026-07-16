@@ -183,9 +183,18 @@ function Studio() {
     setError(null);
     const s = buildScenario(draft);
     const code = (s as Scenario & { shareCode: string }).shareCode;
+
+    // Tag with the designer's current noir rank at publish time.
+    const p = loadProfile();
+    const manual = loadUnlocked().size;
+    const currentRank = rankFromXp(computeXp(p, manual, p.publishedCount ?? 0)).current;
+    s.designerRank = currentRank.name;
+
     saveCitizenCase(s);
     try {
       const res = await publishFn({ data: { shareCode: code, scenario: s as unknown as Record<string, unknown>, deviceId: getDeviceId(), lane } as never }) as { lane: "private" | "community"; aiChecked: boolean };
+      // Successful publish → increment XP-layer counter (feeds ranks + prestige).
+      incrementPublishedCount();
       if (res.lane === "community") {
         alert(`Submitted to the Community Library — queued for human review.\n\nShare code (playable now for you & anyone you send it to): ${code}\n\nAI safety check: ${res.aiChecked ? "passed ✓" : "unavailable — will be reviewed manually"}`);
       } else {
