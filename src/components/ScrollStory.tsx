@@ -251,17 +251,37 @@ export function ScrollStory() {
       {/* Mobile district stack */}
       <div className="md:hidden px-4 py-12 space-y-4">
         <div className="stencil text-[10px] text-cyan-300/70 text-center">THE DISTRICTS</div>
-        {DISTRICTS.map((d) => (
-          <div key={d.key} className="relative aspect-[16/10] overflow-hidden rounded-sm border border-white/10">
-            <img src={d.art} alt="" loading="lazy" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover" />
-            <DistrictLiveFX district={d.key as DistrictKey} intensity="soft" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-              <div className="stencil text-[9px]" style={{ color: `rgb(${d.glow})` }}>{d.tag}</div>
-              <h3 className="text-3xl font-black text-white" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>{d.label}</h3>
-            </div>
-          </div>
-        ))}
+        {DISTRICTS.map((d) => {
+          const isSubmerging = submerging === d.key;
+          return (
+            <button
+              key={d.key}
+              type="button"
+              onClick={() => submerge(d.href, d.key)}
+              className={`district-card block w-full relative aspect-[16/10] overflow-hidden rounded-sm border border-white/10 text-left ${isSubmerging ? "submerging" : ""}`}
+              style={{ ["--glow" as string]: d.glow }}
+            >
+              {d.video ? (
+                <video src={d.video} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" />
+              ) : (
+                <img src={d.art} alt="" loading="lazy" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover" />
+              )}
+              <DistrictLiveFX district={d.key as DistrictKey} intensity="soft" />
+              <div className="absolute inset-0 pointer-events-none scanlines-live opacity-25" aria-hidden />
+              <div className="absolute inset-0 pointer-events-none neon-flicker-edge"
+                   style={{ boxShadow: `inset 0 0 60px rgba(${d.glow},0.35)` }} aria-hidden />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <div className="stencil text-[9px]" style={{ color: `rgb(${d.glow})` }}>{d.tag}</div>
+                <h3 className="text-3xl font-black text-white glitch-flicker" style={{ fontFamily: '"Bebas Neue", sans-serif', textShadow: `0 0 18px rgba(${d.glow},0.5)` }}>{d.label}</h3>
+              </div>
+              {isSubmerging && (
+                <div className="absolute inset-0 pointer-events-none submerge-flash"
+                     style={{ background: `radial-gradient(circle at 50% 50%, rgba(${d.glow},0.8), rgba(0,0,0,0.95) 70%)` }} />
+              )}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
