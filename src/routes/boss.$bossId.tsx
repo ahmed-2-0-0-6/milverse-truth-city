@@ -175,9 +175,10 @@ function BossPlay() {
     }
 
     return (
-      <div className="min-h-screen bg-black text-white">
+      <div className="min-h-screen bg-black text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-40 pointer-events-none"><DistrictLiveFX district={fxDistrict} intensity="soft" /></div>
         <TopBar />
-        <div className="max-w-2xl mx-auto p-4">
+        <div className="max-w-2xl mx-auto p-4 relative">
           <div className="flex items-center justify-between mb-3 text-xs">
             <div className="flex items-center gap-2 text-red-400 tracking-[0.3em]">
               <Skull className="w-3 h-3" /> {boss.codename}
