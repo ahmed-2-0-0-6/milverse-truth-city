@@ -43,7 +43,7 @@ export function DailyBeacon({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
       <Link
-        to="/drop"
+        to="/paper"
         className="inline-flex items-center gap-2 rounded-sm border border-primary/60 bg-primary/10 px-3 py-1.5 stencil text-[10px] text-primary hover:bg-primary/20 transition"
         title="Today's Forward"
       >
@@ -59,7 +59,7 @@ export function DailyBeacon({ compact = false }: { compact?: boolean }) {
 
   return (
     <Link
-      to="/drop"
+      to="/paper"
       className="group relative block overflow-hidden rounded-sm border border-primary/60 bg-black/40 backdrop-blur px-5 py-4 hover:border-primary transition"
       style={{ boxShadow: "0 0 40px oklch(0.82 0.16 85 / 0.25)" }}
     >
