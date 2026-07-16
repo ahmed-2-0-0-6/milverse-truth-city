@@ -17,6 +17,7 @@ import { AtmosphereLayer } from "@/components/AtmosphereLayer";
 import { GlowCursor } from "@/components/GlowCursor";
 import { RouteWipe } from "@/components/RouteWipe";
 import { RankUpBeat } from "@/components/RankUpBeat";
+import { installTelemetry, track } from "@/lib/telemetry";
 
 function NotFoundComponent() {
   return (
