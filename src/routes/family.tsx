@@ -204,6 +204,20 @@ function FamilyPage() {
               </ul>
             </div>
 
+            {tacticsDisplay.length > 0 && (
+              <div className="mt-6">
+                <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-2">TACTICS MASTERED · FIELD MANUAL</div>
+                <ul className="flex flex-wrap gap-2">
+                  {tacticsDisplay.map((t) => (
+                    <li key={t} className="rounded-md border border-primary/30 bg-primary/5 px-2.5 py-1 text-xs text-primary">
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+
             <p className="mt-6 text-xs text-muted-foreground italic border-t border-border pt-4">
               What you see: lesson count, skills mastered, calibration trend, license status.<br />
               What you don't: message content, conversations, per-answer detail. By design.
