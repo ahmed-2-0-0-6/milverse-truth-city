@@ -9,6 +9,7 @@ import { BootScreen } from "@/components/BootScreen";
 import { HeroType } from "@/components/HeroType";
 import { ScrollStory } from "@/components/ScrollStory";
 import { Marquee } from "@/components/Marquee";
+import { DailyBeacon } from "@/components/DailyBeacon";
 import { useVisualMode } from "@/lib/visual-quality";
 
 export const Route = createFileRoute("/")({
