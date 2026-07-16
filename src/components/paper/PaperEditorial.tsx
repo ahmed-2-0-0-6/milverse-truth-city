@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import type { EditionEditorial } from "@/lib/paper/types";
 import { generateHandlerLine } from "@/lib/handler.functions";
-import { readHandlerCache, writeHandlerCache } from "@/lib/handler/cache";
+import { readCache, writeCache, fingerprint } from "@/lib/handler/cache";
 import { loadProfile } from "@/lib/mirror/profile";
 
 export function PaperEditorial({ editorial, editionNumber }: { editorial: EditionEditorial; editionNumber: number }) {
@@ -11,14 +11,15 @@ export function PaperEditorial({ editorial, editionNumber }: { editorial: Editio
   const genFn = useServerFn(generateHandlerLine);
 
   useEffect(() => {
-    const surface = `paper-editorial-${editionNumber}`;
-    const cached = readHandlerCache(surface);
-    if (cached) { setLine(cached); return; }
+    const surface = "psych-eval" as const; // reuse existing surface enum for the editorial slot
     const p = loadProfile();
+    const hash = fingerprint({ editionNumber, cp: p.casesPlayed, ms: p.missedScams, fa: p.falseAlarms });
+    const cached = readCache(surface, hash);
+    if (cached) { setLine(cached.text); return; }
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), 2500);
     genFn({ data: {
-      surface: "editorial",
+      surface,
       profileSummary: {
         casesPlayed: p.casesPlayed,
         correctVerdicts: p.correctVerdicts,
@@ -31,7 +32,7 @@ export function PaperEditorial({ editorial, editionNumber }: { editorial: Editio
     } as never })
       .then((r) => {
         const text = (r as { line?: string })?.line ?? editorial.fallback;
-        writeHandlerCache(surface, text);
+        writeCache(surface, hash, text, "ai");
         setLine(text);
       })
       .catch(() => {})

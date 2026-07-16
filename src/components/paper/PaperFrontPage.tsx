@@ -99,7 +99,7 @@ function PlayFlow({ editionNumber, editionDate, caseId, truth, probes, onCommit 
     });
     if (!res) return;
     void logInt({ data: { number: editionNumber, section: "lead", correct: res.correct, deviceId: getDeviceId() } }).catch(() => {});
-    track("case_verdict_locked", { case_id: caseId, correct: res.correct });
+    track("case_verdict_locked", { case_id: caseId, payload: { correct: res.correct } });
     setStage("reveal");
     onCommit();
   }
