@@ -108,9 +108,12 @@ function CityMap() {
             <div className="stencil text-[10px] text-cyan-300">// ENTER THE CITY</div>
             <div className="h-px flex-1 bg-cyan-400/20" />
           </div>
-          <h2 className="text-3xl sm:text-5xl font-black text-white leading-none tracking-tight" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
-            Drag the city. Zoom the quarters. Clear the stations.
-          </h2>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <h2 className="text-3xl sm:text-5xl font-black text-white leading-none tracking-tight" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
+              Drag the city. Zoom the quarters. Clear the stations.
+            </h2>
+            <DailyBeacon compact />
+          </div>
         </div>
 
         <div className="mx-auto max-w-6xl mt-6 relative">
