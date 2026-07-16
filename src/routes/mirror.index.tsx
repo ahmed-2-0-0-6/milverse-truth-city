@@ -10,6 +10,7 @@ import { RecommendedStrip } from "@/components/RecommendedStrip";
 import { DistrictIntro } from "@/components/DistrictIntro";
 import mirrorArt from "@/assets/district-mirror.jpg";
 import mirrorVideo from "@/assets/mirror.mp4.asset.json";
+import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 
 export const Route = createFileRoute("/mirror/")({
   head: () => ({
@@ -30,6 +31,7 @@ const TIER_NAMES: Record<TierId, string> = {
 };
 
 function CaseFiles() {
+  const gate = useJuniorGate("The Mirror");
   const navigate = useNavigate();
   const [profile, setProfile] = useState<TrustProfile | null>(null);
   const [citizen, setCitizen] = useState<Scenario[]>([]);
