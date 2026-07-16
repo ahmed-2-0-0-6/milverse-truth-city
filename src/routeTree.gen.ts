@@ -28,10 +28,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as MirrorIndexRouteImport } from './routes/mirror.index'
 import { Route as ManualIndexRouteImport } from './routes/manual.index'
 import { Route as FeedIndexRouteImport } from './routes/feed.index'
+import { Route as BossIndexRouteImport } from './routes/boss.index'
 import { Route as MirrorCaseIdRouteImport } from './routes/mirror.$caseId'
 import { Route as ManualTakeItOutsideRouteImport } from './routes/manual.take-it-outside'
 import { Route as ManualEntryIdRouteImport } from './routes/manual.$entryId'
 import { Route as FeedCaseIdRouteImport } from './routes/feed.$caseId'
+import { Route as BossBossIdRouteImport } from './routes/boss.$bossId'
 import { Route as ArchiveSubmitRouteImport } from './routes/archive.submit'
 import { Route as ApiPublicTelemetryRouteImport } from './routes/api/public/telemetry'
 
@@ -130,6 +132,11 @@ const FeedIndexRoute = FeedIndexRouteImport.update({
   path: '/feed/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BossIndexRoute = BossIndexRouteImport.update({
+  id: '/boss/',
+  path: '/boss/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MirrorCaseIdRoute = MirrorCaseIdRouteImport.update({
   id: '/mirror/$caseId',
   path: '/mirror/$caseId',
@@ -148,6 +155,11 @@ const ManualEntryIdRoute = ManualEntryIdRouteImport.update({
 const FeedCaseIdRoute = FeedCaseIdRouteImport.update({
   id: '/feed/$caseId',
   path: '/feed/$caseId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BossBossIdRoute = BossBossIdRouteImport.update({
+  id: '/boss/$bossId',
+  path: '/boss/$bossId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArchiveSubmitRoute = ArchiveSubmitRouteImport.update({
@@ -179,10 +191,12 @@ export interface FileRoutesByFullPath {
   '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
   '/archive/submit': typeof ArchiveSubmitRoute
+  '/boss/$bossId': typeof BossBossIdRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
   '/manual/$entryId': typeof ManualEntryIdRoute
   '/manual/take-it-outside': typeof ManualTakeItOutsideRoute
   '/mirror/$caseId': typeof MirrorCaseIdRoute
+  '/boss/': typeof BossIndexRoute
   '/feed/': typeof FeedIndexRoute
   '/manual/': typeof ManualIndexRoute
   '/mirror/': typeof MirrorIndexRoute
@@ -206,10 +220,12 @@ export interface FileRoutesByTo {
   '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
   '/archive/submit': typeof ArchiveSubmitRoute
+  '/boss/$bossId': typeof BossBossIdRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
   '/manual/$entryId': typeof ManualEntryIdRoute
   '/manual/take-it-outside': typeof ManualTakeItOutsideRoute
   '/mirror/$caseId': typeof MirrorCaseIdRoute
+  '/boss': typeof BossIndexRoute
   '/feed': typeof FeedIndexRoute
   '/manual': typeof ManualIndexRoute
   '/mirror': typeof MirrorIndexRoute
@@ -234,10 +250,12 @@ export interface FileRoutesById {
   '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
   '/archive/submit': typeof ArchiveSubmitRoute
+  '/boss/$bossId': typeof BossBossIdRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
   '/manual/$entryId': typeof ManualEntryIdRoute
   '/manual/take-it-outside': typeof ManualTakeItOutsideRoute
   '/mirror/$caseId': typeof MirrorCaseIdRoute
+  '/boss/': typeof BossIndexRoute
   '/feed/': typeof FeedIndexRoute
   '/manual/': typeof ManualIndexRoute
   '/mirror/': typeof MirrorIndexRoute
@@ -263,10 +281,12 @@ export interface FileRouteTypes {
     | '/review'
     | '/studio'
     | '/archive/submit'
+    | '/boss/$bossId'
     | '/feed/$caseId'
     | '/manual/$entryId'
     | '/manual/take-it-outside'
     | '/mirror/$caseId'
+    | '/boss/'
     | '/feed/'
     | '/manual/'
     | '/mirror/'
@@ -290,10 +310,12 @@ export interface FileRouteTypes {
     | '/review'
     | '/studio'
     | '/archive/submit'
+    | '/boss/$bossId'
     | '/feed/$caseId'
     | '/manual/$entryId'
     | '/manual/take-it-outside'
     | '/mirror/$caseId'
+    | '/boss'
     | '/feed'
     | '/manual'
     | '/mirror'
@@ -317,10 +339,12 @@ export interface FileRouteTypes {
     | '/review'
     | '/studio'
     | '/archive/submit'
+    | '/boss/$bossId'
     | '/feed/$caseId'
     | '/manual/$entryId'
     | '/manual/take-it-outside'
     | '/mirror/$caseId'
+    | '/boss/'
     | '/feed/'
     | '/manual/'
     | '/mirror/'
@@ -344,10 +368,12 @@ export interface RootRouteChildren {
   QuickTourRoute: typeof QuickTourRoute
   ReviewRoute: typeof ReviewRoute
   StudioRoute: typeof StudioRoute
+  BossBossIdRoute: typeof BossBossIdRoute
   FeedCaseIdRoute: typeof FeedCaseIdRoute
   ManualEntryIdRoute: typeof ManualEntryIdRoute
   ManualTakeItOutsideRoute: typeof ManualTakeItOutsideRoute
   MirrorCaseIdRoute: typeof MirrorCaseIdRoute
+  BossIndexRoute: typeof BossIndexRoute
   FeedIndexRoute: typeof FeedIndexRoute
   ManualIndexRoute: typeof ManualIndexRoute
   MirrorIndexRoute: typeof MirrorIndexRoute
@@ -489,6 +515,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/boss/': {
+      id: '/boss/'
+      path: '/boss'
+      fullPath: '/boss/'
+      preLoaderRoute: typeof BossIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mirror/$caseId': {
       id: '/mirror/$caseId'
       path: '/mirror/$caseId'
@@ -515,6 +548,13 @@ declare module '@tanstack/react-router' {
       path: '/feed/$caseId'
       fullPath: '/feed/$caseId'
       preLoaderRoute: typeof FeedCaseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/boss/$bossId': {
+      id: '/boss/$bossId'
+      path: '/boss/$bossId'
+      fullPath: '/boss/$bossId'
+      preLoaderRoute: typeof BossBossIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/archive/submit': {
@@ -562,10 +602,12 @@ const rootRouteChildren: RootRouteChildren = {
   QuickTourRoute: QuickTourRoute,
   ReviewRoute: ReviewRoute,
   StudioRoute: StudioRoute,
+  BossBossIdRoute: BossBossIdRoute,
   FeedCaseIdRoute: FeedCaseIdRoute,
   ManualEntryIdRoute: ManualEntryIdRoute,
   ManualTakeItOutsideRoute: ManualTakeItOutsideRoute,
   MirrorCaseIdRoute: MirrorCaseIdRoute,
+  BossIndexRoute: BossIndexRoute,
   FeedIndexRoute: FeedIndexRoute,
   ManualIndexRoute: ManualIndexRoute,
   MirrorIndexRoute: MirrorIndexRoute,
