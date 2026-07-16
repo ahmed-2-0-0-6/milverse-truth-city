@@ -22,7 +22,10 @@ import { detectAmount, type SavedContact } from "@/lib/chat/contacts";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 
 export const Route = createFileRoute("/boss/$bossId")({
-  component: BossPlay,
+  component: function BossPlayGuarded() {
+    const gate = useJuniorGate("Boss Protocol");
+    return gate ?? <BossPlay />;
+  },
 });
 
 interface LogItem {

@@ -28,7 +28,10 @@ export const Route = createFileRoute("/feed/$caseId")({
     if (!s) throw notFound();
     return { scenario: s };
   },
-  component: FeedPlay,
+  component: function FeedCaseGuarded() {
+    const gate = useJuniorGate("The Feed");
+    return gate ?? <FeedPlay />;
+  },
 });
 
 type Phase = "brief" | "sim" | "verdict" | "reveal" | "debrief";

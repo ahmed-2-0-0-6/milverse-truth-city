@@ -14,7 +14,10 @@ export const Route = createFileRoute("/feed/")({
       { name: "description", content: "Verify claims, not just people. Fight viral lies without breaking your relationships." },
     ],
   }),
-  component: FeedIndex,
+  component: function FeedIndexGuarded() {
+    const gate = useJuniorGate("The Feed");
+    return gate ?? <FeedIndex />;
+  },
 });
 
 const TIER_NAMES: Record<1 | 2 | 3, string> = {

@@ -34,7 +34,10 @@ export const Route = createFileRoute("/mirror/$caseId")({
     if (!s) throw notFound();
     return { scenario: s };
   },
-  component: CasePlay,
+  component: function MirrorCaseGuarded() {
+    const gate = useJuniorGate("The Mirror");
+    return gate ?? <CasePlay />;
+  },
 });
 
 type Phase = "dossier" | "sim" | "verdict" | "reveal" | "debrief";

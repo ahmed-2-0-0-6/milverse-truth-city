@@ -19,7 +19,10 @@ export const Route = createFileRoute("/mirror/")({
       { name: "description", content: "Live conversations. Real or imposter? You decide." },
     ],
   }),
-  component: CaseFiles,
+  component: function MirrorIndexGuarded() {
+    const gate = useJuniorGate("The Mirror");
+    return gate ?? <CaseFiles />;
+  },
 });
 
 const TIER_NAMES: Record<TierId, string> = {

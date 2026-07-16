@@ -16,7 +16,10 @@ export const Route = createFileRoute("/boss/")({
       { property: "og:description", content: "Fact-checks will not save you. Protocol will." },
     ],
   }),
-  component: BossLobby,
+  component: function BossIndexGuarded() {
+    const gate = useJuniorGate("Boss Protocol");
+    return gate ?? <BossLobby />;
+  },
 });
 
 function BossLobby() {
