@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Skull, Phone, Users, KeyRound, Hand, ShieldCheck, ShieldOff, HandCoins, Check, X, Award, Home } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
+import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
 import { getBoss } from "@/lib/boss/scenarios";
 import type { BossVerdict, ProtocolMove } from "@/lib/boss/types";
 import {
