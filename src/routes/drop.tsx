@@ -21,6 +21,7 @@ import {
 import { commitDailyPlay, readDailyStatus, stakeBounds, localSharpness } from "@/lib/daily/profile";
 import { logDailyPlay, fetchDailySplit, fetchSharpestWatch, fetchMostDeviousDesigner } from "@/lib/daily.functions";
 import { getDeviceId, logPilotEntry, getActiveGroup } from "@/lib/pilot";
+import { track, bucketStake, bucketStreak } from "@/lib/telemetry";
 import type { FeedScenario, FeedToolKind } from "@/lib/feed/scenarios";
 import { Flame, Radio, Coins, Search, Trophy, ChevronRight } from "lucide-react";
 
