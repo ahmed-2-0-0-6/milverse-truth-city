@@ -412,7 +412,7 @@ export const runAnalysisBrief = createServerFn({ method: "POST" })
       .gte("ts", sinceISO)
       .order("ts", { ascending: false })
       .limit(20000);
-    const sum = summarize(rows ?? []);
+    const sum = summarize((rows ?? []) as unknown as TmRow[]);
 
     const fallback = deterministicBrief(sum);
     let brief: Brief = fallback;
