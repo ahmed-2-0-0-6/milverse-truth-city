@@ -220,6 +220,16 @@ function Studio() {
 
   return (
     <div className="min-h-screen grain">
+      <DistrictIntro
+        id="studio"
+        chapter="CHAPTER 05"
+        title="THE STUDIO"
+        art={studioArt}
+        lines={[
+          "Enough training. Someone's cousin is about to answer a message like this next week.",
+          "Write the case they'll rehearse against. The city's next cases are written by players like you.",
+        ]}
+      />
       <TopBar />
       <main className="mx-auto max-w-2xl px-4 py-10">
         <Link to="/" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">
@@ -231,7 +241,7 @@ function Studio() {
           </div>
           <h1 className="mt-2 text-3xl font-semibold">Design a case</h1>
           <p className="mt-2 text-muted-foreground">
-            5 steps. LEARN → PLAY → DESIGN. Publish and share with friends.
+            The city's next cases are written by players like you. 5 steps. LEARN → PLAY → DESIGN. Publish and share.
           </p>
           <div className="mt-4 flex gap-1">
             {[1, 2, 3, 4, 5].map((n) => (
