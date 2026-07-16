@@ -46,11 +46,10 @@ function DropPage() {
   const yesterday = useMemo(() => yesterdaysDailyCase(), []);
   const [showYesterday, setShowYesterday] = useState(false);
 
-  useEffect(() => {
-    const on = () => setStatus(readDailyStatus());
-    window.addEventListener("milverse:profile", on);
-    return () => window.removeEventListener("milverse:profile", on);
-  }, []);
+  // NOTE: we deliberately do NOT re-read status on `milverse:profile`. The
+  // child PlayFlow calls onDone() itself once the cinematic is finished; if we
+  // synced on every profile ping, committing the play would immediately flip
+  // playedToday → true and unmount the cinematic mid-slam.
 
   const rollover = secondsToNextDrop(new Date(now));
   const hh = String(Math.floor(rollover / 3600)).padStart(2, "0");
