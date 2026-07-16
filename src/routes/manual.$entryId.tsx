@@ -39,6 +39,7 @@ export const Route = createFileRoute("/manual/$entryId")({
 
 function EntryPage() {
   const { entry: e } = Route.useLoaderData() as { entry: ManualEntry };
+  useEffect(() => { track("manual_open", { payload: { entry: e.id } }); }, [e.id]);
   return (
     <div className="min-h-screen grain">
       <TopBar />
