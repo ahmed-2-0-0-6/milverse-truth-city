@@ -8,27 +8,74 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+const SummarySchema = z.object({
+  lean: z.string(),           // e.g. "SOFT TARGET"
+  leanBlurb: z.string(),
+  strength: z.string(),
+  directive: z.string(),
+  weakestTactic: z.string().nullable(),
+  weakestWrong: z.number().int().min(0).max(999),
+  weakestSeen: z.number().int().min(0).max(999),
+  wager: z.string(),          // "OVERCONFIDENT" / "TIMID" / "MEASURED" / "—"
+  dailyStreak: z.number().int().min(0).max(9999),
+  lastPlayCorrect: z.boolean().nullable().optional(),
+  lastPlayStake: z.number().int().min(0).max(9999).optional(),
+  leaderboardPercentile: z.number().min(0).max(100).nullable().optional(),
+  weeklyTrend: z.enum(["steady", "toward-calibrated", "away-from-calibrated"]).nullable().optional(),
+});
+
+const LegacyProfileSummarySchema = z.object({
+  casesPlayed: z.number().int().min(0).max(9999).optional(),
+  correctVerdicts: z.number().int().min(0).max(9999).optional(),
+  missedScams: z.number().int().min(0).max(9999).optional(),
+  falseAlarms: z.number().int().min(0).max(9999).optional(),
+  dailyStreak: z.number().int().min(0).max(9999).optional(),
+  trust: z.number().optional(),
+}).optional();
+
 const InputSchema = z.object({
   surface: z.enum(["reading", "assignment-reaction", "drop-line", "leaderboard-nudge", "psych-eval"]),
   fallback: z.string().min(1).max(600),
   // Compact, non-PII profile summary — the ONLY thing about the player
   // sent to the model. No case content, no verdicts about specific artifacts.
-  summary: z.object({
-    lean: z.string(),           // e.g. "SOFT TARGET"
-    leanBlurb: z.string(),
-    strength: z.string(),
-    directive: z.string(),
-    weakestTactic: z.string().nullable(),
-    weakestWrong: z.number().int().min(0).max(999),
-    weakestSeen: z.number().int().min(0).max(999),
-    wager: z.string(),          // "OVERCONFIDENT" / "TIMID" / "MEASURED" / "—"
-    dailyStreak: z.number().int().min(0).max(9999),
-    lastPlayCorrect: z.boolean().nullable().optional(),
-    lastPlayStake: z.number().int().min(0).max(9999).optional(),
-    leaderboardPercentile: z.number().min(0).max(100).nullable().optional(),
-    weeklyTrend: z.enum(["steady", "toward-calibrated", "away-from-calibrated"]).nullable().optional(),
-  }),
-});
+  summary: SummarySchema.optional(),
+  // Backward-compatible shim for older PaperEditorial clients.
+  profileSummary: LegacyProfileSummarySchema,
+}).transform((input) => ({
+  surface: input.surface,
+  fallback: input.fallback,
+  summary: input.summary ?? legacyToSummary(input.profileSummary),
+}));
+
+function legacyToSummary(profileSummary: z.infer<typeof LegacyProfileSummarySchema>): z.infer<typeof SummarySchema> {
+  const played = profileSummary?.casesPlayed ?? 0;
+  const correct = profileSummary?.correctVerdicts ?? 0;
+  const missed = profileSummary?.missedScams ?? 0;
+  const falseAlarms = profileSummary?.falseAlarms ?? 0;
+  const lean = played < 5
+    ? "ROOKIE"
+    : missed > falseAlarms
+      ? "DRIFTING TRUSTING"
+      : falseAlarms > missed
+        ? "JUMPY"
+        : "CALIBRATED";
+
+  return {
+    lean,
+    leanBlurb: played < 5 ? "File's thin. More reps before a hard read." : `${correct}/${Math.max(played, 1)} calls closed clean.`,
+    strength: correct > 0 ? `You've closed ${correct} calls clean.` : "Instinct's alive. Now we sharpen it.",
+    directive: missed > falseAlarms
+      ? "Slow down before you agree. Probe first."
+      : falseAlarms > missed
+        ? "Prove REAL as hard as you prove FAKE."
+        : "Hold the line. Keep the read calibrated.",
+    weakestTactic: null,
+    weakestWrong: 0,
+    weakestSeen: 0,
+    wager: "—",
+    dailyStreak: profileSummary?.dailyStreak ?? 0,
+  };
+}
 
 /**
  * Voice bible + rails. Compiled per-surface so the model stays terse and

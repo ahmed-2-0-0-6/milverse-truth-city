@@ -5,6 +5,8 @@ import type { EditionEditorial } from "@/lib/paper/types";
 import { generateHandlerLine } from "@/lib/handler.functions";
 import { readCache, writeCache, fingerprint } from "@/lib/handler/cache";
 import { loadProfile } from "@/lib/mirror/profile";
+import { computeReading } from "@/lib/handler/profile";
+import { feedTacticMap } from "@/lib/handler/feedTactics";
 
 export function PaperEditorial({ editorial, editionNumber }: { editorial: EditionEditorial; editionNumber: number }) {
   const [line, setLine] = useState<string>(editorial.fallback);
@@ -13,6 +15,7 @@ export function PaperEditorial({ editorial, editionNumber }: { editorial: Editio
   useEffect(() => {
     const surface = "psych-eval" as const; // reuse existing surface enum for the editorial slot
     const p = loadProfile();
+    const reading = computeReading(p, feedTacticMap());
     const hash = fingerprint({ editionNumber, cp: p.casesPlayed, ms: p.missedScams, fa: p.falseAlarms });
     const cached = readCache(surface, hash);
     if (cached) { setLine(cached.text); return; }
@@ -20,19 +23,22 @@ export function PaperEditorial({ editorial, editionNumber }: { editorial: Editio
     const timer = window.setTimeout(() => controller.abort(), 2500);
     genFn({ data: {
       surface,
-      profileSummary: {
-        casesPlayed: p.casesPlayed,
-        correctVerdicts: p.correctVerdicts,
-        missedScams: p.missedScams,
-        falseAlarms: p.falseAlarms,
+      summary: {
+        lean: reading.lean.label,
+        leanBlurb: reading.lean.blurb,
+        strength: reading.strength,
+        directive: reading.directive,
+        weakestTactic: reading.weakness ? String(reading.weakness.tactic) : null,
+        weakestWrong: reading.weakness?.wrong ?? 0,
+        weakestSeen: reading.weakness?.seen ?? 0,
+        wager: reading.wager.label,
         dailyStreak: p.dailyStreak,
-        trust: p.trust,
       },
       fallback: editorial.fallback,
-    } as never })
+    } })
       .then((r) => {
-        const text = (r as { line?: string })?.line ?? editorial.fallback;
-        writeCache(surface, hash, text, "ai");
+        const text = r.text ?? editorial.fallback;
+        writeCache(surface, hash, text, r.source ?? "fallback");
         setLine(text);
       })
       .catch(() => {})
