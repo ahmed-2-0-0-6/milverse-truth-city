@@ -158,6 +158,10 @@ function ProfilePage() {
           </div>
         </div>
 
+        <HandlersReading />
+
+        <WeeklyEval />
+
         <section className="mt-6">
           <div className="stencil text-[10px] tracking-widest text-muted-foreground mb-2">RANK LADDER</div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
