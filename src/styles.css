@@ -294,6 +294,28 @@
 }
 .fog-drift { animation: fog-drift 22s ease-in-out infinite alternate; }
 
+/* District card animated backgrounds */
+@keyframes dot-drift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 60px 40px; }
+}
+.dot-drift { animation: dot-drift 18s linear infinite; will-change: background-position; }
+
+@keyframes scan-sheen-kf {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  40%  { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+.scan-sheen {
+  background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.14) 50%, rgba(255,255,255,0.06) 55%, transparent 100%);
+  animation: scan-sheen-kf 6s ease-in-out infinite;
+}
+
+@keyframes district-pulse {
+  0%, 100% { opacity: 0.25; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(1.08); }
+}
+
 /* Occasional neon flicker for district titles */
 @keyframes neon-flicker {
   0%, 92%, 100% { opacity: 1; text-shadow: 0 0 24px currentColor, 0 0 6px currentColor; }

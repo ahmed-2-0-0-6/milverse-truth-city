@@ -176,9 +176,13 @@ export function ScrollStory() {
                    className="absolute inset-0 h-full w-full object-cover kenburns" />
               <DistrictLiveFX district={d.key as DistrictKey} />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-              <div className="absolute inset-0 opacity-20 mix-blend-overlay" style={{
+              <div className="absolute inset-0 opacity-20 mix-blend-overlay dot-drift" style={{
                 backgroundImage: "radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px)", backgroundSize: "3px 3px",
               }} />
+              <div className="absolute inset-0 pointer-events-none scan-sheen" aria-hidden />
+              <div className="absolute inset-0 pointer-events-none mix-blend-screen opacity-40"
+                   style={{ background: `radial-gradient(60% 40% at 50% 60%, rgba(${d.glow},0.35), transparent 70%)`, animation: "district-pulse 4.5s ease-in-out infinite" }}
+                   aria-hidden />
               <div className="absolute bottom-0 left-0 right-0 p-8">
                 <div className="stencil text-[10px] mb-2" style={{ color: `rgb(${d.glow})` }}>{d.tag}</div>
                 <h3 className="text-5xl font-black text-white tracking-tight" style={{ fontFamily: '"Bebas Neue", sans-serif', textShadow: `0 0 24px rgba(${d.glow},0.45)` }}>
