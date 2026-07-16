@@ -52,6 +52,7 @@ export const LESSONS: Lesson[] = [
       "Your phone is a doorway. Some knocks are friends, some are strangers pretending.",
       "You don't have to answer every knock.",
       "Rule zero: when you're not sure, ask.",
+      "No adult around right now? Don't reply, don't pay, don't forward. Save it. Show someone later — a parent, teacher, or librarian.",
     ],
     cases: [
       {

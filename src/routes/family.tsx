@@ -2,12 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { TopBar } from "@/components/TopBar";
-import { fetchPilotGroup } from "@/lib/pilot.functions";
+import { registerFamilyCode, regenerateFamilyCode, fetchFamilyProgress, checkFamilyCodeJoin } from "@/lib/family.functions";
 import { LESSONS, TOTAL_LESSONS, type JuniorTactic } from "@/lib/firstPhone/lessons";
 import { loadFirstPhone, joinFamily } from "@/lib/firstPhone/profile";
 import { manualDisplayForTactics } from "@/lib/firstPhone/tacticMap";
 import { JUNIOR_COPY } from "@/lib/firstPhone/copy";
-import { Users, Copy, Check, ShieldCheck } from "lucide-react";
+import { Users, Copy, Check, ShieldCheck, RefreshCw } from "lucide-react";
+
+/** Threshold below which aggregated metrics are suppressed (k-anonymity). */
+const K_ANON = 5;
 
 export const Route = createFileRoute("/family")({
   head: () => ({
@@ -30,7 +33,7 @@ function generateFamilyCode(): string {
   return s;
 }
 
-type CloudEntry = { device_id: string; wing: string; case_id: string; result: string; created_at: string };
+type CloudEntry = { device_id: string; wing: string; case_id: string; result: string };
 
 function FamilyPage() {
   // Hydration-safe: all localStorage reads live in useEffect.
@@ -38,11 +41,16 @@ function FamilyPage() {
   const [kidJoinCode, setKidJoinCode] = useState("");
   const [entries, setEntries] = useState<CloudEntry[]>([]);
   const [copied, setCopied] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
   const [kidState, setKidState] = useState(() => ({
     active: false, kidCityName: "", familyCode: null as string | null,
     lessonsCompleted: [] as number[], licenseIssuedAt: null as number | null, licenseNumber: null as string | null,
   }));
-  const fetchGroup = useServerFn(fetchPilotGroup);
+  const registerFn = useServerFn(registerFamilyCode);
+  const regenerateFn = useServerFn(regenerateFamilyCode);
+  const fetchProgress = useServerFn(fetchFamilyProgress);
+  const joinCheckFn = useServerFn(checkFamilyCodeJoin);
 
   useEffect(() => {
     const saved = localStorage.getItem(CODE_KEY);
@@ -54,29 +62,53 @@ function FamilyPage() {
   }, []);
 
   const refresh = useCallback(async (code: string) => {
+    setErr(null);
     try {
-      const r = await fetchGroup({ data: { groupCode: code } });
+      const r = await fetchProgress({ data: { code } });
       setEntries((r.entries ?? []) as CloudEntry[]);
-    } catch {
+    } catch (e) {
+      setErr((e as Error).message);
       setEntries([]);
     }
-  }, [fetchGroup]);
+  }, [fetchProgress]);
 
   useEffect(() => {
     if (parentCode) refresh(parentCode);
   }, [parentCode, refresh]);
 
-  function createCode() {
-    const c = generateFamilyCode();
-    localStorage.setItem(CODE_KEY, c);
-    setParentCode(c);
+  async function createCode() {
+    setBusy(true); setErr(null);
+    try {
+      const c = generateFamilyCode();
+      await registerFn({ data: { code: c } });
+      localStorage.setItem(CODE_KEY, c);
+      setParentCode(c);
+    } catch (e) { setErr((e as Error).message); }
+    setBusy(false);
   }
 
-  function joinAsKid() {
+  async function regenerate() {
+    if (!parentCode) return;
+    setBusy(true); setErr(null);
+    try {
+      const c = generateFamilyCode();
+      await regenerateFn({ data: { oldCode: parentCode, newCode: c } });
+      localStorage.setItem(CODE_KEY, c);
+      setParentCode(c);
+      setEntries([]);
+    } catch (e) { setErr((e as Error).message); }
+    setBusy(false);
+  }
+
+  async function joinAsKid() {
     const code = kidJoinCode.trim().toUpperCase();
     if (!/^[A-Z0-9]{4,6}$/.test(code)) return;
-    joinFamily(code);
-    setKidJoinCode("");
+    setErr(null);
+    try {
+      await joinCheckFn({ data: { code } });
+      joinFamily(code);
+      setKidJoinCode("");
+    } catch (e) { setErr((e as Error).message); }
   }
 
   // Aggregate: only junior lesson entries count. Case IDs are like junior:L3:xxx.
@@ -126,13 +158,14 @@ function FamilyPage() {
           {!parentCode ? (
             <>
               <p className="mt-2 text-sm text-muted-foreground">Generate a family code, then share it with your kid.</p>
-              <button onClick={createCode} className="mt-3 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
-                Create family code
+              <button onClick={createCode} disabled={busy} className="mt-3 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50">
+                {busy ? "Creating…" : "Create family code"}
               </button>
+              {err && <p className="mt-2 text-xs text-destructive">{err}</p>}
             </>
           ) : (
             <>
-              <div className="mt-3 flex items-center gap-3">
+              <div className="mt-3 flex flex-wrap items-center gap-3">
                 <div className="rounded-md border border-primary/40 bg-primary/5 px-5 py-3 font-mono text-2xl tracking-[0.3em] text-primary">
                   {parentCode}
                 </div>
@@ -146,8 +179,19 @@ function FamilyPage() {
                 <button onClick={() => refresh(parentCode)} className="text-xs text-muted-foreground hover:text-foreground">
                   Refresh
                 </button>
+                <button
+                  onClick={regenerate}
+                  disabled={busy}
+                  className="inline-flex items-center gap-1 rounded-md border border-caution/50 bg-caution/10 px-3 py-2 text-xs text-caution disabled:opacity-50"
+                  title="Generate a new code. The old one immediately stops working."
+                >
+                  <RefreshCw className="h-3 w-3" /> Regenerate
+                </button>
               </div>
-              <p className="mt-2 text-xs text-muted-foreground">Have your kid paste this into the box below on their device.</p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Have your kid paste this into the box below on their device. Regenerating invalidates the old code server-side.
+              </p>
+              {err && <p className="mt-2 text-xs text-destructive">{err}</p>}
             </>
           )}
         </section>
@@ -180,47 +224,62 @@ function FamilyPage() {
         {parentCode && (
           <section className="mt-4 rounded-2xl border-2 border-primary/40 bg-card p-6">
             <div className="font-mono text-[10px] tracking-widest text-primary">DASHBOARD · CODE {parentCode}</div>
-            <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <StatBox label="LESSONS" value={`${lessonList.length} / ${TOTAL_LESSONS}`} />
-              <StatBox label="TACTICS" value={String(tacticsMastered)} />
-              <StatBox label="TREND" value={lessonList.length >= 3 ? "↑ improving" : "warming up"} />
-              <StatBox label="LICENSE" value={licenseIssued ? "ISSUED" : "in progress"} tone={licenseIssued ? "good" : undefined} />
-            </div>
 
-            <div className="mt-6">
-              <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-2">LESSONS COMPLETED</div>
-              <ul className="space-y-1.5">
-                {LESSONS.map((l) => {
-                  const done = lessonList.includes(l.n);
-                  return (
-                    <li key={l.n} className={`flex items-center gap-3 text-sm ${done ? "text-foreground" : "text-muted-foreground"}`}>
-                      <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${done ? "bg-primary text-primary-foreground" : "border border-border"}`}>
-                        {done ? "✓" : l.n}
-                      </span>
-                      <span>{l.title}</span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-
-            {tacticsDisplay.length > 0 && (
-              <div className="mt-6">
-                <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-2">TACTICS MASTERED · FIELD MANUAL</div>
-                <ul className="flex flex-wrap gap-2">
-                  {tacticsDisplay.map((t) => (
-                    <li key={t} className="rounded-md border border-primary/30 bg-primary/5 px-2.5 py-1 text-xs text-primary">
-                      {t}
-                    </li>
-                  ))}
-                </ul>
+            {juniorEntries.length < K_ANON ? (
+              <div className="mt-4 rounded-md border border-caution/40 bg-caution/5 p-4 text-sm">
+                <div className="font-mono text-[10px] tracking-widest text-caution mb-1">NOT ENOUGH DATA YET</div>
+                <p className="text-muted-foreground">
+                  Aggregated metrics are shown when the group is larger (at least {K_ANON} completed entries).
+                  Currently: {juniorEntries.length}.
+                </p>
               </div>
+            ) : (
+              <>
+                <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <StatBox label="LESSONS" value={`${lessonList.length} / ${TOTAL_LESSONS}`} />
+                  <StatBox label="TACTICS" value={String(tacticsMastered)} />
+                  <StatBox label="TREND" value={lessonList.length >= 3 ? "↑ improving" : "warming up"} />
+                  <StatBox label="LICENSE" value={licenseIssued ? "ISSUED" : "in progress"} tone={licenseIssued ? "good" : undefined} />
+                </div>
+
+                <div className="mt-6">
+                  <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-2">LESSONS COMPLETED</div>
+                  <ul className="space-y-1.5">
+                    {LESSONS.map((l) => {
+                      const done = lessonList.includes(l.n);
+                      return (
+                        <li key={l.n} className={`flex items-center gap-3 text-sm ${done ? "text-foreground" : "text-muted-foreground"}`}>
+                          <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${done ? "bg-primary text-primary-foreground" : "border border-border"}`}>
+                            {done ? "✓" : l.n}
+                          </span>
+                          <span>{l.title}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+
+                {tacticsDisplay.length > 0 && (
+                  <div className="mt-6">
+                    <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-2">TACTICS MASTERED · FIELD MANUAL</div>
+                    <ul className="flex flex-wrap gap-2">
+                      {tacticsDisplay.map((t) => (
+                        <li key={t} className="rounded-md border border-primary/30 bg-primary/5 px-2.5 py-1 text-xs text-primary">
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </>
             )}
 
-
             <p className="mt-6 text-xs text-muted-foreground italic border-t border-border pt-4">
-              What you see: lesson count, skills mastered, calibration trend, license status.<br />
+              What you see: lesson count, skills mastered, calibration trend, license status. Day-level activity only — no exact timestamps.<br />
               What you don't: message content, conversations, per-answer detail. By design.
+            </p>
+            <p className="mt-3 text-[11px] italic text-muted-foreground">
+              Certifies completion of a learning pathway. Not a guarantee of online safety — the training continues in real life.
             </p>
           </section>
         )}

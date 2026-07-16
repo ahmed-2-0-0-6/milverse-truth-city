@@ -21,6 +21,9 @@ export function ParentPitch({ onStart }: { onStart: () => void }) {
         <p className="mt-3 text-lg text-muted-foreground max-w-2xl">
           A 10-lesson program that gives kids a phone that <em>feels</em> real inside MILVERSE — scams, forwards, impersonators and all — so their first real phone isn't their first real test.
         </p>
+        <p className="mt-3 text-sm italic text-muted-foreground max-w-2xl">
+          Certifies completion of a learning pathway. Not a guarantee of online safety — the training continues in real life.
+        </p>
       </header>
 
       <div className="rounded-2xl border border-primary/40 bg-primary/5 p-6 flex items-start gap-4">

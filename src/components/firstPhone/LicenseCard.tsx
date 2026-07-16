@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { loadFirstPhone, saveFirstPhone } from "@/lib/firstPhone/profile";
 import { LESSONS } from "@/lib/firstPhone/lessons";
 import { describeTactic } from "@/lib/firstPhone/tacticMap";
@@ -6,12 +6,22 @@ import { Download, Printer } from "lucide-react";
 
 interface Props { onClose?: () => void }
 
+/** Random per-print issue mark. NOT persisted anywhere. Regenerates every mount. */
+function generateIssueMark(): string {
+  const A = "ABCDEFGHJKMNPQRSTVWXYZ";
+  const N = "23456789";
+  const pick = (s: string) => s[Math.floor(Math.random() * s.length)];
+  return `${pick(A)}${pick(A)}-${pick(N)}${pick(N)}${pick(N)}${pick(N)}`;
+}
+
 export function LicenseCard({ onClose }: Props) {
   const state = loadFirstPhone();
   const [name, setName] = useState(state.kidCityName || "");
+  // Per-print mark — regenerates on every mount and every render trigger.
+  const issueMark = useMemo(() => generateIssueMark(), []);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => { render(); }, [name]);
+  useEffect(() => { render(); }, [name, issueMark]);
 
   function render() {
     const c = canvasRef.current;
@@ -66,11 +76,15 @@ export function LicenseCard({ onClose }: Props) {
       const suffix = d?.manualCode ? `  ·  Field Manual ${d.manualCode}` : "";
       ctx.fillText(`L${l.n} · ${l.title}${suffix}`, 72 + col * 540, 432 + row * 28);
     });
-    // Footer
+    // Footer — issue mark is per-print, not stored anywhere.
     const issued = state.licenseIssuedAt ? new Date(state.licenseIssuedAt) : new Date();
     ctx.fillStyle = "#94a3b8"; ctx.font = "500 13px ui-monospace, Menlo, monospace";
-    ctx.fillText(`LICENSE NO. ${state.licenseNumber ?? "PENDING"}`, 72, 688);
+    ctx.fillText(`ISSUE MARK ${issueMark}`, 72, 688);
     ctx.fillText(`ISSUED ${issued.toISOString().slice(0, 10)}`, 72, 710);
+    // Small print — the license disclaimer, on-card.
+    ctx.fillStyle = "#64748b"; ctx.font = "italic 11px ui-sans-serif, system-ui, sans-serif";
+    ctx.fillText("Certifies completion of a learning pathway. Not a guarantee of online", 72, 732);
+    ctx.fillText("safety — the training continues in real life.", 72, 748);
     // Stamp
     ctx.save();
     ctx.translate(W - 200, H - 180);
@@ -125,6 +139,10 @@ export function LicenseCard({ onClose }: Props) {
       <div className="mt-4 overflow-x-auto">
         <canvas ref={canvasRef} className="w-full max-w-full rounded-lg border border-border" style={{ aspectRatio: "1200 / 760" }} />
       </div>
+
+      <p className="mt-3 text-[11px] italic text-muted-foreground print:hidden">
+        Certifies completion of a learning pathway. Not a guarantee of online safety — the training continues in real life.
+      </p>
 
       <div className="mt-4 flex flex-wrap gap-2 print:hidden">
         <button onClick={save} className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">

@@ -43,6 +43,10 @@ export function TrustedAdultChip({ scene, onResolved, className }: Props) {
           <Check className="h-4 w-4" />
           <span className="text-sm font-medium">{JUNIOR_COPY.trustedAdultCelebrate}</span>
         </div>
+        <div className="mt-4 rounded-md border border-caution/30 bg-caution/5 p-3 text-xs">
+          <div className="font-mono text-[10px] tracking-widest text-caution mb-1">NO ADULT AROUND?</div>
+          <p>Don't reply. Don't pay. Don't forward. Save it. Show someone later — a parent, teacher, or librarian.</p>
+        </div>
         <button
           onClick={onResolved}
           className="mt-4 rounded-md bg-primary px-4 py-2 text-primary-foreground text-sm font-medium"

@@ -341,55 +341,68 @@ function AssessmentTab({ passcode }: { passcode: string }) {
             </div>
           )}
 
-          {rollup.meanIntake && rollup.meanExit && (
-            <div className="mt-4 rounded-sm border border-border bg-card p-5">
-              <div className="stencil text-[10px] text-muted-foreground">COHORT MEANS · PAIRED PARTICIPANTS ONLY</div>
-              <div className="mt-3 space-y-3">
-                <PairedBar label="Accuracy (out of 6)" pre={rollup.meanIntake.accuracy} post={rollup.meanExit.accuracy} max={6} higherIsBetter />
-                <PairedBar label="Calibration gap (|value|)" pre={Math.abs(rollup.meanIntake.calibrationGap)} post={Math.abs(rollup.meanExit.calibrationGap)} max={50} higherIsBetter={false} note={`${rollup.meanIntake.calibrationGap} → ${rollup.meanExit.calibrationGap}`} />
-                <PairedBar label="Overconfident errors" pre={rollup.meanIntake.overconfidentErrors} post={rollup.meanExit.overconfidentErrors} max={6} higherIsBetter={false} />
-                <PairedBar label="Missed scams" pre={rollup.meanIntake.missedScams} post={rollup.meanExit.missedScams} max={2} higherIsBetter={false} />
-                <PairedBar label="False alarms" pre={rollup.meanIntake.falseAlarms} post={rollup.meanExit.falseAlarms} max={2} higherIsBetter={false} />
-              </div>
+          {rollup.nPaired < 5 ? (
+            <div className="mt-4 rounded-sm border border-caution/40 bg-caution/5 p-4 text-sm">
+              <div className="stencil text-[10px] text-caution mb-1">NOT ENOUGH DATA YET</div>
+              <p className="text-muted-foreground">
+                Cohort metrics and per-tactic breakdown are shown when the group is larger
+                (at least 5 paired participants). Currently paired: {rollup.nPaired}.
+                Day-level activity only — exact timestamps are not shown.
+              </p>
             </div>
-          )}
-
-          <div className="mt-4 rounded-sm border border-border bg-card p-5">
-            <div className="stencil text-[10px] text-muted-foreground">PER-TACTIC · CORRECT %</div>
-            <div className="mt-3 space-y-2">
-              {rollup.perTactic.map((t) => (
-                <div key={t.pairId} className="flex items-center gap-3 text-sm">
-                  <div className="w-40 truncate">{t.label}</div>
-                  <div className="w-16 text-right font-mono text-muted-foreground">{t.intakeCorrectPct ?? "—"}%</div>
-                  <div className="text-muted-foreground">→</div>
-                  <div className={`w-16 text-right font-mono ${t.exitCorrectPct != null && t.intakeCorrectPct != null && t.exitCorrectPct > t.intakeCorrectPct ? "text-primary" : ""}`}>
-                    {t.exitCorrectPct ?? "—"}%
+          ) : (
+            <>
+              {rollup.meanIntake && rollup.meanExit && (
+                <div className="mt-4 rounded-sm border border-border bg-card p-5">
+                  <div className="stencil text-[10px] text-muted-foreground">COHORT MEANS · PAIRED PARTICIPANTS ONLY</div>
+                  <div className="mt-3 space-y-3">
+                    <PairedBar label="Accuracy (out of 6)" pre={rollup.meanIntake.accuracy} post={rollup.meanExit.accuracy} max={6} higherIsBetter />
+                    <PairedBar label="Calibration gap (|value|)" pre={Math.abs(rollup.meanIntake.calibrationGap)} post={Math.abs(rollup.meanExit.calibrationGap)} max={50} higherIsBetter={false} note={`${rollup.meanIntake.calibrationGap} → ${rollup.meanExit.calibrationGap}`} />
+                    <PairedBar label="Overconfident errors" pre={rollup.meanIntake.overconfidentErrors} post={rollup.meanExit.overconfidentErrors} max={6} higherIsBetter={false} />
+                    <PairedBar label="Missed scams" pre={rollup.meanIntake.missedScams} post={rollup.meanExit.missedScams} max={2} higherIsBetter={false} />
+                    <PairedBar label="False alarms" pre={rollup.meanIntake.falseAlarms} post={rollup.meanExit.falseAlarms} max={2} higherIsBetter={false} />
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+              )}
 
-          <div className="mt-4 rounded-sm border border-border bg-card p-5">
-            <div className="stencil text-[10px] text-muted-foreground">PER-STUDENT · CODENAME ONLY</div>
-            <table className="mt-3 w-full text-xs">
-              <thead className="text-left text-muted-foreground stencil text-[10px]">
-                <tr><th>CODENAME</th><th>INTAKE</th><th>EXIT</th></tr>
-              </thead>
-              <tbody>
-                {rollup.perStudent.map((s) => (
-                  <tr key={s.codenameHash} className="border-t border-border/60">
-                    <td className="py-1.5 font-mono">{s.codenameHash.slice(0,6)}</td>
-                    <td className="py-1.5">{s.intakeAt ? <CheckCircle2 className="inline h-3 w-3 text-primary" /> : <span className="text-muted-foreground">—</span>}</td>
-                    <td className="py-1.5">{s.exitAt ? <CheckCircle2 className="inline h-3 w-3 text-primary" /> : <span className="text-muted-foreground">—</span>}</td>
-                  </tr>
-                ))}
-                {rollup.perStudent.length === 0 && (
-                  <tr><td colSpan={3} className="py-3 text-muted-foreground">No attempts yet.</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+              <div className="mt-4 rounded-sm border border-border bg-card p-5">
+                <div className="stencil text-[10px] text-muted-foreground">PER-TACTIC · CORRECT %</div>
+                <div className="mt-3 space-y-2">
+                  {rollup.perTactic.map((t) => (
+                    <div key={t.pairId} className="flex items-center gap-3 text-sm">
+                      <div className="w-40 truncate">{t.label}</div>
+                      <div className="w-16 text-right font-mono text-muted-foreground">{t.intakeCorrectPct ?? "—"}%</div>
+                      <div className="text-muted-foreground">→</div>
+                      <div className={`w-16 text-right font-mono ${t.exitCorrectPct != null && t.intakeCorrectPct != null && t.exitCorrectPct > t.intakeCorrectPct ? "text-primary" : ""}`}>
+                        {t.exitCorrectPct ?? "—"}%
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-4 rounded-sm border border-border bg-card p-5">
+                <div className="stencil text-[10px] text-muted-foreground">PER-STUDENT · CODENAME ONLY · DAY-LEVEL</div>
+                <table className="mt-3 w-full text-xs">
+                  <thead className="text-left text-muted-foreground stencil text-[10px]">
+                    <tr><th>CODENAME</th><th>INTAKE</th><th>EXIT</th></tr>
+                  </thead>
+                  <tbody>
+                    {rollup.perStudent.map((s) => (
+                      <tr key={s.codenameHash} className="border-t border-border/60">
+                        <td className="py-1.5 font-mono">{s.codenameHash.slice(0,6)}</td>
+                        <td className="py-1.5">{s.intakeAt ? <CheckCircle2 className="inline h-3 w-3 text-primary" /> : <span className="text-muted-foreground">—</span>}</td>
+                        <td className="py-1.5">{s.exitAt ? <CheckCircle2 className="inline h-3 w-3 text-primary" /> : <span className="text-muted-foreground">—</span>}</td>
+                      </tr>
+                    ))}
+                    {rollup.perStudent.length === 0 && (
+                      <tr><td colSpan={3} className="py-3 text-muted-foreground">No attempts yet.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
 
           <p className="mt-4 text-[11px] text-muted-foreground leading-relaxed">
             <b>Anonymous by design:</b> codenames only, no accounts, no names.
