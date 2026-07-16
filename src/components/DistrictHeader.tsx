@@ -3,6 +3,7 @@
 // LITE / prefers-reduced-motion → static image, no drift, no flicker.
 
 import { useVisualMode } from "@/lib/visual-quality";
+import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
 
 interface Props {
   art: string;
@@ -11,6 +12,8 @@ interface Props {
   /** rgb triplet like "34,211,238" for the district's accent glow */
   glow?: string;
   className?: string;
+  /** Which live overlay to render on top of the art. */
+  district?: DistrictKey;
 }
 
 export function DistrictHeader({ art, title, tag, glow = "34,211,238", className = "" }: Props) {
