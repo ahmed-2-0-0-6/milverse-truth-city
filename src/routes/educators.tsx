@@ -91,6 +91,7 @@ function EducatorsPage() {
             <li>· <b>No accounts, no tracking.</b> Nothing to set up.</li>
             <li>· <Link to="/pilot" className="text-primary underline">Pilot mode</Link> for anonymous before/after cohort measurement.</li>
             <li>· <Link to="/kit" className="text-primary underline inline-flex items-center gap-1"><Printer className="h-3 w-3" /> Printable Field Kit</Link> for offline sessions and homework.</li>
+            <li>· <Link to="/first-phone" className="text-primary underline">First Phone Program</Link> — a 10-lesson path for kids (~10–14) before their first real phone.</li>
           </ul>
         </section>
 
