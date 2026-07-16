@@ -58,7 +58,8 @@ export function markLessonComplete(n: number) {
   }
   if (n === 10 && !s.licenseIssuedAt) {
     s.licenseIssuedAt = Date.now();
-    s.licenseNumber = generateLicenseNumber();
+    // licenseNumber intentionally left null — issue mark is per-print, never stored.
+    s.licenseNumber = null;
   }
   saveFirstPhone(s);
   // Bridge: also stamp the mapped Field Manual entry so the adult manual
