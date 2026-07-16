@@ -46,11 +46,11 @@ export function BankConfirmSheet({
   }
   // Keyboard equivalent: Enter/Space press-and-hold on the button also drives
   // the same beginHold/endHold pipeline via key events.
-  function onKeyDown(e: React.KeyboardEvent) {
+  function onKeyDown(e: ReactKeyboardEvent) {
     if ((e.key === "Enter" || e.key === " ") && !e.repeat) { e.preventDefault(); beginHold(); }
     if (e.key === "Escape") { e.preventDefault(); onCancel(); }
   }
-  function onKeyUp(e: React.KeyboardEvent) {
+  function onKeyUp(e: ReactKeyboardEvent) {
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); endHold(); }
   }
 
