@@ -37,6 +37,8 @@ export interface Scenario {
   designerRank?: string;
   title: string;
   teaser: string;
+  /** Primary manipulation tactic, matches manual/entries.ts TacticId. Powers debrief stamp + telemetry. */
+  tactic: TacticId;
   channel: "text";
   tier: TierId;
   isSurvivorStory?: boolean;
