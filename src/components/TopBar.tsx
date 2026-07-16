@@ -9,6 +9,7 @@ import {
 } from "@/lib/mirror/profile";
 import { isMuted, setMuted } from "@/lib/mirror/audio";
 import { VisualQualityToggle } from "@/components/VisualQualityToggle";
+import { AccessPanel } from "@/components/AccessPanel";
 import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp } from "@/lib/ranks";
 
@@ -76,6 +77,7 @@ export function TopBar() {
             <span className="hidden md:inline">MANUAL</span>
           </Link>
           <VisualQualityToggle />
+          <AccessPanel />
           <button
             onClick={() => { setMuted(!muted); setLocalMuted(!muted); }}
             className="rounded border border-border p-2 text-muted-foreground transition hover:text-foreground hover:bg-accent"

@@ -1,34 +1,43 @@
-# CitizenOS Follow-Up: Verify, Extend, Polish
+# Scope check before I ship
 
-Presentation-layer only. Zero changes to `mirror/engine.ts`, `boss/engine.ts`, `feed/engine.ts`, any `scenarios.ts`, profile stores, or Supabase.
+This ask is 4 big passes braided together. If I try to land all of it in one turn, half of it will be shallow — especially the sitewide ARIA sweep, the per-image alt rewrite, and the cast diversity audit across ~54 scenarios. I want to sequence it so each pass is real, not cosmetic.
 
-## 1. Verify (first, before touching anything)
-- Boot the app in headless Playwright at 390×844 (phone) and 1280×1800.
-- Load `/mirror` → pick a case → screenshot Mirror ChatShell (idle, typing, verdict, bank sheet if amount).
-- Load `/boss` → pick a boss → screenshot Boss ChatShell (idle, callback contact, notification banner phase ≥ 2).
-- Read console + network for errors. Report any regression before extending.
-- Fix only what's clearly broken from the last pass; list anything ambiguous under RISKS.
+## Proposed sequence (each pass is one turn, reviewable)
 
-## 2. Extend ChatShell to remaining conversation surfaces
-Wrap these in `<ChatShell>` with theme-appropriate header/status, keeping all existing engine/store hooks untouched:
+**Pass 1 — Access infrastructure (A5 + A1 + A4 color-independence)**
+The load-bearing plumbing. Once this ships, every later pass inherits it.
+- New `AccessProvider` + `mem://` persisted store: text size, high-legibility mode, reduce motion (composes with existing visual-quality), transcripts-always-open, sound.
+- New `AccessPanel` sheet + TopBar entry (icon-only button, aria-labeled).
+- Global focus-visible ring token in `styles.css`; audit `outline: none` offenders.
+- Focus-trap + ESC + return-focus wired into the shared bottom-sheet primitives (ContactsSheet, BankConfirmSheet, action sheet, verdict overlay).
+- Color-independence pass on verdict states: add glyph + label everywhere (chip, stamp, receipt, profile matrix). List of surfaces touched in the report.
+- Keyboard order + stake-slider arrow-key + aria-valuenow.
 
-- `src/routes/feed.index.tsx` — Feed thread view: use ChatShell as the surface for post/reply conversations. Header shows the district handle; status bar unchanged. Existing feed engine untouched.
-- `src/components/handler/HandlerDropLine.tsx` and `HandlersReading.tsx` — Handler drop/reading conversations get ChatShell with a "Handler" header variant (unknown-number banner off, verified check on). WeeklyEval stays as-is (it's a report card, not a chat).
-- Drop (`src/routes/drop.tsx`) if it renders a conversation, otherwise skip.
+**Pass 2 — Deaf/HoH + screen reader (A2 + A3)**
+- ChatShell thread → `role="log"` + `aria-live="polite"`; bubble labels; typing indicator `aria-hidden`.
+- VoiceNote gets global TRANSCRIPT toggle (respects transcripts-always-open).
+- CallScreen live-caption line synced to TTS text.
+- Verdict overlay `aria-live="assertive"`, one-shot.
+- Full-codebase icon-only button sweep — I'll grep every `<Button size="icon"` / bare icon anchor and add `aria-label`. Report will list the count.
+- Sound-only signal audit (stamp thud, rank-up, verdict stings) — list findings + add visual twin where missing.
+- Semantic landmarks + single H1 audit per route.
 
-For each: swap the outer frame only, keep composer, choice chips, VoiceNote, and all state hooks in place.
+**Pass 3 — Alt-text for case media (A2 continued)**
+This is content work, not infra. Every Mirror/Feed/Boss/Paper case image gets a hand-written neutral-faithful alt. I'll do it in this order: Feed cases (25) → Mirror (15) → Boss (14 variants) → Paper. Decorative art (district headers, atmosphere) → `alt=""` + `aria-hidden`. Report lists per-case count.
 
-## 3. Polish CitizenOS visuals
-Small, targeted CSS/prop tweaks — no redesigns:
-- Bubble contrast: verify player vs sender tokens against light + dark; fix any low-contrast pair by binding to semantic tokens in `src/styles.css`.
-- Typing indicator rhythm: confirm 40ms/char clamp 600–2500ms; reduced-motion → instant. Fix if off.
-- Status bar: tighten signal/clock/battery spacing; ensure CitizenOS wordmark is centered on the notch line.
-- Header: unknown-number amber banner uses `--warning` (or add the token if missing) instead of raw amber.
-- Message spacing: 2px between same-sender bubbles, 8px between senders, 16px around date chip.
-- ChatShell max-height on desktop caps at 844px so it looks like a phone, not a stretched panel.
+**Pass 4 — Charter, T-11, two Feed cases, cast sweep, educators (B + C + D)**
+- New `/charter` route, plaque design, footer link + educators link.
+- Field Manual T-11 entry in `manual/entries.ts` + unlock wiring.
+- Two new Feed dossiers ("THE QUOTE", "THE INVASION ALBUM") — fictional council figure + fictional newcomer community, no verbatim slurs, tactic mechanics only.
+- Cast diversity sweep across scenarios (surface details only — names, avatar descriptors, framing lines; zero tell/dossier changes). Delivered as a diff table in the report.
+- `/educators` "ACCESS & INCLUSION" section + motto line.
+- Landing footer motto line.
 
-## Non-goals
-Home screen, app grid, browser app, mic capture, uploads, engine tweaks, scenario edits, new deps.
+## What each pass will NOT touch
+Engines (mirror/boss/feed), scoring, scenario logic/tells/dossier facts, schemas, Supabase, engine profiles. Cast sweep is surface strings only.
 
-## Report back
-`===MILVERSE REPORT===`: 1) Verify results ✅/⚠️/❌ per route with screenshot paths; 2) Files touched in extend pass; 3) Files touched in polish pass; 4) Confirm zero engine/scenario/store edits; 5) RISKS; 6) NEXT.
+## Contrast + zoom sweep
+Both are audit-then-fix. I'll fold them into Pass 1 as a listed audit (offenders enumerated) and fix in Pass 1 if <10 offenders, otherwise defer to a Pass 1b so the pass stays reviewable.
+
+## Confirm before I start
+Reply "go" to start Pass 1, or tell me to collapse passes (e.g. "do 1+2 together") or reorder (e.g. "charter first — it's the demo hook"). If you want everything in one turn I'll do it, but you'll get breadth over depth and I'd rather warn now than apologize later.
