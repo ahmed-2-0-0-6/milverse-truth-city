@@ -50,6 +50,7 @@ function useReducedMotion() {
 }
 
 function BossPlay() {
+  const gate = useJuniorGate("Boss Protocol");
   const { bossId } = Route.useParams();
   const navigate = useNavigate();
   const boss = getBoss(bossId);
