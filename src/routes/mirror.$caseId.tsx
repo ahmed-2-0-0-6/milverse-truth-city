@@ -41,6 +41,7 @@ function CasePlay() {
   return (
     <div className="min-h-screen grain">
       <TopBar />
+      <div className="mx-auto max-w-3xl px-4 pt-4"><RookieIntro /></div>
       {phase === "dossier" && <Dossier scenario={scenario} onStart={() => setPhase("sim")} />}
       {phase === "sim" && (
         <Simulation
