@@ -372,134 +372,139 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
     state.meter > 60 ? "bg-primary" : state.meter > 30 ? "bg-caution" : "bg-destructive";
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-4 flex flex-col" style={{ minHeight: "calc(100vh - 57px)" }}>
+    <>
       <TacticFlash tacticId={tacticFlash} onDone={() => setTacticFlash(null)} />
-      {/* Contact header */}
-      <div className="rounded-t-xl border border-border border-b-0 bg-card px-4 py-3">
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <div className="text-sm font-semibold truncate">{scenario.claimedIdentity}</div>
-            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-              CLAIMED · TIER {scenario.tier} · {scenario.tier >= 3 && <span className="text-caution">TIMED</span>}
+      <ChatShell
+        header={
+          <>
+            <ChatHeader
+              name={scenario.claimedIdentity}
+              number={`+92 3xx ${String((scenario.id.length * 137) % 900 + 100)} ${String((scenario.id.length * 41) % 9000 + 1000)}`}
+              isSaved={false}
+              subtitle={`CLAIMED · TIER ${scenario.tier}${scenario.tier >= 3 ? " · TIMED" : ""}`}
+              onContacts={() => setContactsOpen(true)}
+            />
+            {/* meter + tabs */}
+            <div className="px-3 py-2 bg-neutral-950/80 border-b border-white/10">
+              <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-white/50">
+                <span>{state.meterType === "composure" ? "COMPOSURE" : "PATIENCE"}</span>
+                <span>{Math.round(state.meter)}</span>
+              </div>
+              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                <div className={`h-full transition-all duration-500 ${meterColor}`} style={{ width: `${state.meter}%` }} />
+              </div>
+              <div className="mt-2 flex gap-1">
+                {(["chat", "notes"] as const).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTab(t)}
+                    className={`rounded px-3 py-1 font-mono text-[10px] tracking-widest transition ${
+                      tab === t ? "bg-primary/15 text-primary" : "text-white/50 hover:text-white"
+                    }`}
+                  >
+                    {t === "chat" ? "CHAT" : `NOTES · ${pins.length}/5`}
+                  </button>
+                ))}
+                <div className="flex-1" />
+                <button
+                  onClick={() => setShowVob(true)}
+                  disabled={ended || messages.length < 2}
+                  className="rounded border border-primary/50 bg-primary/10 px-2 py-1 text-[9px] font-mono tracking-widest text-primary hover:bg-primary/20 disabled:opacity-40"
+                >
+                  <ShieldCheck className="inline h-3 w-3 mr-1" /> VERIFY
+                </button>
+                <button
+                  onClick={onEnd}
+                  disabled={messages.length < 2}
+                  className="rounded border border-destructive/50 bg-destructive/10 px-2 py-1 text-[9px] font-mono tracking-widest text-destructive hover:bg-destructive/20 disabled:opacity-40"
+                >
+                  <Phone className="inline h-3 w-3 mr-1" /> CALL IT
+                </button>
+              </div>
+            </div>
+          </>
+        }
+        overlay={
+          <>
+            <ContactsSheet
+              open={contactsOpen}
+              onClose={() => setContactsOpen(false)}
+              mirrorNoHelp={true}
+            />
+            {showVob && (
+              <VobModal
+                onClose={() => setShowVob(false)}
+                onPick={useVob}
+                tier={scenario.tier}
+              />
+            )}
+          </>
+        }
+        composer={
+          <div className="p-3">
+            {aiDown && (
+              <div className="mb-2 rounded-md border border-caution/40 bg-caution/10 p-2 text-[11px]">
+                <div className="font-mono text-[10px] tracking-widest text-caution mb-0.5">CONNECTION UNSTABLE</div>
+                The contact keeps freezing. <Link to="/quick-tour" className="text-primary underline">Quick Tour →</Link>
+              </div>
+            )}
+            <div className="flex gap-2">
+              <input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && send()}
+                placeholder={ended ? "Chat ended — make your call." : "Type anything you want to ask…"}
+                disabled={ended || typing}
+                className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-sm text-white outline-none focus:border-primary disabled:opacity-50"
+              />
+              <button
+                onClick={send}
+                disabled={ended || typing || !input.trim()}
+                className="rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40"
+              >
+                <Send className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="mt-1.5 flex items-center justify-between font-mono text-[9px] tracking-widest text-white/40">
+              <span>ASK FOR A "VOICE NOTE" · TAP PIN TO FLAG</span>
+              <span>{messages.filter((m) => m.role === "player").length} SENT</span>
             </div>
           </div>
-          <div className="flex gap-1.5">
-            <button
-              onClick={() => setShowVob(true)}
-              disabled={ended || messages.length < 2}
-              className="rounded-md border border-primary/50 bg-primary/10 px-2.5 py-1.5 text-[10px] font-mono tracking-widest text-primary transition-colors hover:bg-primary/20 disabled:opacity-40"
-              title="Verify this contact through another channel"
-            >
-              <ShieldCheck className="inline h-3 w-3 mr-1" />
-              VERIFY
-            </button>
-            <button
-              onClick={onEnd}
-              disabled={messages.length < 2}
-              className="rounded-md border border-destructive/50 bg-destructive/10 px-2.5 py-1.5 text-[10px] font-mono tracking-widest text-destructive transition-colors hover:bg-destructive/20 disabled:opacity-40"
-            >
-              <Phone className="inline h-3 w-3 mr-1" />
-              CALL IT
-            </button>
-          </div>
+        }
+      >
+        <div className="flex-1 min-h-0 flex flex-col">
+          {tab === "chat" ? (
+            <div ref={scroller} className="flex-1 overflow-y-auto p-3 space-y-2.5">
+              {messages.map((m, i) => (
+                <MessageRow
+                  key={i}
+                  m={m}
+                  pinned={pins.includes(i)}
+                  onPin={m.role === "contact" ? () => togglePin(i) : undefined}
+                  speakerName={scenario.claimedIdentity}
+                  speakerVoiceDesc={scenario.persona.voice}
+                />
+              ))}
+              {typing && <TypingBubble name={scenario.claimedIdentity} />}
+              {ended && endReason === "contact_left" && (
+                <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-center text-xs font-mono tracking-widest text-destructive">
+                  CONTACT LEFT THE CHAT — MAKE YOUR CALL
+                </div>
+              )}
+              {ended && endReason === "vob_used" && (
+                <div className="mt-4 rounded-md border border-primary/40 bg-primary/10 p-3 text-center text-xs font-mono tracking-widest text-primary">
+                  VERIFICATION COMPLETE — MAKE YOUR CALL
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex-1 overflow-y-auto">
+              <NotesTab scenario={scenario} messages={messages} pins={pins} onUnpin={togglePin} />
+            </div>
+          )}
         </div>
-        {/* meter */}
-        <div className="mt-3">
-          <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-muted-foreground">
-            <span>{state.meterType === "composure" ? "COMPOSURE" : "PATIENCE"}</span>
-            <span>{Math.round(state.meter)}</span>
-          </div>
-          <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-            <div className={`h-full transition-all duration-500 ${meterColor}`} style={{ width: `${state.meter}%` }} />
-          </div>
-        </div>
-        {/* tabs */}
-        <div className="mt-3 flex gap-1 border-t border-border pt-2">
-          {(["chat", "notes"] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`rounded px-3 py-1 font-mono text-[10px] tracking-widest transition ${
-                tab === t ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t === "chat" ? "CHAT" : `NOTES · ${pins.length}/5`}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Body */}
-      <div className="flex-1 overflow-hidden border-x border-border bg-background/40">
-        {tab === "chat" ? (
-          <div ref={scroller} className="h-full overflow-y-auto p-4 space-y-3">
-            {messages.map((m, i) => (
-              <MessageRow
-                key={i}
-                m={m}
-                pinned={pins.includes(i)}
-                onPin={m.role === "contact" ? () => togglePin(i) : undefined}
-                speakerName={scenario.claimedIdentity}
-                speakerVoiceDesc={scenario.persona.voice}
-              />
-            ))}
-            {typing && <TypingBubble name={scenario.claimedIdentity} />}
-            {ended && endReason === "contact_left" && (
-              <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-center text-xs font-mono tracking-widest text-destructive">
-                CONTACT LEFT THE CHAT — MAKE YOUR CALL
-              </div>
-            )}
-            {ended && endReason === "vob_used" && (
-              <div className="mt-4 rounded-md border border-primary/40 bg-primary/10 p-3 text-center text-xs font-mono tracking-widest text-primary">
-                VERIFICATION COMPLETE — MAKE YOUR CALL
-              </div>
-            )}
-          </div>
-        ) : (
-          <NotesTab scenario={scenario} messages={messages} pins={pins} onUnpin={togglePin} />
-        )}
-      </div>
-
-      {/* Composer */}
-      {aiDown && (
-        <div className="my-2 rounded-md border border-caution/40 bg-caution/10 p-3 text-xs">
-          <div className="font-mono text-[10px] tracking-widest text-caution mb-1">CONNECTION UNSTABLE</div>
-          The contact keeps freezing.{" "}
-          <Link to="/quick-tour" className="text-primary underline">Try the Quick Tour instead →</Link>
-        </div>
-      )}
-      <div className="rounded-b-xl border border-border border-t-0 bg-card p-3">
-        <div className="flex gap-2">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && send()}
-            placeholder={ended ? "Chat ended — make your call." : "Type anything you want to ask…"}
-            disabled={ended || typing}
-            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary disabled:opacity-50"
-          />
-          <button
-            onClick={send}
-            disabled={ended || typing || !input.trim()}
-            className="rounded-md bg-primary px-4 text-primary-foreground disabled:opacity-40"
-          >
-            <Send className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="mt-2 flex items-center justify-between font-mono text-[10px] tracking-widest text-muted-foreground">
-          <span>ASK FOR A "VOICE NOTE" · CLICK PIN TO FLAG</span>
-          <span>{messages.filter((m) => m.role === "player").length} SENT</span>
-        </div>
-      </div>
-
-      {showVob && (
-        <VobModal
-          onClose={() => setShowVob(false)}
-          onPick={useVob}
-          tier={scenario.tier}
-        />
-      )}
-    </main>
+      </ChatShell>
+    </>
   );
 }
 
