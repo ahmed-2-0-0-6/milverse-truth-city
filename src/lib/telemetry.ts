@@ -76,18 +76,32 @@ function scheduleFlush() {
   timer = window.setTimeout(() => { timer = null; void flush(); }, FLUSH_MS);
 }
 
-async function flush() {
-  if (queue.length === 0) return;
-  const batch = queue.splice(0, queue.length);
+async function postOnce(batch: TelemetryEvent[]): Promise<boolean> {
   try {
-    await fetch(TELEMETRY_ENDPOINT, {
+    const res = await fetch(TELEMETRY_ENDPOINT, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ events: batch }),
       keepalive: true,
     });
+    return !!res && res.ok;
   } catch {
-    // Silent — telemetry never disrupts the app.
+    return false;
+  }
+}
+
+async function flush() {
+  if (queue.length === 0) return;
+  const batch = queue.splice(0, queue.length);
+  // Attempt 1; if it fails, ONE quick retry; if that fails, drop silently.
+  // A failed telemetry POST must never throw into UI code.
+  try {
+    const ok = await postOnce(batch);
+    if (ok) return;
+    await new Promise((r) => setTimeout(r, 400));
+    await postOnce(batch); // ignore result — drop on second failure
+  } catch {
+    // Absolute belt-and-suspenders: telemetry never surfaces to callers.
   }
 }
 
