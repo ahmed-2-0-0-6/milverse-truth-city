@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      assessment_entries: {
+        Row: {
+          accuracy: number
+          calibration_gap: number
+          codename_hash: string
+          created_at: string
+          false_alarms: number
+          form: string
+          group_code: string
+          id: string
+          items: Json
+          mean_confidence: number
+          missed_scams: number
+          overconfident_errors: number
+          phase: string
+          unverifiable_recognized: number
+        }
+        Insert: {
+          accuracy: number
+          calibration_gap: number
+          codename_hash: string
+          created_at?: string
+          false_alarms: number
+          form: string
+          group_code: string
+          id?: string
+          items: Json
+          mean_confidence: number
+          missed_scams: number
+          overconfident_errors: number
+          phase: string
+          unverifiable_recognized: number
+        }
+        Update: {
+          accuracy?: number
+          calibration_gap?: number
+          codename_hash?: string
+          created_at?: string
+          false_alarms?: number
+          form?: string
+          group_code?: string
+          id?: string
+          items?: Json
+          mean_confidence?: number
+          missed_scams?: number
+          overconfident_errors?: number
+          phase?: string
+          unverifiable_recognized?: number
+        }
+        Relationships: []
+      }
+      assessment_phase: {
+        Row: {
+          group_code: string
+          phase: string
+          updated_at: string
+        }
+        Insert: {
+          group_code: string
+          phase?: string
+          updated_at?: string
+        }
+        Update: {
+          group_code?: string
+          phase?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       citizen_cases: {
         Row: {
           created_at: string

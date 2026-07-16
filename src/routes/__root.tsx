@@ -18,6 +18,7 @@ import { AtmosphereLayer } from "@/components/AtmosphereLayer";
 import { GlowCursor } from "@/components/GlowCursor";
 import { RouteWipe } from "@/components/RouteWipe";
 import { RankUpBeat } from "@/components/RankUpBeat";
+import { AssessmentGate } from "@/components/AssessmentGate";
 import { installTelemetry, track } from "@/lib/telemetry";
 
 function NotFoundComponent() {
@@ -159,6 +160,7 @@ function RootComponent() {
       <AccessProvider>
         <VisualQualityProvider>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <AssessmentGate />
           <Outlet />
           <BadgeToast />
           <AtmosphereLayer />
