@@ -13,6 +13,7 @@ import { ARTIFACT_LABEL } from "@/lib/mirror/voice";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
 import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
+import { track } from "@/lib/telemetry";
 import { tick, tensionCue } from "@/lib/mirror/audio";
 import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
