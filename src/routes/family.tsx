@@ -5,6 +5,7 @@ import { TopBar } from "@/components/TopBar";
 import { fetchPilotGroup } from "@/lib/pilot.functions";
 import { LESSONS, TOTAL_LESSONS, type JuniorTactic } from "@/lib/firstPhone/lessons";
 import { loadFirstPhone, joinFamily } from "@/lib/firstPhone/profile";
+import { manualDisplayForTactics } from "@/lib/firstPhone/tacticMap";
 import { JUNIOR_COPY } from "@/lib/firstPhone/copy";
 import { Users, Copy, Check, ShieldCheck } from "lucide-react";
 
