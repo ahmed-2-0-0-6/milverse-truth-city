@@ -55,6 +55,9 @@ export function DistrictHeader({ art, title, tag, glow = "34,211,238", className
         }} />
       )}
 
+      {/* District-specific live overlay */}
+      {district && <DistrictLiveFX district={district} />}
+
       {/* Grain */}
       <div className="absolute inset-0 opacity-[0.18] mix-blend-overlay pointer-events-none" aria-hidden style={{
         backgroundImage: "radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px)",
