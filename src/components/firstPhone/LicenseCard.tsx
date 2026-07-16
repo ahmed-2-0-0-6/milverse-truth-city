@@ -22,10 +22,6 @@ export function LicenseCard({ onClose }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => { render(); }, [name, issueMark]);
-  const [name, setName] = useState(state.kidCityName || "");
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => { render(); }, [name]);
 
   function render() {
     const c = canvasRef.current;
