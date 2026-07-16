@@ -1,12 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { MessageSquare, ShieldAlert, Lock, CheckCircle2, Sparkles, Users } from "lucide-react";
+import { MessageSquare, ShieldAlert, Lock, CheckCircle2, Sparkles, Users, Building2 } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { SCENARIOS, loadCitizenCases, saveCitizenCase, type TierId, type Scenario } from "@/lib/mirror/scenarios";
 import { loadProfile, unlockedMaxTier, tierWins, type TrustProfile } from "@/lib/mirror/profile";
 import { fetchCitizenCase } from "@/lib/citizen.functions";
 import { RecommendedStrip } from "@/components/RecommendedStrip";
+import { DistrictIntro } from "@/components/DistrictIntro";
+import mirrorArt from "@/assets/district-mirror.jpg";
 
 export const Route = createFileRoute("/mirror/")({
   head: () => ({
