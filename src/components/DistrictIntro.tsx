@@ -4,17 +4,19 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { loadProfile } from "@/lib/mirror/profile";
+import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
 
 interface Props {
   id: string;                    // unique district key
   chapter: string;               // "CHAPTER 02"
   title: string;                 // "THE FEED"
   art?: string;                  // background image URL
+  district?: DistrictKey;        // which live overlay to render on the art
   lines: [string, string];       // exactly two lines of narration
   onDone?: () => void;
 }
 
-export function DistrictIntro({ id, chapter, title, art, lines, onDone }: Props) {
+export function DistrictIntro({ id, chapter, title, art, district, lines, onDone }: Props) {
   const [visible, setVisible] = useState(false);
   const [panel, setPanel] = useState(0);
   const [typed, setTyped] = useState("");
@@ -60,8 +62,9 @@ export function DistrictIntro({ id, chapter, title, art, lines, onDone }: Props)
   return (
     <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 animate-in fade-in duration-300">
       {art && (
-        <div className="absolute inset-0 opacity-30">
-          <img src={art} alt="" className="h-full w-full object-cover" />
+        <div className="absolute inset-0 opacity-30 overflow-hidden">
+          <img src={art} alt="" className="h-full w-full object-cover kenburns" />
+          {district && <DistrictLiveFX district={district} />}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/80" />
         </div>
       )}

@@ -3,6 +3,7 @@
 // LITE / prefers-reduced-motion → static image, no drift, no flicker.
 
 import { useVisualMode } from "@/lib/visual-quality";
+import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
 
 interface Props {
   art: string;
@@ -11,9 +12,11 @@ interface Props {
   /** rgb triplet like "34,211,238" for the district's accent glow */
   glow?: string;
   className?: string;
+  /** Which live overlay to render on top of the art. */
+  district?: DistrictKey;
 }
 
-export function DistrictHeader({ art, title, tag, glow = "34,211,238", className = "" }: Props) {
+export function DistrictHeader({ art, title, tag, glow = "34,211,238", className = "", district }: Props) {
   const { mode } = useVisualMode();
   const cinematic = mode === "cinematic";
 
@@ -51,6 +54,9 @@ export function DistrictHeader({ art, title, tag, glow = "34,211,238", className
           backgroundSize: "200% 200%",
         }} />
       )}
+
+      {/* District-specific live overlay */}
+      {district && <DistrictLiveFX district={district} />}
 
       {/* Grain */}
       <div className="absolute inset-0 opacity-[0.18] mix-blend-overlay pointer-events-none" aria-hidden style={{

@@ -94,6 +94,7 @@ function CaseFiles() {
         chapter="CHAPTER 01"
         title="THE MIRROR"
         art={mirrorArt}
+        district="mirror"
         lines={[
           "Someone's uncle answered a message like this last week. He's still paying for it.",
           "Your turn to answer better. Verify the person, not the vibe.",

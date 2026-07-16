@@ -1,6 +1,7 @@
 // LAYER-7 — Scroll-driven story beats. GSAP ScrollTrigger + horizontal districts.
 // Lazy imports GSAP; respects reduced-motion (renders static).
 import { useEffect, useRef } from "react";
+import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
 import mirrorArt from "@/assets/district-mirror.jpg";
 import feedArt from "@/assets/district-feed.jpg";
 import studioArt from "@/assets/district-studio.jpg";
@@ -173,6 +174,7 @@ export function ScrollStory() {
                  style={{ boxShadow: `0 30px 80px -20px rgba(${d.glow},0.35)` }}>
               <img src={d.art} alt="" loading="lazy" width={1536} height={1024}
                    className="absolute inset-0 h-full w-full object-cover kenburns" />
+              <DistrictLiveFX district={d.key as DistrictKey} />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
               <div className="absolute inset-0 opacity-20 mix-blend-overlay" style={{
                 backgroundImage: "radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px)", backgroundSize: "3px 3px",
@@ -198,6 +200,7 @@ export function ScrollStory() {
         {DISTRICTS.map((d) => (
           <div key={d.key} className="relative aspect-[16/10] overflow-hidden rounded-sm border border-white/10">
             <img src={d.art} alt="" loading="lazy" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover" />
+            <DistrictLiveFX district={d.key as DistrictKey} intensity="soft" />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <div className="stencil text-[9px]" style={{ color: `rgb(${d.glow})` }}>{d.tag}</div>
