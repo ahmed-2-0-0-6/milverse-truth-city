@@ -279,6 +279,19 @@ function PlayFlow({ scenario, dateKey, onDone }: { scenario: FeedScenario; dateK
       });
     }
 
+    track("drop_play", {
+      case_id: scenario.id,
+      payload: {
+        stake_bucket: bucketStake(stake),
+        streak_bucket: bucketStreak(status.streak),
+        correct: result.correct,
+        probes: probesUsed.length,
+      },
+    });
+    if (!result.correct && status.streak > 0) {
+      track("drop_break", { case_id: scenario.id, payload: { streak_bucket: bucketStreak(status.streak) } });
+    }
+
     setStage("verdict-cinema");
   };
 
