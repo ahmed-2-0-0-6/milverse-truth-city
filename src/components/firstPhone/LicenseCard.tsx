@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { loadFirstPhone, saveFirstPhone } from "@/lib/firstPhone/profile";
 import { LESSONS } from "@/lib/firstPhone/lessons";
 import { describeTactic } from "@/lib/firstPhone/tacticMap";
@@ -6,8 +6,22 @@ import { Download, Printer } from "lucide-react";
 
 interface Props { onClose?: () => void }
 
+/** Random per-print issue mark. NOT persisted anywhere. Regenerates every mount. */
+function generateIssueMark(): string {
+  const A = "ABCDEFGHJKMNPQRSTVWXYZ";
+  const N = "23456789";
+  const pick = (s: string) => s[Math.floor(Math.random() * s.length)];
+  return `${pick(A)}${pick(A)}-${pick(N)}${pick(N)}${pick(N)}${pick(N)}`;
+}
+
 export function LicenseCard({ onClose }: Props) {
   const state = loadFirstPhone();
+  const [name, setName] = useState(state.kidCityName || "");
+  // Per-print mark — regenerates on every mount and every render trigger.
+  const issueMark = useMemo(() => generateIssueMark(), []);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => { render(); }, [name, issueMark]);
   const [name, setName] = useState(state.kidCityName || "");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
