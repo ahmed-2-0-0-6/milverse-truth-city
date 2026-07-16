@@ -19,8 +19,9 @@ export const Route = createFileRoute("/boss/")({
 });
 
 function BossLobby() {
-  const [prof, setProf] = useState(loadBossProfile());
+  const [prof, setProf] = useState<ReturnType<typeof loadBossProfile> | null>(null);
   useEffect(() => {
+    setProf(loadBossProfile());
     const on = () => setProf(loadBossProfile());
     window.addEventListener("milverse:boss", on);
     return () => window.removeEventListener("milverse:boss", on);
