@@ -30,6 +30,7 @@ function FeedIndex() {
         chapter="CHAPTER 02"
         title="THE FEED"
         art={feedArt}
+        district="feed"
         lines={[
           "The message arrives from someone you love. It carries a claim you'd want to be true — or dread is true.",
           "Your job is to check the claim without breaking the person. Verify the source. Correct with dignity. Both are the work.",
