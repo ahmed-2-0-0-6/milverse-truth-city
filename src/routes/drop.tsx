@@ -198,6 +198,7 @@ function PostPlayState({ status, today, onOpenYesterday }: {
             </Link>
           </div>
         )}
+        <HandlerDropLine correct={entry.correct} stake={entry.stake} streak={status.streak} cacheKey={entry.dateKey} />
       </div>
 
       <div>
