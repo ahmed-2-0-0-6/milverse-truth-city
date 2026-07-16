@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VisitRouteImport } from './routes/visit'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as QuickTourRouteImport } from './routes/quick-tour'
@@ -41,6 +42,11 @@ import { Route as BossBossIdRouteImport } from './routes/boss.$bossId'
 import { Route as ArchiveSubmitRouteImport } from './routes/archive.submit'
 import { Route as ApiPublicTelemetryRouteImport } from './routes/api/public/telemetry'
 
+const VisitRoute = VisitRouteImport.update({
+  id: '/visit',
+  path: '/visit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudioRoute = StudioRouteImport.update({
   id: '/studio',
   path: '/studio',
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/quick-tour': typeof QuickTourRoute
   '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
+  '/visit': typeof VisitRoute
   '/archive/submit': typeof ArchiveSubmitRoute
   '/boss/$bossId': typeof BossBossIdRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
@@ -251,6 +258,7 @@ export interface FileRoutesByTo {
   '/quick-tour': typeof QuickTourRoute
   '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
+  '/visit': typeof VisitRoute
   '/archive/submit': typeof ArchiveSubmitRoute
   '/boss/$bossId': typeof BossBossIdRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
@@ -285,6 +293,7 @@ export interface FileRoutesById {
   '/quick-tour': typeof QuickTourRoute
   '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
+  '/visit': typeof VisitRoute
   '/archive/submit': typeof ArchiveSubmitRoute
   '/boss/$bossId': typeof BossBossIdRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
@@ -320,6 +329,7 @@ export interface FileRouteTypes {
     | '/quick-tour'
     | '/review'
     | '/studio'
+    | '/visit'
     | '/archive/submit'
     | '/boss/$bossId'
     | '/feed/$caseId'
@@ -353,6 +363,7 @@ export interface FileRouteTypes {
     | '/quick-tour'
     | '/review'
     | '/studio'
+    | '/visit'
     | '/archive/submit'
     | '/boss/$bossId'
     | '/feed/$caseId'
@@ -386,6 +397,7 @@ export interface FileRouteTypes {
     | '/quick-tour'
     | '/review'
     | '/studio'
+    | '/visit'
     | '/archive/submit'
     | '/boss/$bossId'
     | '/feed/$caseId'
@@ -420,6 +432,7 @@ export interface RootRouteChildren {
   QuickTourRoute: typeof QuickTourRoute
   ReviewRoute: typeof ReviewRoute
   StudioRoute: typeof StudioRoute
+  VisitRoute: typeof VisitRoute
   BossBossIdRoute: typeof BossBossIdRoute
   FeedCaseIdRoute: typeof FeedCaseIdRoute
   ManualEntryIdRoute: typeof ManualEntryIdRoute
@@ -434,6 +447,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/visit': {
+      id: '/visit'
+      path: '/visit'
+      fullPath: '/visit'
+      preLoaderRoute: typeof VisitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/studio': {
       id: '/studio'
       path: '/studio'
@@ -686,6 +706,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuickTourRoute: QuickTourRoute,
   ReviewRoute: ReviewRoute,
   StudioRoute: StudioRoute,
+  VisitRoute: VisitRoute,
   BossBossIdRoute: BossBossIdRoute,
   FeedCaseIdRoute: FeedCaseIdRoute,
   ManualEntryIdRoute: ManualEntryIdRoute,
