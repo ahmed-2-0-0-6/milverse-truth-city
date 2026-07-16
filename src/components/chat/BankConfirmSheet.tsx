@@ -77,11 +77,11 @@ export function BankConfirmSheet({
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-indigo-500 text-white text-xs font-black">CP</div>
             <div>
-              <div className="text-sm font-semibold text-white">CitizenPay</div>
+              <div id="bank-sheet-title" className="text-sm font-semibold text-white">CitizenPay — Confirm transfer</div>
               <div className="text-[10px] font-mono tracking-wider text-white/50">Confirm transfer</div>
             </div>
           </div>
-          <button onClick={onCancel} className="p-1.5 text-white/60 hover:text-white" aria-label="Cancel">
+          <button onClick={onCancel} className="p-1.5 min-h-11 min-w-11 flex items-center justify-center text-white/60 hover:text-white" aria-label="Cancel transfer">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -121,25 +121,34 @@ export function BankConfirmSheet({
         {/* Hold-to-confirm */}
         <div className="px-5 py-6">
           <button
+            type="button"
             onMouseDown={beginHold}
             onTouchStart={beginHold}
             onMouseUp={endHold}
             onMouseLeave={endHold}
             onTouchEnd={endHold}
             onTouchCancel={endHold}
-            className={`relative w-full h-14 rounded-xl overflow-hidden border border-indigo-400/40 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-semibold tracking-widest text-sm ${reducedMotion ? "" : "animate-[heartbeat_1.6s_ease-in-out_infinite]"}`}
+            onKeyDown={onKeyDown}
+            onKeyUp={onKeyUp}
+            aria-label="Hold to confirm transfer. Press and hold Enter or Space on keyboard."
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(holdProgress * 100)}
+            role="button"
+            className={`relative w-full min-h-14 rounded-xl overflow-hidden border border-indigo-400/40 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-semibold tracking-widest text-sm focus-visible:ring-2 focus-visible:ring-white ${reducedMotion ? "" : "animate-[heartbeat_1.6s_ease-in-out_infinite]"}`}
           >
             <span
               className="absolute inset-y-0 left-0 bg-white/25 transition-none"
               style={{ width: `${holdProgress * 100}%` }}
+              aria-hidden="true"
             />
             <span className="relative flex items-center justify-center gap-2">
-              <ShieldCheck className="h-4 w-4" />
+              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
               {holdProgress > 0 ? "HOLDING…" : "HOLD TO CONFIRM TRANSFER"}
             </span>
           </button>
           <div className="mt-3 text-center text-[11px] text-white/50">
-            Once confirmed, this cannot be reversed.
+            Once confirmed, this cannot be reversed. Keyboard: press and hold <kbd className="font-mono">Enter</kbd>.
           </div>
           <button onClick={onCancel} className="mt-4 w-full py-2 text-sm text-white/60 hover:text-white">
             Cancel — go back to chat
