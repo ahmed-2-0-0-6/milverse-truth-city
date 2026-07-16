@@ -17,7 +17,7 @@ const DISTRICTS: District[] = [
   { key: "studio", label: "THE STUDIO", tag: "Design the attack yourself — teach by authoring.", art: studioArt, href: "/studio", glow: "245,185,66" },
   { key: "archive", label: "THE ARCHIVE", tag: "Revisit closed cases — build the pattern memory.", art: archiveArt, href: "/archive", glow: "34,211,238" },
   { key: "cleanroom", label: "CLEAN ROOM", tag: "Calibrate confidence — know when you know.", art: cleanroomArt, href: "/devintel", glow: "34,211,238" },
-] as const;
+];
 
 const BEATS = [
   { headline: "Every day, someone in your family gets a message.", sub: "It's already happened this week. Maybe today." },
