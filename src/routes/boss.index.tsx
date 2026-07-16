@@ -55,9 +55,9 @@ function BossLobby() {
 
         <div className="grid gap-4">
           {BOSSES.map((b) => {
-            const wins = prof.attempts.filter((a) => a.bossId === b.id && a.outcome === "WIN").length;
-            const losses = prof.attempts.filter((a) => a.bossId === b.id && a.outcome !== "WIN").length;
-            const declassified = prof.declassified.includes(b.id);
+            const wins = prof?.attempts.filter((a) => a.bossId === b.id && a.outcome === "WIN").length ?? 0;
+            const losses = prof?.attempts.filter((a) => a.bossId === b.id && a.outcome !== "WIN").length ?? 0;
+            const declassified = prof?.declassified.includes(b.id) ?? false;
             const rematchOk = canRematch(b.id);
             return (
               <Link
