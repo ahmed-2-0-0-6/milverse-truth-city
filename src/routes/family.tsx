@@ -33,8 +33,6 @@ function generateFamilyCode(): string {
   return s;
 }
 
-type CloudEntry = { device_id: string; wing: string; case_id: string; result: string; created_at: string };
-
 type CloudEntry = { device_id: string; wing: string; case_id: string; result: string };
 
 function FamilyPage() {
