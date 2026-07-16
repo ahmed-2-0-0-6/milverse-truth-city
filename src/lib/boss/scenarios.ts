@@ -167,9 +167,32 @@ export const BOSSES: BossConfig[] = [
           { id: "hold_unverified",label: "HOLD — 'let me call you back first'", blurb: "Refuse to transact.", outcome: "WIN",
             response: "She keeps making excuses — 'this line only', 'battery dying'. Every excuse is the tell. You held. You won.", requiresFollowup: "outbound_video" },
         ],
+      {
+        id: "real-emergency",
+        truth: "REAL",
+        opener: "[video call — your cousin, streaks of mascara, background of a real hospital corridor] please pick up",
+        truthReveal: "It really is her. She's at the hospital for her mother. Blank refusal = False Alarm.",
+        winningVerdict: "HOLD_UNVERIFIED",
+        debriefLine: "This time it was really her. Blank refusal would have hurt someone you love. Protocol still wins — outbound callback + second-person confirms in 90 seconds, then you help.",
+        factChecks: [
+          { id: "face",  label: "Study the face for artifacts", result: "Flawless — because it's her actual face.", supportsCoverStory: true },
+          { id: "voice", label: "Voice cadence check",          result: "Real. Because it's her real voice.", supportsCoverStory: true },
+          { id: "bg",    label: "Study the background",         result: "Hospital signage visible. ✓ Consistent.", supportsCoverStory: true },
+        ],
+        moves: [
+          { id: "outbound_video", label: "'I'll call YOU back on your number'", blurb: "Hang up. Call her real line.", outcome: "WIN",
+            response: "She picks up on her own number, still crying. Same story. Real emergency. Now help." },
+          { id: "shared_secret",  label: "Ask what you both cooked last Eid", blurb: "Something no scraper has.", outcome: "WIN",
+            response: "She answers instantly, then laughs through tears: 'seriously? okay smart of you.' Real her." },
+          { id: "second_person",  label: "Call your aunt", blurb: "She'd know where your cousin is.", outcome: "WIN",
+            response: "Aunt: 'yes she's at the hospital with her mom, please help her.' Confirmed real." },
+          { id: "hold_unverified",label: "HOLD — 'let me call you back first'", blurb: "Refuse to transact until verified.", outcome: "PROGRESS",
+            response: "You HOLD — good instinct. But HOLD alone doesn't help her. Follow through: outbound callback.", requiresFollowup: "outbound_video" },
+        ],
       },
     ],
   },
+
 
   /* ══ BOSS 3 — THE CHORUS (Phase 2 seed, playable stub) ═══════ */
   {
