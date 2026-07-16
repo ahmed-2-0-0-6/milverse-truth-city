@@ -42,7 +42,7 @@ export function ScrollStory() {
   function submerge(href: string, key: string) {
     if (submerging) return;
     setSubmerging(key);
-    window.setTimeout(() => navigate({ to: href as string }), 720);
+    window.setTimeout(() => { (navigate as unknown as (opts: { to: string }) => void)({ to: href }); }, 720);
   }
 
 
