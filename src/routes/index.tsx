@@ -9,6 +9,7 @@ import { BootScreen } from "@/components/BootScreen";
 import { HeroType } from "@/components/HeroType";
 import { ScrollStory } from "@/components/ScrollStory";
 import { Marquee } from "@/components/Marquee";
+import { DailyBeacon } from "@/components/DailyBeacon";
 import { useVisualMode } from "@/lib/visual-quality";
 
 export const Route = createFileRoute("/")({
@@ -83,6 +84,10 @@ function CityMap() {
           </Link>
         </div>
 
+        <div className="mt-8 w-full max-w-xl">
+          <DailyBeacon />
+        </div>
+
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 scroll-hint">
           <span className="stencil text-[9px] text-white/50">SCROLL</span>
           <ChevronDown className="h-4 w-4 text-white/60" />
@@ -103,9 +108,12 @@ function CityMap() {
             <div className="stencil text-[10px] text-cyan-300">// ENTER THE CITY</div>
             <div className="h-px flex-1 bg-cyan-400/20" />
           </div>
-          <h2 className="text-3xl sm:text-5xl font-black text-white leading-none tracking-tight" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
-            Drag the city. Zoom the quarters. Clear the stations.
-          </h2>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <h2 className="text-3xl sm:text-5xl font-black text-white leading-none tracking-tight" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
+              Drag the city. Zoom the quarters. Clear the stations.
+            </h2>
+            <DailyBeacon compact />
+          </div>
         </div>
 
         <div className="mx-auto max-w-6xl mt-6 relative">
@@ -120,6 +128,7 @@ function CityMap() {
       <footer className="mx-auto max-w-6xl px-4 mt-6 border-t border-white/10 pt-6 pb-10 text-center stencil text-[10px] text-white/50 space-y-3">
         <div className="text-cyan-300/80">MEDIA &amp; INFORMATION LITERACY · VERIFY, DON'T GUESS · CALIBRATE, DON'T PANIC</div>
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          <Link to="/drop" className="text-primary hover:underline">[F★] AAJ KA FORWARD — DAILY DROP →</Link>
           <Link to="/educators" className="text-cyan-300 hover:underline">[F0] FOR EDUCATORS →</Link>
           <Link to="/pilot" className="text-cyan-300 hover:underline">[F1] PILOT MODE — CLASSROOM DASHBOARD →</Link>
           <Link to="/kit" className="text-cyan-300 hover:underline">[F2] FIELD KIT — PRINT PACK →</Link>

@@ -41,6 +41,39 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_plays: {
+        Row: {
+          case_id: string
+          correct: boolean
+          created_at: string
+          device_id: string
+          drop_date: string
+          id: string
+          stake: number
+          verdict: string
+        }
+        Insert: {
+          case_id: string
+          correct: boolean
+          created_at?: string
+          device_id: string
+          drop_date: string
+          id?: string
+          stake: number
+          verdict: string
+        }
+        Update: {
+          case_id?: string
+          correct?: boolean
+          created_at?: string
+          device_id?: string
+          drop_date?: string
+          id?: string
+          stake?: number
+          verdict?: string
+        }
+        Relationships: []
+      }
       district_votes: {
         Row: {
           created_at: string
@@ -148,7 +181,29 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_daily_split: {
+        Args: { _case_id: string; _drop_date: string }
+        Returns: {
+          correct_count: number
+          total: number
+        }[]
+      }
+      get_most_devious_designer: {
+        Args: never
+        Returns: {
+          case_id: string
+          fooled_pct: number
+          plays: number
+        }[]
+      }
+      get_sharpest_watch: {
+        Args: never
+        Returns: {
+          correct_pct: number
+          handle: string
+          plays: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

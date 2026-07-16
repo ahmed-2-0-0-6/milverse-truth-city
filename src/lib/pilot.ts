@@ -4,7 +4,7 @@
 // so a real classroom on multiple devices aggregates on the dashboard.
 
 export interface PilotEntry {
-  wing: "mirror" | "feed";
+  wing: "mirror" | "feed" | "daily";
   caseId: string;
   tier?: 1 | 2 | 3 | 4 | 5;
   result: "correct" | "missed_scam" | "false_alarm" | "lucky_guess" | "pyrrhic";

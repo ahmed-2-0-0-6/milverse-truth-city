@@ -17,6 +17,7 @@ import { Route as PilotRouteImport } from './routes/pilot'
 import { Route as MarketRouteImport } from './routes/market'
 import { Route as KitRouteImport } from './routes/kit'
 import { Route as EducatorsRouteImport } from './routes/educators'
+import { Route as DropRouteImport } from './routes/drop'
 import { Route as CityHallRouteImport } from './routes/city-hall'
 import { Route as ArenaRouteImport } from './routes/arena'
 import { Route as ArchiveRouteImport } from './routes/archive'
@@ -68,6 +69,11 @@ const KitRoute = KitRouteImport.update({
 const EducatorsRoute = EducatorsRouteImport.update({
   id: '/educators',
   path: '/educators',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DropRoute = DropRouteImport.update({
+  id: '/drop',
+  path: '/drop',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CityHallRoute = CityHallRouteImport.update({
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
   '/city-hall': typeof CityHallRoute
+  '/drop': typeof DropRoute
   '/educators': typeof EducatorsRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
   '/city-hall': typeof CityHallRoute
+  '/drop': typeof DropRoute
   '/educators': typeof EducatorsRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
@@ -181,6 +189,7 @@ export interface FileRoutesById {
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
   '/city-hall': typeof CityHallRoute
+  '/drop': typeof DropRoute
   '/educators': typeof EducatorsRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
@@ -205,6 +214,7 @@ export interface FileRouteTypes {
     | '/archive'
     | '/arena'
     | '/city-hall'
+    | '/drop'
     | '/educators'
     | '/kit'
     | '/market'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/archive'
     | '/arena'
     | '/city-hall'
+    | '/drop'
     | '/educators'
     | '/kit'
     | '/market'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/archive'
     | '/arena'
     | '/city-hall'
+    | '/drop'
     | '/educators'
     | '/kit'
     | '/market'
@@ -272,6 +284,7 @@ export interface RootRouteChildren {
   ArchiveRoute: typeof ArchiveRouteWithChildren
   ArenaRoute: typeof ArenaRoute
   CityHallRoute: typeof CityHallRoute
+  DropRoute: typeof DropRoute
   EducatorsRoute: typeof EducatorsRoute
   KitRoute: typeof KitRoute
   MarketRoute: typeof MarketRoute
@@ -345,6 +358,13 @@ declare module '@tanstack/react-router' {
       path: '/educators'
       fullPath: '/educators'
       preLoaderRoute: typeof EducatorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drop': {
+      id: '/drop'
+      path: '/drop'
+      fullPath: '/drop'
+      preLoaderRoute: typeof DropRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/city-hall': {
@@ -450,6 +470,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArchiveRoute: ArchiveRouteWithChildren,
   ArenaRoute: ArenaRoute,
   CityHallRoute: CityHallRoute,
+  DropRoute: DropRoute,
   EducatorsRoute: EducatorsRoute,
   KitRoute: KitRoute,
   MarketRoute: MarketRoute,
