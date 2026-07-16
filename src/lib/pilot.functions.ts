@@ -30,7 +30,7 @@ export const logPilotEntryToCloud = createServerFn({ method: "POST" })
     z.object({
       groupCode: z.string().regex(CODE_RE),
       deviceId: z.string().min(8).max(64),
-      wing: z.enum(["mirror", "feed"]),
+      wing: z.enum(["mirror", "feed", "daily"]),
       caseId: z.string().max(120),
       tier: z.number().int().min(1).max(5).optional(),
       result: z.enum(["correct", "missed_scam", "false_alarm", "lucky_guess", "pyrrhic"]),
