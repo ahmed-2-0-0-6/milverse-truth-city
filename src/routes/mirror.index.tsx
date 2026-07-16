@@ -9,6 +9,7 @@ import { fetchCitizenCase } from "@/lib/citizen.functions";
 import { RecommendedStrip } from "@/components/RecommendedStrip";
 import { DistrictIntro } from "@/components/DistrictIntro";
 import mirrorArt from "@/assets/district-mirror.jpg";
+import mirrorVideo from "@/assets/mirror.mp4.asset.json";
 
 export const Route = createFileRoute("/mirror/")({
   head: () => ({
