@@ -179,6 +179,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
   const [aiDown, setAiDown] = useState(false);
   const tacticFlashed = useRef<boolean>(false);
   const [tacticFlash, setTacticFlash] = useState<null | ReturnType<typeof tacticForMirror>>(null);
+  const [contactsOpen, setContactsOpen] = useState(false);
 
   useEffect(() => {
     const opener: Message = { role: "contact", kind: "text", text: scenario.opener, ts: Date.now() };
