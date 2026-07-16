@@ -97,6 +97,7 @@ function ArchivePage() {
         chapter="CHAPTER 04"
         title="THE ARCHIVE"
         art={archiveArt}
+        district="archive"
         lines={[
           "Every case in this room was survived — or wasn't — by someone real. This is the city's memory.",
           "Read it like a debrief, not a museum. Tomorrow's target is in one of these files.",
