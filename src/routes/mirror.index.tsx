@@ -89,6 +89,16 @@ function CaseFiles() {
 
   return (
     <div className="min-h-screen grain">
+      <DistrictIntro
+        id="mirror"
+        chapter="CHAPTER 01"
+        title="THE MIRROR"
+        art={mirrorArt}
+        lines={[
+          "Someone's uncle answered a message like this last week. He's still paying for it.",
+          "Your turn to answer better. Verify the person, not the vibe.",
+        ]}
+      />
       <TopBar />
       <main className="mx-auto max-w-6xl px-4 py-10">
         <Link to="/" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">
