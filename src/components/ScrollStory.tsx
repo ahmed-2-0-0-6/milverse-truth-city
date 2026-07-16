@@ -200,6 +200,7 @@ export function ScrollStory() {
         {DISTRICTS.map((d) => (
           <div key={d.key} className="relative aspect-[16/10] overflow-hidden rounded-sm border border-white/10">
             <img src={d.art} alt="" loading="lazy" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover" />
+            <DistrictLiveFX district={d.key as DistrictKey} intensity="soft" />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <div className="stencil text-[9px]" style={{ color: `rgb(${d.glow})` }}>{d.tag}</div>
