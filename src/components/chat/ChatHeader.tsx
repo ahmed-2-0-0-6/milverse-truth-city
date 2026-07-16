@@ -61,8 +61,12 @@ export function ChatHeader({
         </button>
       </div>
       {number && !isSaved && (
-        <div className="flex items-start gap-2 border-t border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-200">
-          <ShieldAlert className="h-3.5 w-3.5 mt-0.5 shrink-0 text-amber-400" />
+        <div
+          role="note"
+          aria-label={`Warning: the number ${number} is not in your contacts. Any name shown is what the sender claims, not who they are.`}
+          className="flex items-start gap-2 border-t border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-200"
+        >
+          <ShieldAlert className="h-3.5 w-3.5 mt-0.5 shrink-0 text-amber-400" aria-hidden="true" />
           <div>
             <div className="font-semibold text-amber-100">This number is not in your contacts.</div>
             <div className="text-amber-200/80 mt-0.5">

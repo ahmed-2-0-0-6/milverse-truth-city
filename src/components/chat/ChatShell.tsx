@@ -22,7 +22,13 @@ export function ChatShell({ header, children, composer, overlay, className }: Pr
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-[420px] flex-col bg-black text-white sm:my-6 sm:min-h-0 sm:h-[min(880px,calc(100dvh-3rem))] sm:rounded-[36px] sm:border sm:border-white/10 sm:shadow-2xl sm:overflow-hidden sm:ring-1 sm:ring-white/5 relative">
         <StatusBar />
         {header}
-        <div className="relative flex-1 min-h-0 flex flex-col overflow-hidden bg-neutral-950">
+        <div
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions text"
+          aria-label="Chat conversation"
+          className="relative flex-1 min-h-0 flex flex-col overflow-hidden bg-neutral-950"
+        >
           {children}
         </div>
         {composer && (
