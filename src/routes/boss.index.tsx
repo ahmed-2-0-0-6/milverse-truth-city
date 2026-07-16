@@ -101,12 +101,12 @@ function BossLobby() {
                     <div className="mt-1 font-mono text-[11px] text-amber-300/90">
                       PROGRESS · 0 / 1 COMPLETE
                     </div>
-                    <Link
-                      to={districtHref}
+                    <a
+                      href={districtHref}
                       className="mt-2 inline-flex items-center gap-1 rounded border border-amber-500/50 px-3 py-1.5 text-[11px] tracking-widest text-amber-200 hover:bg-amber-500/10 font-mono"
                     >
                       GO TO {districtLabel.toUpperCase()} →
-                    </Link>
+                    </a>
                   </div>
                 )}
               </div>
