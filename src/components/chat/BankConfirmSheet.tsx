@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { X, ChevronDown, ChevronUp, ShieldCheck } from "lucide-react";
 
 interface Props {
