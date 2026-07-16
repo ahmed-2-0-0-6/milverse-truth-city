@@ -575,7 +575,7 @@ function MessageRow({
   );
 }
 
-function TypingBubble({ name: _n }: { name: string }) {
+function TypingBubble({ name }: { name: string }) {
   return (
     <div className="msg-in flex items-center gap-2">
       <div className="rounded-2xl bg-neutral-800 border border-white/10 px-4 py-3">
@@ -583,10 +583,9 @@ function TypingBubble({ name: _n }: { name: string }) {
           <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/50" />
           <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/50" />
           <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/50" />
-
         </div>
       </div>
-      <span className="font-mono text-[10px] text-muted-foreground tracking-widest">{name} is typing…</span>
+      <span className="font-mono text-[10px] text-white/50 tracking-widest">{name} is typing…</span>
     </div>
   );
 }
