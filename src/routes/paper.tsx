@@ -208,8 +208,8 @@ function EditionBody({ edition }: { edition: Edition }) {
 
 function Divider({ label }: { label: string }) {
   return (
-    <div className="paper-fold no-print" aria-hidden />
-  ) as unknown as JSX.Element || <div className="paper-ornament my-8">{label}</div>;
+    <div className="paper-ornament my-8" aria-label={label}>{label}</div>
+  );
 }
 
 function YesterdaysPapers({ currentNumber, onOpen }: { currentNumber: number; onOpen: (n: number) => void }) {

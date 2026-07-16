@@ -14,6 +14,7 @@ import { Route as ReviewRouteImport } from './routes/review'
 import { Route as QuickTourRouteImport } from './routes/quick-tour'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PilotRouteImport } from './routes/pilot'
+import { Route as PaperRouteImport } from './routes/paper'
 import { Route as MarketRouteImport } from './routes/market'
 import { Route as KitRouteImport } from './routes/kit'
 import { Route as EducatorsRouteImport } from './routes/educators'
@@ -55,6 +56,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const PilotRoute = PilotRouteImport.update({
   id: '/pilot',
   path: '/pilot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaperRoute = PaperRouteImport.update({
+  id: '/paper',
+  path: '/paper',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketRoute = MarketRouteImport.update({
@@ -153,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/educators': typeof EducatorsRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
+  '/paper': typeof PaperRoute
   '/pilot': typeof PilotRoute
   '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
@@ -177,6 +184,7 @@ export interface FileRoutesByTo {
   '/educators': typeof EducatorsRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
+  '/paper': typeof PaperRoute
   '/pilot': typeof PilotRoute
   '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/educators': typeof EducatorsRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
+  '/paper': typeof PaperRoute
   '/pilot': typeof PilotRoute
   '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/educators'
     | '/kit'
     | '/market'
+    | '/paper'
     | '/pilot'
     | '/profile'
     | '/quick-tour'
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
     | '/educators'
     | '/kit'
     | '/market'
+    | '/paper'
     | '/pilot'
     | '/profile'
     | '/quick-tour'
@@ -276,6 +287,7 @@ export interface FileRouteTypes {
     | '/educators'
     | '/kit'
     | '/market'
+    | '/paper'
     | '/pilot'
     | '/profile'
     | '/quick-tour'
@@ -301,6 +313,7 @@ export interface RootRouteChildren {
   EducatorsRoute: typeof EducatorsRoute
   KitRoute: typeof KitRoute
   MarketRoute: typeof MarketRoute
+  PaperRoute: typeof PaperRoute
   PilotRoute: typeof PilotRoute
   ProfileRoute: typeof ProfileRoute
   QuickTourRoute: typeof QuickTourRoute
@@ -350,6 +363,13 @@ declare module '@tanstack/react-router' {
       path: '/pilot'
       fullPath: '/pilot'
       preLoaderRoute: typeof PilotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/paper': {
+      id: '/paper'
+      path: '/paper'
+      fullPath: '/paper'
+      preLoaderRoute: typeof PaperRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/market': {
@@ -495,6 +515,7 @@ const rootRouteChildren: RootRouteChildren = {
   EducatorsRoute: EducatorsRoute,
   KitRoute: KitRoute,
   MarketRoute: MarketRoute,
+  PaperRoute: PaperRoute,
   PilotRoute: PilotRoute,
   ProfileRoute: ProfileRoute,
   QuickTourRoute: QuickTourRoute,
