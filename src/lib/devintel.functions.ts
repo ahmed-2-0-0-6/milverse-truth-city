@@ -96,7 +96,7 @@ export const fetchIntelligence = createServerFn({ method: "POST" })
       .limit(20000);
     if (error) throw new Error(error.message);
 
-    return summarize(rows ?? []);
+    return summarize((rows ?? []) as unknown as TmRow[]);
   });
 
 interface TmRow {
