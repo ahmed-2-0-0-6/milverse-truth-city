@@ -227,6 +227,45 @@ export type Database = {
         }
         Relationships: []
       }
+      family_code_attempts: {
+        Row: {
+          code: string
+          count: number
+          hour_bucket: string
+        }
+        Insert: {
+          code: string
+          count?: number
+          hour_bucket: string
+        }
+        Update: {
+          code?: string
+          count?: number
+          hour_bucket?: string
+        }
+        Relationships: []
+      }
+      family_codes: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          revoked_at: string | null
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          revoked_at?: string | null
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          revoked_at?: string | null
+        }
+        Relationships: []
+      }
       paper_interactions: {
         Row: {
           correct: boolean
@@ -367,6 +406,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      family_code_is_active: { Args: { _code: string }; Returns: boolean }
+      family_code_register: { Args: { _code: string }; Returns: undefined }
+      family_code_revoke: { Args: { _code: string }; Returns: undefined }
+      family_code_touch: {
+        Args: { _code: string; _limit?: number }
+        Returns: boolean
+      }
       get_daily_split: {
         Args: { _case_id: string; _drop_date: string }
         Returns: {
