@@ -2,11 +2,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Library, ScrollText, Users, ArrowRight, ShieldCheck, BookMarked, Stamp, X } from "lucide-react";
+import { Library, ScrollText, Users, ArrowRight, ShieldCheck, BookMarked, Stamp, X, Building2 } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { SCENARIOS, type Scenario, saveCitizenCase } from "@/lib/mirror/scenarios";
 import { listCommunityCases } from "@/lib/story.functions";
 import { loadProfile, type HistoryEntry, type TrustProfile } from "@/lib/mirror/profile";
+import { DistrictIntro } from "@/components/DistrictIntro";
+import archiveArt from "@/assets/district-archive.jpg";
 
 export const Route = createFileRoute("/archive")({
   head: () => ({
