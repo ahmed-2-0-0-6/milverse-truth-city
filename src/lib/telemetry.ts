@@ -10,12 +10,14 @@ export type TelemetryEventType =
   | "js_error"
   | "case_start"
   | "case_complete"
+  | "case_verdict_locked"
   | "drop_play"
   | "drop_break"
   | "tool_pick"
   | "manual_open"
   | "share_copy"
-  | "lite_fallback";
+  | "lite_fallback"
+  | "paper_section_done";
 
 export interface TelemetryEvent {
   event_type: TelemetryEventType;
