@@ -938,3 +938,64 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-\[heartbeat_1\.6s_ease-in-out_infinite\] { animation: none !important; }
 }
+
+/* ── PASS-1 · ACCESS LAYER ─────────────────────────────────────────
+   Universal focus ring, text-size scale, high-legibility mode,
+   and forced reduce-motion. Driven by <html data-*> from AccessProvider. */
+
+/* Signal-glow focus ring — visible on every keyboard focus, site-wide.
+   Individual components may keep their own focus-visible:ring-* classes,
+   but this guarantees SOMETHING appears even on bespoke elements. */
+:where(a, button, [role="button"], [role="switch"], [role="tab"],
+       input, select, textarea, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Text size scale — root font-size drives all rem-based type. */
+html[data-text-size="large"]  { font-size: 112.5%; }  /* 18px */
+html[data-text-size="xl"]     { font-size: 125%;   }  /* 20px */
+
+/* Force reduce motion (additive to system pref). Cancels animations
+   and transitions everywhere, mirroring @media (prefers-reduced-motion). */
+html[data-force-reduce-motion="on"] *,
+html[data-force-reduce-motion="on"] *::before,
+html[data-force-reduce-motion="on"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* High legibility mode — dark plain surface, no grain/flicker/vignette,
+   denser leading. Composes with LITE mode; overrides atmosphere layers. */
+html[data-high-legibility="on"] {
+  --background: oklch(0.14 0.02 260);
+  --foreground: oklch(0.97 0.005 250);
+  --card: oklch(0.18 0.02 260);
+  --card-foreground: oklch(0.97 0.005 250);
+  --muted-foreground: oklch(0.82 0.01 260);
+  --border: oklch(0.35 0.02 260);
+}
+html[data-high-legibility="on"] body {
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+}
+html[data-high-legibility="on"] .atmo-grain,
+html[data-high-legibility="on"] .atmo-flicker,
+html[data-high-legibility="on"] .atmo-vignette,
+html[data-high-legibility="on"] .fog-drift,
+html[data-high-legibility="on"] .neon-flicker,
+html[data-high-legibility="on"] .fx-rain,
+html[data-high-legibility="on"] .fx-rain-hard,
+html[data-high-legibility="on"] .fx-lightning,
+html[data-high-legibility="on"] .kenburns,
+html[data-high-legibility="on"] .scan-sweep::before {
+  display: none !important;
+  animation: none !important;
+}
+html[data-high-legibility="on"] [class*="text-shadow"],
+html[data-high-legibility="on"] .neon-flicker {
+  text-shadow: none !important;
+}
