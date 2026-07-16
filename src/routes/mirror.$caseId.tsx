@@ -42,17 +42,22 @@ function CasePlay() {
   const { scenario } = Route.useLoaderData();
   const [phase, setPhase] = useState<Phase>("dossier");
 
+  // In the "sim" phase, ChatShell owns the whole viewport (phone frame).
+  // Every other phase keeps the normal MILVERSE app chrome.
+  if (phase === "sim") {
+    return (
+      <Simulation
+        scenario={scenario}
+        onEnd={() => setPhase("verdict")}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen grain">
       <TopBar />
       <div className="mx-auto max-w-3xl px-4 pt-4"><RookieIntro /></div>
       {phase === "dossier" && <Dossier scenario={scenario} onStart={() => setPhase("sim")} />}
-      {phase === "sim" && (
-        <Simulation
-          scenario={scenario}
-          onEnd={() => setPhase("verdict")}
-        />
-      )}
       {phase === "verdict" && <Verdict scenario={scenario} onDone={() => setPhase("reveal")} />}
       {phase === "reveal" && <VerdictReveal scenario={scenario} onDone={() => setPhase("debrief")} />}
       {phase === "debrief" && <Debrief scenario={scenario} />}
@@ -541,7 +546,7 @@ function MessageRow({
         <div className="flex flex-col gap-1">
           {m.text && (
             <div className={`max-w-[80%] rounded-2xl px-3 py-1.5 text-xs italic ${
-              isPlayer ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-card border border-border rounded-bl-sm text-muted-foreground"
+              isPlayer ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-neutral-800 border border-white/10 rounded-bl-sm text-white/80"
             }`}>
               {m.text}
             </div>
@@ -559,8 +564,8 @@ function MessageRow({
             isPlayer
               ? "bg-primary text-primary-foreground rounded-br-sm"
               : pinned
-                ? "bg-caution/15 border border-caution/40 rounded-bl-sm"
-                : "bg-card border border-border rounded-bl-sm"
+                ? "bg-caution/20 border border-caution/50 text-white rounded-bl-sm"
+                : "bg-neutral-800 border border-white/10 text-white rounded-bl-sm"
           }`}
         >
           {m.text}
@@ -570,14 +575,15 @@ function MessageRow({
   );
 }
 
-function TypingBubble({ name }: { name: string }) {
+function TypingBubble({ name: _n }: { name: string }) {
   return (
     <div className="msg-in flex items-center gap-2">
-      <div className="rounded-2xl bg-card border border-border px-4 py-3">
+      <div className="rounded-2xl bg-neutral-800 border border-white/10 px-4 py-3">
         <div className="flex gap-1">
-          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-muted-foreground" />
-          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-muted-foreground" />
-          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-muted-foreground" />
+          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/50" />
+          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/50" />
+          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/50" />
+
         </div>
       </div>
       <span className="font-mono text-[10px] text-muted-foreground tracking-widest">{name} is typing…</span>
