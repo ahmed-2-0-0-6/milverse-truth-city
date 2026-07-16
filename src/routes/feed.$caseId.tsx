@@ -42,6 +42,24 @@ function FeedPlay() {
 
 
   useEffect(() => {
+    track("case_start", { case_id: scenario.id, payload: { district: "feed", tactic: scenario.tacticId ?? "unknown" } });
+  }, [scenario.id, scenario.tacticId]);
+
+  useEffect(() => {
+    if (outcome) {
+      track("case_complete", {
+        case_id: scenario.id,
+        payload: {
+          district: "feed",
+          correct: outcome.result === "correct",
+          result: outcome.result,
+          tactic: scenario.tacticId ?? "unknown",
+        },
+      });
+    }
+  }, [outcome, scenario.id, scenario.tacticId]);
+
+  useEffect(() => {
     if (phase === "sim" && messages.length === 0) {
       setMessages([
         { role: "sender", text: scenario.opener, ts: Date.now() },
