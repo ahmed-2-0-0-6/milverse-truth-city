@@ -76,11 +76,15 @@ export function LicenseCard({ onClose }: Props) {
       const suffix = d?.manualCode ? `  ·  Field Manual ${d.manualCode}` : "";
       ctx.fillText(`L${l.n} · ${l.title}${suffix}`, 72 + col * 540, 432 + row * 28);
     });
-    // Footer
+    // Footer — issue mark is per-print, not stored anywhere.
     const issued = state.licenseIssuedAt ? new Date(state.licenseIssuedAt) : new Date();
     ctx.fillStyle = "#94a3b8"; ctx.font = "500 13px ui-monospace, Menlo, monospace";
-    ctx.fillText(`LICENSE NO. ${state.licenseNumber ?? "PENDING"}`, 72, 688);
+    ctx.fillText(`ISSUE MARK ${issueMark}`, 72, 688);
     ctx.fillText(`ISSUED ${issued.toISOString().slice(0, 10)}`, 72, 710);
+    // Small print — the license disclaimer, on-card.
+    ctx.fillStyle = "#64748b"; ctx.font = "italic 11px ui-sans-serif, system-ui, sans-serif";
+    ctx.fillText("Certifies completion of a learning pathway. Not a guarantee of online", 72, 732);
+    ctx.fillText("safety — the training continues in real life.", 72, 748);
     // Stamp
     ctx.save();
     ctx.translate(W - 200, H - 180);
