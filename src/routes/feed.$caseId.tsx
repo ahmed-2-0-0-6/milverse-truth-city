@@ -20,6 +20,7 @@ import { RookieIntro } from "@/components/handler/RookieIntro";
 import { track } from "@/lib/telemetry";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChatHeader } from "@/components/chat/ChatHeader";
+import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 
 export const Route = createFileRoute("/feed/$caseId")({
   loader: ({ params }) => {

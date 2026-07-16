@@ -19,6 +19,7 @@ import { CallScreen } from "@/components/chat/CallScreen";
 import { BankConfirmSheet } from "@/components/chat/BankConfirmSheet";
 import { NotificationBanner, type NotificationPayload } from "@/components/chat/NotificationBanner";
 import { detectAmount, type SavedContact } from "@/lib/chat/contacts";
+import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 
 export const Route = createFileRoute("/boss/$bossId")({
   component: BossPlay,

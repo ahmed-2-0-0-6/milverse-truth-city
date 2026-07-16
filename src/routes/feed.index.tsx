@@ -5,6 +5,7 @@ import { FormatBadge } from "@/components/feed/FormatFrame";
 import { DistrictIntro } from "@/components/DistrictIntro";
 import feedArt from "@/assets/district-feed.jpg";
 import { Newspaper, Share2 } from "lucide-react";
+import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 
 export const Route = createFileRoute("/feed/")({
   head: () => ({
@@ -23,6 +24,8 @@ const TIER_NAMES: Record<1 | 2 | 3, string> = {
 };
 
 function FeedIndex() {
+  const gate = useJuniorGate("The Feed");
+  if (gate) return gate;
   return (
     <div className="min-h-screen grain">
       <TopBar />
