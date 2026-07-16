@@ -95,8 +95,10 @@ function BossPlay() {
   /* ── INTRO CINEMATIC ─────────────────────────────────────── */
   if (stage === "intro") {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
-        <div className="max-w-lg w-full">
+      <div className="min-h-screen bg-black text-white flex items-center justify-center p-6 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-70"><DistrictLiveFX district={fxDistrict} intensity="soft" /></div>
+        <div className="max-w-lg w-full relative">
+
           <div className="border border-red-900/60 bg-gradient-to-br from-red-950/40 to-black rounded-lg p-6 space-y-4 animate-in fade-in duration-700">
             <div className="flex items-center gap-2 text-red-500 text-[10px] tracking-[0.4em]">
               <Skull className="w-3 h-3" /> SPECIAL CASE — BOSS PROTOCOL
