@@ -220,22 +220,23 @@ function Studio() {
 
   return (
     <div className="min-h-screen grain">
-      <DistrictIntro
-        id="studio"
-        chapter="CHAPTER 05"
-        title="THE STUDIO"
-        art={studioArt}
-        district="studio"
-        lines={[
-          "Enough training. Someone's cousin is about to answer a message like this next week.",
-          "Write the case they'll rehearse against. The city's next cases are written by players like you.",
-        ]}
-      />
       <TopBar />
       <main className="mx-auto max-w-2xl px-4 py-10">
+        <DistrictIntro
+          id="studio"
+          chapter="CHAPTER 05"
+          title="THE STUDIO"
+          art={studioArt}
+          district="studio"
+          lines={[
+            "Enough training. Someone's cousin is about to answer a message like this next week.",
+            "Write the case they'll rehearse against. The city's next cases are written by players like you.",
+          ]}
+        />
         <Link to="/" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">
           ← CITY
         </Link>
+
         <div className="mt-4 mb-8">
           <div className="flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-primary">
             <Clapperboard className="h-4 w-4" /> THE STUDIO · CASE DESIGNER

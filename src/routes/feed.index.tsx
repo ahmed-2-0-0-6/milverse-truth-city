@@ -25,20 +25,21 @@ const TIER_NAMES: Record<1 | 2 | 3, string> = {
 function FeedIndex() {
   return (
     <div className="min-h-screen grain">
-      <DistrictIntro
-        id="feed"
-        chapter="CHAPTER 02"
-        title="THE FEED"
-        art={feedArt}
-        district="feed"
-        lines={[
-          "The message arrives from someone you love. It carries a claim you'd want to be true — or dread is true.",
-          "Your job is to check the claim without breaking the person. Verify the source. Correct with dignity. Both are the work.",
-        ]}
-      />
       <TopBar />
       <main className="mx-auto max-w-5xl px-4 py-10">
+        <DistrictIntro
+          id="feed"
+          chapter="CHAPTER 02"
+          title="THE FEED"
+          art={feedArt}
+          district="feed"
+          lines={[
+            "The message arrives from someone you love. It carries a claim you'd want to be true — or dread is true.",
+            "Your job is to check the claim without breaking the person. Verify the source. Correct with dignity. Both are the work.",
+          ]}
+        />
         <Link to="/" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">← CITY</Link>
+
         <div className="mt-4 max-w-2xl">
           <div className="font-mono text-xs tracking-[0.3em] text-primary">THE FEED · MASS DECEPTION</div>
           <h1 className="mt-2 text-3xl sm:text-4xl font-semibold">Claims, not con artists.</h1>
