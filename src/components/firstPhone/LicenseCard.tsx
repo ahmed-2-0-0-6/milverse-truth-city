@@ -54,11 +54,17 @@ export function LicenseCard({ onClose }: Props) {
     // Endorsements
     ctx.fillStyle = "#94a3b8"; ctx.font = "500 14px ui-monospace, Menlo, monospace";
     ctx.fillText("ENDORSEMENTS · SKILLS EARNED", 72, 400);
-    ctx.fillStyle = "#e2e8f0"; ctx.font = "500 15px ui-sans-serif, system-ui, sans-serif";
+    // Each endorsement pairs the lesson title with its Field Manual entry so
+    // the license reads as a bridge between the junior register and the adult
+    // MIL taxonomy.
+    ctx.fillStyle = "#e2e8f0"; ctx.font = "500 13px ui-sans-serif, system-ui, sans-serif";
     LESSONS.forEach((l, i) => {
       const col = i < 5 ? 0 : 1;
       const row = i % 5;
-      ctx.fillText(`L${l.n} · ${l.title}`, 72 + col * 540, 432 + row * 28);
+      const primary = l.cases[0]?.tactic;
+      const d = primary ? describeTactic(primary) : null;
+      const suffix = d?.manualCode ? `  ·  Field Manual ${d.manualCode}` : "";
+      ctx.fillText(`L${l.n} · ${l.title}${suffix}`, 72 + col * 540, 432 + row * 28);
     });
     // Footer
     const issued = state.licenseIssuedAt ? new Date(state.licenseIssuedAt) : new Date();
