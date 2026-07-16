@@ -2,12 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { TopBar } from "@/components/TopBar";
-import { fetchPilotGroup } from "@/lib/pilot.functions";
+import { registerFamilyCode, regenerateFamilyCode, fetchFamilyProgress, checkFamilyCodeJoin } from "@/lib/family.functions";
 import { LESSONS, TOTAL_LESSONS, type JuniorTactic } from "@/lib/firstPhone/lessons";
 import { loadFirstPhone, joinFamily } from "@/lib/firstPhone/profile";
 import { manualDisplayForTactics } from "@/lib/firstPhone/tacticMap";
 import { JUNIOR_COPY } from "@/lib/firstPhone/copy";
-import { Users, Copy, Check, ShieldCheck } from "lucide-react";
+import { Users, Copy, Check, ShieldCheck, RefreshCw } from "lucide-react";
+
+/** Threshold below which aggregated metrics are suppressed (k-anonymity). */
+const K_ANON = 5;
 
 export const Route = createFileRoute("/family")({
   head: () => ({
