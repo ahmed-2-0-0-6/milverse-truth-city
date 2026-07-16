@@ -227,3 +227,7 @@ export const MANUAL_ENTRIES: ManualEntry[] = [
     counterMove: "The 30-second cooldown. Strong emotion IS the tell — stop, breathe, verify before you amplify. Attack the claim, never the people. Anger that survives a 30-second pause and a source check is legitimate; anger that doesn't survive the pause was never yours in the first place.",
   },
 ];
+
+export function getManualEntry(id: string): ManualEntry | undefined {
+  return MANUAL_ENTRIES.find((e) => e.id === id);
+}
