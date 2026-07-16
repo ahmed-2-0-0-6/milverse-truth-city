@@ -122,6 +122,69 @@ export type Database = {
         }
         Relationships: []
       }
+      editions: {
+        Row: {
+          content: Json
+          created_at: string
+          edition_date: string
+          edition_number: number
+          id: string
+          motto: string
+          published_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          edition_date: string
+          edition_number: number
+          id?: string
+          motto?: string
+          published_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          edition_date?: string
+          edition_number?: number
+          id?: string
+          motto?: string
+          published_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      paper_interactions: {
+        Row: {
+          correct: boolean
+          created_at: string
+          device_id: string | null
+          edition_number: number
+          id: string
+          section: string
+        }
+        Insert: {
+          correct: boolean
+          created_at?: string
+          device_id?: string | null
+          edition_number: number
+          id?: string
+          section: string
+        }
+        Update: {
+          correct?: boolean
+          created_at?: string
+          device_id?: string | null
+          edition_number?: number
+          id?: string
+          section?: string
+        }
+        Relationships: []
+      }
       pilot_entries: {
         Row: {
           case_id: string
@@ -248,6 +311,13 @@ export type Database = {
           case_id: string
           fooled_pct: number
           plays: number
+        }[]
+      }
+      get_paper_split: {
+        Args: { _edition_number: number; _section: string }
+        Returns: {
+          correct_count: number
+          total: number
         }[]
       }
       get_sharpest_watch: {
