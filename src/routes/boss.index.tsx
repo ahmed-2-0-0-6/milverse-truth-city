@@ -5,6 +5,7 @@ import { TopBar } from "@/components/TopBar";
 import { BOSSES } from "@/lib/boss/scenarios";
 import { loadBossProfile, canRematch } from "@/lib/boss/profile";
 import { DOCTRINE_RULES } from "@/lib/boss/doctrine";
+import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 
 export const Route = createFileRoute("/boss/")({
   head: () => ({
@@ -15,7 +16,10 @@ export const Route = createFileRoute("/boss/")({
       { property: "og:description", content: "Fact-checks will not save you. Protocol will." },
     ],
   }),
-  component: BossLobby,
+  component: function BossIndexGuarded() {
+    const gate = useJuniorGate("Boss Protocol");
+    return gate ?? <BossLobby />;
+  },
 });
 
 function BossLobby() {

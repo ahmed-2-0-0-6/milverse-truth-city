@@ -25,6 +25,7 @@ import { tacticForMirror } from "@/lib/mirror/tactics";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ContactsSheet } from "@/components/chat/ContactsSheet";
+import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 
 
 export const Route = createFileRoute("/mirror/$caseId")({
@@ -33,7 +34,10 @@ export const Route = createFileRoute("/mirror/$caseId")({
     if (!s) throw notFound();
     return { scenario: s };
   },
-  component: CasePlay,
+  component: function MirrorCaseGuarded() {
+    const gate = useJuniorGate("The Mirror");
+    return gate ?? <CasePlay />;
+  },
 });
 
 type Phase = "dossier" | "sim" | "verdict" | "reveal" | "debrief";

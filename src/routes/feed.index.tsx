@@ -5,6 +5,7 @@ import { FormatBadge } from "@/components/feed/FormatFrame";
 import { DistrictIntro } from "@/components/DistrictIntro";
 import feedArt from "@/assets/district-feed.jpg";
 import { Newspaper, Share2 } from "lucide-react";
+import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 
 export const Route = createFileRoute("/feed/")({
   head: () => ({
@@ -13,7 +14,10 @@ export const Route = createFileRoute("/feed/")({
       { name: "description", content: "Verify claims, not just people. Fight viral lies without breaking your relationships." },
     ],
   }),
-  component: FeedIndex,
+  component: function FeedIndexGuarded() {
+    const gate = useJuniorGate("The Feed");
+    return gate ?? <FeedIndex />;
+  },
 });
 
 const TIER_NAMES: Record<1 | 2 | 3, string> = {
