@@ -21,7 +21,8 @@ export type FeedTacticId =
   | "trust-farming"
   | "ai-generated"
   | "mis-dis-mal"
-  | "forgery-engine";
+  | "forgery-engine"
+  | "outrage-machine";
 
 export interface FeedAction {
   id: string;
@@ -1115,7 +1116,98 @@ const NEW_CASES: FeedScenario[] = [
   },
 ];
 
+/* ── T-11 OUTRAGE MACHINE — added cases (all names/places FICTIONAL) ─── */
+const OUTRAGE_CASES: FeedScenario[] = [
+  {
+    id: "outrage-quote",
+    title: "THE QUOTE",
+    teaser: "A fabricated inflammatory quote-card attributed to a fictional council figure.",
+    tier: 2,
+    verdict: "FALSE",
+    format: "image",
+    tacticId: "outrage-machine",
+    sender: { name: "Bilal (cousin)", relationship: "Family DM", voice: "furious, sends quote-cards, wants you to pick a side fast" },
+    senderMotive: "He's genuinely upset. He read the card, felt the anger, forwarded it in two seconds. He is not the enemy — the card is.",
+    opener: "Look what this Council-member from Northrun District SAID about people from the Estuary. Share EVERYWHERE. This can't stand.",
+    forward: {
+      meta: "Image forward · Tapscroll",
+      headline: "\"They don't belong in Milverse and I will personally see them removed.\" — Cllr. R. Aslani, Northrun District",
+      imageEmoji: "🖼️",
+      imageAlt: "A quote card with a low-res photo of a councilman, a big red inflammatory quote, and a channel-style watermark",
+      bodyLines: [
+        "Quote-card graphic, aggressive red type over dark photo.",
+        "Watermark reads: 'CIVIC WATCH · MILVERSE' — a channel-looking logo.",
+        "No source link, no date, no clip.",
+      ],
+    },
+    actions: [
+      { id: "search-quote", label: "Search the exact quote in Cllr. Aslani's public record", tool: "check_source", result: "The quote appears nowhere: no council transcript, no recording, no press release, no news report. Zero hits outside forwarded quote-cards.", decisive: true },
+      { id: "check-real", label: "Pull Cllr. Aslani's actual recent statement on the Estuary community", tool: "check_source", result: "His actual statement is procedural and mundane — a routine remark about housing timelines. Nothing inflammatory.", decisive: true },
+      { id: "trace-card", label: "Trace the quote-card graphic", tool: "reverse_image", result: "The card layout matches a public meme template circulating for weeks with different names swapped in — 'CIVIC WATCH · MILVERSE' is not a real outlet.", decisive: true },
+      { id: "check-comments", label: "Read the comment threads under the forwarded card", tool: "cross_check", result: "Comments are already at war. Nobody is asking for a source. The anger is doing the verification for people." },
+    ],
+    truthNote: "The quote does not exist in any recording, transcript, or report. The card is a meme template. His real statement is boring. The card was built to make you furious enough to skip the check.",
+    respectfulScript: "Bilal bhai I looked — there's no recording, no transcript, no news report of that quote. It only exists on forwarded cards. His actual recent statement was about housing paperwork. I know this stuff makes us angry, but this specific card was built to weaponise us. Let me send you what he actually said.",
+    inspiredBy: {
+      patternName: "Fabricated Quote-Card",
+      country: "Global · pre-election periods",
+      year: "2018–ongoing",
+      whatHappened: "Anonymous accounts and coordinated networks produce quote-cards attributing inflammatory statements to real or lightly-fictional public figures, timed for maximum reach. The visual grammar mimics a news outlet; the goal is anger before verification.",
+      prevention: [
+        "Any 'quote' without a link to the recording or transcript is a claim, not a quote.",
+        "Search the exact phrase — real inflammatory quotes get reported by multiple outlets within hours.",
+        "Card templates get reused; a reverse-image on the graphic often surfaces older uses.",
+      ],
+    },
+  },
+  {
+    id: "outrage-invasion-album",
+    title: "THE INVASION ALBUM",
+    teaser: "Three photos captioned as a fictional newcomer community's crimes.",
+    tier: 3,
+    verdict: "FALSE",
+    format: "image",
+    tacticId: "outrage-machine",
+    sender: { name: "Uncle Rehan", relationship: "Family group", voice: "grave, sends 'this is what they don't tell you' albums" },
+    senderMotive: "He is genuinely frightened for his neighbourhood. Frightened people forward first and check later — that is exactly what the album is designed to exploit.",
+    opener: "This is what's actually happening in the outer wards. Media won't touch it. Wake up everyone — share to your groups.",
+    forward: {
+      meta: "3-photo album · Tapscroll",
+      headline: "'The Estuary newcomers — a week in the outer wards'",
+      imageEmoji: "🖼️🖼️🖼️",
+      imageAlt: "Three unrelated dramatic photos: a burned-out storefront, an overturned vehicle at night, a crowd on a bridge",
+      bodyLines: [
+        "Photo 1 caption: 'Estuary newcomers torched this shop on 3rd Ave — last Tuesday.'",
+        "Photo 2 caption: 'Their crowd overturned this bus in Northrun — nobody arrested.'",
+        "Photo 3 caption: 'Bridge blockade last night. This is a coordinated takeover.'",
+      ],
+    },
+    actions: [
+      { id: "reverse-1", label: "Reverse-search photo 1 (burned storefront)", tool: "reverse_image", result: "Photo is from a different (fictional) city — an accidental electrical fire two years ago, unrelated community, no arson.", decisive: true },
+      { id: "reverse-2", label: "Reverse-search photo 2 (overturned vehicle)", tool: "reverse_image", result: "Photo is from a completely different (fictional) city and year — a road-safety protest, not an attack.", decisive: true },
+      { id: "reverse-3", label: "Reverse-search photo 3 (bridge crowd)", tool: "reverse_image", result: "Photo is from yet another (fictional) city — a public festival crowd, mistagged and re-captioned.", decisive: true },
+      { id: "check-outlets", label: "Check any Milverse newsroom for these 'incidents'", tool: "check_source", result: "None reported. There is no wire story matching any of the three captions in the outer wards this month." },
+      { id: "check-date", label: "Check when the three captions first appeared together", tool: "check_date", result: "The album first surfaced 48 hours ago on an anonymous channel that has posted similar 'invasion' albums about three other groups this year." },
+    ],
+    truthNote: "The photos were real. The story was the weapon. Three unrelated images from three different cities and years, restaged as one community's coordinated crimes. This is the Outrage Machine's most dangerous form — real footage carrying a fabricated narrative.",
+    respectfulScript: "Uncle I reverse-searched all three photos — each one is from a different city, different year, and nothing to do with the Estuary newcomers. No newsroom is reporting any of these incidents this month. The album is genuine images used to sell a story that isn't happening. Please don't forward — it puts real neighbours in real danger.",
+    inspiredBy: {
+      patternName: "The 'Invasion' Album",
+      country: "Global · communal-tension events",
+      year: "2016–ongoing",
+      whatHappened: "Coordinated networks compile unrelated photos from disparate places and years and repackage them as a single named community's crimes, always ahead of a vote or a demonstration. The real photos carry the credibility; the false captions carry the payload.",
+      prevention: [
+        "Reverse-image every photo in a themed album — not just the first one.",
+        "A real coordinated event produces real newsroom coverage. Silence from every outlet is the tell.",
+        "Track the channel's history — the same album pattern reused against different groups is the fingerprint.",
+      ],
+    },
+  },
+];
+
 FEED_SCENARIOS.push(...NEW_CASES);
+FEED_SCENARIOS.push(...OUTRAGE_CASES);
+
 
 /* ── Format + tactic defaults for existing cases ────────────────
    Additive-only: keeps original data intact, just fills the new fields.
