@@ -191,50 +191,108 @@ function Stat({ label, value, tone }: { label: string; value: number; tone?: "go
   );
 }
 
-function esc(s: string) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+interface CardData {
+  callsign: string; rank: string; rankCode: string; tagline: string; xp: number;
+  calibration: string; correct: number; total: number; missed: number; falseAlarms: number;
+  manualPct: number; designed: number;
 }
 
-function buildCardSvg(d: {
-  callsign: string; rank: string; rankCode: string; xp: number; calibration: string;
-  correct: number; total: number; missed: number; falseAlarms: number; manualPct: number;
-}) {
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#050813"/>
-      <stop offset="1" stop-color="#0a1424"/>
-    </linearGradient>
-    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
-      <circle cx="1" cy="1" r="1" fill="#22d3ee" opacity="0.08"/>
-    </pattern>
-  </defs>
-  <rect width="1200" height="630" fill="url(#bg)"/>
-  <rect width="1200" height="630" fill="url(#grid)"/>
-  <rect x="20" y="20" width="1160" height="590" fill="none" stroke="#22d3ee" stroke-opacity="0.4" stroke-width="2"/>
-  <text x="60" y="90" fill="#22d3ee" font-family="monospace" font-size="18" letter-spacing="6">MILVERSE · OPERATOR PROFILE</text>
-  <text x="60" y="130" fill="#94a3b8" font-family="monospace" font-size="16" letter-spacing="4">${esc(d.callsign)}</text>
-  <text x="60" y="260" fill="#ffffff" font-family="Impact, sans-serif" font-size="132" letter-spacing="2">${esc(d.rank)}</text>
-  <text x="60" y="300" fill="#22d3ee" font-family="monospace" font-size="20" letter-spacing="4">${esc(d.rankCode)} · ${d.xp} XP</text>
+/** Noir ID-card, rendered client-side to a PNG blob. No external service. */
+function renderProfileCardPng(d: CardData): Promise<Blob> {
+  return new Promise((resolve) => {
+    const W = 1200, H = 630;
+    const canvas = document.createElement("canvas");
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext("2d")!;
 
-  <g transform="translate(60,360)">
-    ${statSvg(0, "CASES", d.total)}
-    ${statSvg(1, "CORRECT", d.correct)}
-    ${statSvg(2, "MISSED", d.missed)}
-    ${statSvg(3, "FALSE ALARM", d.falseAlarms)}
-  </g>
+    // Background gradient
+    const bg = ctx.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, "#050813");
+    bg.addColorStop(1, "#0a1424");
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
 
-  <text x="60" y="560" fill="#94a3b8" font-family="monospace" font-size="16" letter-spacing="3">CALIBRATION · ${esc(d.calibration.toUpperCase())}   ·   MANUAL · ${d.manualPct}%</text>
-  <text x="60" y="595" fill="#22d3ee" font-family="monospace" font-size="14" letter-spacing="4">TRAIN YOUR TRUST · milverse</text>
-</svg>`;
+    // Grain / dot grid
+    ctx.fillStyle = "rgba(34,211,238,0.08)";
+    for (let y = 12; y < H; y += 12) for (let x = 12; x < W; x += 12) ctx.fillRect(x, y, 1, 1);
+
+    // Cyan border + stamp corner marks
+    ctx.strokeStyle = "rgba(34,211,238,0.4)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(20, 20, W - 40, H - 40);
+    ctx.strokeStyle = "rgba(34,211,238,0.7)";
+    ctx.lineWidth = 3;
+    [[20,20],[W-60,20],[20,H-60],[W-60,H-60]].forEach(([x,y]) => {
+      ctx.beginPath(); ctx.moveTo(x, y+40); ctx.lineTo(x, y); ctx.lineTo(x+40, y); ctx.stroke();
+    });
+
+    // Header
+    ctx.fillStyle = "#22d3ee";
+    ctx.font = "600 18px ui-monospace, Menlo, monospace";
+    ctx.fillText("MILVERSE · OPERATOR PROFILE", 60, 82);
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "16px ui-monospace, Menlo, monospace";
+    ctx.fillText(d.callsign, 60, 118);
+
+    // Rank name (big)
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 128px Impact, 'Bebas Neue', sans-serif";
+    ctx.fillText(d.rank, 60, 250);
+
+    // Rank meta
+    ctx.fillStyle = "#22d3ee";
+    ctx.font = "500 20px ui-monospace, Menlo, monospace";
+    ctx.fillText(`${d.rankCode}  ·  ${d.xp} XP`, 60, 285);
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "italic 16px ui-serif, Georgia, serif";
+    ctx.fillText(d.tagline, 60, 312);
+
+    // Stat boxes
+    const stats: [string, number, string][] = [
+      ["CASES", d.total, "#e2e8f0"],
+      ["CORRECT", d.correct, "#22d3ee"],
+      ["MISSED", d.missed, "#f87171"],
+      ["FALSE ALARM", d.falseAlarms, "#fbbf24"],
+    ];
+    stats.forEach(([label, value, color], i) => {
+      const x = 60 + i * 270;
+      ctx.strokeStyle = "rgba(34,211,238,0.3)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x, 360, 250, 120);
+      ctx.fillStyle = color;
+      ctx.font = "900 68px Impact, 'Bebas Neue', sans-serif";
+      ctx.fillText(String(value), x + 20, 435);
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "500 12px ui-monospace, Menlo, monospace";
+      ctx.fillText(label, x + 20, 465);
+    });
+
+    // Footer meta
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "500 15px ui-monospace, Menlo, monospace";
+    ctx.fillText(
+      `CALIBRATION · ${d.calibration.toUpperCase()}    ·    MANUAL · ${d.manualPct}%    ·    DESIGNED · ${d.designed}`,
+      60, 550
+    );
+    ctx.fillStyle = "#22d3ee";
+    ctx.font = "500 14px ui-monospace, Menlo, monospace";
+    ctx.fillText("TRAIN YOUR TRUST · milverse", 60, 585);
+
+    // Rotated stamp mark, top-right
+    ctx.save();
+    ctx.translate(W - 160, 120);
+    ctx.rotate(-0.18);
+    ctx.strokeStyle = "rgba(34,211,238,0.7)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(-70, -22, 140, 44);
+    ctx.fillStyle = "#22d3ee";
+    ctx.font = "500 14px ui-monospace, Menlo, monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("CERTIFIED", 0, 5);
+    ctx.restore();
+    ctx.textAlign = "start";
+
+    canvas.toBlob((blob) => resolve(blob ?? new Blob()), "image/png");
+  });
 }
 
-function statSvg(idx: number, label: string, value: number) {
-  const x = idx * 270;
-  return `
-    <rect x="${x}" y="0" width="250" height="120" fill="none" stroke="#22d3ee" stroke-opacity="0.3"/>
-    <text x="${x + 20}" y="80" fill="#22d3ee" font-family="Impact, sans-serif" font-size="72">${value}</text>
-    <text x="${x + 20}" y="108" fill="#94a3b8" font-family="monospace" font-size="12" letter-spacing="3">${label}</text>
-  `;
-}
