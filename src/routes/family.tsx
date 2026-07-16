@@ -158,13 +158,14 @@ function FamilyPage() {
           {!parentCode ? (
             <>
               <p className="mt-2 text-sm text-muted-foreground">Generate a family code, then share it with your kid.</p>
-              <button onClick={createCode} className="mt-3 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
-                Create family code
+              <button onClick={createCode} disabled={busy} className="mt-3 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50">
+                {busy ? "Creating…" : "Create family code"}
               </button>
+              {err && <p className="mt-2 text-xs text-destructive">{err}</p>}
             </>
           ) : (
             <>
-              <div className="mt-3 flex items-center gap-3">
+              <div className="mt-3 flex flex-wrap items-center gap-3">
                 <div className="rounded-md border border-primary/40 bg-primary/5 px-5 py-3 font-mono text-2xl tracking-[0.3em] text-primary">
                   {parentCode}
                 </div>
@@ -178,8 +179,19 @@ function FamilyPage() {
                 <button onClick={() => refresh(parentCode)} className="text-xs text-muted-foreground hover:text-foreground">
                   Refresh
                 </button>
+                <button
+                  onClick={regenerate}
+                  disabled={busy}
+                  className="inline-flex items-center gap-1 rounded-md border border-caution/50 bg-caution/10 px-3 py-2 text-xs text-caution disabled:opacity-50"
+                  title="Generate a new code. The old one immediately stops working."
+                >
+                  <RefreshCw className="h-3 w-3" /> Regenerate
+                </button>
               </div>
-              <p className="mt-2 text-xs text-muted-foreground">Have your kid paste this into the box below on their device.</p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Have your kid paste this into the box below on their device. Regenerating invalidates the old code server-side.
+              </p>
+              {err && <p className="mt-2 text-xs text-destructive">{err}</p>}
             </>
           )}
         </section>
