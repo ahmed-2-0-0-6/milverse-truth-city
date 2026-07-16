@@ -13,6 +13,7 @@ import { Route as StudioRouteImport } from './routes/studio'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as QuickTourRouteImport } from './routes/quick-tour'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PressroomRouteImport } from './routes/pressroom'
 import { Route as PilotRouteImport } from './routes/pilot'
 import { Route as PaperRouteImport } from './routes/paper'
 import { Route as MarketRouteImport } from './routes/market'
@@ -51,6 +52,11 @@ const QuickTourRoute = QuickTourRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PressroomRoute = PressroomRouteImport.update({
+  id: '/pressroom',
+  path: '/pressroom',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PilotRoute = PilotRouteImport.update({
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/market': typeof MarketRoute
   '/paper': typeof PaperRoute
   '/pilot': typeof PilotRoute
+  '/pressroom': typeof PressroomRoute
   '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
   '/review': typeof ReviewRoute
@@ -186,6 +193,7 @@ export interface FileRoutesByTo {
   '/market': typeof MarketRoute
   '/paper': typeof PaperRoute
   '/pilot': typeof PilotRoute
+  '/pressroom': typeof PressroomRoute
   '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
   '/review': typeof ReviewRoute
@@ -212,6 +220,7 @@ export interface FileRoutesById {
   '/market': typeof MarketRoute
   '/paper': typeof PaperRoute
   '/pilot': typeof PilotRoute
+  '/pressroom': typeof PressroomRoute
   '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
   '/review': typeof ReviewRoute
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/paper'
     | '/pilot'
+    | '/pressroom'
     | '/profile'
     | '/quick-tour'
     | '/review'
@@ -264,6 +274,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/paper'
     | '/pilot'
+    | '/pressroom'
     | '/profile'
     | '/quick-tour'
     | '/review'
@@ -289,6 +300,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/paper'
     | '/pilot'
+    | '/pressroom'
     | '/profile'
     | '/quick-tour'
     | '/review'
@@ -315,6 +327,7 @@ export interface RootRouteChildren {
   MarketRoute: typeof MarketRoute
   PaperRoute: typeof PaperRoute
   PilotRoute: typeof PilotRoute
+  PressroomRoute: typeof PressroomRoute
   ProfileRoute: typeof ProfileRoute
   QuickTourRoute: typeof QuickTourRoute
   ReviewRoute: typeof ReviewRoute
@@ -356,6 +369,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pressroom': {
+      id: '/pressroom'
+      path: '/pressroom'
+      fullPath: '/pressroom'
+      preLoaderRoute: typeof PressroomRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pilot': {
@@ -517,6 +537,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketRoute: MarketRoute,
   PaperRoute: PaperRoute,
   PilotRoute: PilotRoute,
+  PressroomRoute: PressroomRoute,
   ProfileRoute: ProfileRoute,
   QuickTourRoute: QuickTourRoute,
   ReviewRoute: ReviewRoute,
