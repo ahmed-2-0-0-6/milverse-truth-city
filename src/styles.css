@@ -51,7 +51,7 @@
   --secondary: oklch(0.94 0.01 255);           /* pale slate */
   --secondary-foreground: oklch(0.22 0.06 265);
   --muted: oklch(0.955 0.008 250);             /* #e8ecf1 */
-  --muted-foreground: oklch(0.5 0.02 260);     /* slate 500 */
+  --muted-foreground: oklch(0.72 0.02 260);    /* raised from 0.5 → ≥4.5:1 on noir bg (case metadata, chat timestamps, paper bylines) */
   --accent: oklch(0.93 0.03 260);              /* soft blue tint */
   --accent-foreground: oklch(0.22 0.06 265);
   --destructive: oklch(0.58 0.22 25);          /* editorial red */
