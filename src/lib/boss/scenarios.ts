@@ -167,6 +167,7 @@ export const BOSSES: BossConfig[] = [
           { id: "hold_unverified",label: "HOLD — 'let me call you back first'", blurb: "Refuse to transact.", outcome: "WIN",
             response: "She keeps making excuses — 'this line only', 'battery dying'. Every excuse is the tell. You held. You won.", requiresFollowup: "outbound_video" },
         ],
+      },
       {
         id: "real-emergency",
         truth: "REAL",
