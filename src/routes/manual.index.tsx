@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 import { loadUnlocked } from "@/lib/manual/state";
-import { FileText, Lock, ExternalLink } from "lucide-react";
+import { BOSSES } from "@/lib/boss/scenarios";
+import { loadBossProfile } from "@/lib/boss/profile";
+import { FileText, Lock, ExternalLink, Skull } from "lucide-react";
 
 export const Route = createFileRoute("/manual/")({
   head: () => ({
@@ -19,11 +21,18 @@ export const Route = createFileRoute("/manual/")({
 
 function ManualIndex() {
   const [unlocked, setUnlocked] = useState<Set<string>>(new Set());
+  const [bossDeclassified, setBossDeclassified] = useState<string[]>([]);
   useEffect(() => {
     setUnlocked(loadUnlocked());
+    setBossDeclassified(loadBossProfile().declassified);
     const on = () => setUnlocked(loadUnlocked());
+    const onBoss = () => setBossDeclassified(loadBossProfile().declassified);
     window.addEventListener("milverse:manual", on);
-    return () => window.removeEventListener("milverse:manual", on);
+    window.addEventListener("milverse:boss", onBoss);
+    return () => {
+      window.removeEventListener("milverse:manual", on);
+      window.removeEventListener("milverse:boss", onBoss);
+    };
   }, []);
 
   const unlockedCount = MANUAL_ENTRIES.filter((e) => unlocked.has(e.id)).length;
