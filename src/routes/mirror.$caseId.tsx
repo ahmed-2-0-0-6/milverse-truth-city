@@ -22,6 +22,9 @@ import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMome
 import { TacticStamp } from "@/components/TacticStamp";
 import { TacticFlash } from "@/components/TacticFlash";
 import { tacticForMirror } from "@/lib/mirror/tactics";
+import { ChatShell } from "@/components/chat/ChatShell";
+import { ChatHeader } from "@/components/chat/ChatHeader";
+import { ContactsSheet } from "@/components/chat/ContactsSheet";
 
 
 export const Route = createFileRoute("/mirror/$caseId")({
