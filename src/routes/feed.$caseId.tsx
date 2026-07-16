@@ -16,6 +16,7 @@ import { Toolbelt } from "@/components/feed/Toolbelt";
 import { TacticStamp } from "@/components/TacticStamp";
 import { TacticFlash } from "@/components/TacticFlash";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
+import { RookieIntro } from "@/components/handler/RookieIntro";
 
 export const Route = createFileRoute("/feed/$caseId")({
   loader: ({ params }) => {
@@ -50,6 +51,7 @@ function FeedPlay() {
   return (
     <div className="min-h-screen grain">
       <TopBar />
+      <div className="mx-auto max-w-3xl px-4 pt-4"><RookieIntro /></div>
       {phase === "brief" && <Brief scenario={scenario} onStart={() => setPhase("sim")} />}
       {phase === "sim" && (
         <Sim

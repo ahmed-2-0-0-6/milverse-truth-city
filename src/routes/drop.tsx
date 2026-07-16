@@ -9,6 +9,7 @@ import { FormatFrame } from "@/components/feed/FormatFrame";
 import { VerdictMoment } from "@/components/VerdictMoment";
 import { TacticFlash } from "@/components/TacticFlash";
 import { ReceiptCard, type ReceiptData } from "@/components/daily/ReceiptCard";
+import { HandlerDropLine } from "@/components/handler/HandlerDropLine";
 import {
   todaysDailyCase,
   yesterdaysDailyCase,
@@ -197,6 +198,7 @@ function PostPlayState({ status, today, onOpenYesterday }: {
             </Link>
           </div>
         )}
+        <HandlerDropLine correct={entry.correct} stake={entry.stake} streak={status.streak} cacheKey={entry.dateKey} />
       </div>
 
       <div>

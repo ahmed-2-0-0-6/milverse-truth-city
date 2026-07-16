@@ -16,6 +16,7 @@ import { logPilotEntry } from "@/lib/pilot";
 import { tick, tensionCue } from "@/lib/mirror/audio";
 import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
+import { RookieIntro } from "@/components/handler/RookieIntro";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 import { TacticStamp } from "@/components/TacticStamp";
 import { TacticFlash } from "@/components/TacticFlash";
@@ -40,6 +41,7 @@ function CasePlay() {
   return (
     <div className="min-h-screen grain">
       <TopBar />
+      <div className="mx-auto max-w-3xl px-4 pt-4"><RookieIntro /></div>
       {phase === "dossier" && <Dossier scenario={scenario} onStart={() => setPhase("sim")} />}
       {phase === "sim" && (
         <Simulation
