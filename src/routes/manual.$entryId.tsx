@@ -1,6 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { TopBar } from "@/components/TopBar";
 import { getManualEntry, type ManualEntry } from "@/lib/manual/entries";
+import { track } from "@/lib/telemetry";
 import { ArrowLeft, Shield, Flag, Compass } from "lucide-react";
 
 export const Route = createFileRoute("/manual/$entryId")({
