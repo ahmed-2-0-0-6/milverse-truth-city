@@ -84,11 +84,8 @@ export function markLessonComplete(n: number) {
   return s;
 }
 
-function generateLicenseNumber(): string {
-  const alpha = "ABCDEFGHJKMNPQRSTVWXYZ";
-  const num = () => Math.floor(Math.random() * 10);
-  return `${alpha[Math.floor(Math.random() * alpha.length)]}${alpha[Math.floor(Math.random() * alpha.length)]}-${num()}${num()}${num()}${num()}`;
-}
+// generateLicenseNumber removed — issue mark is per-print (LicenseCard),
+// not persisted on the profile. Kept null in state for schema compatibility.
 
 export function isLessonUnlocked(state: FirstPhoneState, n: number): boolean {
   if (n === 1) return true;
