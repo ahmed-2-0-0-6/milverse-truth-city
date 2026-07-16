@@ -14,8 +14,8 @@ import { RecommendedStrip } from "@/components/RecommendedStrip";
 export const Route = createFileRoute("/city-hall")({
   head: () => ({
     meta: [
-      { title: "Reader Profile — MILVERSE" },
-      { name: "description", content: "Your Trust Calibration profile and media-literacy level." },
+      { title: "City Hall — MILVERSE" },
+      { name: "description", content: "Your record on the wall. Cases run, calls made, calibration honest." },
     ],
   }),
   component: CityHall,
