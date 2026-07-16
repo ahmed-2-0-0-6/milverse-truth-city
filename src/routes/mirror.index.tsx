@@ -95,6 +95,7 @@ function CaseFiles() {
         chapter="CHAPTER 01"
         title="THE MIRROR"
         art={mirrorArt}
+        artVideo={mirrorVideo.url}
         district="mirror"
         lines={[
           "Someone's uncle answered a message like this last week. He's still paying for it.",
