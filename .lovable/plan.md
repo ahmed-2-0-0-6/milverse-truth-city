@@ -1,72 +1,48 @@
-This is a large presentation + content pass on top of MILVERSE. I'll ship it in one build without touching engine, scoring, dossier, Supabase, share codes, or the Mirror/Feed/Studio logic. Everything below is additive.
+# CitizenOS phone surface — presentation-only overhaul
 
-## What ships
+## Scope (exactly the 4 surfaces, nothing else)
 
-### 1. Media formats in The Feed
-- Add a `format` field to Feed scenarios: `whatsapp | instagram | news | image | video`.
-- Render distinct frames in `feed.$caseId.tsx`: WhatsApp bubble (existing), Instagram post card (avatar + image + caption + faux likes/comments), news article clip (masthead + headline + date), viral image with caption card, video card (poster + play glyph + caption).
-- Existing 4 cases keep working; add 6 new cases (4 Pakistan-rooted, 2 global patterns: job-offer scam, disaster charity scam).
-- Visible `FORMAT` chip on every case card.
+1. **ChatShell** — reusable phone-frame wrapper hosting Mirror & Boss conversations
+2. **Contacts sheet + Callback UI** — bottom-sheet contacts, full-screen call
+3. **Bank confirm sheet** — bank-app transfer sheet for COMPLY path
+4. **Notification banners** — status-bar drop for boss pressure phases 2+
 
-### 2. The Field Manual (`/manual`)
-- New route: noir codex of tactics (IMPERSONATION, URGENCY & FEAR, OUT-OF-CONTEXT MEDIA, ENGAGEMENT BAIT, IMPOSTER OUTLETS, PHISHING, ROMANCE/TRUST FARMING, AI-GENERATED CONTENT, MIS/DIS/MAL-INFORMATION, THE FORGERY ENGINE).
-- Each entry: how it works, 2 anonymized worldwide examples, red flags, counter-move.
-- Locked entries render as redacted files.
-- Unlock state stored in `localStorage` (new key, does not touch profile schema).
-- Every case scenario gets a `tacticId`; debrief in Feed + Mirror shows "TACTIC IDENTIFIED: X" stamp + link to manual entry.
-- Sub-page "Take It Outside": real tools (Google Lens, lateral reading, AFP, Snopes, Soch Fact Check) with outbound links.
+Everything else in the prompt's "NOT BUILDING" list stays out.
 
-### 3. Verification Toolbelt (Feed cases)
-- Feed scenarios already have `actions`. Tag each with a `tool` type: `reverse_image | check_source | cross_check | check_date`.
-- Render toolbelt UI grouping actions by tool; wrong-tool-for-format hint shown after use.
-- Purely presentational: results still come from `action.result` (dossier ground truth).
+## Files created
 
-### 4. AI literacy
-- Manual entry "THE FORGERY ENGINE" (part of #2).
-- 2 new Feed cases flagged `aiGenerated: true` where only source-check wins.
-- Small transparency blurb on `/manual` and on landing.
+- `src/components/chat/ChatShell.tsx` — device frame + status bar + header + body slot + composer slot
+- `src/components/chat/StatusBar.tsx` — signal/clock/battery/CitizenOS wordmark
+- `src/components/chat/ChatHeader.tsx` — avatar, name, number line, unknown-number amber banner, contacts button
+- `src/components/chat/MessageBubble.tsx` — sender/player bubbles, ticks, timestamps, date chip, forwarded label, voice-note bubble (wraps existing VoiceNote), system inset card
+- `src/components/chat/TypingIndicator.tsx` — dots with human-rhythm delay helper (~40ms/char, clamp 600–2500, reduced-motion → instant)
+- `src/components/chat/SmartReplyChips.tsx` — restyle existing choice options as chips above fake keyboard-suggestion bar; "+" opens action sheet
+- `src/components/chat/ActionSheet.tsx` — generic bottom sheet (probes, contacts, transfer live inside)
+- `src/components/chat/ContactsSheet.tsx` — 4–6 seeded saved contacts + per-case contacts; Mirror shows "No help here"
+- `src/components/chat/CallScreen.tsx` — full-screen outbound + incoming call UI, timer, scripted result text
+- `src/components/chat/BankConfirmSheet.tsx` — CitizenPay header, amount, beneficiary (details collapsed), hold-to-confirm
+- `src/components/chat/NotificationBanner.tsx` — status-bar drop; single-slot queue
+- `src/lib/chat/contacts.ts` — **presentation-only** static contact seed + per-boss-variant contact map (no engine changes)
+- `src/lib/chat/timing.ts` — typing-delay helper, reduced-motion detection
 
-### 5. Ranks & profile card
-- Add XP + rank ladder (CITIZEN → SPOTTER → ANALYST → INVESTIGATOR → EDITOR → CITY DESIGNER) derived from existing `profile` (cases played, correct, manual unlocks, Studio publishes). Pure read-only helpers in a new `src/lib/ranks.ts`.
-- Rank-up stamp animation reused from verdict style, triggered when crossing thresholds (checked client-side on debrief).
-- New route `/profile`: rank, 2x2 calibration, manual %, districts cleared, badges. "Save as image" via `html-to-image`-free approach: render as downloadable SVG (no new dep).
+## Files modified (routes only, no engine files)
 
-### 6. In-room storytelling
-- Reusable `<DistrictIntro>` component: 2-panel noir key-art + typewriter narration, skippable, session-remembered. Wired into Mirror index, Feed index, Studio, Archive intros.
-- Micro tactic-reveal stamp component reused on debrief.
+- `src/routes/mirror.$caseId.tsx` — swap the current custom chat frame in `Simulation` for `<ChatShell>`; keep every state hook, every engine call, every session-storage key, every phase flow. VOB button moves into ContactsSheet ("No help here" branch for pure-Mirror; the existing VOB button stays functional). Verdict phase gets the BankConfirmSheet **only** when the case has a defined transfer amount (existing scenario field or scoped derivation from dossier — flagging as RISK if no field exists, then skipping bank sheet for that case).
+- `src/routes/boss.$bossId.tsx` — swap the boss conversation view into `<ChatShell>`; wire callback contact tap → existing `playMove(<CALLBACK_MOVE_ID>)` from `boss/engine.ts` (READ-ONLY use of existing exports); wire notification banner to phase ≥ 2 incoming messages.
 
-### 7. Judge-proofing
-- Landing: add pinned "MEDIA / INFORMATION / LITERACY" scroll beat in `ScrollStory`.
-- New `/educators` route: MIL competency mapping, inoculation theory, lateral reading — half-page.
-- Landing tagline: "Enter as a target. Leave as a designer."
+## Explicitly untouched (per guard)
 
-### 8. Map
-- Add Field Manual + Educators + Profile as landmarks in `CityWorld` / `CityList` (data only — no map restructure).
+`src/lib/mirror/engine.ts`, `src/lib/boss/engine.ts`, `src/lib/feed/engine.ts`, any `scenarios.ts`, profile stores, `boss/doctrine.ts`, Supabase. If a needed piece of data (transfer amount, callback move id per variant) isn't already exported, I stop and put it in the RISKS section rather than modifying those files.
 
-## Files (new)
-- `src/lib/manual/entries.ts`, `src/lib/manual/state.ts`
-- `src/lib/ranks.ts`
-- `src/routes/manual.tsx`, `src/routes/manual.$entryId.tsx`, `src/routes/manual.take-it-outside.tsx`
-- `src/routes/educators.tsx`
-- `src/routes/profile.tsx`
-- `src/components/feed/FormatFrame.tsx`
-- `src/components/feed/Toolbelt.tsx`
-- `src/components/TacticStamp.tsx`
-- `src/components/DistrictIntro.tsx`
+## Reduced motion & LITE
 
-## Files (edited, presentation only)
-- `src/lib/feed/scenarios.ts` — add `format`, `tacticId`, `aiGenerated`, `actions[].tool`; add 6+2 cases.
-- `src/routes/feed.$caseId.tsx` — mount FormatFrame + Toolbelt + tactic stamp on debrief.
-- `src/routes/feed.index.tsx` — format chip.
-- `src/routes/mirror.$caseId.tsx` — tactic stamp on debrief.
-- `src/components/ScrollStory.tsx` — MEDIA/INFORMATION/LITERACY beat + tagline.
-- `src/components/CityWorld.tsx`, `src/components/CityList.tsx` — 3 new landmarks.
-- `src/components/TopBar.tsx` — Manual link.
+- All animations gated by `prefers-reduced-motion` and the existing `visual-quality` context.
+- LITE: no blurs on bubbles, no ring pulses (static ring), notifications = static toast.
 
-## Guardrails
-- No engine, scoring, dossier, share-code, Supabase, or route-restructure changes.
-- No feature judges truth for the player: Toolbelt returns dossier text, Manual is reference material, ranks are derived from existing history.
-- LITE mode + reduced motion respected (typewriters/stamps short-circuit).
-- No new heavy deps.
+## Report format
 
-Self-audit reported at the end.
+Ends with the requested `===MILVERSE REPORT===` block covering surfaces, files, routes, engine-file audit, callback move ids used, risks, next.
+
+## Non-goals confirmed
+
+No home screen, app grid, browser/Reels app, settings, battery mechanics, Feed migration, free-text input, mic/media capture, uploads, new deps.

@@ -923,3 +923,18 @@
   .scanlines-live, .neon-flicker-edge, .glitch-flicker, .hud-blink-slow,
   .district-card.submerging, .submerge-flash { animation: none !important; }
 }
+
+/* CitizenOS phone shell */
+.chat-shell-backdrop {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(80,80,120,0.18), transparent 60%),
+    radial-gradient(ellipse at 50% 100%, rgba(30,20,40,0.4), transparent 60%),
+    #0a0a0d;
+}
+@keyframes heartbeat {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.5); }
+  50%      { box-shadow: 0 0 0 8px rgba(99,102,241,0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-\[heartbeat_1\.6s_ease-in-out_infinite\] { animation: none !important; }
+}
