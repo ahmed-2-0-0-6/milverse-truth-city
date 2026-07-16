@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { loadFirstPhone, saveFirstPhone } from "@/lib/firstPhone/profile";
 import { LESSONS } from "@/lib/firstPhone/lessons";
+import { describeTactic } from "@/lib/firstPhone/tacticMap";
 import { Download, Printer } from "lucide-react";
 
 interface Props { onClose?: () => void }
