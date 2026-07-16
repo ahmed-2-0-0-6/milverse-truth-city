@@ -62,8 +62,9 @@ export function DistrictIntro({ id, chapter, title, art, district, lines, onDone
   return (
     <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 animate-in fade-in duration-300">
       {art && (
-        <div className="absolute inset-0 opacity-30">
-          <img src={art} alt="" className="h-full w-full object-cover" />
+        <div className="absolute inset-0 opacity-30 overflow-hidden">
+          <img src={art} alt="" className="h-full w-full object-cover kenburns" />
+          {district && <DistrictLiveFX district={district} />}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/80" />
         </div>
       )}
