@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Skull, Phone, Users, KeyRound, Hand, ShieldCheck, ShieldOff, HandCoins, Check, X, Award, Home } from "lucide-react";
+import { Skull, KeyRound, Hand, ShieldCheck, ShieldOff, HandCoins, Award, Home, Search } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
 import { getBoss } from "@/lib/boss/scenarios";
@@ -12,20 +12,17 @@ import {
 import { attemptCount, recordBossAttempt, canRematch } from "@/lib/boss/profile";
 import { DOCTRINE_RULES } from "@/lib/boss/doctrine";
 import { logPilotEntry } from "@/lib/pilot";
+import { ChatShell } from "@/components/chat/ChatShell";
+import { ChatHeader } from "@/components/chat/ChatHeader";
+import { ContactsSheet } from "@/components/chat/ContactsSheet";
+import { CallScreen } from "@/components/chat/CallScreen";
+import { BankConfirmSheet } from "@/components/chat/BankConfirmSheet";
+import { NotificationBanner, type NotificationPayload } from "@/components/chat/NotificationBanner";
+import { detectAmount, type SavedContact } from "@/lib/chat/contacts";
 
 export const Route = createFileRoute("/boss/$bossId")({
   component: BossPlay,
 });
-
-const MOVE_ICON: Record<ProtocolMove, typeof Phone> = {
-  callback_known: Phone,
-  second_person: Users,
-  shared_secret: KeyRound,
-  hold_unverified: Hand,
-  outbound_video: Phone,
-  provenance_trace: KeyRound,
-  delay_past_window: Hand,
-};
 
 interface LogItem {
   kind: "boss" | "you" | "sys" | "check" | "move";
@@ -33,16 +30,41 @@ interface LogItem {
   meta?: string;
 }
 
+const BOSS_NUMBERS: Record<string, string> = {
+  "ghost-of-bali": "+92 3xx 887 4419",
+  "the-twin": "+92 3xx 221 9047",
+  "the-chorus": "unknown source",
+};
+
+function useReducedMotion() {
+  const [rm, setRm] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setRm(mql.matches);
+    const on = () => setRm(mql.matches);
+    mql.addEventListener("change", on);
+    return () => mql.removeEventListener("change", on);
+  }, []);
+  return rm;
+}
+
 function BossPlay() {
   const { bossId } = Route.useParams();
   const navigate = useNavigate();
   const boss = getBoss(bossId);
+  const reducedMotion = useReducedMotion();
 
   const [stage, setStage] = useState<"intro" | "play" | "debrief">("intro");
   const [state, setState] = useState<BossState | null>(null);
   const [log, setLog] = useState<LogItem[]>([]);
   const [outcome, setOutcome] = useState<BossOutcome | null>(null);
   const [chainOpen, setChainOpen] = useState<string[] | null>(null);
+
+  // Phone surface state
+  const [contactsOpen, setContactsOpen] = useState(false);
+  const [call, setCall] = useState<{ name: string; number?: string; line?: string | null } | null>(null);
+  const [bankOpen, setBankOpen] = useState(false);
+  const [banner, setBanner] = useState<NotificationPayload | null>(null);
 
   const variant = useMemo(() => {
     if (!boss) return null;
@@ -98,7 +120,6 @@ function BossPlay() {
       <div className="min-h-screen bg-black text-white flex items-center justify-center p-6 relative overflow-hidden">
         <div className="absolute inset-0 opacity-70"><DistrictLiveFX district={fxDistrict} intensity="soft" /></div>
         <div className="max-w-lg w-full relative">
-
           <div className="border border-red-900/60 bg-gradient-to-br from-red-950/40 to-black rounded-lg p-6 space-y-4 animate-in fade-in duration-700">
             <div className="flex items-center gap-2 text-red-500 text-[10px] tracking-[0.4em]">
               <Skull className="w-3 h-3" /> SPECIAL CASE — BOSS PROTOCOL
@@ -111,9 +132,7 @@ function BossPlay() {
                 FACT-CHECKS WILL NOT SAVE YOU
               </div>
             </div>
-            <div className="text-xs text-white/50 italic">
-              Doctrine reminder — {boss.doctrineRule}
-            </div>
+            <div className="text-xs text-white/50 italic">Doctrine reminder — {boss.doctrineRule}</div>
             <div className="flex gap-3 pt-3">
               <button
                 onClick={() => setStage("play")}
@@ -135,15 +154,23 @@ function BossPlay() {
 
     function push(item: LogItem) { setLog((l) => [...l, item]); }
 
+    function fireBanner(sender: string, preview: string) {
+      // pressure phases 2+ only
+      const phase = currentPressureLine(state!, boss!).phase;
+      const highPressure = phase !== "friendly";
+      if (!highPressure) return;
+      setBanner({ id: `${Date.now()}`, sender, preview, ts: Date.now() });
+    }
+
     function doCheck(id: string) {
       const res = runFactCheck(state!, boss!, variant!, id);
       setState(res.state);
       const fc = variant!.factChecks.find((f) => f.id === id)!;
       push({ kind: "check", text: `⌕ ${fc.label}`, meta: res.text });
       if (res.provenanceChain) setChainOpen(res.provenanceChain);
-      // pressure escalates: add the current phase line
       const next = currentPressureLine(res.state, boss!);
       push({ kind: "boss", text: next.line, meta: next.phase });
+      fireBanner(boss!.codename, next.line);
     }
 
     function doMove(id: ProtocolMove) {
@@ -151,6 +178,33 @@ function BossPlay() {
       setState(res.state);
       const label = res.move?.label ?? id;
       push({ kind: "move", text: `▶ ${label}`, meta: res.move?.response });
+      return res;
+    }
+
+    function handleContactPick(c: SavedContact) {
+      setContactsOpen(false);
+      if (!c.protocolMove) return;
+      const move = c.protocolMove as ProtocolMove;
+      // Callback / outbound moves → full-screen call UI with scripted result
+      const isCallShape = move === "callback_known" || move === "outbound_video" || move === "second_person";
+      if (isCallShape) {
+        // Find scripted response for that move if available
+        const def = variant!.moves.find((m) => m.id === move);
+        setCall({ name: c.name, number: c.number, line: null });
+        // ring, then reveal
+        setTimeout(() => {
+          if (def) {
+            const res = playMove(state!, boss!, variant!, move);
+            setState(res.state);
+            push({ kind: "move", text: `▶ ${res.move?.label ?? move}`, meta: res.move?.response });
+            setCall((prev) => prev ? { ...prev, line: res.move?.response ?? def.response } : prev);
+          } else {
+            setCall((prev) => prev ? { ...prev, line: "No answer. That's data — the phone isn't dead." } : prev);
+          }
+        }, reducedMotion ? 200 : 1800);
+      } else {
+        doMove(move);
+      }
     }
 
     function commit(verdict: BossVerdict) {
@@ -174,124 +228,162 @@ function BossPlay() {
       setStage("debrief");
     }
 
+    function handleComply() {
+      // Only meaningful when there's a transactable request — Ghost/Twin. Chorus has no transfer.
+      if (boss!.id === "the-chorus") { commit("COMPLY_NOW"); return; }
+      setBankOpen(true);
+    }
+
+    const detectedAmount = detectAmount(variant.opener) ??
+      detectAmount(boss.phases.map(p => p.scriptedLines.join(" ")).join(" ")) ?? "USD 340";
+
     return (
-      <div className="min-h-screen bg-black text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-40 pointer-events-none"><DistrictLiveFX district={fxDistrict} intensity="soft" /></div>
-        <TopBar />
-        <div className="max-w-2xl mx-auto p-4 relative">
-          <div className="flex items-center justify-between mb-3 text-xs">
-            <div className="flex items-center gap-2 text-red-400 tracking-[0.3em]">
-              <Skull className="w-3 h-3" /> {boss.codename}
+      <ChatShell
+        header={
+          <ChatHeader
+            name={boss.codename}
+            number={BOSS_NUMBERS[boss.id] ?? "unknown"}
+            isSaved={false}
+            subtitle={`PHASE · ${phaseLine.phase}`}
+            accent="destructive"
+            onBack={() => navigate({ to: "/boss" })}
+            onContacts={() => setContactsOpen(true)}
+          />
+        }
+        overlay={
+          <>
+            <NotificationBanner banner={banner} onDismiss={() => setBanner(null)} reducedMotion={reducedMotion} />
+            <ContactsSheet
+              open={contactsOpen}
+              onClose={() => setContactsOpen(false)}
+              bossId={boss.id}
+              onPick={handleContactPick}
+            />
+            <CallScreen
+              open={!!call}
+              contactName={call?.name ?? ""}
+              contactNumber={call?.number}
+              resultLine={call?.line ?? null}
+              onEnd={() => setCall(null)}
+              reducedMotion={reducedMotion}
+            />
+            <BankConfirmSheet
+              open={bankOpen}
+              amount={detectedAmount}
+              beneficiaryName={variant.truth === "SCAM" ? "M. Rehman (new acct)" : (boss.codename.split(" ").slice(-1)[0] ?? "Beneficiary")}
+              beneficiaryAccount="PK36 SCBL 0000 1234 5678 9012"
+              mismatchNote={variant.truth === "SCAM" ? "Account holder name differs from claimed sender." : null}
+              onCancel={() => setBankOpen(false)}
+              onConfirm={() => { setBankOpen(false); commit("COMPLY_NOW"); }}
+              reducedMotion={reducedMotion}
+            />
+          </>
+        }
+        composer={
+          <div className="p-3 space-y-3 max-h-[45%] overflow-y-auto">
+            {/* Fact-check chips */}
+            <div>
+              <div className="text-[10px] tracking-[0.3em] text-white/40 mb-1.5 font-mono">FACT-CHECK</div>
+              <div className="flex flex-wrap gap-1.5">
+                {variant.factChecks.map((f) => (
+                  <button
+                    key={f.id}
+                    disabled={state.factChecksUsed.includes(f.id)}
+                    onClick={() => doCheck(f.id)}
+                    className="text-[11px] px-2.5 py-1 rounded-full border border-cyan-500/30 bg-cyan-950/30 text-cyan-200 hover:bg-cyan-950/60 disabled:opacity-30"
+                  >
+                    <Search className="inline h-3 w-3 mr-1" /> {f.label}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="text-white/50 font-mono">PHASE · {phaseLine.phase}</div>
+            {/* Protocol move chips (smart-reply row) */}
+            <div>
+              <div className="text-[10px] tracking-[0.3em] text-emerald-400 mb-1.5 font-mono">PROTOCOL MOVES</div>
+              <div className="flex flex-wrap gap-1.5">
+                {variant.moves.map((m) => {
+                  const played = state.movesPlayed.includes(m.id);
+                  return (
+                    <button
+                      key={m.id}
+                      disabled={played}
+                      onClick={() => doMove(m.id)}
+                      className="text-[11px] px-2.5 py-1 rounded-full border border-emerald-500/40 bg-emerald-950/30 text-emerald-200 hover:bg-emerald-950/60 disabled:opacity-30"
+                      title={m.blurb}
+                    >
+                      ▶ {m.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            {/* Verdict row */}
+            <div className="pt-1 border-t border-white/5">
+              <div className="text-[10px] tracking-[0.3em] text-red-400 mb-1.5 font-mono">VERDICT</div>
+              <div className="grid grid-cols-3 gap-1.5">
+                <button onClick={handleComply}
+                  className="text-[10px] py-2 rounded border border-white/20 hover:bg-white/5">
+                  <HandCoins className="w-3 h-3 inline mr-1" /> COMPLY
+                </button>
+                <button onClick={() => commit("REFUSE_REPORT")}
+                  className="text-[10px] py-2 rounded border border-white/20 hover:bg-white/5">
+                  <ShieldOff className="w-3 h-3 inline mr-1" /> REFUSE
+                </button>
+                <button onClick={() => commit("HOLD_UNVERIFIED")}
+                  className="text-[10px] py-2 rounded border border-red-500/50 bg-red-950/30 hover:bg-red-950/60 font-bold">
+                  <ShieldCheck className="w-3 h-3 inline mr-1" /> HOLD
+                </button>
+              </div>
+              <p className="text-[9px] text-white/40 mt-1.5 leading-snug">
+                HOLD refuses to transact until verification completes.
+              </p>
+            </div>
           </div>
-
-          {/* Conversation log */}
-          <div className="border border-white/10 rounded-lg bg-black/60 p-4 min-h-[300px] max-h-[52vh] overflow-y-auto space-y-3">
-            {log.map((m, i) => {
-              if (m.kind === "boss") return (
-                <div key={i} className="max-w-[85%]">
-                  {m.meta && <div className="text-[10px] text-red-400/70 tracking-widest mb-0.5">{m.meta}</div>}
-                  <div className="inline-block bg-white/5 border border-white/10 rounded-2xl px-4 py-2 text-sm">{m.text}</div>
+        }
+      >
+        {/* Chat log body */}
+        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2.5">
+          {log.map((m, i) => {
+            if (m.kind === "boss") return (
+              <div key={i} className="max-w-[85%]">
+                {m.meta && <div className="text-[9px] text-red-400/70 tracking-widest mb-0.5 font-mono uppercase">{m.meta}</div>}
+                <div className="inline-block bg-white/[0.06] border border-white/10 rounded-2xl rounded-bl-sm px-3.5 py-2 text-sm text-white">
+                  {m.text}
                 </div>
-              );
-              if (m.kind === "sys") return (
-                <div key={i} className="text-center text-[10px] tracking-[0.3em] text-white/40">— {m.text} —</div>
-              );
-              if (m.kind === "check") return (
-                <div key={i} className="text-right">
-                  <div className="inline-block text-left max-w-[85%] border border-cyan-500/30 bg-cyan-950/30 rounded px-3 py-2 text-xs">
-                    <div className="text-cyan-300 font-mono mb-1">{m.text}</div>
-                    <div className="text-white/80">{m.meta}</div>
-                  </div>
+              </div>
+            );
+            if (m.kind === "sys") return (
+              <div key={i} className="text-center text-[10px] tracking-[0.3em] text-white/40 font-mono">— {m.text} —</div>
+            );
+            if (m.kind === "check") return (
+              <div key={i} className="flex justify-center">
+                <div className="max-w-[90%] rounded-md border border-cyan-500/30 bg-cyan-950/30 px-3 py-2 text-xs">
+                  <div className="text-cyan-300 font-mono mb-1">{m.text}</div>
+                  <div className="text-white/85">{m.meta}</div>
                 </div>
-              );
-              if (m.kind === "move") return (
-                <div key={i} className="text-right">
-                  <div className="inline-block text-left max-w-[85%] border border-emerald-500/40 bg-emerald-950/30 rounded px-3 py-2 text-xs">
-                    <div className="text-emerald-300 font-mono mb-1">{m.text}</div>
-                    {m.meta && <div className="text-white/80">{m.meta}</div>}
-                  </div>
+              </div>
+            );
+            if (m.kind === "move") return (
+              <div key={i} className="flex justify-end">
+                <div className="max-w-[85%] rounded-md border border-emerald-500/40 bg-emerald-950/30 px-3 py-2 text-xs">
+                  <div className="text-emerald-300 font-mono mb-1">{m.text}</div>
+                  {m.meta && <div className="text-white/85">{m.meta}</div>}
                 </div>
-              );
-              return null;
-            })}
-          </div>
-
+              </div>
+            );
+            return null;
+          })}
           {chainOpen && (
-            <div className="mt-3 border border-amber-500/40 bg-amber-950/20 rounded p-3 text-xs">
-              <div className="text-amber-300 tracking-widest mb-1">PROVENANCE CHAIN</div>
+            <div className="mx-auto max-w-[95%] border border-amber-500/40 bg-amber-950/20 rounded p-3 text-xs">
+              <div className="text-amber-300 tracking-widest mb-1 font-mono">PROVENANCE CHAIN</div>
               <ol className="list-decimal list-inside space-y-0.5 text-white/80">
                 {chainOpen.map((c, i) => <li key={i}>{c}</li>)}
               </ol>
               <button className="mt-2 text-amber-400 underline" onClick={() => setChainOpen(null)}>Close</button>
             </div>
           )}
-
-          {/* Fact-check toolbelt (the trap) */}
-          <div className="mt-4">
-            <div className="text-[10px] tracking-[0.3em] text-white/40 mb-2">FACT-CHECK · uses pressure phase</div>
-            <div className="flex flex-wrap gap-2">
-              {variant.factChecks.map((f) => (
-                <button
-                  key={f.id}
-                  disabled={state.factChecksUsed.includes(f.id)}
-                  onClick={() => doCheck(f.id)}
-                  className="text-xs px-3 py-1.5 border border-cyan-500/30 bg-cyan-950/30 rounded hover:bg-cyan-950/60 disabled:opacity-30"
-                >
-                  ⌕ {f.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Protocol moves */}
-          <div className="mt-4">
-            <div className="text-[10px] tracking-[0.3em] text-emerald-400 mb-2">PROTOCOL MOVES</div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {variant.moves.map((m) => {
-                const Icon = MOVE_ICON[m.id] ?? Hand;
-                const played = state.movesPlayed.includes(m.id);
-                return (
-                  <button
-                    key={m.id}
-                    disabled={played}
-                    onClick={() => doMove(m.id)}
-                    className="text-left text-xs p-3 border border-emerald-500/30 bg-emerald-950/20 rounded hover:bg-emerald-950/50 disabled:opacity-30"
-                  >
-                    <div className="flex items-center gap-2 font-bold text-emerald-300">
-                      <Icon className="w-3 h-3" /> {m.label}
-                    </div>
-                    <div className="text-white/60 mt-1">{m.blurb}</div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Verdict */}
-          <div className="mt-6">
-            <div className="text-[10px] tracking-[0.3em] text-red-400 mb-2">FINAL VERDICT</div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <button onClick={() => commit("COMPLY_NOW")}
-                className="p-3 border border-white/20 rounded text-sm hover:bg-white/5">
-                <HandCoins className="w-4 h-4 inline mr-1" /> COMPLY NOW
-              </button>
-              <button onClick={() => commit("REFUSE_REPORT")}
-                className="p-3 border border-white/20 rounded text-sm hover:bg-white/5">
-                <ShieldOff className="w-4 h-4 inline mr-1" /> REFUSE & REPORT
-              </button>
-              <button onClick={() => commit("HOLD_UNVERIFIED")}
-                className="p-3 border border-red-500/50 bg-red-950/30 rounded text-sm hover:bg-red-950/60 font-bold">
-                <ShieldCheck className="w-4 h-4 inline mr-1" /> HOLD — UNVERIFIED
-              </button>
-            </div>
-            <p className="text-[11px] text-white/40 mt-2">
-              HOLD refuses to transact until verification completes. If the case is a real request, HOLD then verifying = full win. Blank refusal on a real request = False Alarm.
-            </p>
-          </div>
         </div>
-      </div>
+      </ChatShell>
     );
   }
 
@@ -333,7 +425,6 @@ function BossPlay() {
               </div>
             )}
 
-            {/* Doctrine card — shareable, spoiler-safe */}
             <div className="border-t border-white/10 pt-4 mt-6">
               <div className="text-[10px] tracking-[0.4em] text-white/50 mb-2">THE DOCTRINE</div>
               <ul className="space-y-1 text-sm">
