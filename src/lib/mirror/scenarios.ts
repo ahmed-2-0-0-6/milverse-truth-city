@@ -575,7 +575,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T2 IMPOSTER — THE WRONG TRANSACTION ─────────────────── */
   {
     id: "pk-wrong-txn",
-    tactic: "phishing",
+    tactic: "urgency-fear",
     title: "\"I sent ₨5,000 to your wallet by mistake\"",
     teaser: "A stranger begs. Even forwards an official-looking SMS.",
     channel: "text",
@@ -647,7 +647,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T2 IMPOSTER — THE ONLINE BUYER (military officer) ───── */
   {
     id: "pk-online-buyer",
-    tactic: "impersonation",
+    tactic: "phishing",
     title: "\"Military officer\" wants your phone",
     teaser: "Says he'll pay in advance so a courier can collect it.",
     channel: "text",
@@ -723,7 +723,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T2 IMPOSTER — THE DREAM JOB (paid task 1) ──────────── */
   {
     id: "pk-dream-job",
-    tactic: "trust-farming",
+    tactic: "phishing",
     title: "₨5,000/day for liking videos",
     teaser: "Sends you REAL payment for task 1. Task 2 asks for a deposit.",
     channel: "text",
@@ -934,7 +934,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T5 IMPOSTER — THE CLEAN ROOM ────────────────────────── */
   {
     id: "t5-clean-room",
-    tactic: "impersonation",
+    tactic: "forgery-engine",
     title: "Uncle Farooq — every fact answered",
     teaser: "Fully researched. Every dossier fact answered correctly. There are no in-chat tells.",
     channel: "text",
@@ -1005,7 +1005,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T5 REAL — THE UNLUCKY BOSS ──────────────────────────── */
   {
     id: "t5-unlucky-boss",
-    tactic: "impersonation",
+    tactic: "forgery-engine",
     title: "Your CEO, from a new number, on holiday",
     teaser: "Every pattern-match screams scam. Out-of-band confirms it's really her.",
     channel: "text",
@@ -1065,7 +1065,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T2 SURVIVOR — WHATSAPP GROUP ADMIN OTP (based on reported PK pattern) ─ */
   {
     id: "survivor-wa-admin",
-    tactic: "phishing",
+    tactic: "impersonation",
     title: "\"Family group admin — verify to keep access\"",
     teaser: "Based on a real reported pattern. Cousin's WhatsApp cloned, admin asks for a code.",
     channel: "text",
