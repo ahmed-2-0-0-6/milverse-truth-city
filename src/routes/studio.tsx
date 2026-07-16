@@ -6,6 +6,11 @@ import { saveCitizenCase } from "@/lib/mirror/scenarios";
 import type { Scenario, EvidenceChip } from "@/lib/mirror/scenarios";
 import { publishCitizenCase } from "@/lib/citizen.functions";
 import { getDeviceId } from "@/lib/pilot";
+import { incrementPublishedCount, loadProfile } from "@/lib/mirror/profile";
+import { loadUnlocked } from "@/lib/manual/state";
+import { computeXp, rankFromXp } from "@/lib/ranks";
+import { DistrictIntro } from "@/components/DistrictIntro";
+import studioArt from "@/assets/district-studio.jpg";
 import { Clapperboard, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 
 
