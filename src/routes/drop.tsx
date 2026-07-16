@@ -9,6 +9,7 @@ import { FormatFrame } from "@/components/feed/FormatFrame";
 import { VerdictMoment } from "@/components/VerdictMoment";
 import { TacticFlash } from "@/components/TacticFlash";
 import { ReceiptCard, type ReceiptData } from "@/components/daily/ReceiptCard";
+import { HandlerDropLine } from "@/components/handler/HandlerDropLine";
 import {
   todaysDailyCase,
   yesterdaysDailyCase,
