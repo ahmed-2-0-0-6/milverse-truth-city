@@ -17,6 +17,7 @@ import { TacticStamp } from "@/components/TacticStamp";
 import { TacticFlash } from "@/components/TacticFlash";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 import { RookieIntro } from "@/components/handler/RookieIntro";
+import { track } from "@/lib/telemetry";
 
 export const Route = createFileRoute("/feed/$caseId")({
   loader: ({ params }) => {
