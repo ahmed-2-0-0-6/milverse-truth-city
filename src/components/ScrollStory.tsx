@@ -1,20 +1,22 @@
 // LAYER-7 — Scroll-driven story beats. GSAP ScrollTrigger + horizontal districts.
 // Lazy imports GSAP; respects reduced-motion (renders static).
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
 import mirrorArt from "@/assets/district-mirror.jpg";
 import feedArt from "@/assets/district-feed.jpg";
 import studioArt from "@/assets/district-studio.jpg";
 import archiveArt from "@/assets/district-archive.jpg";
 import cleanroomArt from "@/assets/district-cleanroom.jpg";
+import mirrorVideo from "@/assets/mirror.mp4.asset.json";
 
 const DISTRICTS = [
-  { key: "mirror", label: "THE MIRROR", tag: "Judge messages aimed at you — real family, or someone wearing them?", art: mirrorArt, glow: "34,211,238" },
-  { key: "feed", label: "THE FEED", tag: "Judge real-world posts — true, false, or misleading?", art: feedArt, glow: "245,185,66" },
-  { key: "studio", label: "THE STUDIO", tag: "Design the attack yourself — teach by authoring.", art: studioArt, glow: "245,185,66" },
-  { key: "archive", label: "THE ARCHIVE", tag: "Revisit closed cases — build the pattern memory.", art: archiveArt, glow: "34,211,238" },
-  { key: "cleanroom", label: "CLEAN ROOM", tag: "Calibrate confidence — know when you know.", art: cleanroomArt, glow: "34,211,238" },
-];
+  { key: "mirror", label: "THE MIRROR", tag: "Judge messages aimed at you — real family, or someone wearing them?", art: mirrorArt, video: mirrorVideo.url, href: "/mirror", glow: "34,211,238" },
+  { key: "feed", label: "THE FEED", tag: "Judge real-world posts — true, false, or misleading?", art: feedArt, href: "/feed", glow: "245,185,66" },
+  { key: "studio", label: "THE STUDIO", tag: "Design the attack yourself — teach by authoring.", art: studioArt, href: "/studio", glow: "245,185,66" },
+  { key: "archive", label: "THE ARCHIVE", tag: "Revisit closed cases — build the pattern memory.", art: archiveArt, href: "/archive", glow: "34,211,238" },
+  { key: "cleanroom", label: "CLEAN ROOM", tag: "Calibrate confidence — know when you know.", art: cleanroomArt, href: "/devintel", glow: "34,211,238" },
+] as const;
 
 const BEATS = [
   { headline: "Every day, someone in your family gets a message.", sub: "It's already happened this week. Maybe today." },
