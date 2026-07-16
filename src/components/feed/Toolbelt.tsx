@@ -183,6 +183,10 @@ export function Toolbelt({ scenario, used, onUse, onGrade }: Props) {
       wasted: c.wasted + (quality === "wasted" ? 1 : 0),
     }));
     onGrade?.(tool.kind, quality);
+    track("tool_pick", {
+      case_id: scenario.id,
+      payload: { tool: tool.kind, quality, correct: quality === "strong" },
+    });
   }
 
   return (
