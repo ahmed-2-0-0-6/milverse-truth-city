@@ -84,6 +84,10 @@ function CityMap() {
           </Link>
         </div>
 
+        <div className="mt-8 w-full max-w-xl">
+          <DailyBeacon />
+        </div>
+
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 scroll-hint">
           <span className="stencil text-[9px] text-white/50">SCROLL</span>
           <ChevronDown className="h-4 w-4 text-white/60" />
