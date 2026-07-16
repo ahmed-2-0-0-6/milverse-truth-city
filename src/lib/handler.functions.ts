@@ -57,7 +57,7 @@ function systemPromptFor(surface: z.infer<typeof InputSchema>["surface"]) {
 }
 
 export const generateHandlerLine = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => InputSchema.parse(data))
+  .validator((data: unknown) => InputSchema.parse(data))
   .handler(async ({ data }) => {
     const key = process.env.LOVABLE_API_KEY;
     if (!key) return { text: data.fallback, source: "fallback" as const };
