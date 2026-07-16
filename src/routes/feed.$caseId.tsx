@@ -18,6 +18,8 @@ import { TacticFlash } from "@/components/TacticFlash";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 import { RookieIntro } from "@/components/handler/RookieIntro";
 import { track } from "@/lib/telemetry";
+import { ChatShell } from "@/components/chat/ChatShell";
+import { ChatHeader } from "@/components/chat/ChatHeader";
 
 export const Route = createFileRoute("/feed/$caseId")({
   loader: ({ params }) => {
@@ -67,21 +69,25 @@ function FeedPlay() {
     }
   }, [phase, scenario.opener, messages.length]);
 
+  // In "sim" phase, ChatShell owns the whole viewport (CitizenOS phone).
+  if (phase === "sim") {
+    return (
+      <Sim
+        scenario={scenario}
+        state={state}
+        setState={setState}
+        messages={messages}
+        setMessages={setMessages}
+        onDeliverVerdict={() => setPhase("verdict")}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen grain">
       <TopBar />
       <div className="mx-auto max-w-3xl px-4 pt-4"><RookieIntro /></div>
       {phase === "brief" && <Brief scenario={scenario} onStart={() => setPhase("sim")} />}
-      {phase === "sim" && (
-        <Sim
-          scenario={scenario}
-          state={state}
-          setState={setState}
-          messages={messages}
-          setMessages={setMessages}
-          onDeliverVerdict={() => setPhase("verdict")}
-        />
-      )}
       {phase === "verdict" && (
         <VerdictScreen
           scenario={scenario}
