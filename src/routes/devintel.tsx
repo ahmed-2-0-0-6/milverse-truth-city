@@ -47,7 +47,7 @@ function DevIntelPage() {
       const s = await fetchIntelFn({ data: { passcode } });
       setIntel(s);
       const b = await listBriefsFn({ data: { passcode } });
-      setBriefs((b as { rows: typeof briefs }).rows);
+      setBriefs((b as unknown as { rows: typeof briefs }).rows);
       setAuthed(true);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Access denied.");
@@ -68,7 +68,7 @@ function DevIntelPage() {
     try {
       await runBriefFn({ data: { passcode } });
       const b = await listBriefsFn({ data: { passcode } });
-      setBriefs((b as { rows: typeof briefs }).rows);
+      setBriefs((b as unknown as { rows: typeof briefs }).rows);
       setTab("briefs");
     } catch (e) { setErr(e instanceof Error ? e.message : String(e)); }
     finally { setBusy(false); }
