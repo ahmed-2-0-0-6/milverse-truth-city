@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LESSONS, TOTAL_LESSONS, type Lesson, type JuniorCase } from "@/lib/firstPhone/lessons";
-import { loadFirstPhone, markLessonComplete, isLessonUnlocked } from "@/lib/firstPhone/profile";
+import { loadFirstPhone, markLessonComplete, isLessonUnlocked, type FirstPhoneState } from "@/lib/firstPhone/profile";
 import { TrustedAdultChip } from "./TrustedAdultChip";
 import { logPilotEntry } from "@/lib/pilot";
 import { Lock, Check, Circle } from "lucide-react";
 import { LicenseCard } from "./LicenseCard";
 
+function freshState(): FirstPhoneState {
+  return { active: false, kidCityName: "", familyCode: null, lessonsCompleted: [], licenseIssuedAt: null, licenseNumber: null };
+}
+
 export function LessonPath() {
-  const [state, setState] = useState(() => loadFirstPhone());
+  // Hydration-safe: SSR + first client render use a neutral state; real state
+  // loads in useEffect. Prevents mismatch for kids mid-program.
+  const [state, setState] = useState<FirstPhoneState>(freshState);
   const [openLesson, setOpenLesson] = useState<number | null>(null);
   const [showLicense, setShowLicense] = useState(false);
+
+  useEffect(() => { setState(loadFirstPhone()); }, []);
 
   function refresh() { setState(loadFirstPhone()); }
 

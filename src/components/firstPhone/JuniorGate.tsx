@@ -14,8 +14,22 @@ import { useJuniorMode } from "@/hooks/useJuniorMode";
  */
 export function useJuniorGate(districtName: string) {
   const state = useJuniorMode();
+  // Before hydration we don't know if First Phone is active. Render a
+  // neutral placeholder so we NEVER flash the adult district first.
+  if (!state.ready) return <JuniorNeutralScreen />;
   if (!state.active) return null;
   return <JuniorLockScreen districtName={districtName} />;
+}
+
+function JuniorNeutralScreen() {
+  return (
+    <div className="min-h-screen grain" aria-busy="true">
+      <TopBar />
+      <main className="mx-auto max-w-2xl px-4 py-16">
+        <div className="h-40 rounded-2xl border border-border bg-card/50 animate-pulse" />
+      </main>
+    </div>
+  );
 }
 
 function JuniorLockScreen({ districtName }: { districtName: string }) {

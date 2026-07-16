@@ -32,16 +32,24 @@ function generateFamilyCode(): string {
 type CloudEntry = { device_id: string; wing: string; case_id: string; result: string; created_at: string };
 
 function FamilyPage() {
+  // Hydration-safe: all localStorage reads live in useEffect.
   const [parentCode, setParentCode] = useState<string | null>(null);
   const [kidJoinCode, setKidJoinCode] = useState("");
   const [entries, setEntries] = useState<CloudEntry[]>([]);
   const [copied, setCopied] = useState(false);
+  const [kidState, setKidState] = useState(() => ({
+    active: false, kidCityName: "", familyCode: null as string | null,
+    lessonsCompleted: [] as number[], licenseIssuedAt: null as number | null, licenseNumber: null as string | null,
+  }));
   const fetchGroup = useServerFn(fetchPilotGroup);
-  const kidState = loadFirstPhone();
 
   useEffect(() => {
     const saved = localStorage.getItem(CODE_KEY);
     if (saved) setParentCode(saved);
+    setKidState(loadFirstPhone());
+    const on = () => setKidState(loadFirstPhone());
+    window.addEventListener("milverse:firstphone", on);
+    return () => window.removeEventListener("milverse:firstphone", on);
   }, []);
 
   const refresh = useCallback(async (code: string) => {
