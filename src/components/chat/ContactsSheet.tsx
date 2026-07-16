@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { X, Phone, ShieldOff } from "lucide-react";
 import { BASE_CONTACTS, BOSS_CONTACTS, type SavedContact } from "@/lib/chat/contacts";
 
@@ -12,21 +13,42 @@ interface Props {
 }
 
 export function ContactsSheet({ open, onClose, bossId, mirrorNoHelp, onPick }: Props) {
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const invokerRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    invokerRef.current = (document.activeElement as HTMLElement) ?? null;
+    closeBtnRef.current?.focus();
+    function onKey(e: KeyboardEvent) { if (e.key === "Escape") onClose(); }
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      invokerRef.current?.focus?.();
+    };
+  }, [open, onClose]);
+
   if (!open) return null;
   const boss = bossId ? BOSS_CONTACTS[bossId] ?? [] : [];
   const list = [...boss, ...BASE_CONTACTS];
   return (
-    <div className="absolute inset-0 z-40 flex items-end bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="contacts-sheet-title"
+      className="absolute inset-0 z-40 flex items-end bg-black/70 backdrop-blur-sm animate-in fade-in duration-200"
+    >
       <div className="w-full rounded-t-2xl border-t border-white/10 bg-neutral-950 max-h-[80%] overflow-hidden flex flex-col animate-in slide-in-from-bottom duration-200">
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
           <div>
             <div className="text-[10px] tracking-[0.3em] text-white/50 font-mono">SAVED CONTACTS</div>
-            <div className="text-sm font-semibold text-white">Who do you actually know?</div>
+            <div id="contacts-sheet-title" className="text-sm font-semibold text-white">Who do you actually know?</div>
           </div>
-          <button onClick={onClose} className="p-1.5 text-white/60 hover:text-white" aria-label="Close">
+          <button ref={closeBtnRef} onClick={onClose} className="p-1.5 min-h-11 min-w-11 flex items-center justify-center text-white/60 hover:text-white" aria-label="Close contacts sheet">
             <X className="h-5 w-5" />
           </button>
         </div>
+
         {mirrorNoHelp && (
           <div className="mx-4 mt-3 flex items-start gap-2 rounded border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
             <ShieldOff className="h-4 w-4 mt-0.5 shrink-0" />

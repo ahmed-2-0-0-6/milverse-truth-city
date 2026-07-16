@@ -42,12 +42,20 @@ export function CallScreen({
   const ss = (seconds % 60).toString().padStart(2, "0");
 
   return (
-    <div className="absolute inset-0 z-50 flex flex-col items-center justify-between bg-gradient-to-b from-neutral-900 via-black to-neutral-950 text-white px-6 pt-16 pb-10">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="call-screen-title"
+      className="absolute inset-0 z-50 flex flex-col items-center justify-between bg-gradient-to-b from-neutral-900 via-black to-neutral-950 text-white px-6 pt-16 pb-10"
+    >
       <div className="text-center">
         <div className="text-[10px] font-mono tracking-[0.3em] text-white/60 uppercase">
           {direction === "in" ? "Incoming call" : ringing ? "Calling saved number…" : "In call"}
         </div>
-        <div className="mt-6 text-3xl font-semibold">{contactName}</div>
+        <div id="call-screen-title" className="mt-6 text-3xl font-semibold">
+          {direction === "in" ? `Incoming call from ${contactName}` : `Call to ${contactName}`}
+        </div>
+        <div className="text-3xl font-semibold sr-only">{contactName}</div>
         {contactNumber && (
           <div className="mt-1 text-sm font-mono text-white/60 tracking-wider">{contactNumber}</div>
         )}
