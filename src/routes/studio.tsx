@@ -225,6 +225,7 @@ function Studio() {
         chapter="CHAPTER 05"
         title="THE STUDIO"
         art={studioArt}
+        district="studio"
         lines={[
           "Enough training. Someone's cousin is about to answer a message like this next week.",
           "Write the case they'll rehearse against. The city's next cases are written by players like you.",
