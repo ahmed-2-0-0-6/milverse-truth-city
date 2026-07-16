@@ -16,7 +16,7 @@ interface Props {
   district?: DistrictKey;
 }
 
-export function DistrictHeader({ art, title, tag, glow = "34,211,238", className = "" }: Props) {
+export function DistrictHeader({ art, title, tag, glow = "34,211,238", className = "", district }: Props) {
   const { mode } = useVisualMode();
   const cinematic = mode === "cinematic";
 
