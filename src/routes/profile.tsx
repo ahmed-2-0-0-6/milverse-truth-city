@@ -138,7 +138,7 @@ function ProfilePage() {
                 onClick={downloadCard}
                 className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 stencil text-[10px] tracking-widest text-primary-foreground"
               >
-                <Download className="h-3.5 w-3.5" /> DOWNLOAD CARD (SVG)
+                <Download className="h-3.5 w-3.5" /> SAVE CARD (PNG)
               </button>
               <button
                 onClick={() => {
