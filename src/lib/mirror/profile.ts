@@ -83,7 +83,7 @@ export function loadProfile(): TrustProfile {
       return p;
     }
     const parsed = JSON.parse(raw) as Partial<TrustProfile>;
-    return { ...newProfile(), ...parsed, history: parsed.history ?? [] };
+    return { ...newProfile(), ...parsed, history: parsed.history ?? [], dailyPlays: parsed.dailyPlays ?? [] };
   } catch {
     return newProfile();
   }
