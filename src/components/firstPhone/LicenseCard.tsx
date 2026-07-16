@@ -140,6 +140,10 @@ export function LicenseCard({ onClose }: Props) {
         <canvas ref={canvasRef} className="w-full max-w-full rounded-lg border border-border" style={{ aspectRatio: "1200 / 760" }} />
       </div>
 
+      <p className="mt-3 text-[11px] italic text-muted-foreground print:hidden">
+        Certifies completion of a learning pathway. Not a guarantee of online safety — the training continues in real life.
+      </p>
+
       <div className="mt-4 flex flex-wrap gap-2 print:hidden">
         <button onClick={save} className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
           <Download className="h-4 w-4" /> Save PNG
