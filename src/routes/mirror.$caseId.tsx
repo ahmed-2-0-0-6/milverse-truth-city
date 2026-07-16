@@ -25,6 +25,7 @@ import { tacticForMirror } from "@/lib/mirror/tactics";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ContactsSheet } from "@/components/chat/ContactsSheet";
+import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 
 
 export const Route = createFileRoute("/mirror/$caseId")({
@@ -41,6 +42,8 @@ type Phase = "dossier" | "sim" | "verdict" | "reveal" | "debrief";
 function CasePlay() {
   const { scenario } = Route.useLoaderData();
   const [phase, setPhase] = useState<Phase>("dossier");
+  const gate = useJuniorGate("The Mirror");
+  if (gate) return gate;
 
   // In the "sim" phase, ChatShell owns the whole viewport (phone frame).
   // Every other phase keeps the normal MILVERSE app chrome.
