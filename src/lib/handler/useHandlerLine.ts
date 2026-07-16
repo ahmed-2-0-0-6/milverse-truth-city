@@ -7,14 +7,26 @@ import { useServerFn } from "@tanstack/react-start";
 import { generateHandlerLine } from "@/lib/handler.functions";
 import { readCache, writeCache, fingerprint, type HandlerSurface } from "./cache";
 
+export interface HandlerSummary {
+  lean: string;
+  leanBlurb: string;
+  strength: string;
+  directive: string;
+  weakestTactic: string | null;
+  weakestWrong: number;
+  weakestSeen: number;
+  wager: string;
+  dailyStreak: number;
+  lastPlayCorrect?: boolean | null;
+  lastPlayStake?: number;
+  leaderboardPercentile?: number | null;
+  weeklyTrend?: "steady" | "toward-calibrated" | "away-from-calibrated" | null;
+}
+
 export interface HandlerLineInput {
   surface: HandlerSurface;
   fallback: string;
-  summary: Parameters<typeof generateHandlerLine>[0] extends { data: infer D }
-    ? D extends { summary: infer S }
-      ? S
-      : never
-    : never;
+  summary: HandlerSummary;
   /** Extra hash bits (e.g. playerId) to key the cache per profile. */
   cacheKey?: string;
   /** Set false to skip AI entirely (still returns fallback). */
