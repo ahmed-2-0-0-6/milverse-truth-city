@@ -16,6 +16,7 @@ import { Toolbelt } from "@/components/feed/Toolbelt";
 import { TacticStamp } from "@/components/TacticStamp";
 import { TacticFlash } from "@/components/TacticFlash";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
+import { RookieIntro } from "@/components/handler/RookieIntro";
 
 export const Route = createFileRoute("/feed/$caseId")({
   loader: ({ params }) => {
