@@ -44,10 +44,33 @@ export function BankConfirmSheet({
     holdRef.current = null;
     if (holdProgress < 1) setHoldProgress(0);
   }
+  // Keyboard equivalent: Enter/Space press-and-hold on the button also drives
+  // the same beginHold/endHold pipeline via key events.
+  function onKeyDown(e: React.KeyboardEvent) {
+    if ((e.key === "Enter" || e.key === " ") && !e.repeat) { e.preventDefault(); beginHold(); }
+    if (e.key === "Escape") { e.preventDefault(); onCancel(); }
+  }
+  function onKeyUp(e: React.KeyboardEvent) {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); endHold(); }
+  }
+
+  // Dialog-level ESC handled by button too; provide a second layer for AT users
+  // who focus outside the button.
+  useEffect(() => {
+    if (!open) return;
+    function esc(e: KeyboardEvent) { if (e.key === "Escape") onCancel(); }
+    document.addEventListener("keydown", esc);
+    return () => document.removeEventListener("keydown", esc);
+  }, [open, onCancel]);
 
   if (!open) return null;
   return (
-    <div className="absolute inset-0 z-50 flex items-end bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="bank-sheet-title"
+      className="absolute inset-0 z-50 flex items-end bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+    >
       <div className="w-full bg-neutral-950 rounded-t-2xl border-t border-white/10 flex flex-col max-h-[92%] animate-in slide-in-from-bottom duration-200">
         {/* Bank-app header — noir, not iOS-clone */}
         <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-indigo-950 to-neutral-950 border-b border-white/10">

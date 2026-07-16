@@ -53,9 +53,8 @@ export function CallScreen({
           {direction === "in" ? "Incoming call" : ringing ? "Calling saved number…" : "In call"}
         </div>
         <div id="call-screen-title" className="mt-6 text-3xl font-semibold">
-          {direction === "in" ? `Incoming call from ${contactName}` : `Call to ${contactName}`}
+          {contactName}
         </div>
-        <div className="text-3xl font-semibold sr-only">{contactName}</div>
         {contactNumber && (
           <div className="mt-1 text-sm font-mono text-white/60 tracking-wider">{contactNumber}</div>
         )}
