@@ -174,6 +174,7 @@ export function ScrollStory() {
                  style={{ boxShadow: `0 30px 80px -20px rgba(${d.glow},0.35)` }}>
               <img src={d.art} alt="" loading="lazy" width={1536} height={1024}
                    className="absolute inset-0 h-full w-full object-cover kenburns" />
+              <DistrictLiveFX district={d.key as DistrictKey} />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
               <div className="absolute inset-0 opacity-20 mix-blend-overlay" style={{
                 backgroundImage: "radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px)", backgroundSize: "3px 3px",
