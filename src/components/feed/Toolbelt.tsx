@@ -17,6 +17,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Image as ImageIcon, Globe2, Layers, CalendarClock, ExternalLink } from "lucide-react";
 import type { FeedAction, FeedFormat, FeedToolKind, FeedScenario } from "@/lib/feed/scenarios";
+import { track } from "@/lib/telemetry";
 
 interface ToolMeta {
   kind: FeedToolKind;
