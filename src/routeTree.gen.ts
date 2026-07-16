@@ -33,6 +33,7 @@ import { Route as ManualTakeItOutsideRouteImport } from './routes/manual.take-it
 import { Route as ManualEntryIdRouteImport } from './routes/manual.$entryId'
 import { Route as FeedCaseIdRouteImport } from './routes/feed.$caseId'
 import { Route as ArchiveSubmitRouteImport } from './routes/archive.submit'
+import { Route as ApiPublicTelemetryRouteImport } from './routes/api/public/telemetry'
 
 const StudioRoute = StudioRouteImport.update({
   id: '/studio',
@@ -154,6 +155,11 @@ const ArchiveSubmitRoute = ArchiveSubmitRouteImport.update({
   path: '/submit',
   getParentRoute: () => ArchiveRoute,
 } as any)
+const ApiPublicTelemetryRoute = ApiPublicTelemetryRouteImport.update({
+  id: '/api/public/telemetry',
+  path: '/api/public/telemetry',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -180,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/feed/': typeof FeedIndexRoute
   '/manual/': typeof ManualIndexRoute
   '/mirror/': typeof MirrorIndexRoute
+  '/api/public/telemetry': typeof ApiPublicTelemetryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/feed': typeof FeedIndexRoute
   '/manual': typeof ManualIndexRoute
   '/mirror': typeof MirrorIndexRoute
+  '/api/public/telemetry': typeof ApiPublicTelemetryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -233,6 +241,7 @@ export interface FileRoutesById {
   '/feed/': typeof FeedIndexRoute
   '/manual/': typeof ManualIndexRoute
   '/mirror/': typeof MirrorIndexRoute
+  '/api/public/telemetry': typeof ApiPublicTelemetryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -261,6 +270,7 @@ export interface FileRouteTypes {
     | '/feed/'
     | '/manual/'
     | '/mirror/'
+    | '/api/public/telemetry'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -287,6 +297,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/manual'
     | '/mirror'
+    | '/api/public/telemetry'
   id:
     | '__root__'
     | '/'
@@ -313,6 +324,7 @@ export interface FileRouteTypes {
     | '/feed/'
     | '/manual/'
     | '/mirror/'
+    | '/api/public/telemetry'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -339,6 +351,7 @@ export interface RootRouteChildren {
   FeedIndexRoute: typeof FeedIndexRoute
   ManualIndexRoute: typeof ManualIndexRoute
   MirrorIndexRoute: typeof MirrorIndexRoute
+  ApiPublicTelemetryRoute: typeof ApiPublicTelemetryRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -511,6 +524,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArchiveSubmitRouteImport
       parentRoute: typeof ArchiveRoute
     }
+    '/api/public/telemetry': {
+      id: '/api/public/telemetry'
+      path: '/api/public/telemetry'
+      fullPath: '/api/public/telemetry'
+      preLoaderRoute: typeof ApiPublicTelemetryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -549,6 +569,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeedIndexRoute: FeedIndexRoute,
   ManualIndexRoute: ManualIndexRoute,
   MirrorIndexRoute: MirrorIndexRoute,
+  ApiPublicTelemetryRoute: ApiPublicTelemetryRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

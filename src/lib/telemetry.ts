@@ -2,8 +2,6 @@
 // Fire-and-forget: events queue in memory, flush every 5s / 10 events / on unload.
 // Zero content, zero identity — just event counts + tiny bucketed payloads.
 
-import { logTelemetryBatch } from "./devintel.functions";
-
 export type TelemetryEventType =
   | "route_visit"
   | "session_end"
@@ -31,6 +29,7 @@ export interface TelemetryEvent {
 const FLUSH_MS = 5000;
 const MAX_QUEUE = 10;
 const MAX_PAYLOAD_KEYS = 8;
+const TELEMETRY_ENDPOINT = "/api/public/telemetry";
 
 let queue: TelemetryEvent[] = [];
 let timer: number | null = null;
@@ -81,21 +80,23 @@ async function flush() {
   if (queue.length === 0) return;
   const batch = queue.splice(0, queue.length);
   try {
-    await logTelemetryBatch({ data: { events: batch } });
+    await fetch(TELEMETRY_ENDPOINT, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ events: batch }),
+      keepalive: true,
+    });
   } catch {
     // Silent — telemetry never disrupts the app.
   }
 }
 
-/** Beacon-based flush for `beforeunload` — bypasses the async server-fn stub. */
+/** Beacon-based flush for `beforeunload` — uses a raw endpoint, not server-fn RPC. */
 function beaconFlush(events: TelemetryEvent[]) {
   if (typeof navigator === "undefined" || !navigator.sendBeacon) return false;
   try {
-    // Use the server-fn URL if available (TanStack exposes it on the callable).
-    const fn = logTelemetryBatch as unknown as { url?: string };
-    if (!fn.url) return false;
-    const body = new Blob([JSON.stringify({ data: { events } })], { type: "application/json" });
-    return navigator.sendBeacon(fn.url, body);
+    const body = new Blob([JSON.stringify({ events })], { type: "application/json" });
+    return navigator.sendBeacon(TELEMETRY_ENDPOINT, body);
   } catch {
     return false;
   }
