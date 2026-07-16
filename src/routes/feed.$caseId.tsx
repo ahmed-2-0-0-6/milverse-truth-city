@@ -252,54 +252,76 @@ function Sim({
     state.dignity > 60 ? "bg-primary" : state.dignity > 30 ? "bg-caution" : "bg-destructive";
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-4 flex flex-col" style={{ minHeight: "calc(100vh - 57px)" }}>
+    <>
       <TacticFlash tacticId={tacticFlash ?? null} onDone={() => setTacticFlash(null)} />
-      <div className="rounded-t-xl border border-border border-b-0 bg-card px-4 py-3">
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <div className="text-sm font-semibold truncate">{scenario.sender.name}</div>
-            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{scenario.sender.relationship}</div>
+      <ChatShell
+        header={
+          <>
+            <ChatHeader
+              name={scenario.sender.name}
+              subtitle={scenario.sender.relationship.toUpperCase()}
+              isSaved={true}
+              onContacts={undefined}
+            />
+            <div className="px-3 py-2 bg-neutral-950/80 border-b border-white/10">
+              <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-white/50">
+                <span>DIGNITY · {scenario.sender.name.split(" ")[0]}</span>
+                <span>{Math.round(state.dignity)}</span>
+              </div>
+              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                <div className={`h-full transition-all duration-500 ${dignityColor}`} style={{ width: `${state.dignity}%` }} />
+              </div>
+              <div className="mt-2 flex gap-1">
+                {(["chat", "toolkit"] as const).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTab(t)}
+                    className={`rounded px-3 py-1 font-mono text-[10px] tracking-widest transition ${
+                      tab === t ? "bg-primary/15 text-primary" : "text-white/50 hover:text-white"
+                    }`}
+                  >
+                    {t === "chat" ? "CHAT" : `TOOLKIT · ${state.actionsUsed.length}/${scenario.actions.length}`}
+                  </button>
+                ))}
+                <div className="flex-1" />
+                <button
+                  onClick={onDeliverVerdict}
+                  disabled={messages.length < 2}
+                  className="rounded border border-primary/50 bg-primary/10 px-2 py-1 text-[9px] font-mono tracking-widest text-primary hover:bg-primary/20 disabled:opacity-40"
+                >
+                  DELIVER VERDICT →
+                </button>
+              </div>
+            </div>
+          </>
+        }
+        composer={
+          <div className="p-3">
+            <div className="flex gap-2">
+              <input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && send()}
+                placeholder="Reply to them…"
+                className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-sm text-white outline-none focus:border-primary"
+              />
+              <button onClick={send} disabled={!input.trim()} className="rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40">
+                <Send className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="mt-1.5 font-mono text-[9px] tracking-widest text-white/40">
+              OPEN TOOLBELT · PICK THE RIGHT TOOL FOR THIS FORMAT
+            </div>
           </div>
-          <button
-            onClick={onDeliverVerdict}
-            disabled={messages.length < 2}
-            className="rounded-md border border-primary/50 bg-primary/10 px-2.5 py-1.5 text-[10px] font-mono tracking-widest text-primary hover:bg-primary/20 disabled:opacity-40"
-          >
-            DELIVER VERDICT →
-          </button>
-        </div>
-        <div className="mt-3">
-          <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-muted-foreground">
-            <span>DIGNITY · {scenario.sender.name.split(" ")[0]}</span>
-            <span>{Math.round(state.dignity)}</span>
-          </div>
-          <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-            <div className={`h-full transition-all duration-500 ${dignityColor}`} style={{ width: `${state.dignity}%` }} />
-          </div>
-        </div>
-        <div className="mt-3 flex gap-1 border-t border-border pt-2">
-          {(["chat", "toolkit"] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`rounded px-3 py-1 font-mono text-[10px] tracking-widest transition ${
-                tab === t ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t === "chat" ? "CHAT" : `TOOLKIT · ${state.actionsUsed.length}/${scenario.actions.length}`}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-hidden border-x border-border bg-background/40">
+        }
+      >
         {tab === "chat" ? (
-          <div ref={scroller} className="h-full overflow-y-auto p-4 space-y-3">
+          <div ref={scroller} className="flex-1 overflow-y-auto p-3 space-y-3">
             <FormatFrame format={scenario.format ?? "whatsapp"} senderName={scenario.sender.name} forward={scenario.forward} aiGenerated={scenario.aiGenerated} />
             {messages.map((m, i) => <FeedRow key={i} m={m} />)}
           </div>
         ) : (
-          <div className="p-4">
+          <div className="flex-1 overflow-y-auto p-3">
             <Toolbelt
               scenario={scenario}
               used={state.actionsUsed}
@@ -313,35 +335,17 @@ function Sim({
             />
           </div>
         )}
-      </div>
-
-      <div className="rounded-b-xl border border-border border-t-0 bg-card p-3">
-        <div className="flex gap-2">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && send()}
-            placeholder="Reply to them…"
-            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary"
-          />
-          <button onClick={send} disabled={!input.trim()} className="rounded-md bg-primary px-4 text-primary-foreground disabled:opacity-40">
-            <Send className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="mt-2 font-mono text-[10px] tracking-widest text-muted-foreground">
-          OPEN TOOLBELT · PICK THE RIGHT TOOL FOR THIS FORMAT
-        </div>
-      </div>
-    </main>
+      </ChatShell>
+    </>
   );
 }
 
 function FeedRow({ m }: { m: FeedMessage }) {
   if (m.role === "system") {
     return (
-      <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-xs">
+      <div className="rounded-md border border-primary/40 bg-primary/10 p-3 text-xs">
         <div className="font-mono text-[10px] tracking-widest text-primary">{m.isAction ? "VERIFICATION" : "SYSTEM"}</div>
-        <div className="mt-1 text-foreground/90">{m.text}</div>
+        <div className="mt-1 text-white/90">{m.text}</div>
       </div>
     );
   }
@@ -349,7 +353,7 @@ function FeedRow({ m }: { m: FeedMessage }) {
   return (
     <div className={`msg-in flex ${isPlayer ? "justify-end" : "justify-start"}`}>
       <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
-        isPlayer ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-background border border-border rounded-bl-sm"
+        isPlayer ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-neutral-800 border border-white/10 text-white rounded-bl-sm"
       }`}>{m.text}</div>
     </div>
   );
