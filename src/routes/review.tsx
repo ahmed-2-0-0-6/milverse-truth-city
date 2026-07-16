@@ -192,7 +192,7 @@ function AssessmentTab({ passcode }: { passcode: string }) {
     if (upper.length < 4) return;
     setBusy(true); setErr(null);
     try {
-      const res = await fetchFn({ data: { groupCode: upper } as never }) as {
+      const res = (await fetchFn({ data: { groupCode: upper } as never })) as unknown as {
         entries: CloudAssessmentRow[]; phase: { phase: "intake" | "exit" };
       };
       setRows(res.entries ?? []);
