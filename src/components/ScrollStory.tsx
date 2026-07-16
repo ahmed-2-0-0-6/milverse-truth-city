@@ -8,11 +8,11 @@ import archiveArt from "@/assets/district-archive.jpg";
 import cleanroomArt from "@/assets/district-cleanroom.jpg";
 
 const DISTRICTS = [
-  { key: "mirror", label: "THE MIRROR", tag: "Verify people", art: mirrorArt, glow: "34,211,238" },
-  { key: "feed", label: "THE FEED", tag: "Verify claims", art: feedArt, glow: "245,185,66" },
-  { key: "studio", label: "THE STUDIO", tag: "Author cases", art: studioArt, glow: "245,185,66" },
-  { key: "archive", label: "THE ARCHIVE", tag: "Living memory", art: archiveArt, glow: "34,211,238" },
-  { key: "cleanroom", label: "CLEAN ROOM", tag: "Calibrate", art: cleanroomArt, glow: "34,211,238" },
+  { key: "mirror", label: "THE MIRROR", tag: "Judge messages aimed at you — real family, or someone wearing them?", art: mirrorArt, glow: "34,211,238" },
+  { key: "feed", label: "THE FEED", tag: "Judge real-world posts — true, false, or misleading?", art: feedArt, glow: "245,185,66" },
+  { key: "studio", label: "THE STUDIO", tag: "Design the attack yourself — teach by authoring.", art: studioArt, glow: "245,185,66" },
+  { key: "archive", label: "THE ARCHIVE", tag: "Revisit closed cases — build the pattern memory.", art: archiveArt, glow: "34,211,238" },
+  { key: "cleanroom", label: "CLEAN ROOM", tag: "Calibrate confidence — know when you know.", art: cleanroomArt, glow: "34,211,238" },
 ];
 
 const BEATS = [

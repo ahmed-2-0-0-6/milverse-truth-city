@@ -59,6 +59,12 @@ function ManualIndex() {
           >
             <ExternalLink className="h-3.5 w-3.5" /> TAKE IT OUTSIDE — REAL TOOLS
           </Link>
+          <Link
+            to="/educators"
+            className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-1.5 stencil text-[10px] tracking-widest text-muted-foreground hover:text-foreground hover:border-primary/50"
+          >
+            FOR EDUCATORS →
+          </Link>
         </div>
 
         <div className="mt-6 rounded-md border border-border bg-background/50 p-4 text-xs text-muted-foreground">

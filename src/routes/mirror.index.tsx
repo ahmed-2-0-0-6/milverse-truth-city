@@ -162,7 +162,7 @@ function CaseFiles() {
                 <div className="rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
                   {tier === 5
                     ? "No cases at this tier yet. Prepare for the Clean Room."
-                    : "Scenarios coming soon."}
+                    : "No cases at this tier — clear the tier below to open more."}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
