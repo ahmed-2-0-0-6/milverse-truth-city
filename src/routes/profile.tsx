@@ -113,7 +113,7 @@ function ProfilePage() {
               <Stat label="FALSE ALARM" value={falseAlarms} tone="warn" />
             </div>
 
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="rounded-md border border-border bg-background/50 p-3">
                 <div className="stencil text-[10px] tracking-widest text-muted-foreground">CALIBRATION</div>
                 <div className="mt-1 text-lg font-semibold">{cal.label}</div>
@@ -126,6 +126,10 @@ function ProfilePage() {
                     <div className="h-full bg-primary" style={{ width: `${manualPct}%` }} />
                   </div>
                 </div>
+              </div>
+              <div className="rounded-md border border-border bg-background/50 p-3">
+                <div className="stencil text-[10px] tracking-widest text-muted-foreground">CASES DESIGNED</div>
+                <div className="mt-1 text-lg font-semibold">{publishedCount}</div>
               </div>
             </div>
 
