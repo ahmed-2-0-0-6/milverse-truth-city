@@ -471,3 +471,118 @@
   60%  { opacity: 1; transform: scale(0.94) translateY(2px); }
   100% { opacity: 1; transform: scale(1)    translateY(0);   }
 }
+
+/* ─────────── THE DAILY MIRAGE — newsprint dressing ─────────── */
+.paper {
+  --paper-bg: oklch(0.955 0.02 85);
+  --paper-ink: oklch(0.18 0.02 60);
+  --paper-rule: oklch(0.35 0.02 60 / 0.35);
+  --paper-muted: oklch(0.35 0.02 60 / 0.7);
+  background: var(--paper-bg);
+  color: var(--paper-ink);
+  background-image:
+    radial-gradient(rgba(60,40,20,0.08) 1px, transparent 1px),
+    radial-gradient(rgba(60,40,20,0.05) 1px, transparent 1px);
+  background-size: 3px 3px, 7px 7px;
+  background-position: 0 0, 1px 1px;
+}
+.paper-serif { font-family: "Playfair Display", "Georgia", "Times New Roman", serif; }
+.paper-blackletter {
+  font-family: "UnifrakturCook", "Playfair Display", serif;
+  letter-spacing: 0.005em;
+}
+.paper-mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+.paper-rule { border-color: var(--paper-rule) !important; }
+.paper-hairline { border-top: 1px solid var(--paper-rule); }
+.paper-double { border-top: 3px double var(--paper-rule); border-bottom: 3px double var(--paper-rule); }
+
+.paper-body {
+  font-family: "Playfair Display", "Georgia", serif;
+  font-size: 1rem;
+  line-height: 1.55;
+  text-align: justify;
+  hyphens: auto;
+  color: var(--paper-ink);
+}
+@media (min-width: 900px) {
+  .paper-cols-3 { column-count: 3; column-gap: 1.75rem; column-rule: 1px solid var(--paper-rule); }
+  .paper-cols-2 { column-count: 2; column-gap: 1.5rem;  column-rule: 1px solid var(--paper-rule); }
+}
+.paper-body p { margin: 0 0 0.75rem; break-inside: avoid; }
+.paper-body p:first-of-type::first-letter {
+  font-family: "UnifrakturCook", "Playfair Display", serif;
+  float: left; font-size: 3.2em; line-height: 0.85; padding: 0.05em 0.12em 0 0; color: var(--paper-ink);
+}
+.paper-body.no-dropcap p:first-of-type::first-letter { all: unset; }
+
+.paper-halftone {
+  filter: grayscale(1) contrast(1.15);
+  background-image:
+    radial-gradient(rgba(0,0,0,0.55) 0.9px, transparent 1px),
+    linear-gradient(180deg, oklch(0.65 0.02 60), oklch(0.4 0.02 60));
+  background-size: 3px 3px, 100% 100%;
+}
+.paper-halftone-mask {
+  -webkit-mask-image: linear-gradient(180deg, black 70%, transparent 100%);
+          mask-image: linear-gradient(180deg, black 70%, transparent 100%);
+}
+
+.paper-ornament {
+  display: flex; align-items: center; gap: 0.75rem; color: var(--paper-muted);
+  font-family: "Playfair Display", serif; letter-spacing: 0.4em; font-size: 0.7rem; text-transform: uppercase;
+}
+.paper-ornament::before, .paper-ornament::after {
+  content: ""; flex: 1; border-top: 1px solid var(--paper-rule);
+}
+
+.paper-headline-link { position: relative; }
+.paper-headline-link::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 2px;
+  background: currentColor; transform: scaleX(0); transform-origin: left;
+  transition: transform .35s ease;
+}
+.paper-headline-link:hover::after { transform: scaleX(1); }
+
+.paper-flag-marked {
+  background: transparent;
+  border: 2px solid oklch(0.55 0.18 25 / 0.85);
+  border-radius: 999px;
+  padding: 0 4px;
+  box-shadow: 0 0 0 1px oklch(0.55 0.18 25 / 0.35) inset;
+  color: oklch(0.4 0.15 25);
+}
+
+@keyframes paper-unfold {
+  0%   { opacity: 0; transform: perspective(1200px) rotateX(-70deg); transform-origin: top center; }
+  60%  { opacity: 1; transform: perspective(1200px) rotateX(6deg);  }
+  100% { opacity: 1; transform: none; }
+}
+.paper-unfold { animation: paper-unfold 720ms cubic-bezier(.2,.7,.2,1) both; }
+
+@keyframes paper-stamp {
+  0%   { opacity: 0; transform: rotate(-14deg) scale(2.2); }
+  55%  { opacity: 1; transform: rotate(-6deg)  scale(0.9); }
+  100% { opacity: 1; transform: rotate(-8deg)  scale(1);   }
+}
+.paper-stamp { animation: paper-stamp 520ms cubic-bezier(.4,1.6,.5,1) both; }
+
+/* Fold shadow between sections */
+.paper-fold {
+  height: 12px;
+  background: linear-gradient(180deg, transparent, oklch(0.7 0.02 60 / 0.35), transparent);
+  margin: 1.25rem 0;
+}
+
+/* Reduced motion — kill unfold/stamp */
+@media (prefers-reduced-motion: reduce) {
+  .paper-unfold, .paper-stamp { animation: none !important; }
+}
+
+/* ── Print stylesheet — one clean A4 for the field kit ── */
+@media print {
+  body { background: white !important; }
+  .paper { background: white !important; background-image: none !important; }
+  .no-print { display: none !important; }
+  .paper-body p:first-of-type::first-letter { font-size: 2.5em; }
+  .paper-halftone { filter: grayscale(1) contrast(1.3); }
+}

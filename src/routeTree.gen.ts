@@ -13,7 +13,9 @@ import { Route as StudioRouteImport } from './routes/studio'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as QuickTourRouteImport } from './routes/quick-tour'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PressroomRouteImport } from './routes/pressroom'
 import { Route as PilotRouteImport } from './routes/pilot'
+import { Route as PaperRouteImport } from './routes/paper'
 import { Route as MarketRouteImport } from './routes/market'
 import { Route as KitRouteImport } from './routes/kit'
 import { Route as EducatorsRouteImport } from './routes/educators'
@@ -52,9 +54,19 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PressroomRoute = PressroomRouteImport.update({
+  id: '/pressroom',
+  path: '/pressroom',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PilotRoute = PilotRouteImport.update({
   id: '/pilot',
   path: '/pilot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaperRoute = PaperRouteImport.update({
+  id: '/paper',
+  path: '/paper',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketRoute = MarketRouteImport.update({
@@ -153,7 +165,9 @@ export interface FileRoutesByFullPath {
   '/educators': typeof EducatorsRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
+  '/paper': typeof PaperRoute
   '/pilot': typeof PilotRoute
+  '/pressroom': typeof PressroomRoute
   '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
   '/review': typeof ReviewRoute
@@ -177,7 +191,9 @@ export interface FileRoutesByTo {
   '/educators': typeof EducatorsRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
+  '/paper': typeof PaperRoute
   '/pilot': typeof PilotRoute
+  '/pressroom': typeof PressroomRoute
   '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
   '/review': typeof ReviewRoute
@@ -202,7 +218,9 @@ export interface FileRoutesById {
   '/educators': typeof EducatorsRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
+  '/paper': typeof PaperRoute
   '/pilot': typeof PilotRoute
+  '/pressroom': typeof PressroomRoute
   '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
   '/review': typeof ReviewRoute
@@ -228,7 +246,9 @@ export interface FileRouteTypes {
     | '/educators'
     | '/kit'
     | '/market'
+    | '/paper'
     | '/pilot'
+    | '/pressroom'
     | '/profile'
     | '/quick-tour'
     | '/review'
@@ -252,7 +272,9 @@ export interface FileRouteTypes {
     | '/educators'
     | '/kit'
     | '/market'
+    | '/paper'
     | '/pilot'
+    | '/pressroom'
     | '/profile'
     | '/quick-tour'
     | '/review'
@@ -276,7 +298,9 @@ export interface FileRouteTypes {
     | '/educators'
     | '/kit'
     | '/market'
+    | '/paper'
     | '/pilot'
+    | '/pressroom'
     | '/profile'
     | '/quick-tour'
     | '/review'
@@ -301,7 +325,9 @@ export interface RootRouteChildren {
   EducatorsRoute: typeof EducatorsRoute
   KitRoute: typeof KitRoute
   MarketRoute: typeof MarketRoute
+  PaperRoute: typeof PaperRoute
   PilotRoute: typeof PilotRoute
+  PressroomRoute: typeof PressroomRoute
   ProfileRoute: typeof ProfileRoute
   QuickTourRoute: typeof QuickTourRoute
   ReviewRoute: typeof ReviewRoute
@@ -345,11 +371,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pressroom': {
+      id: '/pressroom'
+      path: '/pressroom'
+      fullPath: '/pressroom'
+      preLoaderRoute: typeof PressroomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pilot': {
       id: '/pilot'
       path: '/pilot'
       fullPath: '/pilot'
       preLoaderRoute: typeof PilotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/paper': {
+      id: '/paper'
+      path: '/paper'
+      fullPath: '/paper'
+      preLoaderRoute: typeof PaperRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/market': {
@@ -495,7 +535,9 @@ const rootRouteChildren: RootRouteChildren = {
   EducatorsRoute: EducatorsRoute,
   KitRoute: KitRoute,
   MarketRoute: MarketRoute,
+  PaperRoute: PaperRoute,
   PilotRoute: PilotRoute,
+  PressroomRoute: PressroomRoute,
   ProfileRoute: ProfileRoute,
   QuickTourRoute: QuickTourRoute,
   ReviewRoute: ReviewRoute,

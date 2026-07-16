@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Play, Eye, Newspaper, Clapperboard, Library, Landmark as LandmarkIcon, Store, Swords, BookOpen, IdCard, GraduationCap } from "lucide-react";
+import { Play, Eye, Newspaper, Clapperboard, Library, Landmark as LandmarkIcon, Store, Swords, BookOpen, IdCard, GraduationCap, NotebookPen } from "lucide-react";
 import { buildMirrorStations, buildFeedStations, MIRROR_COLOR, FEED_COLOR, type Station } from "@/lib/city/world-data";
 import { loadProfile, type TrustProfile } from "@/lib/mirror/profile";
 import { getMirrorRecommendations } from "@/lib/recommendations";
@@ -41,6 +41,7 @@ export function CityList({ onSwitchToMap }: { onSwitchToMap: () => void }) {
 
       {/* Landmark districts */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 p-2 border-b border-border">
+        <LandmarkTile to="/paper" Icon={NotebookPen} label="Newsstand · The Daily Mirage" badge="TODAY" />
         <LandmarkTile to="/city-hall" Icon={LandmarkIcon} label="City Hall" />
         <LandmarkTile to="/studio" Icon={Clapperboard} label="Studio" />
         <LandmarkTile to="/archive" Icon={Library} label="Archive · City Library" badge={profile?.history?.length ? `${new Set(profile.history.map((h) => h.caseId)).size} ON SHELF` : undefined} />

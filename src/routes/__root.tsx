@@ -106,7 +106,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       // Fonts are self-hosted via @fontsource in src/styles.css (LAYER-3)
-
+      // The Daily Mirage — newsprint fonts (loaded via <link> per Tailwind v4 remote-import rule).
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" } as never,
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=UnifrakturCook:wght@700&display=swap" },
     ],
   }),
   shellComponent: RootShell,
