@@ -196,7 +196,7 @@ function EditionBody({ edition }: { edition: Edition }) {
       <PaperRealWorld realWorld={c.realWorld} />
 
       {/* Cover-to-cover stamp */}
-      {record.coverToCoverAt && (
+      {record?.coverToCoverAt && (
         <div className="no-print mt-8 flex justify-end">
           <div className="paper-stamp inline-block border-4 border-[oklch(0.5_0.2_25)] px-4 py-2 paper-mono text-xs tracking-[0.3em] text-[oklch(0.4_0.2_25)]" style={{ transform: "rotate(-8deg)" }}>
             READ COVER TO COVER · +15 TRUST
