@@ -90,6 +90,8 @@ function BossPlay() {
     );
   }
 
+  const fxDistrict: DistrictKey = boss.district === "feed" ? "feed" : "mirror";
+
   /* ── INTRO CINEMATIC ─────────────────────────────────────── */
   if (stage === "intro") {
     return (
