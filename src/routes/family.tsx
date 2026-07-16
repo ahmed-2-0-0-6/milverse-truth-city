@@ -89,13 +89,15 @@ function FamilyPage() {
   const lessonList = Array.from(lessonsDone).sort((a, b) => a - b);
   const licenseIssued = lessonsDone.has(10);
 
-  // Real tactic mastery: unique tactics across the completed lessons.
+  // Real tactic mastery: unique tactics across the completed lessons, shown
+  // with their Field Manual display names (bridge between junior + adult).
   const tacticSet = new Set<JuniorTactic>();
   lessonList.forEach((n) => {
     const lesson = LESSONS.find((l) => l.n === n);
     lesson?.cases.forEach((c) => tacticSet.add(c.tactic));
   });
-  const tacticsMastered = tacticSet.size;
+  const tacticsDisplay = manualDisplayForTactics([...tacticSet]);
+  const tacticsMastered = tacticsDisplay.length;
 
   return (
     <div className="min-h-screen grain">
