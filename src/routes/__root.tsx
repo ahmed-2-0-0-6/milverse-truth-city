@@ -131,6 +131,24 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    installTelemetry();
+    // Log initial route + every navigation. Skip the passcode-gated
+    // /devintel and /review so admin traffic doesn't pollute stats.
+    const send = (path: string) => {
+      if (path.startsWith("/devintel") || path.startsWith("/review")) return;
+      track("route_visit", { route: path });
+    };
+    send(window.location.pathname + window.location.search);
+    const unsub = router.subscribe("onResolved", (ev) => {
+      const pathname = ev.toLocation?.pathname ?? window.location.pathname;
+      const search = ev.toLocation?.searchStr ?? "";
+      send(pathname + search);
+    });
+    return () => { unsub(); };
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>
