@@ -2,6 +2,9 @@
 // Each scenario has a public dossier + hidden ground-truth fact sheet,
 // a tier (1..5) that changes engine behavior, and optional voice-note text.
 
+import type { TacticId } from "@/lib/manual/entries";
+
+
 export type FactId = string;
 export type TierId = 1 | 2 | 3 | 4 | 5;
 
