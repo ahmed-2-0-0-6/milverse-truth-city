@@ -35,6 +35,15 @@ export function ScrollStory() {
   const rootRef = useRef<HTMLDivElement>(null);
   const horizontalRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const [submerging, setSubmerging] = useState<string | null>(null);
+
+  function submerge(href: string, key: string) {
+    if (submerging) return;
+    setSubmerging(key);
+    window.setTimeout(() => navigate({ to: href }), 720);
+  }
+
 
   useEffect(() => {
     if (typeof window === "undefined") return;
