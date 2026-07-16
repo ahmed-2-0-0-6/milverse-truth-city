@@ -186,11 +186,22 @@ function ArchivePage() {
                 >
                   <div className="folder-tab bg-caution/20 text-caution">CASE · {row.share_code}</div>
                   <div className="folder-body">
-                    <div className="text-sm font-semibold group-hover:text-caution">{row.scenario.title}</div>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="text-sm font-semibold group-hover:text-caution">{row.scenario.title}</div>
+                      {row.scenario.designerRank === "CITY DESIGNER" && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-primary/60 bg-primary/10 px-1.5 py-0.5 text-[9px] font-mono tracking-widest text-primary shrink-0">
+                          <Building2 className="h-2.5 w-2.5" /> DESIGNER
+                        </span>
+                      )}
+                    </div>
                     <div className="mt-1 text-xs text-muted-foreground line-clamp-2">{row.scenario.teaser}</div>
                     <div className="mt-3 flex items-center justify-between stencil text-[9px]">
                       <span className="text-caution/80">T{row.scenario.tier} · {row.scenario.truth}</span>
-                      {row.scenario.inspiredBy && <span className="text-muted-foreground">{row.scenario.inspiredBy.country} · {row.scenario.inspiredBy.year}</span>}
+                      {row.scenario.designerRank ? (
+                        <span className="text-primary/80">BYLINE · {row.scenario.designerRank}</span>
+                      ) : row.scenario.inspiredBy && (
+                        <span className="text-muted-foreground">{row.scenario.inspiredBy.country} · {row.scenario.inspiredBy.year}</span>
+                      )}
                     </div>
                   </div>
                 </button>
