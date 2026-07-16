@@ -13,6 +13,7 @@ import { ARTIFACT_LABEL } from "@/lib/mirror/voice";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
 import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
+import { track } from "@/lib/telemetry";
 import { tick, tensionCue } from "@/lib/mirror/audio";
 import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
@@ -965,9 +966,23 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       probeStats: { strong: result.strong, weak: result.weak, wasted: result.wasted },
       ts: Date.now(),
     });
+    // Anonymous telemetry — includes tactic tag for aggregate learning analytics.
+    // Wrapped so a failed track never touches the case-completion path.
+    try {
+      track("case_complete", {
+        case_id: scenario.id,
+        payload: {
+          district: "mirror",
+          tactic: scenario.tactic ?? tacticForMirror(scenario.id),
+          tier: scenario.tier,
+          result: result.resultKind,
+          used_vob: result.usedVob,
+        },
+      });
+    } catch { /* noop */ }
     window.dispatchEvent(new Event("milverse:profile"));
     checkAndAwardBadges(p);
-  }, [result, scenario.id, scenario.tier, scenario.truth, verdictRaw]);
+  }, [result, scenario.id, scenario.tier, scenario.truth, scenario.tactic, verdictRaw]);
 
   if (!result || !verdictRaw) {
     return (

@@ -13,7 +13,7 @@ import { useHandlerLine } from "@/lib/handler/useHandlerLine";
 const REDUCED = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 export function HandlersReading() {
-  const [profile, setProfile] = useState(() => (typeof window === "undefined" ? null : loadProfile()));
+  const [profile, setProfile] = useState<ReturnType<typeof loadProfile> | null>(null);
 
   useEffect(() => {
     setProfile(loadProfile());

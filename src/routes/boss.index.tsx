@@ -19,8 +19,9 @@ export const Route = createFileRoute("/boss/")({
 });
 
 function BossLobby() {
-  const [prof, setProf] = useState(loadBossProfile());
+  const [prof, setProf] = useState<ReturnType<typeof loadBossProfile> | null>(null);
   useEffect(() => {
+    setProf(loadBossProfile());
     const on = () => setProf(loadBossProfile());
     window.addEventListener("milverse:boss", on);
     return () => window.removeEventListener("milverse:boss", on);
@@ -54,39 +55,61 @@ function BossLobby() {
 
         <div className="grid gap-4">
           {BOSSES.map((b) => {
-            const wins = prof.attempts.filter((a) => a.bossId === b.id && a.outcome === "WIN").length;
-            const losses = prof.attempts.filter((a) => a.bossId === b.id && a.outcome !== "WIN").length;
-            const declassified = prof.declassified.includes(b.id);
+            const wins = prof?.attempts.filter((a) => a.bossId === b.id && a.outcome === "WIN").length ?? 0;
+            const losses = prof?.attempts.filter((a) => a.bossId === b.id && a.outcome !== "WIN").length ?? 0;
+            const declassified = prof?.declassified.includes(b.id) ?? false;
             const rematchOk = canRematch(b.id);
+            const districtHref = b.district === "mirror" ? "/mirror" : b.district === "feed" ? "/feed" : "/";
+            const districtLabel = b.district === "mirror" ? "The Mirror" : b.district === "feed" ? "The Feed" : b.district;
+            const assignmentOpen = !rematchOk && losses > 0;
             return (
-              <Link
-                key={b.id}
-                to="/boss/$bossId"
-                params={{ bossId: b.id }}
-                className="group block border border-white/10 hover:border-red-500/60 bg-black/60 rounded-lg p-5 transition"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 text-[10px] tracking-[0.3em] text-red-400 mb-1">
-                      <Skull className="w-3 h-3" />
-                      <span>{b.threatRating}</span>
-                      <span className="text-white/40">·</span>
-                      <span className="text-white/60">{b.district.toUpperCase()}</span>
+              <div key={b.id} className="border border-white/10 hover:border-red-500/60 bg-black/60 rounded-lg transition">
+                <Link
+                  to="/boss/$bossId"
+                  params={{ bossId: b.id }}
+                  className="group block p-5"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 text-[10px] tracking-[0.3em] text-red-400 mb-1">
+                        <Skull className="w-3 h-3" />
+                        <span>{b.threatRating}</span>
+                        <span className="text-white/40">·</span>
+                        <span className="text-white/60">{b.district.toUpperCase()}</span>
+                      </div>
+                      <div className="text-xl font-black">{b.codename}</div>
+                      <div className="text-sm text-white/60 mt-1">{b.tagline}</div>
+                      <div className="mt-3 text-[11px] tracking-widest text-red-500/80 font-mono">
+                        FACT-CHECKS WILL NOT SAVE YOU
+                      </div>
                     </div>
-                    <div className="text-xl font-black">{b.codename}</div>
-                    <div className="text-sm text-white/60 mt-1">{b.tagline}</div>
-                    <div className="mt-3 text-[11px] tracking-widest text-red-500/80 font-mono">
-                      FACT-CHECKS WILL NOT SAVE YOU
+                    <div className="text-right text-xs text-white/50 space-y-1 shrink-0">
+                      {wins > 0 && <div className="flex items-center gap-1 justify-end text-emerald-400"><Award className="w-3 h-3" /> {b.badge.label}</div>}
+                      {losses > 0 && <div>{losses} loss{losses > 1 ? "es" : ""}</div>}
+                      {declassified && <div className="flex items-center gap-1 justify-end text-white/70"><CheckCircle2 className="w-3 h-3" /> DECLASSIFIED</div>}
+                      {!rematchOk && <div className="flex items-center gap-1 justify-end text-amber-500"><Lock className="w-3 h-3" /> REMATCH LOCKED</div>}
                     </div>
                   </div>
-                  <div className="text-right text-xs text-white/50 space-y-1 shrink-0">
-                    {wins > 0 && <div className="flex items-center gap-1 justify-end text-emerald-400"><Award className="w-3 h-3" /> {b.badge.label}</div>}
-                    {losses > 0 && <div>{losses} loss{losses > 1 ? "es" : ""}</div>}
-                    {declassified && <div className="flex items-center gap-1 justify-end text-white/70"><CheckCircle2 className="w-3 h-3" /> DECLASSIFIED</div>}
-                    {!rematchOk && <div className="flex items-center gap-1 justify-end text-amber-500"><Lock className="w-3 h-3" /> COMPLETE TRAINING</div>}
+                </Link>
+
+                {assignmentOpen && (
+                  <div className="border-t border-amber-500/30 bg-amber-500/[0.05] rounded-b-lg px-5 py-3">
+                    <div className="text-[10px] tracking-[0.3em] text-amber-400 mb-1">ASSIGNMENT · REMATCH GATE</div>
+                    <div className="text-sm text-white/90">
+                      Win 1 case in <span className="font-semibold">{districtLabel}</span> to unlock the rematch.
+                    </div>
+                    <div className="mt-1 font-mono text-[11px] text-amber-300/90">
+                      PROGRESS · 0 / 1 COMPLETE
+                    </div>
+                    <a
+                      href={districtHref}
+                      className="mt-2 inline-flex items-center gap-1 rounded border border-amber-500/50 px-3 py-1.5 text-[11px] tracking-widest text-amber-200 hover:bg-amber-500/10 font-mono"
+                    >
+                      GO TO {districtLabel.toUpperCase()} →
+                    </a>
                   </div>
-                </div>
-              </Link>
+                )}
+              </div>
             );
           })}
         </div>

@@ -18,7 +18,7 @@ interface Props {
 }
 
 export function HandlerDropLine({ correct, stake, streak, cacheKey }: Props) {
-  const [profile, setProfile] = useState(() => (typeof window === "undefined" ? null : loadProfile()));
+  const [profile, setProfile] = useState<ReturnType<typeof loadProfile> | null>(null);
   useEffect(() => {
     setProfile(loadProfile());
     const on = () => setProfile(loadProfile());

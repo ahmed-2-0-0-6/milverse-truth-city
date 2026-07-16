@@ -8,7 +8,7 @@ import { feedTacticMap } from "@/lib/handler/feedTactics";
 import { useHandlerLine } from "@/lib/handler/useHandlerLine";
 
 export function WeeklyEval() {
-  const [profile, setProfile] = useState(() => (typeof window === "undefined" ? null : loadProfile()));
+  const [profile, setProfile] = useState<ReturnType<typeof loadProfile> | null>(null);
   useEffect(() => {
     setProfile(loadProfile());
     const on = () => setProfile(loadProfile());

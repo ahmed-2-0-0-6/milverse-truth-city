@@ -25,8 +25,9 @@ export function PaperFrontPage({ lead, editionNumber, editionDate, onDone }: {
 }) {
   const scenario = useMemo(() => FEED_SCENARIOS.find((s) => s.id === lead.caseId), [lead.caseId]);
   const truth: Verdict = scenario ? toDailyVerdict(scenario.verdict) : "SCAM";
-  const [record, setRecord] = useState(() => readEditionRecord(editionNumber));
-  const played = !!record.playedLeadAt;
+  const [record, setRecord] = useState<ReturnType<typeof readEditionRecord> | null>(null);
+  useEffect(() => { setRecord(readEditionRecord(editionNumber)); }, [editionNumber]);
+  const played = !!record?.playedLeadAt;
 
   return (
     <article className="mt-8">

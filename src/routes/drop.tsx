@@ -40,9 +40,12 @@ export const Route = createFileRoute("/drop")({
 type Stage = "intake" | "wager" | "verdict-cinema" | "reveal" | "receipt";
 
 function DropPage() {
-  const [status, setStatus] = useState(() => readDailyStatus());
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => { const t = window.setInterval(() => setNow(Date.now()), 1000); return () => window.clearInterval(t); }, []);
+  const emptyStatus = { playedToday: false, todayEntry: null, streak: 0, trust: 100 };
+  const [status, setStatus] = useState<ReturnType<typeof readDailyStatus>>(emptyStatus);
+  const [now, setNow] = useState(0);
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { setStatus(readDailyStatus()); setNow(Date.now()); setHydrated(true); }, []);
+  useEffect(() => { if (!hydrated) return; const t = window.setInterval(() => setNow(Date.now()), 1000); return () => window.clearInterval(t); }, [hydrated]);
 
   const today = useMemo(() => todaysDailyCase(), []);
   const yesterday = useMemo(() => yesterdaysDailyCase(), []);

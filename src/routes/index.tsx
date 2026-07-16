@@ -59,9 +59,22 @@ function CityMap() {
       {intro && booted && <Intro onDone={() => { localStorage.setItem(INTRO_KEY, "1"); setIntro(false); }} />}
 
       {/* ── HERO ── full-viewport cinematic */}
-      <section className="hero-frame relative min-h-[100svh] flex flex-col items-center justify-center px-4 overflow-hidden">
+      <section className={`hero-frame relative min-h-[100svh] flex flex-col items-center px-4 overflow-hidden ${mode === "cinematic" ? "justify-center" : "justify-start pt-24 sm:pt-28"}`}>
         <div className="absolute inset-0 -z-10">
-          <CityHero3D className="absolute inset-0" />
+          {mode === "cinematic" ? (
+            <CityHero3D className="absolute inset-0" />
+          ) : (
+            // LITE / low-memory fallback: static noir backdrop so the hero
+            // never renders as an empty black void.
+            <>
+              <div className="absolute inset-0" style={{
+                background: "radial-gradient(ellipse at 50% 15%, rgba(34,211,238,0.14), transparent 55%), radial-gradient(ellipse at 20% 90%, rgba(245,185,66,0.10), transparent 60%), linear-gradient(180deg, #05080d 0%, #02040a 100%)",
+              }} />
+              <div className="absolute inset-0 opacity-[0.06]" style={{
+                backgroundImage: "repeating-linear-gradient(0deg, rgba(255,255,255,0.5) 0 1px, transparent 1px 3px)",
+              }} />
+            </>
+          )}
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black" />
           <div className="absolute inset-0 opacity-20" style={{
             backgroundImage: "radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px)",
@@ -71,17 +84,20 @@ function CityMap() {
 
         <div className="stencil text-[10px] text-cyan-300/80 mb-4 hud-blink">// MILVERSE · CITY OF VERIFICATION</div>
         <HeroType />
-        <p className="mt-6 max-w-xl text-center text-white/60 text-sm sm:text-base">
-          A living city where you learn to spot the fakes — by verifying, not guessing.
+        <p className="mt-4 max-w-xl text-center text-white/70 text-sm sm:text-base">
+          A city that trains your trust — play today's forward.
+        </p>
+        <p className="mt-2 max-w-xl text-center text-white/50 text-xs sm:text-sm">
+          Learn to spot the fakes by verifying, not guessing.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <a href="#enter" className="cta-glow inline-flex items-center gap-2 rounded-sm bg-primary px-6 py-3 text-primary-foreground stencil text-xs">
+          <Link to="/drop" className="cta-glow inline-flex items-center gap-2 rounded-sm bg-primary px-6 py-3 text-primary-foreground stencil text-xs">
+            <Sparkles className="h-3.5 w-3.5" /> PLAY TODAY'S DROP →
+          </Link>
+          <a href="#enter" className="inline-flex items-center gap-2 rounded-sm border border-white/25 px-6 py-3 text-white/80 stencil text-xs hover:border-cyan-300 hover:text-cyan-200 transition">
             ENTER THE CITY ↓
           </a>
-          <Link to="/quick-tour" className="inline-flex items-center gap-2 rounded-sm border border-white/25 px-6 py-3 text-white/80 stencil text-xs hover:border-cyan-300 hover:text-cyan-200 transition">
-            <Sparkles className="h-3.5 w-3.5" /> QUICK TOUR · 90 SEC
-          </Link>
         </div>
 
         <div className="mt-8 w-full max-w-xl">

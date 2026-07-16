@@ -90,23 +90,23 @@ function CaseFiles() {
 
   return (
     <div className="min-h-screen grain">
-      <DistrictIntro
-        id="mirror"
-        chapter="CHAPTER 01"
-        title="THE MIRROR"
-        art={mirrorArt}
-        artVideo={mirrorVideo.url}
-        district="mirror"
-        lines={[
-          "Someone's uncle answered a message like this last week. He's still paying for it.",
-          "Your turn to answer better. Verify the person, not the vibe.",
-        ]}
-      />
       <TopBar />
       <main className="mx-auto max-w-6xl px-4 py-10">
         <Link to="/" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">
           ← CITY
         </Link>
+        <DistrictIntro
+          id="mirror"
+          chapter="CHAPTER 01"
+          title="THE MIRROR"
+          art={mirrorArt}
+          artVideo={mirrorVideo.url}
+          district="mirror"
+          lines={[
+            "Someone's uncle answered a message like this last week. He's still paying for it.",
+            "Your turn to answer better. Verify the person, not the vibe.",
+          ]}
+        />
         <div className="mt-4 mb-4 max-w-2xl">
           <div className="font-mono text-xs tracking-[0.3em] text-primary">THE MIRROR · TEXT CHANNEL</div>
           <h1 className="mt-2 text-3xl sm:text-4xl font-semibold">Case Files</h1>
