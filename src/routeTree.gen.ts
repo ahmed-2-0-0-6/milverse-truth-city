@@ -18,6 +18,7 @@ import { Route as MarketRouteImport } from './routes/market'
 import { Route as KitRouteImport } from './routes/kit'
 import { Route as EducatorsRouteImport } from './routes/educators'
 import { Route as DropRouteImport } from './routes/drop'
+import { Route as DevintelRouteImport } from './routes/devintel'
 import { Route as CityHallRouteImport } from './routes/city-hall'
 import { Route as ArenaRouteImport } from './routes/arena'
 import { Route as ArchiveRouteImport } from './routes/archive'
@@ -74,6 +75,11 @@ const EducatorsRoute = EducatorsRouteImport.update({
 const DropRoute = DropRouteImport.update({
   id: '/drop',
   path: '/drop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevintelRoute = DevintelRouteImport.update({
+  id: '/devintel',
+  path: '/devintel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CityHallRoute = CityHallRouteImport.update({
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
   '/city-hall': typeof CityHallRoute
+  '/devintel': typeof DevintelRoute
   '/drop': typeof DropRoute
   '/educators': typeof EducatorsRoute
   '/kit': typeof KitRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
   '/city-hall': typeof CityHallRoute
+  '/devintel': typeof DevintelRoute
   '/drop': typeof DropRoute
   '/educators': typeof EducatorsRoute
   '/kit': typeof KitRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
   '/city-hall': typeof CityHallRoute
+  '/devintel': typeof DevintelRoute
   '/drop': typeof DropRoute
   '/educators': typeof EducatorsRoute
   '/kit': typeof KitRoute
@@ -214,6 +223,7 @@ export interface FileRouteTypes {
     | '/archive'
     | '/arena'
     | '/city-hall'
+    | '/devintel'
     | '/drop'
     | '/educators'
     | '/kit'
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/archive'
     | '/arena'
     | '/city-hall'
+    | '/devintel'
     | '/drop'
     | '/educators'
     | '/kit'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/archive'
     | '/arena'
     | '/city-hall'
+    | '/devintel'
     | '/drop'
     | '/educators'
     | '/kit'
@@ -284,6 +296,7 @@ export interface RootRouteChildren {
   ArchiveRoute: typeof ArchiveRouteWithChildren
   ArenaRoute: typeof ArenaRoute
   CityHallRoute: typeof CityHallRoute
+  DevintelRoute: typeof DevintelRoute
   DropRoute: typeof DropRoute
   EducatorsRoute: typeof EducatorsRoute
   KitRoute: typeof KitRoute
@@ -365,6 +378,13 @@ declare module '@tanstack/react-router' {
       path: '/drop'
       fullPath: '/drop'
       preLoaderRoute: typeof DropRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/devintel': {
+      id: '/devintel'
+      path: '/devintel'
+      fullPath: '/devintel'
+      preLoaderRoute: typeof DevintelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/city-hall': {
@@ -470,6 +490,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArchiveRoute: ArchiveRouteWithChildren,
   ArenaRoute: ArenaRoute,
   CityHallRoute: CityHallRoute,
+  DevintelRoute: DevintelRoute,
   DropRoute: DropRoute,
   EducatorsRoute: EducatorsRoute,
   KitRoute: KitRoute,

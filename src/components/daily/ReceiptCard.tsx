@@ -4,6 +4,7 @@
 // stake delta + streak + local sharpness estimate.
 
 import { useEffect, useRef, useState } from "react";
+import { track } from "@/lib/telemetry";
 import { Copy, Download, Share2, Check } from "lucide-react";
 
 export interface ReceiptData {
@@ -146,6 +147,7 @@ export function ReceiptCard({ data }: { data: ReceiptData }) {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
+      track("share_copy", { payload: { surface: "receipt" } });
       setTimeout(() => setCopied(false), 1400);
     } catch { /* ignore */ }
   };

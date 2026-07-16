@@ -21,6 +21,7 @@ import {
 import { commitDailyPlay, readDailyStatus, stakeBounds, localSharpness } from "@/lib/daily/profile";
 import { logDailyPlay, fetchDailySplit, fetchSharpestWatch, fetchMostDeviousDesigner } from "@/lib/daily.functions";
 import { getDeviceId, logPilotEntry, getActiveGroup } from "@/lib/pilot";
+import { track, bucketStake, bucketStreak } from "@/lib/telemetry";
 import type { FeedScenario, FeedToolKind } from "@/lib/feed/scenarios";
 import { Flame, Radio, Coins, Search, Trophy, ChevronRight } from "lucide-react";
 
@@ -276,6 +277,19 @@ function PlayFlow({ scenario, dateKey, onDone }: { scenario: FeedScenario; dateK
         probeStats: { strong: probesUsed.length, weak: 0, wasted: 0 },
         ts: Date.now(),
       });
+    }
+
+    track("drop_play", {
+      case_id: scenario.id,
+      payload: {
+        stake_bucket: bucketStake(stake),
+        streak_bucket: bucketStreak(status.streak),
+        correct: result.correct,
+        probes: probesUsed.length,
+      },
+    });
+    if (!result.correct && status.streak > 0) {
+      track("drop_break", { case_id: scenario.id, payload: { streak_bucket: bucketStreak(status.streak) } });
     }
 
     setStage("verdict-cinema");

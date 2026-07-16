@@ -17,6 +17,7 @@ import { TacticStamp } from "@/components/TacticStamp";
 import { TacticFlash } from "@/components/TacticFlash";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 import { RookieIntro } from "@/components/handler/RookieIntro";
+import { track } from "@/lib/telemetry";
 
 export const Route = createFileRoute("/feed/$caseId")({
   loader: ({ params }) => {
@@ -39,6 +40,24 @@ function FeedPlay() {
   const [finalReply, setFinalReply] = useState("");
   const [conclusion, setConclusion] = useState("");
 
+
+  useEffect(() => {
+    track("case_start", { case_id: scenario.id, payload: { district: "feed", tactic: scenario.tacticId ?? "unknown" } });
+  }, [scenario.id, scenario.tacticId]);
+
+  useEffect(() => {
+    if (outcome) {
+      track("case_complete", {
+        case_id: scenario.id,
+        payload: {
+          district: "feed",
+          correct: outcome.result === "correct",
+          result: outcome.result,
+          tactic: scenario.tacticId ?? "unknown",
+        },
+      });
+    }
+  }, [outcome, scenario.id, scenario.tacticId]);
 
   useEffect(() => {
     if (phase === "sim" && messages.length === 0) {

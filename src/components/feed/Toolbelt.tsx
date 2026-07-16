@@ -17,6 +17,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Image as ImageIcon, Globe2, Layers, CalendarClock, ExternalLink } from "lucide-react";
 import type { FeedAction, FeedFormat, FeedToolKind, FeedScenario } from "@/lib/feed/scenarios";
+import { track } from "@/lib/telemetry";
 
 interface ToolMeta {
   kind: FeedToolKind;
@@ -182,6 +183,10 @@ export function Toolbelt({ scenario, used, onUse, onGrade }: Props) {
       wasted: c.wasted + (quality === "wasted" ? 1 : 0),
     }));
     onGrade?.(tool.kind, quality);
+    track("tool_pick", {
+      case_id: scenario.id,
+      payload: { tool: tool.kind, quality, correct: quality === "strong" },
+    });
   }
 
   return (

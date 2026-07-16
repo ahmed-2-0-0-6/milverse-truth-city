@@ -1,6 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { TopBar } from "@/components/TopBar";
 import { getManualEntry, type ManualEntry } from "@/lib/manual/entries";
+import { track } from "@/lib/telemetry";
 import { ArrowLeft, Shield, Flag, Compass } from "lucide-react";
 
 export const Route = createFileRoute("/manual/$entryId")({
@@ -37,6 +39,7 @@ export const Route = createFileRoute("/manual/$entryId")({
 
 function EntryPage() {
   const { entry: e } = Route.useLoaderData() as { entry: ManualEntry };
+  useEffect(() => { track("manual_open", { payload: { entry: e.id } }); }, [e.id]);
   return (
     <div className="min-h-screen grain">
       <TopBar />
