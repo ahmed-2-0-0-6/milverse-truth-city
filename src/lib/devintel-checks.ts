@@ -2,7 +2,7 @@
 // No AI. No network. Pure scans against the shipped catalog.
 
 import { FEED_SCENARIOS } from "@/lib/feed/scenarios";
-import { getAllScenarios } from "@/lib/mirror/scenarios";
+import { SCENARIOS as MIRROR_SCENARIOS, type Scenario as MirrorScenario } from "@/lib/mirror/scenarios";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 
 export type HeuristicStatus = "pass" | "warn" | "fail";
@@ -60,7 +60,7 @@ export function runHeuristicChecks(): HeuristicResult[] {
 
   // ── MIRROR catalog integrity ──────────────────────────────────
   {
-    const mirror = getAllScenarios();
+    const mirror = MIRROR_SCENARIOS;
     const total = mirror.length;
     const missingDossier = mirror.filter((s) => !s.dossier || !Array.isArray(s.dossier.knownFacts) || s.dossier.knownFacts.length === 0).map((s) => s.id);
     out.push({
@@ -128,7 +128,7 @@ export function runHeuristicChecks(): HeuristicResult[] {
     const feedHits = FEED_SCENARIOS.filter((s) =>
       flagRe.test(s.title) || flagRe.test(s.teaser) || flagRe.test(s.opener),
     ).map((s) => s.id);
-    const mirrorHits = getAllScenarios().filter((s) =>
+    const mirrorHits = MIRROR_SCENARIOS.filter((s) =>
       flagRe.test(s.title) || flagRe.test(s.teaser) || flagRe.test(s.opener),
     ).map((s) => s.id);
     const total = feedHits.length + mirrorHits.length;
