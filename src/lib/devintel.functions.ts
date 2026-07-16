@@ -51,7 +51,7 @@ function anonClient() {
 }
 
 export const logTelemetryBatch = createServerFn({ method: "POST" })
-  .validator((data: unknown) =>
+  .inputValidator((data: unknown) =>
     z.object({
       events: z.array(EventSchema).min(1).max(50),
     }).parse(data),
@@ -80,7 +80,7 @@ export const logTelemetryBatch = createServerFn({ method: "POST" })
 
 // ── Admin: aggregate intelligence ────────────────────────────────
 export const fetchIntelligence = createServerFn({ method: "POST" })
-  .validator((data: unknown) => z.object({ passcode: z.string().min(1) }).parse(data))
+  .inputValidator((data: unknown) => z.object({ passcode: z.string().min(1) }).parse(data))
   .handler(async ({ data }) => {
     checkPasscode(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -388,7 +388,7 @@ function wrapPrompt(inner: string): string {
 const RUN_ANALYSIS_MIN_INTERVAL_MS = 60 * 1000; // no accidental double-clicks
 
 export const runAnalysisBrief = createServerFn({ method: "POST" })
-  .validator((data: unknown) => z.object({ passcode: z.string().min(1) }).parse(data))
+  .inputValidator((data: unknown) => z.object({ passcode: z.string().min(1) }).parse(data))
   .handler(async ({ data }) => {
     checkPasscode(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -497,7 +497,7 @@ function safeParseBrief(text: string): Brief | null {
 }
 
 export const listBriefs = createServerFn({ method: "POST" })
-  .validator((data: unknown) => z.object({ passcode: z.string().min(1) }).parse(data))
+  .inputValidator((data: unknown) => z.object({ passcode: z.string().min(1) }).parse(data))
   .handler(async ({ data }) => {
     checkPasscode(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
