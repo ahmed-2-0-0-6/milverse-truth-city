@@ -147,6 +147,7 @@ export function ReceiptCard({ data }: { data: ReceiptData }) {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
+      track("share_copy", { payload: { surface: "receipt" } });
       setTimeout(() => setCopied(false), 1400);
     } catch { /* ignore */ }
   };
