@@ -10,7 +10,8 @@ import archiveArt from "@/assets/district-archive.jpg";
 import cleanroomArt from "@/assets/district-cleanroom.jpg";
 import mirrorVideo from "@/assets/mirror.mp4.asset.json";
 
-const DISTRICTS = [
+type District = { key: string; label: string; tag: string; art: string; video?: string; href: string; glow: string };
+const DISTRICTS: District[] = [
   { key: "mirror", label: "THE MIRROR", tag: "Judge messages aimed at you — real family, or someone wearing them?", art: mirrorArt, video: mirrorVideo.url, href: "/mirror", glow: "34,211,238" },
   { key: "feed", label: "THE FEED", tag: "Judge real-world posts — true, false, or misleading?", art: feedArt, href: "/feed", glow: "245,185,66" },
   { key: "studio", label: "THE STUDIO", tag: "Design the attack yourself — teach by authoring.", art: studioArt, href: "/studio", glow: "245,185,66" },
