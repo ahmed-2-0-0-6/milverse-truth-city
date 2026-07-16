@@ -113,6 +113,49 @@ function ManualIndex() {
             );
           })}
         </div>
+
+        {/* Boss Dossiers — declassified via Boss Protocol wins */}
+        <div className="mt-12">
+          <div className="flex items-center gap-2 mb-2 stencil text-[10px] tracking-widest text-red-400">
+            <Skull className="w-3 h-3" /> BOSS DOSSIERS · CLASSIFIED
+          </div>
+          <p className="text-xs text-muted-foreground mb-4 max-w-2xl">
+            Method pages for the three capstone bosses. Each dossier declassifies when you win the case in Boss Protocol.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {BOSSES.map((b) => {
+              const dc = bossDeclassified.includes(b.id);
+              return (
+                <Link
+                  key={b.id}
+                  to="/boss/$bossId"
+                  params={{ bossId: b.id }}
+                  className={`block rounded-xl border p-5 transition ${
+                    dc ? "border-red-500/50 bg-red-950/20 hover:border-red-500" : "border-dashed border-border bg-muted/10 hover:border-red-500/40"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="stencil text-[10px] tracking-widest text-red-400">{b.threatRating}</div>
+                    {dc ? <FileText className="h-4 w-4 text-red-400" /> : <Lock className="h-4 w-4 text-muted-foreground" />}
+                  </div>
+                  <div className="mt-3 text-2xl font-black tracking-tight" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
+                    {dc ? b.methodPage.codename : "▓▓▓▓▓▓▓"}
+                  </div>
+                  {dc ? (
+                    <div className="mt-2 space-y-2 text-xs text-muted-foreground">
+                      <p><b className="text-foreground">How it works:</b> {b.methodPage.howItWorks}</p>
+                      <p><b className="text-foreground">The trap:</b> {b.methodPage.theTrap}</p>
+                      <p><b className="text-foreground">The counter:</b> {b.methodPage.theCounter}</p>
+                      <p className="italic pt-1 border-t border-red-500/20">{b.methodPage.realWorldPattern}</p>
+                    </div>
+                  ) : (
+                    <p className="mt-1 text-sm text-muted-foreground italic">Beat this boss to declassify.</p>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
       </main>
     </div>
   );
