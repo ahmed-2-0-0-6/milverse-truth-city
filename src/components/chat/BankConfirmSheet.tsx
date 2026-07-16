@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { X, ChevronDown, ChevronUp, ShieldCheck } from "lucide-react";
 
 interface Props {
@@ -44,21 +44,44 @@ export function BankConfirmSheet({
     holdRef.current = null;
     if (holdProgress < 1) setHoldProgress(0);
   }
+  // Keyboard equivalent: Enter/Space press-and-hold on the button also drives
+  // the same beginHold/endHold pipeline via key events.
+  function onKeyDown(e: ReactKeyboardEvent) {
+    if ((e.key === "Enter" || e.key === " ") && !e.repeat) { e.preventDefault(); beginHold(); }
+    if (e.key === "Escape") { e.preventDefault(); onCancel(); }
+  }
+  function onKeyUp(e: ReactKeyboardEvent) {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); endHold(); }
+  }
+
+  // Dialog-level ESC handled by button too; provide a second layer for AT users
+  // who focus outside the button.
+  useEffect(() => {
+    if (!open) return;
+    function esc(e: KeyboardEvent) { if (e.key === "Escape") onCancel(); }
+    document.addEventListener("keydown", esc);
+    return () => document.removeEventListener("keydown", esc);
+  }, [open, onCancel]);
 
   if (!open) return null;
   return (
-    <div className="absolute inset-0 z-50 flex items-end bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="bank-sheet-title"
+      className="absolute inset-0 z-50 flex items-end bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+    >
       <div className="w-full bg-neutral-950 rounded-t-2xl border-t border-white/10 flex flex-col max-h-[92%] animate-in slide-in-from-bottom duration-200">
         {/* Bank-app header — noir, not iOS-clone */}
         <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-indigo-950 to-neutral-950 border-b border-white/10">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-indigo-500 text-white text-xs font-black">CP</div>
             <div>
-              <div className="text-sm font-semibold text-white">CitizenPay</div>
+              <div id="bank-sheet-title" className="text-sm font-semibold text-white">CitizenPay — Confirm transfer</div>
               <div className="text-[10px] font-mono tracking-wider text-white/50">Confirm transfer</div>
             </div>
           </div>
-          <button onClick={onCancel} className="p-1.5 text-white/60 hover:text-white" aria-label="Cancel">
+          <button onClick={onCancel} className="p-1.5 min-h-11 min-w-11 flex items-center justify-center text-white/60 hover:text-white" aria-label="Cancel transfer">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -98,25 +121,34 @@ export function BankConfirmSheet({
         {/* Hold-to-confirm */}
         <div className="px-5 py-6">
           <button
+            type="button"
             onMouseDown={beginHold}
             onTouchStart={beginHold}
             onMouseUp={endHold}
             onMouseLeave={endHold}
             onTouchEnd={endHold}
             onTouchCancel={endHold}
-            className={`relative w-full h-14 rounded-xl overflow-hidden border border-indigo-400/40 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-semibold tracking-widest text-sm ${reducedMotion ? "" : "animate-[heartbeat_1.6s_ease-in-out_infinite]"}`}
+            onKeyDown={onKeyDown}
+            onKeyUp={onKeyUp}
+            aria-label="Hold to confirm transfer. Press and hold Enter or Space on keyboard."
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(holdProgress * 100)}
+            role="button"
+            className={`relative w-full min-h-14 rounded-xl overflow-hidden border border-indigo-400/40 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-semibold tracking-widest text-sm focus-visible:ring-2 focus-visible:ring-white ${reducedMotion ? "" : "animate-[heartbeat_1.6s_ease-in-out_infinite]"}`}
           >
             <span
               className="absolute inset-y-0 left-0 bg-white/25 transition-none"
               style={{ width: `${holdProgress * 100}%` }}
+              aria-hidden="true"
             />
             <span className="relative flex items-center justify-center gap-2">
-              <ShieldCheck className="h-4 w-4" />
+              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
               {holdProgress > 0 ? "HOLDING…" : "HOLD TO CONFIRM TRANSFER"}
             </span>
           </button>
           <div className="mt-3 text-center text-[11px] text-white/50">
-            Once confirmed, this cannot be reversed.
+            Once confirmed, this cannot be reversed. Keyboard: press and hold <kbd className="font-mono">Enter</kbd>.
           </div>
           <button onClick={onCancel} className="mt-4 w-full py-2 text-sm text-white/60 hover:text-white">
             Cancel — go back to chat

@@ -32,20 +32,24 @@ export function NotificationBanner({ banner, onDismiss, reducedMotion }: Props) 
 
   return (
     <div
+      role="status"
+      aria-live="polite"
       className={`absolute left-2 right-2 top-2 z-[60] pointer-events-none ${
         reducedMotion ? "" : show ? "animate-in slide-in-from-top duration-300" : "animate-out slide-out-to-top duration-200"
       }`}
     >
-      <div
+      <button
+        type="button"
         onClick={() => onDismiss(banner.id)}
-        className="pointer-events-auto rounded-xl border border-white/10 bg-neutral-900/95 backdrop-blur shadow-2xl px-3 py-2.5 cursor-pointer hover:bg-neutral-800/95 transition-colors"
+        aria-label={`Notification from ${banner.sender}: ${banner.preview}. Tap to dismiss.`}
+        className="pointer-events-auto w-full text-left rounded-xl border border-white/10 bg-neutral-900/95 backdrop-blur shadow-2xl px-3 py-2.5 cursor-pointer hover:bg-neutral-800/95 transition-colors"
       >
         <div className="flex items-center justify-between text-[10px] font-mono tracking-wider text-white/50 mb-0.5">
           <span>{banner.sender}</span>
           <span>{hh}:{mm}</span>
         </div>
         <div className="text-xs text-white line-clamp-2">{banner.preview}</div>
-      </div>
+      </button>
     </div>
   );
 }

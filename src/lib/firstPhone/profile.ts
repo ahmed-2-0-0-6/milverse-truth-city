@@ -61,6 +61,25 @@ export function markLessonComplete(n: number) {
     s.licenseNumber = generateLicenseNumber();
   }
   saveFirstPhone(s);
+  // Bridge: also stamp the mapped Field Manual entry so the adult manual
+  // records the same skill. Junior curriculum stays first-class; the manual
+  // stays reachable read-only for kids.
+  try {
+    // Dynamic imports avoid circular init at module load.
+    void import("./lessons").then(({ LESSONS }) => {
+      const lesson = LESSONS.find((l) => l.n === n);
+      if (!lesson) return;
+      const tactics = new Set(lesson.cases.map((c) => c.tactic));
+      void Promise.all([import("./tacticMap"), import("@/lib/manual/state")]).then(
+        ([{ JUNIOR_TO_MANUAL }, { unlockTactic }]) => {
+          tactics.forEach((t) => {
+            const id = JUNIOR_TO_MANUAL[t];
+            if (id) unlockTactic(id);
+          });
+        }
+      );
+    });
+  } catch { /* SSR / storage-off — silent */ }
   return s;
 }
 

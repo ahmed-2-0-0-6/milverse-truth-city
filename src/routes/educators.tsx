@@ -95,6 +95,17 @@ function EducatorsPage() {
           </ul>
         </section>
 
+        <section className="mt-6 rounded-xl border-2 border-primary/40 bg-gradient-to-b from-neutral-900 to-neutral-950 p-5">
+          <div className="stencil text-[10px] tracking-widest text-primary mb-2">CITY PLAQUE</div>
+          <p className="text-sm">
+            The city was built on five articles — verification, every citizen, dignity, every voice, peace.
+            Read the <Link to="/charter" className="text-primary underline">City Charter</Link>.
+          </p>
+          <p className="mt-2 text-[11px] italic text-muted-foreground">
+            MILVERSE aligns with UNESCO's vision of media and information literacy — and stands as a city in the MILtiverse.
+          </p>
+        </section>
+
         <section className="mt-6 text-xs text-muted-foreground">
           Full tactic list and counter-moves: <Link to="/manual" className="text-primary underline">The Field Manual</Link>.
         </section>

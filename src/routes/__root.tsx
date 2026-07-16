@@ -165,6 +165,13 @@ function RootComponent() {
           <GlowCursor />
           <RouteWipe />
           <RankUpBeat />
+          <footer className="border-t border-border/60 bg-background/60 py-3 text-center text-[11px] text-muted-foreground">
+            <Link to="/charter" className="font-mono tracking-widest hover:text-foreground">
+              THE CITY CHARTER
+            </Link>
+            <span className="mx-2 opacity-40">·</span>
+            <span className="italic">A city in the MILtiverse.</span>
+          </footer>
         </VisualQualityProvider>
       </AccessProvider>
     </QueryClientProvider>

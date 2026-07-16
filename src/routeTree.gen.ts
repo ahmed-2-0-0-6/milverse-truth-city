@@ -24,6 +24,7 @@ import { Route as EducatorsRouteImport } from './routes/educators'
 import { Route as DropRouteImport } from './routes/drop'
 import { Route as DevintelRouteImport } from './routes/devintel'
 import { Route as CityHallRouteImport } from './routes/city-hall'
+import { Route as CharterRouteImport } from './routes/charter'
 import { Route as ArenaRouteImport } from './routes/arena'
 import { Route as ArchiveRouteImport } from './routes/archive'
 import { Route as IndexRouteImport } from './routes/index'
@@ -114,6 +115,11 @@ const CityHallRoute = CityHallRouteImport.update({
   path: '/city-hall',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CharterRoute = CharterRouteImport.update({
+  id: '/charter',
+  path: '/charter',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ArenaRoute = ArenaRouteImport.update({
   id: '/arena',
   path: '/arena',
@@ -189,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
+  '/charter': typeof CharterRoute
   '/city-hall': typeof CityHallRoute
   '/devintel': typeof DevintelRoute
   '/drop': typeof DropRoute
@@ -220,6 +227,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
+  '/charter': typeof CharterRoute
   '/city-hall': typeof CityHallRoute
   '/devintel': typeof DevintelRoute
   '/drop': typeof DropRoute
@@ -252,6 +260,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
+  '/charter': typeof CharterRoute
   '/city-hall': typeof CityHallRoute
   '/devintel': typeof DevintelRoute
   '/drop': typeof DropRoute
@@ -285,6 +294,7 @@ export interface FileRouteTypes {
     | '/'
     | '/archive'
     | '/arena'
+    | '/charter'
     | '/city-hall'
     | '/devintel'
     | '/drop'
@@ -316,6 +326,7 @@ export interface FileRouteTypes {
     | '/'
     | '/archive'
     | '/arena'
+    | '/charter'
     | '/city-hall'
     | '/devintel'
     | '/drop'
@@ -347,6 +358,7 @@ export interface FileRouteTypes {
     | '/'
     | '/archive'
     | '/arena'
+    | '/charter'
     | '/city-hall'
     | '/devintel'
     | '/drop'
@@ -379,6 +391,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ArchiveRoute: typeof ArchiveRouteWithChildren
   ArenaRoute: typeof ArenaRoute
+  CharterRoute: typeof CharterRoute
   CityHallRoute: typeof CityHallRoute
   DevintelRoute: typeof DevintelRoute
   DropRoute: typeof DropRoute
@@ -513,6 +526,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CityHallRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/charter': {
+      id: '/charter'
+      path: '/charter'
+      fullPath: '/charter'
+      preLoaderRoute: typeof CharterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/arena': {
       id: '/arena'
       path: '/arena'
@@ -629,6 +649,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ArchiveRoute: ArchiveRouteWithChildren,
   ArenaRoute: ArenaRoute,
+  CharterRoute: CharterRoute,
   CityHallRoute: CityHallRoute,
   DevintelRoute: DevintelRoute,
   DropRoute: DropRoute,
@@ -658,13 +679,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

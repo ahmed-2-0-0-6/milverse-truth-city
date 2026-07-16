@@ -5,6 +5,7 @@ import { TopBar } from "@/components/TopBar";
 import { fetchPilotGroup } from "@/lib/pilot.functions";
 import { LESSONS, TOTAL_LESSONS, type JuniorTactic } from "@/lib/firstPhone/lessons";
 import { loadFirstPhone, joinFamily } from "@/lib/firstPhone/profile";
+import { manualDisplayForTactics } from "@/lib/firstPhone/tacticMap";
 import { JUNIOR_COPY } from "@/lib/firstPhone/copy";
 import { Users, Copy, Check, ShieldCheck } from "lucide-react";
 
@@ -32,16 +33,24 @@ function generateFamilyCode(): string {
 type CloudEntry = { device_id: string; wing: string; case_id: string; result: string; created_at: string };
 
 function FamilyPage() {
+  // Hydration-safe: all localStorage reads live in useEffect.
   const [parentCode, setParentCode] = useState<string | null>(null);
   const [kidJoinCode, setKidJoinCode] = useState("");
   const [entries, setEntries] = useState<CloudEntry[]>([]);
   const [copied, setCopied] = useState(false);
+  const [kidState, setKidState] = useState(() => ({
+    active: false, kidCityName: "", familyCode: null as string | null,
+    lessonsCompleted: [] as number[], licenseIssuedAt: null as number | null, licenseNumber: null as string | null,
+  }));
   const fetchGroup = useServerFn(fetchPilotGroup);
-  const kidState = loadFirstPhone();
 
   useEffect(() => {
     const saved = localStorage.getItem(CODE_KEY);
     if (saved) setParentCode(saved);
+    setKidState(loadFirstPhone());
+    const on = () => setKidState(loadFirstPhone());
+    window.addEventListener("milverse:firstphone", on);
+    return () => window.removeEventListener("milverse:firstphone", on);
   }, []);
 
   const refresh = useCallback(async (code: string) => {
@@ -80,13 +89,15 @@ function FamilyPage() {
   const lessonList = Array.from(lessonsDone).sort((a, b) => a - b);
   const licenseIssued = lessonsDone.has(10);
 
-  // Real tactic mastery: unique tactics across the completed lessons.
+  // Real tactic mastery: unique tactics across the completed lessons, shown
+  // with their Field Manual display names (bridge between junior + adult).
   const tacticSet = new Set<JuniorTactic>();
   lessonList.forEach((n) => {
     const lesson = LESSONS.find((l) => l.n === n);
     lesson?.cases.forEach((c) => tacticSet.add(c.tactic));
   });
-  const tacticsMastered = tacticSet.size;
+  const tacticsDisplay = manualDisplayForTactics([...tacticSet]);
+  const tacticsMastered = tacticsDisplay.length;
 
   return (
     <div className="min-h-screen grain">
@@ -192,6 +203,20 @@ function FamilyPage() {
                 })}
               </ul>
             </div>
+
+            {tacticsDisplay.length > 0 && (
+              <div className="mt-6">
+                <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-2">TACTICS MASTERED · FIELD MANUAL</div>
+                <ul className="flex flex-wrap gap-2">
+                  {tacticsDisplay.map((t) => (
+                    <li key={t} className="rounded-md border border-primary/30 bg-primary/5 px-2.5 py-1 text-xs text-primary">
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
 
             <p className="mt-6 text-xs text-muted-foreground italic border-t border-border pt-4">
               What you see: lesson count, skills mastered, calibration trend, license status.<br />

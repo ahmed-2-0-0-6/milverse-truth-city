@@ -14,8 +14,12 @@ export function StatusBar() {
     const iv = setInterval(fmt, 15_000);
     return () => clearInterval(iv);
   }, []);
+  // Decorative iOS-style status bar — hidden from AT.
   return (
-    <div className="flex items-center justify-between px-4 py-1.5 text-[10px] font-mono tracking-wider text-white/80 bg-black/80 border-b border-white/10 select-none">
+    <div
+      aria-hidden="true"
+      className="flex items-center justify-between px-4 py-1.5 text-[10px] font-mono tracking-wider text-white/80 bg-black/80 border-b border-white/10 select-none"
+    >
       <div className="flex items-center gap-1.5">
         <span className="text-white font-semibold tracking-[0.2em]">CitizenOS</span>
       </div>

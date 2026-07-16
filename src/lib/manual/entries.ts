@@ -12,7 +12,8 @@ export type TacticId =
   | "trust-farming"
   | "ai-generated"
   | "mis-dis-mal"
-  | "forgery-engine";
+  | "forgery-engine"
+  | "outrage-machine";
 
 export interface ManualEntry {
   id: TacticId;
@@ -205,6 +206,25 @@ export const MANUAL_ENTRIES: ManualEntry[] = [
       "You are being asked to act on the media itself, without independent confirmation.",
     ],
     counterMove: "Assume forgery is possible for everything. Then check the source, not the surface. This is why MILVERSE trains the pause, not the eye.",
+  },
+  {
+    id: "outrage-machine",
+    code: "T-11",
+    name: "THE OUTRAGE MACHINE",
+    oneLine: "Fury is the product. You are the delivery vehicle.",
+    howItWorks:
+      "A message is engineered so that being angry IS the point. It names an enemy group in one clean phrase, fabricates or reframes a quote, and demands you share as a moral duty. Platforms reward the anger with reach, and the anger recruits more anger in the comments — a self-feeding loop where the underlying claim never gets checked because checking feels like disloyalty. The weapon is not the claim. The weapon is what you do next.",
+    worldwide: [
+      { where: "Global · elections", pattern: "A fabricated quote-card attributes an inflammatory line to a real or thinly-fictional public figure hours before a vote. Their actual statement is mundane." },
+      { where: "Global · communal tension", pattern: "Three unrelated photos of unrest, each from a different city and year, are stitched together as 'yesterday, our neighbourhood, them' — the story is the weapon." },
+    ],
+    redFlags: [
+      "Names a whole group as the enemy in one short phrase.",
+      "Demands sharing as a moral or patriotic duty.",
+      "Maximum emotion, minimum source — no link, no date, no witness.",
+      "Comments are already a battlefield when you arrive.",
+    ],
+    counterMove: "The 30-second cooldown. Strong emotion IS the tell — stop, breathe, verify before you amplify. Attack the claim, never the people. Anger that survives a 30-second pause and a source check is legitimate; anger that doesn't survive the pause was never yours in the first place.",
   },
 ];
 
