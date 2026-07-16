@@ -107,6 +107,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T1 REAL — old classmate ─────────────────────────────── */
   {
     id: "classmate-danish",
+    tactic: "impersonation",
     title: "An old classmate texts",
     teaser: "Says he sat behind you in school.",
     channel: "text",
@@ -158,6 +159,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T2 IMPOSTER — fake boss, gift cards ─────────────────── */
   {
     id: "boss-newnumber",
+    tactic: "impersonation",
     title: "Your boss, from a new number",
     teaser: "\"Hey, it's Sana — lost my phone. Quick favor.\"",
     channel: "text",
@@ -224,6 +226,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T2 SURVIVOR — bank OTP ──────────────────────────────── */
   {
     id: "survivor-bankfraud",
+    tactic: "phishing",
     title: "\"Fraud team\" from your bank",
     teaser: "Based on a real reported scam. Calm, procedural, asks for an OTP.",
     channel: "text",
@@ -295,6 +298,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T3 IMPOSTER — bank fraud dept (knows your name + txn) ─ */
   {
     id: "t3-fraud-dept",
+    tactic: "phishing",
     title: "Fraud dept — knows your recent transaction",
     teaser: "Formal, polished. Even greets you by name and cites a real purchase.",
     channel: "text",
@@ -368,6 +372,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T3 REAL — genuine bank fraud desk. Stressed but real. ── */
   {
     id: "t3-real-bank",
+    tactic: "phishing",
     title: "Bank fraud desk — genuine call",
     teaser: "Procedural. Insistent. Feels scammy. But it's actually your bank.",
     channel: "text",
@@ -422,6 +427,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T4 IMPOSTER — close friend's "new account". ────────── */
   {
     id: "t4-ghost-friend",
+    tactic: "impersonation",
     title: "Your best friend's new account",
     teaser: "\"Old one got hacked, this is my new number.\" Near-perfect. One slip.",
     channel: "text",
@@ -496,6 +502,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T1 IMPOSTER — THE PRIZE SMS ─────────────────────────── */
   {
     id: "pk-prize-sms",
+    tactic: "phishing",
     title: "You've won ₨5 lakh in a lucky draw",
     teaser: "A \"verification officer\" from a famous TV show texts.",
     channel: "text",
@@ -568,6 +575,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T2 IMPOSTER — THE WRONG TRANSACTION ─────────────────── */
   {
     id: "pk-wrong-txn",
+    tactic: "phishing",
     title: "\"I sent ₨5,000 to your wallet by mistake\"",
     teaser: "A stranger begs. Even forwards an official-looking SMS.",
     channel: "text",
@@ -639,6 +647,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T2 IMPOSTER — THE ONLINE BUYER (military officer) ───── */
   {
     id: "pk-online-buyer",
+    tactic: "impersonation",
     title: "\"Military officer\" wants your phone",
     teaser: "Says he'll pay in advance so a courier can collect it.",
     channel: "text",
@@ -714,6 +723,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T2 IMPOSTER — THE DREAM JOB (paid task 1) ──────────── */
   {
     id: "pk-dream-job",
+    tactic: "trust-farming",
     title: "₨5,000/day for liking videos",
     teaser: "Sends you REAL payment for task 1. Task 2 asks for a deposit.",
     channel: "text",
@@ -789,6 +799,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T3 REAL — THE STRANDED COUSIN (paranoia test) ────── */
   {
     id: "pk-stranded-cousin",
+    tactic: "impersonation",
     title: "Cousin stranded — needs mobile load",
     teaser: "Unknown number. She's real. This is the paranoia test.",
     channel: "text",
@@ -860,6 +871,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T4 REAL — THE STRESSED SISTER (paranoia test) ───────── */
   {
     id: "t4-stressed-sister",
+    tactic: "impersonation",
     title: "Your sister — borrowed phone, in a panic",
     teaser: "Rushed, evasive, slightly inconsistent. Every instinct says fake. She's not.",
     channel: "text",
@@ -922,6 +934,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T5 IMPOSTER — THE CLEAN ROOM ────────────────────────── */
   {
     id: "t5-clean-room",
+    tactic: "impersonation",
     title: "Uncle Farooq — every fact answered",
     teaser: "Fully researched. Every dossier fact answered correctly. There are no in-chat tells.",
     channel: "text",
@@ -992,6 +1005,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T5 REAL — THE UNLUCKY BOSS ──────────────────────────── */
   {
     id: "t5-unlucky-boss",
+    tactic: "impersonation",
     title: "Your CEO, from a new number, on holiday",
     teaser: "Every pattern-match screams scam. Out-of-band confirms it's really her.",
     channel: "text",
@@ -1051,6 +1065,7 @@ export const SCENARIOS: Scenario[] = [
   /* ── T2 SURVIVOR — WHATSAPP GROUP ADMIN OTP (based on reported PK pattern) ─ */
   {
     id: "survivor-wa-admin",
+    tactic: "phishing",
     title: "\"Family group admin — verify to keep access\"",
     teaser: "Based on a real reported pattern. Cousin's WhatsApp cloned, admin asks for a code.",
     channel: "text",
