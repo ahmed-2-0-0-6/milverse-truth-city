@@ -74,6 +74,30 @@ export type Database = {
         }
         Relationships: []
       }
+      devintel_briefs: {
+        Row: {
+          brief: Json
+          created_at: string
+          id: string
+          source: string
+          stats: Json
+        }
+        Insert: {
+          brief: Json
+          created_at?: string
+          id?: string
+          source?: string
+          stats: Json
+        }
+        Update: {
+          brief?: Json
+          created_at?: string
+          id?: string
+          source?: string
+          stats?: Json
+        }
+        Relationships: []
+      }
       district_votes: {
         Row: {
           created_at: string
@@ -173,6 +197,36 @@ export type Database = {
           story?: Json
           updated_at?: string
           year?: number | null
+        }
+        Relationships: []
+      }
+      telemetry_events: {
+        Row: {
+          case_id: string | null
+          event_type: string
+          id: number
+          payload: Json
+          route: string | null
+          session_id: string | null
+          ts: string
+        }
+        Insert: {
+          case_id?: string | null
+          event_type: string
+          id?: number
+          payload?: Json
+          route?: string | null
+          session_id?: string | null
+          ts?: string
+        }
+        Update: {
+          case_id?: string | null
+          event_type?: string
+          id?: number
+          payload?: Json
+          route?: string | null
+          session_id?: string | null
+          ts?: string
         }
         Relationships: []
       }
