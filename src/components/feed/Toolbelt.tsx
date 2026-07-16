@@ -119,7 +119,8 @@ function resolveSlot(scenario: FeedScenario, kind: FeedToolKind): Slot {
 
 export function Toolbelt({ scenario, used, onUse, onGrade }: Props) {
   const format = scenario.format ?? "whatsapp";
-  const [firstUse, setFirstUse] = useState<Set<FeedToolKind>>(() => loadFirstUse());
+  const [firstUse, setFirstUse] = useState<Set<FeedToolKind>>(() => new Set());
+  useEffect(() => { setFirstUse(loadFirstUse()); }, []);
   const [active, setActive] = useState<FeedToolKind | null>(null);
   const [reveals, setReveals] = useState<Record<FeedToolKind, string | null>>({
     reverse_image: null, check_source: null, cross_check: null, check_date: null,
