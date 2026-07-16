@@ -143,6 +143,11 @@ function CityMap() {
 
       <footer className="mx-auto max-w-6xl px-4 mt-6 border-t border-white/10 pt-6 pb-10 text-center stencil text-[10px] text-white/50 space-y-3">
         <div className="text-cyan-300/80">MEDIA &amp; INFORMATION LITERACY · VERIFY, DON'T GUESS · CALIBRATE, DON'T PANIC</div>
+        <div>
+          <Link to="/visit" className="inline-block rounded border border-primary/60 bg-primary/10 px-3 py-1.5 text-primary hover:bg-primary/20">
+            JUDGES &amp; EDUCATORS: TAKE THE 3-MINUTE VISIT →
+          </Link>
+        </div>
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
           <Link to="/drop" className="text-primary hover:underline">[F★] AAJ KA FORWARD — DAILY DROP →</Link>
           <Link to="/educators" className="text-cyan-300 hover:underline">[F0] FOR EDUCATORS →</Link>

@@ -49,6 +49,19 @@ function EducatorsPage() {
           </div>
         </div>
 
+        <div className="mt-5 rounded-lg border border-primary/50 bg-primary/10 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="stencil text-[10px] tracking-[0.3em] text-primary">3-MINUTE GUIDED VISIT</div>
+              <p className="mt-1 text-sm">See MILVERSE in three minutes — play a scam, meet a boss, tour the city. No signup.</p>
+            </div>
+            <Link to="/visit" className="shrink-0 rounded-md bg-primary px-4 py-2 stencil text-[11px] tracking-[0.25em] text-primary-foreground">
+              TAKE THE VISIT →
+            </Link>
+          </div>
+        </div>
+
+
         <p className="mt-5 text-base leading-relaxed">
           MILVERSE is a <b>Media &amp; Information Literacy training simulator</b>: students rehearse manipulation attempts safely,
           learn to name the tactic, and master real verification tools.
