@@ -92,12 +92,12 @@ function CityMap() {
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <a href="#enter" className="cta-glow inline-flex items-center gap-2 rounded-sm bg-primary px-6 py-3 text-primary-foreground stencil text-xs">
+          <Link to="/drop" className="cta-glow inline-flex items-center gap-2 rounded-sm bg-primary px-6 py-3 text-primary-foreground stencil text-xs">
+            <Sparkles className="h-3.5 w-3.5" /> PLAY TODAY'S DROP →
+          </Link>
+          <a href="#enter" className="inline-flex items-center gap-2 rounded-sm border border-white/25 px-6 py-3 text-white/80 stencil text-xs hover:border-cyan-300 hover:text-cyan-200 transition">
             ENTER THE CITY ↓
           </a>
-          <Link to="/quick-tour" className="inline-flex items-center gap-2 rounded-sm border border-white/25 px-6 py-3 text-white/80 stencil text-xs hover:border-cyan-300 hover:text-cyan-200 transition">
-            <Sparkles className="h-3.5 w-3.5" /> QUICK TOUR · 90 SEC
-          </Link>
         </div>
 
         <div className="mt-8 w-full max-w-xl">
