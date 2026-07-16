@@ -76,7 +76,6 @@ function legacyToSummary(profileSummary: z.infer<typeof LegacyProfileSummarySche
     dailyStreak: profileSummary?.dailyStreak ?? 0,
   };
 }
-});
 
 /**
  * Voice bible + rails. Compiled per-surface so the model stays terse and
