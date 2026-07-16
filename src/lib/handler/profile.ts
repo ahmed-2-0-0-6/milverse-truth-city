@@ -175,6 +175,7 @@ export function labelForTactic(t: TacticId): string {
     "ai-generated":     "AI-generated fakes",
     "mis-dis-mal":      "mis/dis/mal information",
     "forgery-engine":   "forged documents",
+    "outrage-machine":  "the outrage machine",
   };
   return m[t] ?? String(t);
 }
