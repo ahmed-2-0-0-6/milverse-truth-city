@@ -1,4 +1,6 @@
 // MILVERSE — Boss Protocol types.
+export type BossOutcomeKind = "WIN" | "LOSS_TRANSACTED" | "LOSS_FALSE_ALARM" | "LOSS_PARANOIA";
+
 // Bosses extend the Scenario ground-truth model with:
 //  - supportsCoverStory: fact-checks CONFIRM the scam by design
 //  - winning protocol moves (channel/second-person/shared-secret/HOLD)

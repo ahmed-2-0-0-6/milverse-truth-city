@@ -17,9 +17,9 @@ export interface BossState {
 
 export type BossOutcome =
   | { kind: "WIN"; badge: string; wasCorrectVerdict: true; usedMoves: ProtocolMove[] }
-  | { kind: "LOSS_TRANSACTED"; wasCorrectVerdict: false; reason: "You transacted on an unverified channel." }
-  | { kind: "LOSS_FALSE_ALARM"; wasCorrectVerdict: false; reason: "This was a REAL request. Blank refusal cost you. Protocol still wins — HOLD and verify." }
-  | { kind: "LOSS_PARANOIA"; wasCorrectVerdict: false; reason: "You tried to fact-check your way out. Every check confirmed the story. That was the trap." };
+  | { kind: "LOSS_TRANSACTED"; wasCorrectVerdict: false; reason: string }
+  | { kind: "LOSS_FALSE_ALARM"; wasCorrectVerdict: false; reason: string }
+  | { kind: "LOSS_PARANOIA"; wasCorrectVerdict: false; reason: string };
 
 export function initBoss(boss: BossConfig, variant: BossVariant): BossState {
   return {
