@@ -35,17 +35,24 @@ function generateFamilyCode(): string {
 
 type CloudEntry = { device_id: string; wing: string; case_id: string; result: string; created_at: string };
 
+type CloudEntry = { device_id: string; wing: string; case_id: string; result: string };
+
 function FamilyPage() {
   // Hydration-safe: all localStorage reads live in useEffect.
   const [parentCode, setParentCode] = useState<string | null>(null);
   const [kidJoinCode, setKidJoinCode] = useState("");
   const [entries, setEntries] = useState<CloudEntry[]>([]);
   const [copied, setCopied] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
   const [kidState, setKidState] = useState(() => ({
     active: false, kidCityName: "", familyCode: null as string | null,
     lessonsCompleted: [] as number[], licenseIssuedAt: null as number | null, licenseNumber: null as string | null,
   }));
-  const fetchGroup = useServerFn(fetchPilotGroup);
+  const registerFn = useServerFn(registerFamilyCode);
+  const regenerateFn = useServerFn(regenerateFamilyCode);
+  const fetchProgress = useServerFn(fetchFamilyProgress);
+  const joinCheckFn = useServerFn(checkFamilyCodeJoin);
 
   useEffect(() => {
     const saved = localStorage.getItem(CODE_KEY);
@@ -57,29 +64,53 @@ function FamilyPage() {
   }, []);
 
   const refresh = useCallback(async (code: string) => {
+    setErr(null);
     try {
-      const r = await fetchGroup({ data: { groupCode: code } });
+      const r = await fetchProgress({ data: { code } });
       setEntries((r.entries ?? []) as CloudEntry[]);
-    } catch {
+    } catch (e) {
+      setErr((e as Error).message);
       setEntries([]);
     }
-  }, [fetchGroup]);
+  }, [fetchProgress]);
 
   useEffect(() => {
     if (parentCode) refresh(parentCode);
   }, [parentCode, refresh]);
 
-  function createCode() {
-    const c = generateFamilyCode();
-    localStorage.setItem(CODE_KEY, c);
-    setParentCode(c);
+  async function createCode() {
+    setBusy(true); setErr(null);
+    try {
+      const c = generateFamilyCode();
+      await registerFn({ data: { code: c } });
+      localStorage.setItem(CODE_KEY, c);
+      setParentCode(c);
+    } catch (e) { setErr((e as Error).message); }
+    setBusy(false);
   }
 
-  function joinAsKid() {
+  async function regenerate() {
+    if (!parentCode) return;
+    setBusy(true); setErr(null);
+    try {
+      const c = generateFamilyCode();
+      await regenerateFn({ data: { oldCode: parentCode, newCode: c } });
+      localStorage.setItem(CODE_KEY, c);
+      setParentCode(c);
+      setEntries([]);
+    } catch (e) { setErr((e as Error).message); }
+    setBusy(false);
+  }
+
+  async function joinAsKid() {
     const code = kidJoinCode.trim().toUpperCase();
     if (!/^[A-Z0-9]{4,6}$/.test(code)) return;
-    joinFamily(code);
-    setKidJoinCode("");
+    setErr(null);
+    try {
+      await joinCheckFn({ data: { code } });
+      joinFamily(code);
+      setKidJoinCode("");
+    } catch (e) { setErr((e as Error).message); }
   }
 
   // Aggregate: only junior lesson entries count. Case IDs are like junior:L3:xxx.
