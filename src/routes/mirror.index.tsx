@@ -135,6 +135,21 @@ function CaseFiles() {
 
         <RecommendedStrip />
 
+        {/* Boss Protocol beacon */}
+        <Link
+          to="/boss"
+          className="mt-6 mb-4 block border border-red-900/60 bg-gradient-to-r from-red-950/40 via-black to-black rounded-lg p-4 hover:border-red-500/70 transition"
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="text-[10px] tracking-[0.3em] text-red-400">☠ SPECIAL CASE — BOSS PROTOCOL</div>
+              <div className="font-black text-lg mt-1">Fact-checks will not save you.</div>
+              <div className="text-xs text-white/60 mt-1">Capstone cases. Beatable only by protocol.</div>
+            </div>
+            <div className="text-red-500 text-3xl font-black">›</div>
+          </div>
+        </Link>
+
 
 
 
