@@ -180,7 +180,7 @@ export const LESSONS: Lesson[] = [
           "urgent bhai please",
         ],
         sender: "\"Ali\" (new number)",
-        truth: "IMPERSONATOR",
+        truth: "IMPOSTER",
         options: [
           { id: "send", label: "Send the code — Ali needs help", correct: false, feedback: "That code unlocks YOUR account, not theirs. Codes never help someone else in." },
           { id: "call", label: "Call Ali's old number to check", correct: true, feedback: "Perfect move. If it's really Ali, he picks up. If it's not, you didn't hand over the keys." },
@@ -238,7 +238,7 @@ export const LESSONS: Lesson[] = [
           "(voice sounds a little flat)",
         ],
         sender: "\"Nani\" (unknown number)",
-        truth: "IMPERSONATOR",
+        truth: "IMPOSTER",
         options: [
           { id: "send", label: "Send the money — it's Nani's voice", correct: false, feedback: "Voices can be copied by AI now. Money on urgency is the tell." },
           { id: "call", label: "Call Nani's saved number first", correct: true, feedback: "Exactly. Voice ≠ proof anymore. A callback is." },
@@ -325,7 +325,7 @@ export const LESSONS: Lesson[] = [
           "and don't call me phone is dying I said",
         ],
         sender: "\"Baba\" (unknown number)",
-        truth: "IMPERSONATOR",
+        truth: "IMPOSTER",
         options: [
           { id: "send", label: "Send it — dad's in trouble", correct: false, feedback: "Three tells: unknown number, urgency, \"don't call.\" That combo IS the scam." },
           { id: "call", label: "Call Baba's real number anyway", correct: true, feedback: "You caught all three. That's a licensed operator." },

@@ -18,6 +18,8 @@ import { Route as PilotRouteImport } from './routes/pilot'
 import { Route as PaperRouteImport } from './routes/paper'
 import { Route as MarketRouteImport } from './routes/market'
 import { Route as KitRouteImport } from './routes/kit'
+import { Route as FirstPhoneRouteImport } from './routes/first-phone'
+import { Route as FamilyRouteImport } from './routes/family'
 import { Route as EducatorsRouteImport } from './routes/educators'
 import { Route as DropRouteImport } from './routes/drop'
 import { Route as DevintelRouteImport } from './routes/devintel'
@@ -80,6 +82,16 @@ const MarketRoute = MarketRouteImport.update({
 const KitRoute = KitRouteImport.update({
   id: '/kit',
   path: '/kit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FirstPhoneRoute = FirstPhoneRouteImport.update({
+  id: '/first-phone',
+  path: '/first-phone',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FamilyRoute = FamilyRouteImport.update({
+  id: '/family',
+  path: '/family',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EducatorsRoute = EducatorsRouteImport.update({
@@ -181,6 +193,8 @@ export interface FileRoutesByFullPath {
   '/devintel': typeof DevintelRoute
   '/drop': typeof DropRoute
   '/educators': typeof EducatorsRoute
+  '/family': typeof FamilyRoute
+  '/first-phone': typeof FirstPhoneRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
   '/paper': typeof PaperRoute
@@ -210,6 +224,8 @@ export interface FileRoutesByTo {
   '/devintel': typeof DevintelRoute
   '/drop': typeof DropRoute
   '/educators': typeof EducatorsRoute
+  '/family': typeof FamilyRoute
+  '/first-phone': typeof FirstPhoneRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
   '/paper': typeof PaperRoute
@@ -240,6 +256,8 @@ export interface FileRoutesById {
   '/devintel': typeof DevintelRoute
   '/drop': typeof DropRoute
   '/educators': typeof EducatorsRoute
+  '/family': typeof FamilyRoute
+  '/first-phone': typeof FirstPhoneRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
   '/paper': typeof PaperRoute
@@ -271,6 +289,8 @@ export interface FileRouteTypes {
     | '/devintel'
     | '/drop'
     | '/educators'
+    | '/family'
+    | '/first-phone'
     | '/kit'
     | '/market'
     | '/paper'
@@ -300,6 +320,8 @@ export interface FileRouteTypes {
     | '/devintel'
     | '/drop'
     | '/educators'
+    | '/family'
+    | '/first-phone'
     | '/kit'
     | '/market'
     | '/paper'
@@ -329,6 +351,8 @@ export interface FileRouteTypes {
     | '/devintel'
     | '/drop'
     | '/educators'
+    | '/family'
+    | '/first-phone'
     | '/kit'
     | '/market'
     | '/paper'
@@ -359,6 +383,8 @@ export interface RootRouteChildren {
   DevintelRoute: typeof DevintelRoute
   DropRoute: typeof DropRoute
   EducatorsRoute: typeof EducatorsRoute
+  FamilyRoute: typeof FamilyRoute
+  FirstPhoneRoute: typeof FirstPhoneRoute
   KitRoute: typeof KitRoute
   MarketRoute: typeof MarketRoute
   PaperRoute: typeof PaperRoute
@@ -443,6 +469,20 @@ declare module '@tanstack/react-router' {
       path: '/kit'
       fullPath: '/kit'
       preLoaderRoute: typeof KitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/first-phone': {
+      id: '/first-phone'
+      path: '/first-phone'
+      fullPath: '/first-phone'
+      preLoaderRoute: typeof FirstPhoneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/family': {
+      id: '/family'
+      path: '/family'
+      fullPath: '/family'
+      preLoaderRoute: typeof FamilyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/educators': {
@@ -593,6 +633,8 @@ const rootRouteChildren: RootRouteChildren = {
   DevintelRoute: DevintelRoute,
   DropRoute: DropRoute,
   EducatorsRoute: EducatorsRoute,
+  FamilyRoute: FamilyRoute,
+  FirstPhoneRoute: FirstPhoneRoute,
   KitRoute: KitRoute,
   MarketRoute: MarketRoute,
   PaperRoute: PaperRoute,
