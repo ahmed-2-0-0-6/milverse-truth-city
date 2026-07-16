@@ -14,6 +14,19 @@ export interface HistoryEntry {
   ts: number;
 }
 
+/** A single Daily Drop play (date-keyed). */
+export interface DailyPlayEntry {
+  dateKey: string;         // YYYY-MM-DD in UTC+5
+  caseId: string;
+  verdict: "LEGIT" | "SCAM" | "MISLEADING";
+  truth: "LEGIT" | "SCAM" | "MISLEADING";
+  correct: boolean;
+  stake: number;           // Trust wagered
+  delta: number;           // +win / -loss applied to trust
+  probesUsed: number;      // 0..2
+  ts: number;
+}
+
 export interface TrustProfile {
   playerId: string;
   casesPlayed: number;
@@ -28,6 +41,11 @@ export interface TrustProfile {
   /** Studio publishes (private + community). Additive XP layer only. */
   publishedCount: number;
   history: HistoryEntry[];
+  /** Daily Drop layer — fictional city currency, streak, and per-day play log. */
+  trust: number;                    // current Trust balance
+  dailyStreak: number;              // consecutive days on watch
+  lastDailyDate: string | null;     // last date the drop was played (UTC+5)
+  dailyPlays: DailyPlayEntry[];     // append-only, most recent last
 }
 
 const KEY = "milverse.profile.v2";
@@ -47,6 +65,10 @@ function newProfile(): TrustProfile {
     points: 0,
     publishedCount: 0,
     history: [],
+    trust: 100,
+    dailyStreak: 0,
+    lastDailyDate: null,
+    dailyPlays: [],
   };
 }
 
