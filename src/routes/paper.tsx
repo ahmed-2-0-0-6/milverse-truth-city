@@ -144,10 +144,11 @@ function PaperPage() {
 
 function EditionBody({ edition }: { edition: Edition }) {
   const c: EditionContent = edition.content;
-  const [record, setRecord] = useState(() => readEditionRecord(edition.edition_number));
+  const [record, setRecord] = useState<ReturnType<typeof readEditionRecord> | null>(null);
   const refresh = () => setRecord(readEditionRecord(edition.edition_number));
 
   useEffect(() => {
+    refresh();
     const on = () => refresh();
     window.addEventListener("milverse:profile", on);
     return () => window.removeEventListener("milverse:profile", on);
