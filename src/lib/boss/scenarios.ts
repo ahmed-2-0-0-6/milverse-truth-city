@@ -243,6 +243,28 @@ export const BOSSES: BossConfig[] = [
             response: "You didn't forward. The chorus needed you to grow — you starved it.", requiresFollowup: "provenance_trace" },
         ],
       },
+      {
+        id: "real-alert",
+        truth: "REAL",
+        opener: "ALERT — schools shut tomorrow due to smog. Two outlets and the education board confirm.",
+        truthReveal: "It's real this time. Multiple independent origins. Blank refusal to warn = False Alarm.",
+        winningVerdict: "HOLD_UNVERIFIED",
+        debriefLine: "This time the chorus WAS a confirmation — because the sources were independent. Provenance trace still wins: it distinguishes the echo from the real chorus.",
+        factChecks: [
+          { id: "cross",     label: "Cross-check across outlets", result: "3 outlets reporting — Dawn, Geo, and the ED Board Twitter. ✓ Independent.", supportsCoverStory: true,
+            provenanceChain: ["Dawn: staff reporter, filed 2h ago", "Geo: independent bureau, filed 3h ago", "ED Board: official press release"] },
+          { id: "screenshot",label: "Original screenshot",       result: "Official ED Board PDF with letterhead. ✓ Traceable.", supportsCoverStory: true },
+          { id: "outlet",    label: "Check outlet reputation",    result: "All established outlets with editorial oversight. ✓ Real.", supportsCoverStory: true },
+        ],
+        moves: [
+          { id: "provenance_trace", label: "Trace the provenance chain", blurb: "Follow each source to its origin.", outcome: "WIN",
+            response: "Each source traces to an INDEPENDENT origin — a staff reporter, a bureau, an official release. That's a real chorus. Forward with confidence." },
+          { id: "delay_past_window",label: "HOLD — wait past the urgency window", blurb: "Rumors die on schedule.", outcome: "PROGRESS",
+            response: "You waited. Story is still standing 3 hours later, more outlets picking it up. That's the pattern of real news — but you also need provenance." },
+          { id: "hold_unverified",  label: "Don't forward — refuse until verified", blurb: "Break the chain at you.", outcome: "PROGRESS",
+            response: "HOLD is smart — but a real school closure needs to reach parents. Trace the chain, confirm independence, THEN forward.", requiresFollowup: "provenance_trace" },
+        ],
+      },
     ],
   },
 ];
