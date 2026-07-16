@@ -168,8 +168,32 @@ export const BOSSES: BossConfig[] = [
             response: "She keeps making excuses — 'this line only', 'battery dying'. Every excuse is the tell. You held. You won.", requiresFollowup: "outbound_video" },
         ],
       },
+      {
+        id: "real-emergency",
+        truth: "REAL",
+        opener: "[video call — your cousin, streaks of mascara, background of a real hospital corridor] please pick up",
+        truthReveal: "It really is her. She's at the hospital for her mother. Blank refusal = False Alarm.",
+        winningVerdict: "HOLD_UNVERIFIED",
+        debriefLine: "This time it was really her. Blank refusal would have hurt someone you love. Protocol still wins — outbound callback + second-person confirms in 90 seconds, then you help.",
+        factChecks: [
+          { id: "face",  label: "Study the face for artifacts", result: "Flawless — because it's her actual face.", supportsCoverStory: true },
+          { id: "voice", label: "Voice cadence check",          result: "Real. Because it's her real voice.", supportsCoverStory: true },
+          { id: "bg",    label: "Study the background",         result: "Hospital signage visible. ✓ Consistent.", supportsCoverStory: true },
+        ],
+        moves: [
+          { id: "outbound_video", label: "'I'll call YOU back on your number'", blurb: "Hang up. Call her real line.", outcome: "WIN",
+            response: "She picks up on her own number, still crying. Same story. Real emergency. Now help." },
+          { id: "shared_secret",  label: "Ask what you both cooked last Eid", blurb: "Something no scraper has.", outcome: "WIN",
+            response: "She answers instantly, then laughs through tears: 'seriously? okay smart of you.' Real her." },
+          { id: "second_person",  label: "Call your aunt", blurb: "She'd know where your cousin is.", outcome: "WIN",
+            response: "Aunt: 'yes she's at the hospital with her mom, please help her.' Confirmed real." },
+          { id: "hold_unverified",label: "HOLD — 'let me call you back first'", blurb: "Refuse to transact until verified.", outcome: "PROGRESS",
+            response: "You HOLD — good instinct. But HOLD alone doesn't help her. Follow through: outbound callback.", requiresFollowup: "outbound_video" },
+        ],
+      },
     ],
   },
+
 
   /* ══ BOSS 3 — THE CHORUS (Phase 2 seed, playable stub) ═══════ */
   {
@@ -217,6 +241,28 @@ export const BOSSES: BossConfig[] = [
             response: "You waited 6 hours. Ministry issued a denial. Original post: deleted." },
           { id: "hold_unverified",  label: "Don't forward — refuse until verified", blurb: "Break the chain at you.", outcome: "WIN",
             response: "You didn't forward. The chorus needed you to grow — you starved it.", requiresFollowup: "provenance_trace" },
+        ],
+      },
+      {
+        id: "real-alert",
+        truth: "REAL",
+        opener: "ALERT — schools shut tomorrow due to smog. Two outlets and the education board confirm.",
+        truthReveal: "It's real this time. Multiple independent origins. Blank refusal to warn = False Alarm.",
+        winningVerdict: "HOLD_UNVERIFIED",
+        debriefLine: "This time the chorus WAS a confirmation — because the sources were independent. Provenance trace still wins: it distinguishes the echo from the real chorus.",
+        factChecks: [
+          { id: "cross",     label: "Cross-check across outlets", result: "3 outlets reporting — Dawn, Geo, and the ED Board Twitter. ✓ Independent.", supportsCoverStory: true,
+            provenanceChain: ["Dawn: staff reporter, filed 2h ago", "Geo: independent bureau, filed 3h ago", "ED Board: official press release"] },
+          { id: "screenshot",label: "Original screenshot",       result: "Official ED Board PDF with letterhead. ✓ Traceable.", supportsCoverStory: true },
+          { id: "outlet",    label: "Check outlet reputation",    result: "All established outlets with editorial oversight. ✓ Real.", supportsCoverStory: true },
+        ],
+        moves: [
+          { id: "provenance_trace", label: "Trace the provenance chain", blurb: "Follow each source to its origin.", outcome: "WIN",
+            response: "Each source traces to an INDEPENDENT origin — a staff reporter, a bureau, an official release. That's a real chorus. Forward with confidence." },
+          { id: "delay_past_window",label: "HOLD — wait past the urgency window", blurb: "Rumors die on schedule.", outcome: "PROGRESS",
+            response: "You waited. Story is still standing 3 hours later, more outlets picking it up. That's the pattern of real news — but you also need provenance." },
+          { id: "hold_unverified",  label: "Don't forward — refuse until verified", blurb: "Break the chain at you.", outcome: "PROGRESS",
+            response: "HOLD is smart — but a real school closure needs to reach parents. Trace the chain, confirm independence, THEN forward.", requiresFollowup: "provenance_trace" },
         ],
       },
     ],
