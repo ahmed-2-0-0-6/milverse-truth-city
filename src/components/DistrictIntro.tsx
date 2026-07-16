@@ -1,11 +1,12 @@
 // MILVERSE — Reusable district-intro cutscene.
-// 2-panel typewriter narration, skippable, session-remembered.
+// 2-panel typewriter narration, skippable, ONCE PER PROFILE (playerId-scoped).
 
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import { loadProfile } from "@/lib/mirror/profile";
 
 interface Props {
-  id: string;                    // unique key for sessionStorage
+  id: string;                    // unique district key
   chapter: string;               // "CHAPTER 02"
   title: string;                 // "THE FEED"
   art?: string;                  // background image URL
@@ -21,12 +22,15 @@ export function DistrictIntro({ id, chapter, title, art, lines, onDone }: Props)
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const key = `milverse.intro.${id}`;
-    if (sessionStorage.getItem(key)) return;
+    const p = loadProfile();
+    // Scope to playerId so intros play once per profile, not once per tab.
+    const key = `milverse.intro.v2.${p.playerId}.${id}`;
+    if (localStorage.getItem(key)) return;
     setReducedMotion(!!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
     setVisible(true);
-    sessionStorage.setItem(key, "1");
+    localStorage.setItem(key, "1");
   }, [id]);
+
 
   useEffect(() => {
     if (!visible) return;

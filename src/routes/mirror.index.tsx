@@ -1,12 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { MessageSquare, ShieldAlert, Lock, CheckCircle2, Sparkles, Users } from "lucide-react";
+import { MessageSquare, ShieldAlert, Lock, CheckCircle2, Sparkles, Users, Building2 } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { SCENARIOS, loadCitizenCases, saveCitizenCase, type TierId, type Scenario } from "@/lib/mirror/scenarios";
 import { loadProfile, unlockedMaxTier, tierWins, type TrustProfile } from "@/lib/mirror/profile";
 import { fetchCitizenCase } from "@/lib/citizen.functions";
 import { RecommendedStrip } from "@/components/RecommendedStrip";
+import { DistrictIntro } from "@/components/DistrictIntro";
+import mirrorArt from "@/assets/district-mirror.jpg";
 
 export const Route = createFileRoute("/mirror/")({
   head: () => ({
@@ -87,6 +89,16 @@ function CaseFiles() {
 
   return (
     <div className="min-h-screen grain">
+      <DistrictIntro
+        id="mirror"
+        chapter="CHAPTER 01"
+        title="THE MIRROR"
+        art={mirrorArt}
+        lines={[
+          "Someone's uncle answered a message like this last week. He's still paying for it.",
+          "Your turn to answer better. Verify the person, not the vibe.",
+        ]}
+      />
       <TopBar />
       <main className="mx-auto max-w-6xl px-4 py-10">
         <Link to="/" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">
@@ -238,17 +250,25 @@ function CaseFiles() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {citizen.map((s) => (
                 <Link key={s.id} to="/mirror/$caseId" params={{ caseId: s.id }} className="group rounded-xl border border-primary/30 bg-card p-6 hover:border-primary/60 transition">
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-2">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 text-primary">
                       <MessageSquare className="h-5 w-5" />
                     </div>
-                    <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[9px] font-mono tracking-widest text-primary">
-                      DESIGNED BY A CITIZEN
-                    </span>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[9px] font-mono tracking-widest text-primary">
+                        DESIGNED BY A CITIZEN
+                      </span>
+                      {s.designerRank === "CITY DESIGNER" && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-caution/50 bg-caution/10 px-2 py-0.5 text-[9px] font-mono tracking-widest text-caution">
+                          <Building2 className="h-2.5 w-2.5" /> CITY DESIGNER
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <h3 className="mt-4 text-base font-semibold">{s.title}</h3>
                   <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{s.teaser}</p>
                   <div className="mt-3 font-mono text-[10px] tracking-widest text-muted-foreground">
+                    {s.designerRank && <span className="mr-2 text-primary/80">BYLINE · {s.designerRank}</span>}
                     CODE: {s.id.replace("citizen-", "").toUpperCase().slice(0, 6)}
                   </div>
                 </Link>

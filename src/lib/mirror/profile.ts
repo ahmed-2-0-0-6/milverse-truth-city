@@ -25,6 +25,8 @@ export interface TrustProfile {
   weakProbesTotal: number;
   wastedPressureTotal: number;
   points: number;
+  /** Studio publishes (private + community). Additive XP layer only. */
+  publishedCount: number;
   history: HistoryEntry[];
 }
 
@@ -43,6 +45,7 @@ function newProfile(): TrustProfile {
     weakProbesTotal: 0,
     wastedPressureTotal: 0,
     points: 0,
+    publishedCount: 0,
     history: [],
   };
 }
@@ -67,6 +70,15 @@ export function loadProfile(): TrustProfile {
 export function saveProfile(p: TrustProfile) {
   if (typeof window === "undefined") return;
   localStorage.setItem(KEY, JSON.stringify(p));
+}
+
+/** Additive XP-layer helper — increments Studio publish counter and pings listeners. */
+export function incrementPublishedCount(): number {
+  const p = loadProfile();
+  p.publishedCount = (p.publishedCount ?? 0) + 1;
+  saveProfile(p);
+  window.dispatchEvent(new Event("milverse:profile"));
+  return p.publishedCount;
 }
 
 export function calibrationLabel(p: TrustProfile): {

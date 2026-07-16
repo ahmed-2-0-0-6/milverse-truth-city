@@ -4,35 +4,42 @@ import { Volume2, VolumeX, BookOpen } from "lucide-react";
 import {
   loadProfile,
   calibrationLabel,
-  operatorRank,
   operatorCallsign,
   type TrustProfile,
 } from "@/lib/mirror/profile";
 import { isMuted, setMuted } from "@/lib/mirror/audio";
 import { VisualQualityToggle } from "@/components/VisualQualityToggle";
+import { loadUnlocked } from "@/lib/manual/state";
+import { computeXp, rankFromXp } from "@/lib/ranks";
 
 export function TopBar() {
   const [profile, setProfile] = useState<TrustProfile | null>(null);
   const [muted, setLocalMuted] = useState(false);
+  const [manualUnlocks, setManualUnlocks] = useState(0);
 
   useEffect(() => {
     setProfile(loadProfile());
     setLocalMuted(isMuted());
+    setManualUnlocks(loadUnlocked().size);
     const onProfile = () => setProfile(loadProfile());
     const onMute = () => setLocalMuted(isMuted());
+    const onManual = () => setManualUnlocks(loadUnlocked().size);
     window.addEventListener("storage", onProfile);
     window.addEventListener("milverse:profile", onProfile);
     window.addEventListener("milverse:mute", onMute);
+    window.addEventListener("milverse:manual", onManual);
     return () => {
       window.removeEventListener("storage", onProfile);
       window.removeEventListener("milverse:profile", onProfile);
       window.removeEventListener("milverse:mute", onMute);
+      window.removeEventListener("milverse:manual", onManual);
     };
   }, []);
 
   const cal = profile ? calibrationLabel(profile) : { label: "STANDBY", tone: "neutral" as const };
-  const rank = profile ? operatorRank(profile) : null;
   const call = profile ? operatorCallsign(profile) : "———";
+  const xp = computeXp(profile, manualUnlocks, profile?.publishedCount ?? 0);
+  const noirRank = rankFromXp(xp);
   const toneClass =
     cal.tone === "good" ? "text-primary border-primary/50"
     : cal.tone === "warn" ? "text-caution border-caution/50"
@@ -80,12 +87,17 @@ export function TopBar() {
           <Link
             to="/profile"
             className={`flex items-center gap-2 rounded border px-2.5 py-1.5 stencil text-[10px] transition-colors hover:bg-accent ${toneClass}`}
+            title={`${noirRank.current.name} · ${xp} XP${noirRank.next ? ` · next ${noirRank.next.name}` : ""}`}
           >
-            {rank && <span className="opacity-70">{rank.code}</span>}
-            <span className="hidden sm:inline text-foreground/90">{rank?.rank ?? "READER"}</span>
-            <span className="text-muted-foreground">·</span>
-            <span className="opacity-80">{cal.label.toUpperCase()}</span>
+            <span className="opacity-70">{noirRank.current.code}</span>
+            <span className="hidden sm:inline text-foreground/90">{noirRank.current.name}</span>
+            <span className="hidden md:inline-block h-1 w-8 overflow-hidden rounded-full bg-muted">
+              <span className="block h-full bg-primary" style={{ width: `${Math.round(noirRank.progress * 100)}%` }} />
+            </span>
+            <span className="hidden md:inline text-muted-foreground">·</span>
+            <span className="hidden md:inline opacity-80">{cal.label.toUpperCase()}</span>
           </Link>
+
         </div>
       </div>
     </header>

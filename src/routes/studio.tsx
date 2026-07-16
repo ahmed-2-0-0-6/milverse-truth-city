@@ -6,6 +6,11 @@ import { saveCitizenCase } from "@/lib/mirror/scenarios";
 import type { Scenario, EvidenceChip } from "@/lib/mirror/scenarios";
 import { publishCitizenCase } from "@/lib/citizen.functions";
 import { getDeviceId } from "@/lib/pilot";
+import { incrementPublishedCount, loadProfile } from "@/lib/mirror/profile";
+import { loadUnlocked } from "@/lib/manual/state";
+import { computeXp, rankFromXp } from "@/lib/ranks";
+import { DistrictIntro } from "@/components/DistrictIntro";
+import studioArt from "@/assets/district-studio.jpg";
 import { Clapperboard, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 
 
@@ -178,9 +183,18 @@ function Studio() {
     setError(null);
     const s = buildScenario(draft);
     const code = (s as Scenario & { shareCode: string }).shareCode;
+
+    // Tag with the designer's current noir rank at publish time.
+    const p = loadProfile();
+    const manual = loadUnlocked().size;
+    const currentRank = rankFromXp(computeXp(p, manual, p.publishedCount ?? 0)).current;
+    s.designerRank = currentRank.name;
+
     saveCitizenCase(s);
     try {
       const res = await publishFn({ data: { shareCode: code, scenario: s as unknown as Record<string, unknown>, deviceId: getDeviceId(), lane } as never }) as { lane: "private" | "community"; aiChecked: boolean };
+      // Successful publish → increment XP-layer counter (feeds ranks + prestige).
+      incrementPublishedCount();
       if (res.lane === "community") {
         alert(`Submitted to the Community Library — queued for human review.\n\nShare code (playable now for you & anyone you send it to): ${code}\n\nAI safety check: ${res.aiChecked ? "passed ✓" : "unavailable — will be reviewed manually"}`);
       } else {
@@ -206,6 +220,16 @@ function Studio() {
 
   return (
     <div className="min-h-screen grain">
+      <DistrictIntro
+        id="studio"
+        chapter="CHAPTER 05"
+        title="THE STUDIO"
+        art={studioArt}
+        lines={[
+          "Enough training. Someone's cousin is about to answer a message like this next week.",
+          "Write the case they'll rehearse against. The city's next cases are written by players like you.",
+        ]}
+      />
       <TopBar />
       <main className="mx-auto max-w-2xl px-4 py-10">
         <Link to="/" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">
@@ -217,7 +241,7 @@ function Studio() {
           </div>
           <h1 className="mt-2 text-3xl font-semibold">Design a case</h1>
           <p className="mt-2 text-muted-foreground">
-            5 steps. LEARN → PLAY → DESIGN. Publish and share with friends.
+            The city's next cases are written by players like you. 5 steps. LEARN → PLAY → DESIGN. Publish and share.
           </p>
           <div className="mt-4 flex gap-1">
             {[1, 2, 3, 4, 5].map((n) => (
