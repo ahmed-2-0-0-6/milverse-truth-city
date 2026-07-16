@@ -1,0 +1,360 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { Skull, Phone, Users, KeyRound, Hand, ShieldCheck, ShieldOff, HandCoins, Check, X, Award, Home } from "lucide-react";
+import { TopBar } from "@/components/TopBar";
+import { getBoss } from "@/lib/boss/scenarios";
+import type { BossVerdict, ProtocolMove } from "@/lib/boss/types";
+import {
+  initBoss, pickVariant, runFactCheck, playMove, resolveVerdict,
+  currentPressureLine, type BossState, type BossOutcome,
+} from "@/lib/boss/engine";
+import { attemptCount, recordBossAttempt, canRematch } from "@/lib/boss/profile";
+import { DOCTRINE_RULES } from "@/lib/boss/doctrine";
+import { logPilotEntry } from "@/lib/pilot";
+
+export const Route = createFileRoute("/boss/$bossId")({
+  component: BossPlay,
+});
+
+const MOVE_ICON: Record<ProtocolMove, typeof Phone> = {
+  callback_known: Phone,
+  second_person: Users,
+  shared_secret: KeyRound,
+  hold_unverified: Hand,
+  outbound_video: Phone,
+  provenance_trace: KeyRound,
+  delay_past_window: Hand,
+};
+
+interface LogItem {
+  kind: "boss" | "you" | "sys" | "check" | "move";
+  text: string;
+  meta?: string;
+}
+
+function BossPlay() {
+  const { bossId } = Route.useParams();
+  const navigate = useNavigate();
+  const boss = getBoss(bossId);
+
+  const [stage, setStage] = useState<"intro" | "play" | "debrief">("intro");
+  const [state, setState] = useState<BossState | null>(null);
+  const [log, setLog] = useState<LogItem[]>([]);
+  const [outcome, setOutcome] = useState<BossOutcome | null>(null);
+  const [chainOpen, setChainOpen] = useState<string[] | null>(null);
+
+  const variant = useMemo(() => {
+    if (!boss) return null;
+    return pickVariant(boss, attemptCount(boss.id));
+  }, [boss]);
+
+  useEffect(() => {
+    if (boss && variant && stage === "play" && !state) {
+      const s = initBoss(boss, variant);
+      setState(s);
+      setLog([
+        { kind: "sys", text: `${boss.codename} — ${boss.phases[0].label}` },
+        { kind: "boss", text: variant.opener },
+      ]);
+    }
+  }, [boss, variant, stage, state]);
+
+  if (!boss || !variant) {
+    return (
+      <div className="min-h-screen bg-black text-white p-6">
+        <TopBar />
+        <div className="max-w-lg mx-auto mt-10">
+          <p>Unknown boss.</p>
+          <Link to="/boss" className="text-red-400 underline">Back to Boss Protocol</Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!canRematch(boss.id)) {
+    return (
+      <div className="min-h-screen bg-black text-white p-6">
+        <TopBar />
+        <div className="max-w-lg mx-auto mt-10 space-y-4">
+          <div className="text-red-500 text-xs tracking-[0.3em]">HANDLER ASSIGNMENT PENDING</div>
+          <h1 className="text-2xl font-black">Complete your training first.</h1>
+          <p className="text-white/70">The Handler assigned remediation after your last loss. Play any wing case to complete it, then return.</p>
+          <div className="flex gap-3 pt-2">
+            <Link to="/mirror" className="px-4 py-2 bg-white/10 rounded hover:bg-white/20">Mirror</Link>
+            <Link to="/feed" className="px-4 py-2 bg-white/10 rounded hover:bg-white/20">Feed</Link>
+            <Link to="/boss" className="px-4 py-2 border border-white/20 rounded">Back</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── INTRO CINEMATIC ─────────────────────────────────────── */
+  if (stage === "intro") {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
+        <div className="max-w-lg w-full">
+          <div className="border border-red-900/60 bg-gradient-to-br from-red-950/40 to-black rounded-lg p-6 space-y-4 animate-in fade-in duration-700">
+            <div className="flex items-center gap-2 text-red-500 text-[10px] tracking-[0.4em]">
+              <Skull className="w-3 h-3" /> SPECIAL CASE — BOSS PROTOCOL
+            </div>
+            <div className="text-3xl font-black tracking-tight">{boss.codename}</div>
+            <div className="text-xs tracking-[0.3em] text-red-400">THREAT RATING {boss.threatRating}</div>
+            <p className="text-white/80 leading-relaxed">{boss.tagline}</p>
+            <div className="border-t border-red-900/40 pt-4 mt-4">
+              <div className="inline-block px-3 py-1.5 bg-red-600 text-white text-[10px] font-black tracking-[0.3em] rotate-[-2deg]">
+                FACT-CHECKS WILL NOT SAVE YOU
+              </div>
+            </div>
+            <div className="text-xs text-white/50 italic">
+              Doctrine reminder — {boss.doctrineRule}
+            </div>
+            <div className="flex gap-3 pt-3">
+              <button
+                onClick={() => setStage("play")}
+                className="flex-1 py-3 bg-red-600 hover:bg-red-500 rounded font-bold tracking-wider text-sm"
+              >
+                ENTER
+              </button>
+              <Link to="/boss" className="px-4 py-3 border border-white/20 rounded text-sm">Abort</Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── PLAY ────────────────────────────────────────────────── */
+  if (stage === "play" && state) {
+    const phaseLine = currentPressureLine(state, boss);
+
+    function push(item: LogItem) { setLog((l) => [...l, item]); }
+
+    function doCheck(id: string) {
+      const res = runFactCheck(state!, boss!, variant!, id);
+      setState(res.state);
+      const fc = variant!.factChecks.find((f) => f.id === id)!;
+      push({ kind: "check", text: `⌕ ${fc.label}`, meta: res.text });
+      if (res.provenanceChain) setChainOpen(res.provenanceChain);
+      // pressure escalates: add the current phase line
+      const next = currentPressureLine(res.state, boss!);
+      push({ kind: "boss", text: next.line, meta: next.phase });
+    }
+
+    function doMove(id: ProtocolMove) {
+      const res = playMove(state!, boss!, variant!, id);
+      setState(res.state);
+      const label = res.move?.label ?? id;
+      push({ kind: "move", text: `▶ ${label}`, meta: res.move?.response });
+    }
+
+    function commit(verdict: BossVerdict) {
+      const out = resolveVerdict(state!, boss!, variant!, verdict);
+      setOutcome(out);
+      const declassify = out.kind === "WIN" ? boss!.id : undefined;
+      recordBossAttempt({
+        bossId: boss!.id,
+        variantId: variant!.id,
+        ts: Date.now(),
+        outcome: out.kind,
+        winningMove: out.kind === "WIN" ? state!.movesPlayed[state!.movesPlayed.length - 1] : undefined,
+      }, out.kind === "WIN" ? boss!.badge.label : undefined, declassify);
+      logPilotEntry({
+        wing: boss!.district === "feed" ? "feed" : "mirror",
+        caseId: `boss-${boss!.id}`,
+        result: out.kind === "WIN" ? "correct" : out.kind === "LOSS_FALSE_ALARM" ? "false_alarm" : "missed_scam",
+        points: out.kind === "WIN" ? 100 : 0,
+        ts: Date.now(),
+      });
+      setStage("debrief");
+    }
+
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <TopBar />
+        <div className="max-w-2xl mx-auto p-4">
+          <div className="flex items-center justify-between mb-3 text-xs">
+            <div className="flex items-center gap-2 text-red-400 tracking-[0.3em]">
+              <Skull className="w-3 h-3" /> {boss.codename}
+            </div>
+            <div className="text-white/50 font-mono">PHASE · {phaseLine.phase}</div>
+          </div>
+
+          {/* Conversation log */}
+          <div className="border border-white/10 rounded-lg bg-black/60 p-4 min-h-[300px] max-h-[52vh] overflow-y-auto space-y-3">
+            {log.map((m, i) => {
+              if (m.kind === "boss") return (
+                <div key={i} className="max-w-[85%]">
+                  {m.meta && <div className="text-[10px] text-red-400/70 tracking-widest mb-0.5">{m.meta}</div>}
+                  <div className="inline-block bg-white/5 border border-white/10 rounded-2xl px-4 py-2 text-sm">{m.text}</div>
+                </div>
+              );
+              if (m.kind === "sys") return (
+                <div key={i} className="text-center text-[10px] tracking-[0.3em] text-white/40">— {m.text} —</div>
+              );
+              if (m.kind === "check") return (
+                <div key={i} className="text-right">
+                  <div className="inline-block text-left max-w-[85%] border border-cyan-500/30 bg-cyan-950/30 rounded px-3 py-2 text-xs">
+                    <div className="text-cyan-300 font-mono mb-1">{m.text}</div>
+                    <div className="text-white/80">{m.meta}</div>
+                  </div>
+                </div>
+              );
+              if (m.kind === "move") return (
+                <div key={i} className="text-right">
+                  <div className="inline-block text-left max-w-[85%] border border-emerald-500/40 bg-emerald-950/30 rounded px-3 py-2 text-xs">
+                    <div className="text-emerald-300 font-mono mb-1">{m.text}</div>
+                    {m.meta && <div className="text-white/80">{m.meta}</div>}
+                  </div>
+                </div>
+              );
+              return null;
+            })}
+          </div>
+
+          {chainOpen && (
+            <div className="mt-3 border border-amber-500/40 bg-amber-950/20 rounded p-3 text-xs">
+              <div className="text-amber-300 tracking-widest mb-1">PROVENANCE CHAIN</div>
+              <ol className="list-decimal list-inside space-y-0.5 text-white/80">
+                {chainOpen.map((c, i) => <li key={i}>{c}</li>)}
+              </ol>
+              <button className="mt-2 text-amber-400 underline" onClick={() => setChainOpen(null)}>Close</button>
+            </div>
+          )}
+
+          {/* Fact-check toolbelt (the trap) */}
+          <div className="mt-4">
+            <div className="text-[10px] tracking-[0.3em] text-white/40 mb-2">FACT-CHECK · uses pressure phase</div>
+            <div className="flex flex-wrap gap-2">
+              {variant.factChecks.map((f) => (
+                <button
+                  key={f.id}
+                  disabled={state.factChecksUsed.includes(f.id)}
+                  onClick={() => doCheck(f.id)}
+                  className="text-xs px-3 py-1.5 border border-cyan-500/30 bg-cyan-950/30 rounded hover:bg-cyan-950/60 disabled:opacity-30"
+                >
+                  ⌕ {f.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Protocol moves */}
+          <div className="mt-4">
+            <div className="text-[10px] tracking-[0.3em] text-emerald-400 mb-2">PROTOCOL MOVES</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {variant.moves.map((m) => {
+                const Icon = MOVE_ICON[m.id] ?? Hand;
+                const played = state.movesPlayed.includes(m.id);
+                return (
+                  <button
+                    key={m.id}
+                    disabled={played}
+                    onClick={() => doMove(m.id)}
+                    className="text-left text-xs p-3 border border-emerald-500/30 bg-emerald-950/20 rounded hover:bg-emerald-950/50 disabled:opacity-30"
+                  >
+                    <div className="flex items-center gap-2 font-bold text-emerald-300">
+                      <Icon className="w-3 h-3" /> {m.label}
+                    </div>
+                    <div className="text-white/60 mt-1">{m.blurb}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Verdict */}
+          <div className="mt-6">
+            <div className="text-[10px] tracking-[0.3em] text-red-400 mb-2">FINAL VERDICT</div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <button onClick={() => commit("COMPLY_NOW")}
+                className="p-3 border border-white/20 rounded text-sm hover:bg-white/5">
+                <HandCoins className="w-4 h-4 inline mr-1" /> COMPLY NOW
+              </button>
+              <button onClick={() => commit("REFUSE_REPORT")}
+                className="p-3 border border-white/20 rounded text-sm hover:bg-white/5">
+                <ShieldOff className="w-4 h-4 inline mr-1" /> REFUSE & REPORT
+              </button>
+              <button onClick={() => commit("HOLD_UNVERIFIED")}
+                className="p-3 border border-red-500/50 bg-red-950/30 rounded text-sm hover:bg-red-950/60 font-bold">
+                <ShieldCheck className="w-4 h-4 inline mr-1" /> HOLD — UNVERIFIED
+              </button>
+            </div>
+            <p className="text-[11px] text-white/40 mt-2">
+              HOLD refuses to transact until verification completes. If the case is a real request, HOLD then verifying = full win. Blank refusal on a real request = False Alarm.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── DEBRIEF ─────────────────────────────────────────────── */
+  if (stage === "debrief" && outcome) {
+    const win = outcome.kind === "WIN";
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <TopBar />
+        <div className="max-w-2xl mx-auto p-4 pt-10 space-y-6">
+          <div className={`border rounded-lg p-6 ${win ? "border-emerald-500/60 bg-emerald-950/30" : "border-red-700/60 bg-red-950/30"}`}>
+            <div className={`text-[10px] tracking-[0.4em] mb-2 ${win ? "text-emerald-400" : "text-red-400"}`}>
+              {win ? "CASE CLOSED — WIN" : "CASE CLOSED — LOSS"}
+            </div>
+            <div className="text-3xl font-black mb-1">{boss.codename}</div>
+            <div className="text-sm text-white/70">Variant: {variant.truth === "REAL" ? "TRUE REQUEST" : "IMPOSTER"}</div>
+
+            {win ? (
+              <div className="mt-4 space-y-3">
+                <div className="flex items-center gap-2 text-emerald-300"><Award className="w-4 h-4" /> Badge unlocked: <b>{boss.badge.label}</b></div>
+                <p className="text-white/80">{variant.debriefLine}</p>
+                <div className="border-t border-emerald-500/30 pt-3 mt-3">
+                  <div className="text-[10px] tracking-[0.3em] text-emerald-400 mb-1">FIELD MANUAL DECLASSIFIED</div>
+                  <div className="font-bold">{boss.methodPage.codename} — HOW IT WORKS</div>
+                  <p className="text-xs text-white/70 mt-1">{boss.methodPage.howItWorks}</p>
+                  <p className="text-xs text-white/70 mt-2"><b className="text-white">The trap:</b> {boss.methodPage.theTrap}</p>
+                  <p className="text-xs text-white/70 mt-2"><b className="text-white">The counter:</b> {boss.methodPage.theCounter}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-4 space-y-3">
+                <p className="text-red-200">{"reason" in outcome ? outcome.reason : ""}</p>
+                <div className="border-t border-red-500/30 pt-3 mt-3">
+                  <div className="text-[10px] tracking-[0.3em] text-red-400 mb-1">THE HANDLER</div>
+                  <p className="text-white/80 italic">
+                    "{boss.codename} is still out there. Come back when you're ready. Play any wing case first — I'll know when you're trained."
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Doctrine card — shareable, spoiler-safe */}
+            <div className="border-t border-white/10 pt-4 mt-6">
+              <div className="text-[10px] tracking-[0.4em] text-white/50 mb-2">THE DOCTRINE</div>
+              <ul className="space-y-1 text-sm">
+                {DOCTRINE_RULES.map((r) => (
+                  <li key={r.n} className="flex gap-3">
+                    <span className="text-white/50 font-mono">#{r.n}</span>
+                    <span>{r.rule}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="flex gap-3 pt-6">
+              <button onClick={() => navigate({ to: "/boss" })} className="flex-1 py-2 border border-white/20 rounded text-sm">
+                <Home className="w-3 h-3 inline mr-1" /> Boss lobby
+              </button>
+              {!win && (
+                <Link to="/mirror" className="flex-1 py-2 bg-white/10 rounded text-sm text-center">
+                  Complete training
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
