@@ -31,7 +31,6 @@ const TIER_NAMES: Record<TierId, string> = {
 };
 
 function CaseFiles() {
-  const gate = useJuniorGate("The Mirror");
   const navigate = useNavigate();
   const [profile, setProfile] = useState<TrustProfile | null>(null);
   const [citizen, setCitizen] = useState<Scenario[]>([]);
@@ -89,8 +88,6 @@ function CaseFiles() {
 
   const maxTier = profile ? unlockedMaxTier(profile) : 2;
   const tiers: TierId[] = [1, 2, 3, 4, 5];
-
-  if (gate) return gate;
 
   return (
     <div className="min-h-screen grain">

@@ -34,7 +34,6 @@ export const Route = createFileRoute("/feed/$caseId")({
 type Phase = "brief" | "sim" | "verdict" | "reveal" | "debrief";
 
 function FeedPlay() {
-  const gate = useJuniorGate("The Feed");
   const { scenario } = Route.useLoaderData();
   const [phase, setPhase] = useState<Phase>("brief");
   const [state, setState] = useState<FeedState>(() => initFeedState());

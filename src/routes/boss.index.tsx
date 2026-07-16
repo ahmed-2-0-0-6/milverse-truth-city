@@ -20,7 +20,6 @@ export const Route = createFileRoute("/boss/")({
 });
 
 function BossLobby() {
-  const gate = useJuniorGate("Boss Protocol");
   const [prof, setProf] = useState<ReturnType<typeof loadBossProfile> | null>(null);
   useEffect(() => {
     setProf(loadBossProfile());
@@ -28,8 +27,6 @@ function BossLobby() {
     window.addEventListener("milverse:boss", on);
     return () => window.removeEventListener("milverse:boss", on);
   }, []);
-
-  if (gate) return gate;
 
   return (
     <div className="min-h-screen bg-black text-white">

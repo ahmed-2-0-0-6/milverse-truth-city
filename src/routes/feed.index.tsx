@@ -24,8 +24,6 @@ const TIER_NAMES: Record<1 | 2 | 3, string> = {
 };
 
 function FeedIndex() {
-  const gate = useJuniorGate("The Feed");
-  if (gate) return gate;
   return (
     <div className="min-h-screen grain">
       <TopBar />
