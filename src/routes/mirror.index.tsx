@@ -90,6 +90,8 @@ function CaseFiles() {
   const maxTier = profile ? unlockedMaxTier(profile) : 2;
   const tiers: TierId[] = [1, 2, 3, 4, 5];
 
+  if (gate) return gate;
+
   return (
     <div className="min-h-screen grain">
       <TopBar />
