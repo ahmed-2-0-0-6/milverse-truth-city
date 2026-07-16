@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { TopBar } from "@/components/TopBar";
 import { fetchPilotGroup } from "@/lib/pilot.functions";
-import { LESSONS, TOTAL_LESSONS } from "@/lib/firstPhone/lessons";
+import { LESSONS, TOTAL_LESSONS, type JuniorTactic } from "@/lib/firstPhone/lessons";
 import { loadFirstPhone, joinFamily } from "@/lib/firstPhone/profile";
 import { JUNIOR_COPY } from "@/lib/firstPhone/copy";
 import { Users, Copy, Check, ShieldCheck } from "lucide-react";
@@ -79,6 +79,14 @@ function FamilyPage() {
   });
   const lessonList = Array.from(lessonsDone).sort((a, b) => a - b);
   const licenseIssued = lessonsDone.has(10);
+
+  // Real tactic mastery: unique tactics across the completed lessons.
+  const tacticSet = new Set<JuniorTactic>();
+  lessonList.forEach((n) => {
+    const lesson = LESSONS.find((l) => l.n === n);
+    lesson?.cases.forEach((c) => tacticSet.add(c.tactic));
+  });
+  const tacticsMastered = tacticSet.size;
 
   return (
     <div className="min-h-screen grain">
@@ -163,7 +171,7 @@ function FamilyPage() {
             <div className="font-mono text-[10px] tracking-widest text-primary">DASHBOARD · CODE {parentCode}</div>
             <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
               <StatBox label="LESSONS" value={`${lessonList.length} / ${TOTAL_LESSONS}`} />
-              <StatBox label="TACTICS" value={String(Math.min(lessonList.length, 8))} />
+              <StatBox label="TACTICS" value={String(tacticsMastered)} />
               <StatBox label="TREND" value={lessonList.length >= 3 ? "↑ improving" : "warming up"} />
               <StatBox label="LICENSE" value={licenseIssued ? "ISSUED" : "in progress"} tone={licenseIssued ? "good" : undefined} />
             </div>
