@@ -180,31 +180,69 @@ export function ScrollStory() {
           THE DISTRICTS · SCROLL →
         </div>
         <div ref={trackRef} className="flex gap-6 pl-8 pr-8 h-screen items-center will-change-transform">
-          {DISTRICTS.map((d) => (
-            <div key={d.key} className="relative shrink-0 w-[78vw] max-w-[720px] aspect-[4/5] rounded-sm overflow-hidden border border-white/10"
-                 style={{ boxShadow: `0 30px 80px -20px rgba(${d.glow},0.35)` }}>
-              <img src={d.art} alt="" loading="lazy" width={1536} height={1024}
-                   className="absolute inset-0 h-full w-full object-cover kenburns" />
-              <DistrictLiveFX district={d.key as DistrictKey} />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-              <div className="absolute inset-0 opacity-20 mix-blend-overlay dot-drift" style={{
-                backgroundImage: "radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px)", backgroundSize: "3px 3px",
-              }} />
-              <div className="absolute inset-0 pointer-events-none scan-sheen" aria-hidden />
-              <div className="absolute inset-0 pointer-events-none mix-blend-screen opacity-40"
-                   style={{ background: `radial-gradient(60% 40% at 50% 60%, rgba(${d.glow},0.35), transparent 70%)`, animation: "district-pulse 4.5s ease-in-out infinite" }}
-                   aria-hidden />
-              <div className="absolute bottom-0 left-0 right-0 p-8">
-                <div className="stencil text-[10px] mb-2" style={{ color: `rgb(${d.glow})` }}>{d.tag}</div>
-                <h3 className="text-5xl font-black text-white tracking-tight" style={{ fontFamily: '"Bebas Neue", sans-serif', textShadow: `0 0 24px rgba(${d.glow},0.45)` }}>
-                  {d.label}
-                </h3>
-              </div>
-              <div className="absolute top-4 right-4 stencil text-[9px] text-white/50 border border-white/20 px-2 py-1">
-                DIST · 0{DISTRICTS.indexOf(d) + 1}
-              </div>
-            </div>
-          ))}
+          {DISTRICTS.map((d) => {
+            const isSubmerging = submerging === d.key;
+            const dimmed = submerging && !isSubmerging;
+            return (
+              <button
+                key={d.key}
+                type="button"
+                onClick={() => submerge(d.href, d.key)}
+                aria-label={`Enter ${d.label}`}
+                className={`district-card group relative shrink-0 w-[78vw] max-w-[720px] aspect-[4/5] rounded-sm overflow-hidden border border-white/10 text-left transition-all duration-500 ${isSubmerging ? "submerging" : ""} ${dimmed ? "opacity-20 scale-95" : ""}`}
+                style={{ boxShadow: `0 30px 80px -20px rgba(${d.glow},0.45)`, ["--glow" as string]: d.glow }}
+              >
+                {d.video ? (
+                  <video
+                    src={d.video}
+                    autoPlay muted loop playsInline
+                    className="absolute inset-0 h-full w-full object-cover kenburns"
+                  />
+                ) : (
+                  <img src={d.art} alt="" loading="lazy" width={1536} height={1024}
+                       className="absolute inset-0 h-full w-full object-cover kenburns" />
+                )}
+                <DistrictLiveFX district={d.key as DistrictKey} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                <div className="absolute inset-0 opacity-20 mix-blend-overlay dot-drift" style={{
+                  backgroundImage: "radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px)", backgroundSize: "3px 3px",
+                }} />
+                {/* animated scanlines */}
+                <div className="absolute inset-0 pointer-events-none scanlines-live opacity-30" aria-hidden />
+                {/* moving sheen */}
+                <div className="absolute inset-0 pointer-events-none scan-sheen" aria-hidden />
+                {/* neon flicker vignette */}
+                <div className="absolute inset-0 pointer-events-none neon-flicker-edge"
+                     style={{ boxShadow: `inset 0 0 80px rgba(${d.glow},0.35), inset 0 0 180px rgba(${d.glow},0.15)` }}
+                     aria-hidden />
+                {/* pulsing color glow */}
+                <div className="absolute inset-0 pointer-events-none mix-blend-screen opacity-40"
+                     style={{ background: `radial-gradient(60% 40% at 50% 60%, rgba(${d.glow},0.35), transparent 70%)`, animation: "district-pulse 4.5s ease-in-out infinite" }}
+                     aria-hidden />
+                {/* hover chromatic ripple */}
+                <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                     style={{ background: `conic-gradient(from 0deg at 50% 50%, transparent, rgba(${d.glow},0.18), transparent 60%)`, animation: "district-swirl 8s linear infinite" }}
+                     aria-hidden />
+                <div className="absolute bottom-0 left-0 right-0 p-8">
+                  <div className="stencil text-[10px] mb-2 tracking-widest" style={{ color: `rgb(${d.glow})` }}>{d.tag}</div>
+                  <h3 className="text-5xl font-black text-white tracking-tight glitch-flicker" style={{ fontFamily: '"Bebas Neue", sans-serif', textShadow: `0 0 24px rgba(${d.glow},0.55), 0 0 4px rgba(${d.glow},0.9)` }}>
+                    {d.label}
+                  </h3>
+                  <div className="mt-3 stencil text-[10px] text-white/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    CLICK TO ENTER →
+                  </div>
+                </div>
+                <div className="absolute top-4 right-4 stencil text-[9px] text-white/60 border border-white/20 px-2 py-1 hud-blink-slow">
+                  DIST · 0{DISTRICTS.indexOf(d) + 1}
+                </div>
+                {/* submerge wave */}
+                {isSubmerging && (
+                  <div className="absolute inset-0 pointer-events-none submerge-flash"
+                       style={{ background: `radial-gradient(circle at 50% 50%, rgba(${d.glow},0.8), rgba(0,0,0,0.95) 70%)` }} />
+                )}
+              </button>
+            );
+          })}
           <div className="shrink-0 w-8" />
         </div>
       </div>
