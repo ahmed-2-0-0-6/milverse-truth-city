@@ -28,6 +28,7 @@ export const Route = createFileRoute("/profile")({
 function ProfilePage() {
   const [profile, setProfile] = useState<TrustProfile | null>(null);
   const [manualUnlocks, setManualUnlocks] = useState(0);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setProfile(loadProfile());
@@ -137,7 +138,14 @@ function ProfilePage() {
             </div>
 
             {rankInfo.next && (
-              <div className="mt-5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className="mt-5 h-1.5 w-full overflow-hidden rounded-full bg-muted"
+                role="progressbar"
+                aria-label={`Progress to ${rankInfo.next.name}`}
+                aria-valuenow={Math.round(rankInfo.progress * 100)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
                 <div
                   className="h-full bg-primary transition-all"
                   style={{ width: `${Math.round(rankInfo.progress * 100)}%` }}
@@ -152,12 +160,37 @@ function ProfilePage() {
               <Stat label="FALSE ALARM" value={falseAlarms} tone="warn" />
             </div>
 
+            {total === 0 && (
+              <div className="mt-4 rounded-md border border-dashed border-border bg-background/50 p-4">
+                <div className="text-sm text-muted-foreground">
+                  No cases on record. The desk is clean — too clean.
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <Link
+                    to="/drop"
+                    className="inline-flex items-center rounded-md bg-primary px-3 py-1.5 stencil text-[10px] tracking-widest text-primary-foreground"
+                  >
+                    TODAY'S DROP
+                  </Link>
+                  <Link
+                    to="/mirror"
+                    className="inline-flex items-center rounded-md border border-border px-3 py-1.5 stencil text-[10px] tracking-widest text-muted-foreground hover:text-foreground"
+                  >
+                    THE MIRROR
+                  </Link>
+                </div>
+              </div>
+            )}
+
             <div className="mt-4">
               <CalibrationQuadrant profile={profile} />
             </div>
 
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="rounded-md border border-border bg-background/50 p-3">
+              <Link
+                to="/manual"
+                className="rounded-md border border-border bg-background/50 p-3 transition-colors hover:border-primary/50"
+              >
                 <div className="stencil text-[10px] tracking-widest text-muted-foreground">
                   FIELD MANUAL
                 </div>
@@ -169,13 +202,16 @@ function ProfilePage() {
                     <div className="h-full bg-primary" style={{ width: `${manualPct}%` }} />
                   </div>
                 </div>
-              </div>
-              <div className="rounded-md border border-border bg-background/50 p-3">
+              </Link>
+              <Link
+                to="/studio"
+                className="rounded-md border border-border bg-background/50 p-3 transition-colors hover:border-primary/50"
+              >
                 <div className="stencil text-[10px] tracking-widest text-muted-foreground">
                   CASES DESIGNED
                 </div>
                 <div className="mt-1 text-lg font-semibold">{publishedCount}</div>
-              </div>
+              </Link>
             </div>
 
             <div className="mt-6 flex flex-wrap gap-2">
@@ -196,12 +232,15 @@ function ProfilePage() {
                       })
                       .catch(() => {});
                   } else {
-                    navigator.clipboard?.writeText(window.location.href);
+                    navigator.clipboard?.writeText(window.location.href).then(() => {
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    });
                   }
                 }}
                 className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 stencil text-[10px] tracking-widest text-muted-foreground hover:text-foreground"
               >
-                <Share2 className="h-3.5 w-3.5" /> SHARE
+                <Share2 className="h-3.5 w-3.5" /> {copied ? "LINK COPIED" : "SHARE"}
               </button>
             </div>
           </div>
