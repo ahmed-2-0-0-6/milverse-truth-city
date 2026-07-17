@@ -28,6 +28,7 @@ import {
 import { getDeviceId, logPilotEntry, getActiveGroup } from "@/lib/pilot";
 import { track, bucketStake, bucketStreak } from "@/lib/telemetry";
 import type { FeedScenario, FeedToolKind } from "@/lib/feed/scenarios";
+import { getManualEntry } from "@/lib/manual/entries";
 import { Flame, Radio, Coins, Search, Trophy, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/drop")({
@@ -198,7 +199,11 @@ function DropPage() {
                 {yesterday.scenario.tacticId && (
                   <>
                     {" "}
-                    · Tactic: <span className="text-foreground">{yesterday.scenario.tacticId}</span>
+                    · Tactic:{" "}
+                    <span className="text-foreground">
+                      {getManualEntry(yesterday.scenario.tacticId)?.name ??
+                        yesterday.scenario.tacticId}
+                    </span>
                   </>
                 )}
                 {" — "}Playable window closed at UTC+5 midnight.
@@ -290,7 +295,10 @@ function PostPlayState({
           <div className="mt-4 rounded-sm border border-border bg-background/50 p-3 text-sm">
             <div className="stencil text-[10px] text-primary">YOU JUST FACED</div>
             <div className="text-lg font-black mt-0.5">
-              {today.scenario.tacticId.replace(/-/g, " ").toUpperCase()}
+              {(
+                getManualEntry(today.scenario.tacticId)?.name ??
+                today.scenario.tacticId.replace(/-/g, " ")
+              ).toUpperCase()}
             </div>
             <div className="mt-1 text-xs text-muted-foreground">{today.scenario.truthNote}</div>
             <Link
