@@ -1826,3 +1826,33 @@ html[data-high-legibility="on"] [class*="text-shadow"],
 html[data-high-legibility="on"] .neon-flicker {
   text-shadow: none !important;
 }
+
+/* ---------- FIRST PHONE (junior surface) ---------- */
+/* Softer backdrop behind the junior phone frame. */
+.chat-shell-backdrop--junior {
+  background: radial-gradient(circle at 30% 20%, #1e293b 0%, #0b0f1a 60%, #05070d 100%);
+}
+
+/* Notification drop with a small shudder — used for the incoming case beat. */
+@keyframes shudder-in {
+  0% { transform: translateY(-8px) rotate(-0.5deg); opacity: 0; }
+  40% { transform: translateY(2px) rotate(0.4deg); opacity: 1; }
+  60% { transform: translateY(-1px) rotate(-0.3deg); }
+  100% { transform: translateY(0) rotate(0); opacity: 1; }
+}
+.animate-shudder-in { animation: shudder-in 420ms ease-out both; }
+
+/* Gentle attention pulse for the "current" lesson app on the home screen. */
+@keyframes pulse-soft {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.55); }
+  50% { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+}
+.animate-pulse-soft { animation: pulse-soft 1.8s ease-in-out infinite; }
+
+/* Reduced-motion respect */
+@media (prefers-reduced-motion: reduce) {
+  .animate-shudder-in,
+  .animate-pulse-soft { animation: none !important; }
+}
+html[data-force-reduce-motion="on"] .animate-shudder-in,
+html[data-force-reduce-motion="on"] .animate-pulse-soft { animation: none !important; }
