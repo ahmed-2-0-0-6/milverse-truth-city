@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { TopBar } from "@/components/TopBar";
 import { registerFamilyCode, regenerateFamilyCode, fetchFamilyProgress, checkFamilyCodeJoin } from "@/lib/family.functions";
 import { LESSONS, TOTAL_LESSONS, type JuniorTactic } from "@/lib/firstPhone/lessons";
