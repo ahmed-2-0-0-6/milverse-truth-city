@@ -343,10 +343,11 @@ export const SCENARIOS: Scenario[] = [
         "I'll fill you in properly Monday.",
       ],
       urgencyLines: [
-        "Need this done in the next hour.",
-        "Time-sensitive, please.",
-        "Client's waiting on me right now.",
+        "Need this done in the next hour, ideally.",
+        "Bit of a fire, sorry.",
+        "Client's on the other line waiting on me.",
       ],
+
       pushLines: [
         "Can you grab 4x ₹5,000 Amazon gift cards on your way? Photograph the codes and send them here.",
         "Just need those gift card codes — reimbursement Monday, promise.",
@@ -466,16 +467,17 @@ export const SCENARIOS: Scenario[] = [
     persona: {
       voice: "calm, authoritative, uses sir/ma'am, call-centre script",
       fillers: [
-        "Please stay with me.",
-        "I'm here to help you sir.",
-        "For your protection.",
-        "Standard fraud protocol.",
+        "Please stay on the line sir.",
+        "I'm here to help you sir, don't worry.",
+        "This is for your own account safety.",
+        "Standard fraud protocol sir, one moment.",
       ],
       urgencyLines: [
-        "We have less than 60 seconds.",
-        "If you delay, the money is gone.",
-        "Sir every second matters.",
+        "Sir hum ke paas 60 second se bhi kam hai.",
+        "Sir agar aap ne delay kiya to paisay chalay jayenge.",
+        "Sir har second mein transaction process ho raha hai.",
       ],
+
       pushLines: [
         "Please read out the 6-digit code you just received on SMS.",
         "I need that OTP to cancel the transaction — nothing else works.",
@@ -614,15 +616,16 @@ export const SCENARIOS: Scenario[] = [
     persona: {
       voice: "formal, respectful, polished bank-desk cadence — no exclamation marks",
       fillers: [
-        "For your safety sahib.",
-        "Standard procedure, please bear with me.",
-        "I understand your concern.",
-        "We handle 200 such cases a day, sahib.",
+        "This is for your account safety sahib.",
+        "Standard procedure sahib, kindly bear with me.",
+        "Sahib I fully understand your concern.",
+        "We handle nearly 200 such cases every day sahib.",
       ],
       urgencyLines: [
-        "The unauthorised debit will post in 4 minutes.",
-        "I need to close this ticket within the SLA sahib.",
+        "The unauthorised debit will post in under 4 minutes sahib.",
+        "Sahib I have to close this ticket within our SLA window.",
       ],
+
       pushLines: [
         "Please install the security app I've just sent — it's a 30-second verification.",
         "Then read out the 6-digit SMS code and last 4 digits of your PIN. That's all.",
