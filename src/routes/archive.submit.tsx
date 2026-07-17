@@ -2,6 +2,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { TopBar } from "@/components/TopBar";
 import { ArrowLeft, CheckCircle2, AlertTriangle } from "lucide-react";
 import { submitStory } from "@/lib/story.functions";
@@ -30,7 +31,6 @@ function localPiiCheck(...vals: string[]): string | null {
 }
 
 function SubmitStory() {
-  const [step, setStep] = useState(1);
   const [what, setWhat] = useState("");
   const [channel, setChannel] = useState<"text" | "call" | "forward" | "in_person" | "other">("text");
   const [wanted, setWanted] = useState("");
@@ -49,7 +49,9 @@ function SubmitStory() {
     setErr(null);
     const pii = localPiiCheck(what, wanted, tell, pattern);
     if (pii) {
-      setErr(`Please rewrite without the ${pii}. We only publish tactics — never real identities.`);
+      const msg = `Please rewrite without the ${pii}. We only publish tactics — never real identities.`;
+      setErr(msg);
+      toast.error("Contains identifying info", { description: msg });
       return;
     }
     setBusy(true);
@@ -68,9 +70,12 @@ function SubmitStory() {
           deviceId: getDeviceId(),
         } as never,
       });
+      toast.success("Story received", { description: "A human reviewer will read it and, if approved, turn it into a training mission." });
       setDone(true);
     } catch (e) {
-      setErr((e as Error).message ?? "Submission failed. Try again.");
+      const msg = (e as Error).message ?? "Submission failed. Try again.";
+      setErr(msg);
+      toast.error("Submission failed", { description: msg });
     }
     setBusy(false);
   }

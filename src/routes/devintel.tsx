@@ -5,6 +5,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { TopBar } from "@/components/TopBar";
 import { Lock, Radio, ClipboardCopy, CheckCircle2, XCircle, AlertTriangle, Clock } from "lucide-react";
 import {
@@ -49,8 +50,11 @@ function DevIntelPage() {
       const b = await listBriefsFn({ data: { passcode } });
       setBriefs((b as unknown as { rows: typeof briefs }).rows);
       setAuthed(true);
+      toast.success("Intel desk unlocked");
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Access denied.");
+      const msg = e instanceof Error ? e.message : "Access denied.";
+      setErr(msg);
+      toast.error("Access denied", { description: msg });
     } finally { setBusy(false); }
   }
 
@@ -59,7 +63,12 @@ function DevIntelPage() {
     try {
       const s = await fetchIntelFn({ data: { passcode } });
       setIntel(s);
-    } catch (e) { setErr(e instanceof Error ? e.message : String(e)); }
+      toast.success("Intel refreshed");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setErr(msg);
+      toast.error("Refresh failed", { description: msg });
+    }
     finally { setBusy(false); }
   }
 
@@ -70,7 +79,12 @@ function DevIntelPage() {
       const b = await listBriefsFn({ data: { passcode } });
       setBriefs((b as unknown as { rows: typeof briefs }).rows);
       setTab("briefs");
-    } catch (e) { setErr(e instanceof Error ? e.message : String(e)); }
+      toast.success("New brief generated");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setErr(msg);
+      toast.error("Brief generation failed", { description: msg });
+    }
     finally { setBusy(false); }
   }
 
