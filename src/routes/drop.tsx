@@ -70,6 +70,15 @@ function DropPage() {
   const yesterday = useMemo(() => yesterdaysDailyCase(), []);
   const [showYesterday, setShowYesterday] = useState(false);
 
+  // Midnight rollover (UTC+5): a tab left open past 00:00 would otherwise
+  // freeze on yesterday's case with a stuck countdown. When the ticking
+  // clock crosses into a new dateKey, reload — cleanest way to refresh
+  // case, status, and every child mid-flow state at once.
+  useEffect(() => {
+    if (!hydrated || now === 0) return;
+    if (dropDateKey(new Date(now)) !== today.dateKey) window.location.reload();
+  }, [hydrated, now, today.dateKey]);
+
   // NOTE: we deliberately do NOT re-read status on `milverse:profile`. The
   // child PlayFlow calls onDone() itself once the cinematic is finished; if we
   // synced on every profile ping, committing the play would immediately flip
