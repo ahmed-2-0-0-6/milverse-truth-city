@@ -325,8 +325,16 @@ function PilotPage() {
                 <p className="mt-3 text-sm text-muted-foreground">
                   Share the code so students can join on their own devices. Each device logs its
                   outcomes to group <span className="font-mono text-foreground">{active}</span>.
-                  {cloudErr && <span className="block mt-1 text-caution text-xs">{cloudErr}</span>}
                 </p>
+                {cloudErr && (
+                  <div className="mt-3">
+                    <ErrorState
+                      title="Pilot service unreachable"
+                      message={cloudErr}
+                      onRetry={() => { setCloudErr(null); void refreshCloud(); }}
+                    />
+                  </div>
+                )}
               </div>
             )}
 {sample && (
