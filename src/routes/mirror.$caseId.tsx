@@ -27,6 +27,7 @@ import { RealCaseFile } from "@/components/RealCaseFile";
 import { RookieIntro } from "@/components/handler/RookieIntro";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 import { TacticStamp } from "@/components/TacticStamp";
+import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
 import { TacticFlash } from "@/components/TacticFlash";
 import { tacticForMirror } from "@/lib/mirror/tactics";
 import { ChatShell } from "@/components/chat/ChatShell";
@@ -941,6 +942,12 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
 function Debrief({ scenario }: { scenario: Scenario }) {
   const navigate = useNavigate();
   const sim = useMemo(() => loadSim(), []);
+  const [profileSnap, setProfileSnap] = useState(() => loadProfile());
+  useEffect(() => {
+    const on = () => setProfileSnap(loadProfile());
+    window.addEventListener("milverse:profile", on);
+    return () => window.removeEventListener("milverse:profile", on);
+  }, []);
   const verdictRaw = useMemo(() => {
     try {
       const raw = sessionStorage.getItem(VERDICT_KEY);
@@ -1159,6 +1166,8 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       </div>
 
       <TacticStamp tacticId={tacticForMirror(scenario.id)} />
+
+      <CalibrationQuadrant profile={profileSnap} compact caption="CALIBRATION · AFTER THIS CASE" />
 
       {/* 4-axis star scoring */}
       <section className="rounded-xl border border-border bg-card p-6">

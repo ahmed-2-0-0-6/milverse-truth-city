@@ -12,6 +12,7 @@ import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp, RANKS } from "@/lib/ranks";
 import { HandlersReading } from "@/components/handler/HandlersReading";
 import { WeeklyEval } from "@/components/handler/WeeklyEval";
+import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
 import { Download, Share2 } from "lucide-react";
 
 export const Route = createFileRoute("/profile")({
@@ -151,13 +152,11 @@ function ProfilePage() {
               <Stat label="FALSE ALARM" value={falseAlarms} tone="warn" />
             </div>
 
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="rounded-md border border-border bg-background/50 p-3">
-                <div className="stencil text-[10px] tracking-widest text-muted-foreground">
-                  CALIBRATION
-                </div>
-                <div className="mt-1 text-lg font-semibold">{cal.label}</div>
-              </div>
+            <div className="mt-4">
+              <CalibrationQuadrant profile={profile} />
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="rounded-md border border-border bg-background/50 p-3">
                 <div className="stencil text-[10px] tracking-widest text-muted-foreground">
                   FIELD MANUAL
