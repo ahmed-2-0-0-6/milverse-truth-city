@@ -1075,6 +1075,69 @@
   color: oklch(0.4 0.15 25);
 }
 
+/* Unified section anatomy for The Daily Mirage sub-sections.
+   Every section (Forgery, Social, Classifieds, Puzzle, Ledger, Editorial,
+   RealWorld) shares the same kicker → lede → body → action rhythm so the
+   paper reads like one composed edition, not eight separate widgets. */
+.paper-section {
+  margin-top: 0.25rem;
+}
+.paper-section-kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--paper-muted);
+}
+.paper-section-lede {
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  margin-top: 0.5rem;
+  color: var(--paper-ink);
+}
+
+/* Buttons: two shapes only across the paper. */
+.paper-btn {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.9rem;
+  border: 2px solid var(--paper-ink);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--paper-ink);
+  transition: background 160ms ease, transform 160ms ease;
+}
+.paper-btn:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--paper-ink) 6%, transparent);
+}
+.paper-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.paper-btn-primary {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 0.6rem 1rem;
+  border: 3px double var(--paper-ink);
+  border-radius: 2px;
+  background: var(--paper-ink);
+  color: var(--paper-bg);
+  transition: opacity 160ms ease;
+}
+.paper-btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+.paper-btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 @keyframes paper-unfold {
   0% {
     opacity: 0;
