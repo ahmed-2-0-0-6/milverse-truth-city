@@ -13,6 +13,13 @@ import { DailyBeacon } from "@/components/DailyBeacon";
 import { useVisualMode } from "@/lib/visual-quality";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { property: "og:url", content: "https://milverse-truth-city.lovable.app/" },
+      { property: "og:type", content: "website" },
+    ],
+    links: [{ rel: "canonical", href: "https://milverse-truth-city.lovable.app/" }],
+  }),
   component: CityMap,
 });
 
