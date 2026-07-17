@@ -1,77 +1,69 @@
-# FIRST PHONE — Implementation Plan
+# Mil-Verse v2 — Phased Polish Plan
 
-A big multi-surface feature. Before I write ~15+ files I want to lock scope so I don't over-build.
+Goal: a premium, editorial, trustworthy feel across every route. Visuals + UX states only. Game engines, scenarios, scoring, assessment items, daily/boss/firstPhone logic, and DB schemas stay untouched.
 
-## Scope (5 parts)
+## Guardrails (unchanged from prior fix-packs)
+- Do not touch: `boss/engine.ts`, `feed/engine.ts`, `mirror/engine.ts`, scenario dialogue, scoring, assessment items, daily stake math, schemas.
+- Do not touch auto-generated files (`routeTree.gen.ts` except when routes change, supabase `client.ts`, `types.ts`, etc.).
+- No new secrets, no new backend features, no new npm packages unless strictly required (aim: zero).
+- All work in frontend/presentation layer.
 
-### Part 1 — Junior Register (mode toggle)
-- Add `firstPhone: { active, kidCityName, familyCode, lessonsCompleted[], licenseIssuedAt }` to existing profile store (additive, no schema change).
-- Toggle in `/profile` + first-run setup on `/first-phone`.
-- Junior mode = filter case pools by `junior: true` tag; softened copy strings gated behind a `useJuniorMode()` hook read at render (no engine changes).
-- Tag existing safe cases across Mirror / Feed / Daily as junior. Report the list in the final report.
-- Stake slider relabel + loss-screen coaching copy via junior-mode text swap only.
+## Phase 1 — Design system foundation
+Files: `src/styles.css`, `tailwind` tokens via `@theme`, a new `src/components/ui/` primitives review.
 
-### Part 2 — Tell-a-Trusted-Adult protocol move
-- Config-level: reuse boss engine's `protocolMove` pattern. Add `trustedAdult?: { line: string }` to junior case configs; when junior mode active, Mirror/Feed case screens render a persistent "TELL A TRUSTED ADULT" chip beside reply chips.
-- Tapping it: renders a short scene (adult's line from config), resolves as `correct` result-class, credits calibration, debrief celebrates the reflex.
-- Zero engine rewrite — chip lives in the case-screen UI layer, calls existing verdict resolver with `result: "correct"` and a flavor override.
+- Refine typographic scale: introduce editorial pair (display serif + neutral sans) via `<link>` in `__root.tsx` head, wire family names in `@theme` under `--font-display` / `--font-sans`. Keep existing high-legibility mode override intact.
+- Tighten spacing scale, radius tokens (`--radius-sm/md/lg/xl`), elevation tokens (`--shadow-1..4`), and semantic surfaces (`--surface`, `--surface-muted`, `--surface-raised`, `--border-subtle`, `--border-strong`).
+- Contrast pass on `--muted-foreground`, timestamps, byline text — ensure ≥4.5:1 in both default and high-legibility modes.
+- Add motion tokens (`--ease-out-soft`, `--dur-fast/med/slow`) and `prefers-reduced-motion` short-circuits.
+- Focus-visible ring token (`ring-3 ring-ring/60`) applied to all interactive primitives.
 
-### Part 3 — 10-Lesson Path (/first-phone)
-- Transit-line vertical map reusing existing map/blueprint visual language (DistrictBlueprint styling).
-- 10 lesson nodes; each has: 3-sentence teaching card + 1–2 curated case IDs.
-- 4 NEW junior cases to build (game-currency giveaway, classmate OTP impersonation, chain-forward curse, school-closed rumor) — added to Feed/Mirror scenario files with `junior: true`, fictional platforms.
-- Progress unlocks sequentially; state in profile store.
-- L10 completion triggers celebration beat + issues license.
+## Phase 2 — Navigation & IA
+Files: `src/routes/__root.tsx`, new `src/components/site/{SiteHeader,SiteFooter,NavLink}.tsx`.
 
-### Part 4 — Family Code (/family)
-- **Reuse pilot infrastructure** — same `pilot_entries` table, add `wing: "junior"` entries with a `group_code` prefixed `FAM-` (or a `family` flag column? — I'll do the prefix approach to avoid a migration).
-- Parent dashboard queries `fetchPilotGroup` filtered to junior wing.
-- Dashboard shows ONLY: lessons completed count, badges, tactics mastered, calibration arrow, license status. No message content is ever logged for junior wing (enforced in the logger — junior entries include only `caseId`, `result`, `lesson number`).
-- Plain-language parent copy + the promise line.
+- Single sticky top nav with clear grouping: Play (/), Learn (/first-phone, /charter), For Educators (/educators), For Family (/family), Visit (/visit).
+- Mobile: drawer with the same grouping; keyboard traversable; ESC to close; focus trap.
+- Breadcrumb-less; use route titles + a subtle section eyebrow instead.
+- Footer: three columns (Product, For Adults, About) + safety disclaimer line already established in Fix-Pack C.
+- Skip-to-content link, single `<main>` in root layout only.
 
-### Part 5 — First Phone License + Parent Pitch
-- License card: reuse canvas receipt/profile-card render pattern → PNG download + `@media print` A5 stylesheet.
-- `/first-phone` shows parent pitch when program inactive, kid path when active.
-- Cross-links from `/educators` and Charter Article II.
+## Phase 3 — Landing + marketing routes
+Files: `src/routes/index.tsx`, `src/routes/educators.tsx`, `src/routes/family.tsx`, `src/routes/charter.tsx`, `src/routes/visit.tsx`.
 
-## Files (new)
-- `src/lib/firstPhone/profile.ts` — junior state on profile
-- `src/lib/firstPhone/lessons.ts` — 10-lesson config
-- `src/lib/firstPhone/juniorCases.ts` — 4 new cases
-- `src/lib/firstPhone/copy.ts` — junior register text map
-- `src/hooks/useJuniorMode.ts`
-- `src/components/firstPhone/LessonPath.tsx`
-- `src/components/firstPhone/TrustedAdultChip.tsx` + scene modal
-- `src/components/firstPhone/LicenseCard.tsx` (canvas + print)
-- `src/components/firstPhone/ParentPitch.tsx`
-- `src/routes/first-phone.tsx`
-- `src/routes/family.tsx`
+- Landing: sharpen primary purpose in a single sentence hero; two CTAs (Play / Take the Visit); replace clutter with a 3-beat "how it works" strip and a "who it's for" card set.
+- Educators/Family/Charter: editorial layout — hero, pull quote, section cards, disclaimer band; consistent max-width and vertical rhythm.
+- Visit: unchanged mechanics; only shell/typography lift.
 
-## Files (edited, minimal)
-- profile store — add junior fields
-- `/profile` — toggle
-- Mirror + Feed case screens — mount TrustedAdultChip when junior + junior stake-slider label swap
-- Feed/Mirror scenario files — add `junior: true` tags to safe existing cases + append new junior cases
-- `/educators` + charter — link
+## Phase 4 — App shell routes (non-gameplay)
+Files: `src/routes/review.tsx`, `src/routes/assessment.tsx`, `src/routes/family.tsx` dashboards, `src/routes/pilot*`.
 
-## Guardrails baked in
-- Content lines: only scam/impersonation/misinfo/manipulation; fictional platforms in junior content (BloxBux not Roblox, GroupChat not WhatsApp).
-- Zero conversation content in family dashboard — junior logger writes only lesson/result/badge fields.
-- AI voice: unchanged, keeps existing hard fallbacks.
-- CINEMATIC/LITE + Access Panel: LessonPath + LicenseCard respect existing motion/quality tokens.
+- Consistent page header pattern (eyebrow + title + description + inline action slot).
+- Card grid rewrites using shared `Card`, `Stat`, `EmptyState`, `ErrorState`, `LoadingSkeleton` primitives.
+- Add skeletons for every server-fn read; add explicit empty states with a useful next action; error states with retry via `router.invalidate()`; toast (sonner) on save/regenerate/export.
+- Preserve all existing k-anonymity suppression and disclaimers.
 
-## Not doing (flagging so you can push back)
-- No engine rewrites, no new scoring, no schema migration.
-- Not touching boss wing at all (adult register).
-- Not building parent-side auth — Family Code is the same trust model as pilot codes (unlisted string).
-- Print stylesheet is basic A5; not doing a designed PDF export.
+## Phase 5 — Gameplay chrome polish (chrome only, zero logic)
+Files: `src/components/chat/{ChatHeader,ChatShell,StatusBar,NotificationBanner,CallScreen,BankConfirmSheet,ContactsSheet}.tsx`, `src/components/firstPhone/{LicenseCard,LessonPath,JuniorGate,TrustedAdultChip}.tsx`.
 
-## Question before I build
+- Spacing/typography alignment to new tokens; refined shadows; better disabled/validation/loading visuals on sheets.
+- No changes to state, engine calls, scoring, or scenario text.
 
-This is ~12 new files + edits across 6 existing surfaces. Two ways to ship:
+## Phase 6 — UX states sweep
+- Every server-fn call site gets: loading skeleton, empty state, error state with recovery, success toast.
+- Every form gets: inline validation, disabled submit while pending, aria-invalid, aria-describedby error text.
+- Responsive audit at 360 / 768 / 1024 / 1440 using the responsive-layout patterns (grid+min-w-0+shrink-0 for header rows).
 
-**A) Full build in one pass** — all 5 parts, ~1 long turn, everything wired.
+## Phase 7 — Quality pass
+- Fix TS strictness issues surfaced along the way.
+- Delete any dead placeholder handlers, wire buttons that were no-ops.
+- Console-clean load on each route; a11y sweep (axe-style: button-name, contrast, single main, focus visible).
+- Update route `head()` metadata where the copy changed.
 
-**B) Vertical slice first** — Part 1 (junior mode toggle + copy) + Part 2 (Trusted-Adult move) + tag existing cases, ship it, then Parts 3–5 next turn. Safer for review.
+## Out of scope
+- Game engines, scenarios, scoring, assessment items, daily stake math, DB schemas.
+- New product features, search/filter, favorites, profile system.
+- Third-party packages, new secrets, deployment config.
 
-Which do you want? (If no answer, I'll do **A**.)
+## Delivery order
+I'll ship phase-by-phase, one message per phase, with a compact per-phase changelog. After each phase you can stop me, redirect, or continue.
+
+**Starting with Phase 1 (design system foundation) on approval.**
