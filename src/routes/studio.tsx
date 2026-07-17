@@ -12,7 +12,7 @@ import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp } from "@/lib/ranks";
 import { DistrictIntro } from "@/components/DistrictIntro";
 import studioArt from "@/assets/district-studio.jpg";
-import { Clapperboard, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { Clapperboard, ChevronLeft, ChevronRight, Sparkles, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
@@ -329,34 +329,36 @@ function Studio() {
             "Write the case they'll rehearse against. The city's next cases are written by players like you.",
           ]}
         />
-        <Link
-          to="/"
-          className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
-        >
-          ← CITY
-        </Link>
-
-        <div className="mt-4 mb-8">
-          <div className="flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-primary">
+        <header className="mt-6 mb-8 border-b border-border pb-4">
+          <div className="flex items-center justify-between gap-3">
+            <Link
+              to="/"
+              className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+            >
+              <ArrowLeft className="h-3 w-3" /> CITY
+            </Link>
+            <div className="font-mono text-[10px] tracking-widest text-muted-foreground tabular-nums">
+              STEP {step} / 5
+            </div>
+          </div>
+          <div className="mt-4 flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-primary">
             <Clapperboard className="h-4 w-4" /> THE STUDIO · CASE DESIGNER
           </div>
-          <h1 className="mt-2 text-3xl font-semibold">Design a case</h1>
-          <p className="mt-2 text-muted-foreground">
+          <h1 className="mt-2 text-3xl font-semibold leading-tight">Design a case</h1>
+          <p className="mt-2 text-muted-foreground max-w-xl">
             The city's next cases are written by players like you. 5 steps. LEARN → PLAY → DESIGN.
             Publish and share.
           </p>
-          <div className="mt-4 flex gap-1">
+          <div className="mt-4 flex gap-1" aria-label={`Progress: step ${step} of 5`}>
             {[1, 2, 3, 4, 5].map((n) => (
               <div
                 key={n}
-                className={`h-1 flex-1 rounded ${n <= step ? "bg-primary" : "bg-muted"}`}
+                className={`h-1 flex-1 rounded transition-colors ${n <= step ? "bg-primary" : "bg-muted"}`}
               />
             ))}
           </div>
-          <div className="mt-2 font-mono text-[10px] tracking-widest text-muted-foreground">
-            STEP {step}/5
-          </div>
-        </div>
+        </header>
+
 
         {step === 1 && (
           <Section title="THE MASK" hint="Who is the contact pretending to be?">
