@@ -159,9 +159,17 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AccessProvider>
         <VisualQualityProvider>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[200] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
+          >
+            Skip to content
+          </a>
           <AssessmentGate />
-          <Outlet />
+          <main id="main">
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+          </main>
           <BadgeToast />
           <AtmosphereLayer />
           <GlowCursor />

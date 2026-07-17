@@ -74,6 +74,24 @@
     min-height: 100vh;
   }
   .font-mono { font-family: var(--font-mono); }
+
+  /* Consistent accessible focus ring for every interactive element that
+     doesn't already opt into a custom one. Uses design-system tokens. */
+  :where(a, button, [role="button"], input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-ring) 55%, transparent);
+    border-radius: calc(var(--radius) - 2px);
+  }
+
+  /* Respect reduced motion — short-circuit expensive animations globally. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 /* Subtle paper grain — like a research report, not a battlefield */
