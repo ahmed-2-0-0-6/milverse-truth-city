@@ -343,10 +343,11 @@ export const SCENARIOS: Scenario[] = [
         "I'll fill you in properly Monday.",
       ],
       urgencyLines: [
-        "Need this done in the next hour.",
-        "Time-sensitive, please.",
-        "Client's waiting on me right now.",
+        "Need this done in the next hour, ideally.",
+        "Bit of a fire, sorry.",
+        "Client's on the other line waiting on me.",
       ],
+
       pushLines: [
         "Can you grab 4x ₹5,000 Amazon gift cards on your way? Photograph the codes and send them here.",
         "Just need those gift card codes — reimbursement Monday, promise.",
