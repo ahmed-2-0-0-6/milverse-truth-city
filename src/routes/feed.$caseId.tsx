@@ -22,6 +22,7 @@ import { CAST } from "@/lib/cast";
 import { FormatFrame } from "@/components/feed/FormatFrame";
 import { Toolbelt } from "@/components/feed/Toolbelt";
 import { TacticStamp } from "@/components/TacticStamp";
+import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
 import { TacticFlash } from "@/components/TacticFlash";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 import { RookieIntro } from "@/components/handler/RookieIntro";
