@@ -52,16 +52,10 @@ export function PaperPuzzle({
 
   if (puzzle.kind !== "headline_autopsy") {
     return (
-      <section className="mt-2">
-        <div className="paper-mono text-[10px] tracking-[0.3em] text-[color:var(--paper-muted)]">
-          SPOT THE TELL
-        </div>
-        <p className="paper-body no-dropcap mt-2 italic">{puzzle.clickbait}</p>
-        <button
-          onClick={reveal}
-          className="mt-3 border-2 px-3 py-1.5 paper-mono text-[11px] tracking-widest"
-          style={{ borderColor: "var(--paper-ink)" }}
-        >
+      <section className="paper-section">
+        <div className="paper-section-kicker">SPOT THE TELL</div>
+        <p className="paper-section-lede">{puzzle.clickbait}</p>
+        <button onClick={reveal} className="paper-btn mt-3">
           REVEAL
         </button>
         {revealed && <p className="paper-body no-dropcap mt-3">{puzzle.reveal}</p>}
@@ -70,14 +64,9 @@ export function PaperPuzzle({
   }
 
   return (
-    <section className="mt-2">
-      <div className="paper-mono text-[10px] tracking-[0.3em] text-[color:var(--paper-muted)]">
-        HEADLINE AUTOPSY · 60 SECONDS
-      </div>
-      <h3 className="paper-serif text-3xl mt-1" style={{ fontWeight: 900 }}>
-        The Puzzle Corner
-      </h3>
-      <p className="paper-body no-dropcap mt-2">
+    <section className="paper-section">
+      <div className="paper-section-kicker">HEADLINE AUTOPSY · 60 SECONDS</div>
+      <p className="paper-section-lede">
         Rearrange the words into the honest version of this clickbait.
       </p>
       <blockquote
@@ -86,6 +75,7 @@ export function PaperPuzzle({
       >
         “{puzzle.clickbait}”
       </blockquote>
+
 
       <div
         className="mt-4 border border-current/40 p-3 min-h-16 rounded-sm flex flex-wrap gap-2"
