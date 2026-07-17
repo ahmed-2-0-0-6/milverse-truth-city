@@ -120,7 +120,7 @@ export function HandoverMoment({ cityName, onDone }: Props) {
 
         <div className="mt-8 max-w-md mx-auto">
           <div className="text-lg font-semibold leading-snug">
-            Your first phone. Let's learn it before the world knows your number.
+            Your first phone. Learn it before the world learns your number.
           </div>
 
           {showPicker && (
