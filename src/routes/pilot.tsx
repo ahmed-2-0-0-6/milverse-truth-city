@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { TopBar } from "@/components/TopBar";
+import { ErrorState } from "@/components/ui/page-states";
 import {
   getActiveGroup, setActiveGroup, generateGroupCode,
   loadPilotLog, summarize, getDeviceId, type PilotEntry,
@@ -104,19 +106,25 @@ function PilotPage() {
     };
   }, [refreshLocal, refreshCloud]);
 
-  function create() { setActiveGroup(generateGroupCode()); }
+  function create() {
+    const c = generateGroupCode();
+    setActiveGroup(c);
+    toast.success("Pilot group created", { description: `Share code ${c} with your class.` });
+  }
   function join() {
     const c = code.trim().toUpperCase();
-    if (c.length < 4) return;
+    if (c.length < 4) { toast.error("Enter a 4-6 character code"); return; }
     setActiveGroup(c);
     setCode("");
+    toast.success(`Joined group ${c}`);
   }
-  function leave() { setActiveGroup(null); }
+  function leave() { setActiveGroup(null); toast("Left the pilot group"); }
   function copy() {
     if (!active) return;
     navigator.clipboard?.writeText(active);
     setCopied(true);
     setTimeout(() => setCopied(false), 1200);
+    toast.success("Code copied to clipboard");
   }
 
   const effectiveCloud = sample ? SAMPLE_ENTRIES : cloud;
@@ -180,6 +188,10 @@ function PilotPage() {
   }, [effectiveCloud]);
 
   function exportCsv() {
+    if (!cloud.length) {
+      toast.error("No cloud entries to export yet");
+      return;
+    }
     const rows = [
       ["ts_iso", "device_id", "wing", "case_id", "tier", "result", "points"].join(","),
       ...cloud.map((c) => [
@@ -199,6 +211,7 @@ function PilotPage() {
     a.download = `pilot-${active}-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+    toast.success(`Exported ${cloud.length} entries`);
   }
 
   return (
@@ -312,8 +325,16 @@ function PilotPage() {
                 <p className="mt-3 text-sm text-muted-foreground">
                   Share the code so students can join on their own devices. Each device logs its
                   outcomes to group <span className="font-mono text-foreground">{active}</span>.
-                  {cloudErr && <span className="block mt-1 text-caution text-xs">{cloudErr}</span>}
                 </p>
+                {cloudErr && (
+                  <div className="mt-3">
+                    <ErrorState
+                      title="Pilot service unreachable"
+                      description={cloudErr}
+                      onRetry={() => { setCloudErr(null); void refreshCloud(); }}
+                    />
+                  </div>
+                )}
               </div>
             )}
 {sample && (

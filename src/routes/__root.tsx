@@ -19,6 +19,7 @@ import { GlowCursor } from "@/components/GlowCursor";
 import { RouteWipe } from "@/components/RouteWipe";
 import { RankUpBeat } from "@/components/RankUpBeat";
 import { AssessmentGate } from "@/components/AssessmentGate";
+import { Toaster } from "@/components/ui/sonner";
 import { installTelemetry, track } from "@/lib/telemetry";
 
 function NotFoundComponent() {
@@ -171,6 +172,7 @@ function RootComponent() {
             <Outlet />
           </main>
           <BadgeToast />
+          <Toaster />
           <AtmosphereLayer />
           <GlowCursor />
           <RouteWipe />
