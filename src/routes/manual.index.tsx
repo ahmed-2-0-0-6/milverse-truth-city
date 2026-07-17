@@ -14,7 +14,7 @@ export const Route = createFileRoute("/manual/")({
       { title: "The Field Manual — MILVERSE" },
       {
         name: "description",
-        content: "A detective's codex of manipulation tactics. Every entry unlocks through play.",
+        content: "A detective's codex of manipulation tactics. Every entry opens through play.",
       },
       { property: "og:title", content: "The Field Manual — MILVERSE" },
       {

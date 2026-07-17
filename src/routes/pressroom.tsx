@@ -142,7 +142,7 @@ function PressroomPage() {
               onClick={auth}
               className="mt-3 w-full rounded-sm bg-primary text-primary-foreground stencil text-xs px-3 py-2"
             >
-              UNLOCK
+              OPEN THE DESK
             </button>
             {err && <p className="mt-3 text-destructive text-xs">{err}</p>}
           </div>
