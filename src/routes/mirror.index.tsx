@@ -181,7 +181,7 @@ function CaseFiles() {
                 ☠ SPECIAL CASE — BOSS PROTOCOL
               </div>
               <div className="font-black text-lg mt-1">Fact-checks will not save you.</div>
-              <div className="text-xs text-white/60 mt-1">
+              <div className="text-xs text-foreground/60 mt-1">
                 Capstone cases. Beatable only by protocol.
               </div>
             </div>
