@@ -171,9 +171,10 @@ export const generateHandlerLine = createServerFn({ method: "POST" })
         prompt: userMsg,
       });
       const raw = (result.text ?? "").trim();
-      // Basic guards: if empty, too long, or contains banned phrases → fallback.
-      const banned = /\b(anxiety|disorder|diagnos|trauma|as an ai|language model|i cannot)\b/i;
-      if (!raw || raw.length > 700 || banned.test(raw)) {
+      // Guards: empty, too long, banned register, or banned marketing words → fallback.
+      const banned =
+        /\b(anxiety|disorder|diagnos|trauma|as an ai|language model|i cannot|empower|unlock|seamless|dive in|dive into|journey|explore|discover|whether you'?re|in today'?s digital|it'?s important to note|welcome to|get ready to|exciting|amazing)\b/i;
+      if (!raw || raw.length > 700 || raw.includes("!") || banned.test(raw)) {
         return { text: data.fallback, source: "fallback" as const };
       }
       return { text: raw, source: "ai" as const };

@@ -88,18 +88,18 @@ export function computeLean(profile: TrustProfile): LeanReading {
     "drifting-trusting": {
       code: "L-02",
       label: "DRIFTING TRUSTING",
-      blurb: `You lean in a little too fast. Fixable.`,
+      blurb: `You agree a beat too early. Small fix.`,
     },
-    calibrated: { code: "L-03", label: "CALIBRATED", blurb: `Balanced. Keep the head cold.` },
+    calibrated: { code: "L-03", label: "CALIBRATED", blurb: `Balanced week. Keep the head cold.` },
     jumpy: {
       code: "L-04",
       label: "JUMPY",
-      blurb: `${alarms} clean messages flagged. Real people paid the price.`,
+      blurb: `${alarms} clean messages flagged. Real people paid for those.`,
     },
     "fortress-mind": {
       code: "L-05",
       label: "FORTRESS MIND",
-      blurb: `Nothing gets through — including things that should. That's a cost.`,
+      blurb: `Nothing gets through — including things that should. That has a cost.`,
     },
   };
   return { id, ...map[id], score, totalCalls };
@@ -268,11 +268,11 @@ export function computeReading(
     directive =
       "Slow down before you agree. When the clock's loud, that IS the attack — probe first.";
   } else if (lean.id === "jumpy" || lean.id === "fortress-mind") {
-    directive = "Not every stranger is a threat. Prove REAL as hard as you prove FAKE.";
+    directive = "Not every stranger's a threat. Prove REAL as hard as you prove FAKE.";
   } else if (wager.id === "overconfident") {
-    directive = "Ease off the stake until the read is airtight.";
+    directive = "Ease off the stake until the read's airtight.";
   } else if (wager.id === "timid") {
-    directive = "Stake matches your read. Bet the reads you'd bet with your own money.";
+    directive = "Stake what you'd bet with your own Eidi. The read's already there.";
   } else {
     directive = "Hold the line. Push into a tactic you haven't drilled.";
   }
