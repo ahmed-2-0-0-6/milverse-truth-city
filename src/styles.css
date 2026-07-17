@@ -1253,6 +1253,14 @@ html[data-force-reduce-motion="on"] .marquee-track {
   .paper-halftone {
     filter: grayscale(1) contrast(1.3);
   }
+  /* A printed edition is a read-only artifact — verdict buttons, stake
+     inputs and reveal controls mean nothing on paper. */
+  .paper button,
+  .paper input,
+  .paper textarea,
+  .paper select {
+    display: none !important;
+  }
 }
 
 /* ── District live overlays (DistrictLiveFX) ────────────────────
