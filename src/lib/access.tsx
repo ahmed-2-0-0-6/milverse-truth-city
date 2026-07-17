@@ -53,7 +53,9 @@ export function AccessProvider({ children }: { children: ReactNode }) {
         apply(p);
         return;
       }
-    } catch {}
+    } catch {
+      /* localStorage unavailable */
+    }
     apply(DEFAULTS);
   }, []);
 
@@ -62,7 +64,9 @@ export function AccessProvider({ children }: { children: ReactNode }) {
       const next = { ...prev, [k]: v };
       try {
         localStorage.setItem(KEY, JSON.stringify(next));
-      } catch {}
+      } catch {
+        /* localStorage unavailable */
+      }
       apply(next);
       if (typeof window !== "undefined") window.dispatchEvent(new Event("milverse:access"));
       return next;
@@ -73,7 +77,9 @@ export function AccessProvider({ children }: { children: ReactNode }) {
     setPrefs(DEFAULTS);
     try {
       localStorage.removeItem(KEY);
-    } catch {}
+    } catch {
+      /* localStorage unavailable */
+    }
     apply(DEFAULTS);
     if (typeof window !== "undefined") window.dispatchEvent(new Event("milverse:access"));
   };
