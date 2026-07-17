@@ -96,14 +96,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "MILVERSE — Train your trust" },
       {
         property: "og:description",
-        content: "Verify people, verify claims, and calibrate your trust — by doing, not by reading tips.",
+        content:
+          "Verify people, verify claims, and calibrate your trust — by doing, not by reading tips.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "MILVERSE — Train your trust" },
-      { name: "twitter:description", content: "Verify people, verify claims, and calibrate your trust — by doing, not by reading tips." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2d5a6420-ffd9-4775-8625-21924b3f113e/id-preview-9a528e14--b1bda37d-f290-471e-8242-1f3cfcf0f7d7.lovable.app-1784092810821.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2d5a6420-ffd9-4775-8625-21924b3f113e/id-preview-9a528e14--b1bda37d-f290-471e-8242-1f3cfcf0f7d7.lovable.app-1784092810821.png" },
+      {
+        name: "twitter:description",
+        content:
+          "Verify people, verify claims, and calibrate your trust — by doing, not by reading tips.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2d5a6420-ffd9-4775-8625-21924b3f113e/id-preview-9a528e14--b1bda37d-f290-471e-8242-1f3cfcf0f7d7.lovable.app-1784092810821.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2d5a6420-ffd9-4775-8625-21924b3f113e/id-preview-9a528e14--b1bda37d-f290-471e-8242-1f3cfcf0f7d7.lovable.app-1784092810821.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -112,7 +125,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // The Daily Mirage — newsprint fonts (loaded via <link> per Tailwind v4 remote-import rule).
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" } as never,
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=UnifrakturCook:wght@700&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=UnifrakturCook:wght@700&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -153,7 +169,9 @@ function RootComponent() {
       const search = ev.toLocation?.searchStr ?? "";
       send(pathname + search);
     });
-    return () => { unsub(); };
+    return () => {
+      unsub();
+    };
   }, [router]);
 
   return (

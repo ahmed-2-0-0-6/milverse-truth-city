@@ -12,7 +12,9 @@ function detectWebGL(): boolean {
   try {
     const c = document.createElement("canvas");
     return !!(c.getContext("webgl2") || c.getContext("webgl"));
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 function autoForceLite(): boolean {
@@ -25,7 +27,11 @@ function autoForceLite(): boolean {
   return false;
 }
 
-interface Ctx { mode: VisualMode; setMode: (m: VisualMode) => void; forced: boolean; }
+interface Ctx {
+  mode: VisualMode;
+  setMode: (m: VisualMode) => void;
+  forced: boolean;
+}
 const VisualCtx = createContext<Ctx>({ mode: "lite", setMode: () => {}, forced: false });
 
 export function VisualQualityProvider({ children }: { children: ReactNode }) {
@@ -34,7 +40,11 @@ export function VisualQualityProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const auto = autoForceLite();
-    if (auto) { setModeState("lite"); setForced(true); return; }
+    if (auto) {
+      setModeState("lite");
+      setForced(true);
+      return;
+    }
     let stored: VisualMode | null = null;
     try {
       const s = localStorage.getItem(KEY);
@@ -46,11 +56,15 @@ export function VisualQualityProvider({ children }: { children: ReactNode }) {
   const setMode = (m: VisualMode) => {
     if (forced) return;
     setModeState(m);
-    try { localStorage.setItem(KEY, m); } catch {}
+    try {
+      localStorage.setItem(KEY, m);
+    } catch {}
     if (typeof window !== "undefined") window.dispatchEvent(new Event("milverse:visual"));
   };
 
   return <VisualCtx.Provider value={{ mode, setMode, forced }}>{children}</VisualCtx.Provider>;
 }
 
-export function useVisualMode() { return useContext(VisualCtx); }
+export function useVisualMode() {
+  return useContext(VisualCtx);
+}

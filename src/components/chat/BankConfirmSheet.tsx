@@ -14,8 +14,14 @@ interface Props {
 }
 
 export function BankConfirmSheet({
-  open, amount, beneficiaryName, beneficiaryAccount, mismatchNote,
-  onCancel, onConfirm, reducedMotion,
+  open,
+  amount,
+  beneficiaryName,
+  beneficiaryAccount,
+  mismatchNote,
+  onCancel,
+  onConfirm,
+  reducedMotion,
 }: Props) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [holdProgress, setHoldProgress] = useState(0);
@@ -23,7 +29,12 @@ export function BankConfirmSheet({
   const startRef = useRef<number>(0);
   const HOLD_MS = reducedMotion ? 300 : 1200;
 
-  useEffect(() => { if (!open) { setHoldProgress(0); setDetailsOpen(false); } }, [open]);
+  useEffect(() => {
+    if (!open) {
+      setHoldProgress(0);
+      setDetailsOpen(false);
+    }
+  }, [open]);
 
   function beginHold() {
     startRef.current = Date.now();
@@ -47,18 +58,29 @@ export function BankConfirmSheet({
   // Keyboard equivalent: Enter/Space press-and-hold on the button also drives
   // the same beginHold/endHold pipeline via key events.
   function onKeyDown(e: ReactKeyboardEvent) {
-    if ((e.key === "Enter" || e.key === " ") && !e.repeat) { e.preventDefault(); beginHold(); }
-    if (e.key === "Escape") { e.preventDefault(); onCancel(); }
+    if ((e.key === "Enter" || e.key === " ") && !e.repeat) {
+      e.preventDefault();
+      beginHold();
+    }
+    if (e.key === "Escape") {
+      e.preventDefault();
+      onCancel();
+    }
   }
   function onKeyUp(e: ReactKeyboardEvent) {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); endHold(); }
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      endHold();
+    }
   }
 
   // Dialog-level ESC handled by button too; provide a second layer for AT users
   // who focus outside the button.
   useEffect(() => {
     if (!open) return;
-    function esc(e: KeyboardEvent) { if (e.key === "Escape") onCancel(); }
+    function esc(e: KeyboardEvent) {
+      if (e.key === "Escape") onCancel();
+    }
     document.addEventListener("keydown", esc);
     return () => document.removeEventListener("keydown", esc);
   }, [open, onCancel]);
@@ -75,13 +97,23 @@ export function BankConfirmSheet({
         {/* Bank-app header — noir, not iOS-clone */}
         <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-indigo-950 to-neutral-950 border-b border-white/10">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-indigo-500 text-white text-xs font-black shadow-md shadow-indigo-500/30">CP</div>
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-indigo-500 text-white text-xs font-black shadow-md shadow-indigo-500/30">
+              CP
+            </div>
             <div>
-              <div id="bank-sheet-title" className="text-sm font-semibold text-white">CitizenPay — Confirm transfer</div>
-              <div className="text-[10px] font-mono tracking-wider text-white/50">Confirm transfer</div>
+              <div id="bank-sheet-title" className="text-sm font-semibold text-white">
+                CitizenPay — Confirm transfer
+              </div>
+              <div className="text-[10px] font-mono tracking-wider text-white/50">
+                Confirm transfer
+              </div>
             </div>
           </div>
-          <button onClick={onCancel} className="p-1.5 min-h-11 min-w-11 flex items-center justify-center rounded-md text-white/60 hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 transition-colors" aria-label="Cancel transfer">
+          <button
+            onClick={onCancel}
+            className="p-1.5 min-h-11 min-w-11 flex items-center justify-center rounded-md text-white/60 hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 transition-colors"
+            aria-label="Cancel transfer"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -148,9 +180,13 @@ export function BankConfirmSheet({
             </span>
           </button>
           <div className="mt-3 text-center text-[11px] text-white/50">
-            Once confirmed, this cannot be reversed. Keyboard: press and hold <kbd className="font-mono">Enter</kbd>.
+            Once confirmed, this cannot be reversed. Keyboard: press and hold{" "}
+            <kbd className="font-mono">Enter</kbd>.
           </div>
-          <button onClick={onCancel} className="mt-4 w-full py-2 text-sm text-white/60 hover:text-white">
+          <button
+            onClick={onCancel}
+            className="mt-4 w-full py-2 text-sm text-white/60 hover:text-white"
+          >
             Cancel — go back to chat
           </button>
         </div>

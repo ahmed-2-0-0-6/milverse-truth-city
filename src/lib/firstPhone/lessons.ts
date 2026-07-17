@@ -14,8 +14,8 @@ export type JuniorTactic =
   | "group-chat";
 
 export interface JuniorAdultScene {
-  who: string;         // "Baba", "Ammi", "Nani", "Older cousin"
-  line: string;        // adult's short response
+  who: string; // "Baba", "Ammi", "Nani", "Older cousin"
+  line: string; // adult's short response
 }
 
 export interface JuniorCase {
@@ -67,10 +67,24 @@ export const LESSONS: Lesson[] = [
         sender: "Unknown number",
         truth: "SCAM",
         options: [
-          { id: "fwd", label: "Forward to 10 friends", correct: false, feedback: "Phones don't stop working from unforwarded messages. Forwarding spreads the trick." },
-          { id: "ignore", label: "Ignore and delete", correct: true, feedback: "Good instinct. Chain messages are a trick, not a warning." },
+          {
+            id: "fwd",
+            label: "Forward to 10 friends",
+            correct: false,
+            feedback:
+              "Phones don't stop working from unforwarded messages. Forwarding spreads the trick.",
+          },
+          {
+            id: "ignore",
+            label: "Ignore and delete",
+            correct: true,
+            feedback: "Good instinct. Chain messages are a trick, not a warning.",
+          },
         ],
-        adultScene: { who: "Baba", line: "Beta, that's a chain letter. They used to send these on paper too. Ignore." },
+        adultScene: {
+          who: "Baba",
+          line: "Beta, that's a chain letter. They used to send these on paper too. Ignore.",
+        },
         truthNote: "Chain forwards use fear to make you spread them. The threat is the giveaway.",
       },
     ],
@@ -80,8 +94,8 @@ export const LESSONS: Lesson[] = [
     title: "Free stuff isn't free",
     teach: [
       "Real prizes never ask for your password.",
-      "\"You won!\" without entering anything = someone is fishing.",
-      "The price for \"free\" is usually you.",
+      '"You won!" without entering anything = someone is fishing.',
+      'The price for "free" is usually you.',
     ],
     cases: [
       {
@@ -96,11 +110,24 @@ export const LESSONS: Lesson[] = [
         sender: "@bloxbux_official_giveaway",
         truth: "SCAM",
         options: [
-          { id: "send", label: "Send password to claim", correct: false, feedback: "Never send a password. Real companies never ask for it — ever." },
-          { id: "report", label: "Report and block", correct: true, feedback: "Sharp. Passwords stay with you. Reporting protects other kids." },
+          {
+            id: "send",
+            label: "Send password to claim",
+            correct: false,
+            feedback: "Never send a password. Real companies never ask for it — ever.",
+          },
+          {
+            id: "report",
+            label: "Report and block",
+            correct: true,
+            feedback: "Sharp. Passwords stay with you. Reporting protects other kids.",
+          },
         ],
-        adultScene: { who: "Older cousin", line: "That's a classic. They lock you out and sell your account. You just saved yours." },
-        truthNote: "Any \"free\" that costs your password is theft in a party hat.",
+        adultScene: {
+          who: "Older cousin",
+          line: "That's a classic. They lock you out and sell your account. You just saved yours.",
+        },
+        truthNote: 'Any "free" that costs your password is theft in a party hat.',
       },
     ],
   },
@@ -110,7 +137,7 @@ export const LESSONS: Lesson[] = [
     teach: [
       "The person who sent it isn't lying. They just believed it.",
       "Check the claim, not the friend.",
-      "If it says \"forward now\" or \"share to save\" — slow down.",
+      'If it says "forward now" or "share to save" — slow down.',
     ],
     cases: [
       {
@@ -125,10 +152,23 @@ export const LESSONS: Lesson[] = [
         sender: "Auntie Rehana",
         truth: "FAKE",
         options: [
-          { id: "share", label: "Share to family", correct: false, feedback: "Auntie is kind — but the claim isn't true. Sharing spreads it further." },
-          { id: "reply", label: "Reply politely: \"I checked, it isn't true\"", correct: true, feedback: "Respect the person, correct the claim. That's the move." },
+          {
+            id: "share",
+            label: "Share to family",
+            correct: false,
+            feedback: "Auntie is kind — but the claim isn't true. Sharing spreads it further.",
+          },
+          {
+            id: "reply",
+            label: 'Reply politely: "I checked, it isn\'t true"',
+            correct: true,
+            feedback: "Respect the person, correct the claim. That's the move.",
+          },
         ],
-        adultScene: { who: "Ammi", line: "Auntie means well. You can send her the real article — that's how we help." },
+        adultScene: {
+          who: "Ammi",
+          line: "Auntie means well. You can send her the real article — that's how we help.",
+        },
         truthNote: "Kind messenger, wrong message. Verify the claim before you pass it on.",
       },
     ],
@@ -154,11 +194,25 @@ export const LESSONS: Lesson[] = [
         sender: "@breakingnews_desi",
         truth: "FAKE",
         options: [
-          { id: "share", label: "Repost — people should see", correct: false, feedback: "The photo is real, but it's from a different country five years ago." },
-          { id: "check", label: "Reverse-image search first", correct: true, feedback: "Exactly. Real photo, wrong story. The tool caught it in one tap." },
+          {
+            id: "share",
+            label: "Repost — people should see",
+            correct: false,
+            feedback: "The photo is real, but it's from a different country five years ago.",
+          },
+          {
+            id: "check",
+            label: "Reverse-image search first",
+            correct: true,
+            feedback: "Exactly. Real photo, wrong story. The tool caught it in one tap.",
+          },
         ],
-        adultScene: { who: "Baba", line: "Look — same photo showed up in the news three years back, different country. Well spotted." },
-        truthNote: "Out-of-context images are the most-shared kind of fake. Reverse search is your friend.",
+        adultScene: {
+          who: "Baba",
+          line: "Look — same photo showed up in the news three years back, different country. Well spotted.",
+        },
+        truthNote:
+          "Out-of-context images are the most-shared kind of fake. Reverse search is your friend.",
       },
     ],
   },
@@ -180,14 +234,30 @@ export const LESSONS: Lesson[] = [
           "quick help: type the 6-digit code you just got, i need to log back into my game account",
           "urgent bhai please",
         ],
-        sender: "\"Ali\" (new number)",
+        sender: '"Ali" (new number)',
         truth: "IMPOSTER",
         options: [
-          { id: "send", label: "Send the code — Ali needs help", correct: false, feedback: "That code unlocks YOUR account, not theirs. Codes never help someone else in." },
-          { id: "call", label: "Call Ali's old number to check", correct: true, feedback: "Perfect move. If it's really Ali, he picks up. If it's not, you didn't hand over the keys." },
+          {
+            id: "send",
+            label: "Send the code — Ali needs help",
+            correct: false,
+            feedback:
+              "That code unlocks YOUR account, not theirs. Codes never help someone else in.",
+          },
+          {
+            id: "call",
+            label: "Call Ali's old number to check",
+            correct: true,
+            feedback:
+              "Perfect move. If it's really Ali, he picks up. If it's not, you didn't hand over the keys.",
+          },
         ],
-        adultScene: { who: "Older cousin", line: "That's the OTP scam. Call the real Ali — and either way, never send codes." },
-        truthNote: "Impersonation loves urgency. Slow down and verify on a channel you already trust.",
+        adultScene: {
+          who: "Older cousin",
+          line: "That's the OTP scam. Call the real Ali — and either way, never send codes.",
+        },
+        truthNote:
+          "Impersonation loves urgency. Slow down and verify on a channel you already trust.",
       },
     ],
   },
@@ -212,10 +282,23 @@ export const LESSONS: Lesson[] = [
         sender: "Class-9 sibling",
         truth: "RUMOR",
         options: [
-          { id: "spread", label: "Repost — teachers should be exposed", correct: false, feedback: "No name, no proof, no witness. That's a rumor, not a story." },
-          { id: "wait", label: "Wait. Ask an adult who'd actually know.", correct: true, feedback: "Yes. Anger without evidence is fuel. Don't hand out matches." },
+          {
+            id: "spread",
+            label: "Repost — teachers should be exposed",
+            correct: false,
+            feedback: "No name, no proof, no witness. That's a rumor, not a story.",
+          },
+          {
+            id: "wait",
+            label: "Wait. Ask an adult who'd actually know.",
+            correct: true,
+            feedback: "Yes. Anger without evidence is fuel. Don't hand out matches.",
+          },
         ],
-        adultScene: { who: "Ammi", line: "I know Ms. K's coordinator. Let me ask before we share anything." },
+        adultScene: {
+          who: "Ammi",
+          line: "I know Ms. K's coordinator. Let me ask before we share anything.",
+        },
         truthNote: "Outrage-first stories often turn out to be nothing or something else entirely.",
       },
     ],
@@ -238,13 +321,26 @@ export const LESSONS: Lesson[] = [
           "\"Hi beta, it's Nani. I'm at the hospital, please send 5000 to this number quickly.\"",
           "(voice sounds a little flat)",
         ],
-        sender: "\"Nani\" (unknown number)",
+        sender: '"Nani" (unknown number)',
         truth: "IMPOSTER",
         options: [
-          { id: "send", label: "Send the money — it's Nani's voice", correct: false, feedback: "Voices can be copied by AI now. Money on urgency is the tell." },
-          { id: "call", label: "Call Nani's saved number first", correct: true, feedback: "Exactly. Voice ≠ proof anymore. A callback is." },
+          {
+            id: "send",
+            label: "Send the money — it's Nani's voice",
+            correct: false,
+            feedback: "Voices can be copied by AI now. Money on urgency is the tell.",
+          },
+          {
+            id: "call",
+            label: "Call Nani's saved number first",
+            correct: true,
+            feedback: "Exactly. Voice ≠ proof anymore. A callback is.",
+          },
         ],
-        adultScene: { who: "Baba", line: "That was an AI voice — Nani's at home. You did the right thing calling first." },
+        adultScene: {
+          who: "Baba",
+          line: "That was an AI voice — Nani's at home. You did the right thing calling first.",
+        },
         truthNote: "AI can copy voices. Your defense is a callback on a number you already know.",
       },
     ],
@@ -255,7 +351,7 @@ export const LESSONS: Lesson[] = [
     teach: [
       "Sometimes you cannot check something in time.",
       "When you can't check — don't act. Ask.",
-      "\"I'll get back to you\" is a full sentence.",
+      '"I\'ll get back to you" is a full sentence.',
     ],
     cases: [
       {
@@ -270,10 +366,23 @@ export const LESSONS: Lesson[] = [
         sender: "Unknown +92 3XX",
         truth: "UNVERIFIABLE",
         options: [
-          { id: "go", label: "Go — dad probably forgot to tell me", correct: false, feedback: "Never go with someone you can't verify. Urgency is the trap." },
-          { id: "hold", label: "Stay put. Call dad on his number.", correct: true, feedback: "That's HOLD. Unverifiable = don't move. Ask." },
+          {
+            id: "go",
+            label: "Go — dad probably forgot to tell me",
+            correct: false,
+            feedback: "Never go with someone you can't verify. Urgency is the trap.",
+          },
+          {
+            id: "hold",
+            label: "Stay put. Call dad on his number.",
+            correct: true,
+            feedback: "That's HOLD. Unverifiable = don't move. Ask.",
+          },
         ],
-        adultScene: { who: "Baba (on call)", line: "No, beta — I didn't send anyone. Stay inside. I'm coming now." },
+        adultScene: {
+          who: "Baba (on call)",
+          line: "No, beta — I didn't send anyone. Stay inside. I'm coming now.",
+        },
         truthNote: "Can't verify + urgency = stop. Adults you know are the check.",
       },
     ],
@@ -299,10 +408,23 @@ export const LESSONS: Lesson[] = [
         sender: "Uncle Faisal",
         truth: "FAKE",
         options: [
-          { id: "ignore", label: "Ignore it quietly", correct: false, feedback: "Better than forwarding, but the rest of the group is still spreading it." },
-          { id: "correct", label: "Reply politely with the real info", correct: true, feedback: "That's the family checker in action. One kind reply, chain broken." },
+          {
+            id: "ignore",
+            label: "Ignore it quietly",
+            correct: false,
+            feedback: "Better than forwarding, but the rest of the group is still spreading it.",
+          },
+          {
+            id: "correct",
+            label: "Reply politely with the real info",
+            correct: true,
+            feedback: "That's the family checker in action. One kind reply, chain broken.",
+          },
         ],
-        adultScene: { who: "Ammi", line: "See — five people already stopped forwarding after your reply. Good work." },
+        adultScene: {
+          who: "Ammi",
+          line: "See — five people already stopped forwarding after your reply. Good work.",
+        },
         truthNote: "You correcting once with kindness beats ten uncles arguing about it.",
       },
     ],
@@ -325,14 +447,29 @@ export const LESSONS: Lesson[] = [
           "(text) transfer here — 03XX-9982211 — do it now beta, boss is waiting",
           "and don't call me phone is dying I said",
         ],
-        sender: "\"Baba\" (unknown number)",
+        sender: '"Baba" (unknown number)',
         truth: "IMPOSTER",
         options: [
-          { id: "send", label: "Send it — dad's in trouble", correct: false, feedback: "Three tells: unknown number, urgency, \"don't call.\" That combo IS the scam." },
-          { id: "call", label: "Call Baba's real number anyway", correct: true, feedback: "You caught all three. That's a licensed operator." },
+          {
+            id: "send",
+            label: "Send it — dad's in trouble",
+            correct: false,
+            feedback:
+              'Three tells: unknown number, urgency, "don\'t call." That combo IS the scam.',
+          },
+          {
+            id: "call",
+            label: "Call Baba's real number anyway",
+            correct: true,
+            feedback: "You caught all three. That's a licensed operator.",
+          },
         ],
-        adultScene: { who: "Baba (on call)", line: "I'm at the office, beta. That wasn't me. You just passed your last test." },
-        truthNote: "Voice + urgency + \"don't call\" = the classic combo. A callback beats it every time.",
+        adultScene: {
+          who: "Baba (on call)",
+          line: "I'm at the office, beta. That wasn't me. You just passed your last test.",
+        },
+        truthNote:
+          'Voice + urgency + "don\'t call" = the classic combo. A callback beats it every time.',
       },
     ],
   },

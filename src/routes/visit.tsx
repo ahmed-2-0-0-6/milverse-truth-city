@@ -4,8 +4,20 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  ArrowRight, SkipForward, X, Keyboard, Newspaper, BookOpen, Coins,
-  Users, Shield, Sparkles, Phone, Search, GraduationCap, Printer,
+  ArrowRight,
+  SkipForward,
+  X,
+  Keyboard,
+  Newspaper,
+  BookOpen,
+  Coins,
+  Users,
+  Shield,
+  Sparkles,
+  Phone,
+  Search,
+  GraduationCap,
+  Printer,
 } from "lucide-react";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChatHeader } from "@/components/chat/ChatHeader";
@@ -18,9 +30,20 @@ export const Route = createFileRoute("/visit")({
   head: () => ({
     meta: [
       { title: "Visit MILVERSE — 3 minutes inside the city that trains trust" },
-      { name: "description", content: "A guided 3-minute tour for judges, educators, and press. Play a scam, meet a boss, tour the city — no signup." },
-      { property: "og:title", content: "Visit MILVERSE — 3 minutes inside the city that trains trust" },
-      { property: "og:description", content: "A guided 3-minute tour for judges, educators, and press. Play a scam, meet a boss, tour the city — no signup." },
+      {
+        name: "description",
+        content:
+          "A guided 3-minute tour for judges, educators, and press. Play a scam, meet a boss, tour the city — no signup.",
+      },
+      {
+        property: "og:title",
+        content: "Visit MILVERSE — 3 minutes inside the city that trains trust",
+      },
+      {
+        property: "og:description",
+        content:
+          "A guided 3-minute tour for judges, educators, and press. Play a scam, meet a boss, tour the city — no signup.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://milverse-truth-city.lovable.app/visit" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -31,7 +54,14 @@ export const Route = createFileRoute("/visit")({
 });
 
 type Beat = 0 | 1 | 2 | 3 | 4 | 5;
-const BEAT_LABELS = ["ARRIVAL", "GET SCAMMED", "MEET A BOSS", "THE CITY", "THE LICENSE", "DEPARTURE"];
+const BEAT_LABELS = [
+  "ARRIVAL",
+  "GET SCAMMED",
+  "MEET A BOSS",
+  "THE CITY",
+  "THE LICENSE",
+  "DEPARTURE",
+];
 
 function usePrefersReducedMotion() {
   const [rm, setRm] = useState(false);
@@ -81,14 +111,25 @@ function VisitPage() {
 
 /* ---------- Chrome: progress dots, skip, leave ---------- */
 
-function TourChrome({ beat, onSkip, onLeave }: { beat: Beat; onSkip: () => void; onLeave: () => void }) {
+function TourChrome({
+  beat,
+  onSkip,
+  onLeave,
+}: {
+  beat: Beat;
+  onSkip: () => void;
+  onLeave: () => void;
+}) {
   return (
     <div className="sticky top-0 z-40 border-b border-white/10 bg-black/85 backdrop-blur">
       <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-2.5">
         <div className="flex items-center gap-1.5 stencil text-[10px] tracking-[0.3em] text-primary">
           <Sparkles className="h-3.5 w-3.5" /> GUIDED VISIT
         </div>
-        <div className="mx-2 flex flex-1 items-center gap-1.5" aria-label={`Beat ${beat} of 5: ${BEAT_LABELS[beat]}`}>
+        <div
+          className="mx-2 flex flex-1 items-center gap-1.5"
+          aria-label={`Beat ${beat} of 5: ${BEAT_LABELS[beat]}`}
+        >
           {[1, 2, 3, 4, 5].map((n) => (
             <span
               key={n}
@@ -179,8 +220,7 @@ const SCAM_SCRIPT: ScamTurn[] = [
     ],
   },
   {
-    contact:
-      "slack's down for me. LOOK if u can't help just say so. i thought we were friends.",
+    contact: "slack's down for me. LOOK if u can't help just say so. i thought we were friends.",
     choices: [
       { text: "Fine, sending it now — don't be mad.", smart: false },
       { text: "This is an imposter pattern. Blocking + reporting to Sana on Slack.", smart: true },
@@ -190,13 +230,17 @@ const SCAM_SCRIPT: ScamTurn[] = [
 
 function Beat1Scam({ onNext, reducedMotion }: { onNext: () => void; reducedMotion: boolean }) {
   const [turn, setTurn] = useState(0);
-  const [log, setLog] = useState<{ from: "contact" | "you"; text: string }[]>([{ from: "contact", text: SCAM_SCRIPT[0].contact }]);
+  const [log, setLog] = useState<{ from: "contact" | "you"; text: string }[]>([
+    { from: "contact", text: SCAM_SCRIPT[0].contact },
+  ]);
   const [confidence, setConfidence] = useState(75);
   const [pickedSmart, setPickedSmart] = useState<boolean[]>([]);
   const [phase, setPhase] = useState<"chat" | "verdict" | "stamp" | "debrief">("chat");
   const [verdict, setVerdict] = useState<"REAL" | "FAKE" | null>(null);
   const logEnd = useRef<HTMLDivElement>(null);
-  useEffect(() => { logEnd.current?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" }); }, [log, reducedMotion]);
+  useEffect(() => {
+    logEnd.current?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" });
+  }, [log, reducedMotion]);
 
   const smartRate = useMemo(() => {
     if (pickedSmart.length === 0) return 0;
@@ -209,10 +253,13 @@ function Beat1Scam({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
     setLog((L) => [...L, { from: "you", text: choice.text }]);
     setPickedSmart((s) => [...s, choice.smart]);
     if (turn + 1 < SCAM_SCRIPT.length) {
-      setTimeout(() => {
-        setLog((L) => [...L, { from: "contact", text: SCAM_SCRIPT[turn + 1].contact }]);
-        setTurn(turn + 1);
-      }, reducedMotion ? 60 : 700);
+      setTimeout(
+        () => {
+          setLog((L) => [...L, { from: "contact", text: SCAM_SCRIPT[turn + 1].contact }]);
+          setTurn(turn + 1);
+        },
+        reducedMotion ? 60 : 700,
+      );
     } else {
       setTimeout(() => setPhase("verdict"), reducedMotion ? 60 : 500);
     }
@@ -241,7 +288,10 @@ function Beat1Scam({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
           >
             <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2">
               {log.map((m, i) => (
-                <div key={i} className={`flex ${m.from === "you" ? "justify-end" : "justify-start"}`}>
+                <div
+                  key={i}
+                  className={`flex ${m.from === "you" ? "justify-end" : "justify-start"}`}
+                >
                   <div
                     className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
                       m.from === "you"
@@ -257,7 +307,9 @@ function Beat1Scam({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
             </div>
             {phase === "chat" && (
               <div className="border-t border-white/10 bg-neutral-950 p-2 space-y-1.5">
-                <div className="stencil text-[9px] tracking-[0.25em] text-white/40 px-1">CHOOSE YOUR REPLY</div>
+                <div className="stencil text-[9px] tracking-[0.25em] text-white/40 px-1">
+                  CHOOSE YOUR REPLY
+                </div>
                 {SCAM_SCRIPT[turn].choices.map((c, i) => (
                   <button
                     key={i}
@@ -271,13 +323,19 @@ function Beat1Scam({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
             )}
             {phase === "verdict" && (
               <div className="border-t border-white/10 bg-neutral-950 p-3 space-y-3">
-                <div className="stencil text-[10px] tracking-[0.3em] text-caution">CALL IT — REAL OR FAKE?</div>
+                <div className="stencil text-[10px] tracking-[0.3em] text-caution">
+                  CALL IT — REAL OR FAKE?
+                </div>
                 <div>
                   <label className="mb-1 flex items-center justify-between stencil text-[9px] tracking-widest text-white/50">
-                    <span>CONFIDENCE</span><span>{confidence}%</span>
+                    <span>CONFIDENCE</span>
+                    <span>{confidence}%</span>
                   </label>
                   <input
-                    type="range" min={0} max={100} value={confidence}
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={confidence}
                     onChange={(e) => setConfidence(parseInt(e.target.value))}
                     className="w-full accent-primary"
                     aria-label="Confidence percent"
@@ -285,13 +343,23 @@ function Beat1Scam({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <button
-                    onClick={() => { setVerdict("REAL"); setPhase("stamp"); }}
+                    onClick={() => {
+                      setVerdict("REAL");
+                      setPhase("stamp");
+                    }}
                     className="rounded-md border-2 border-white/15 px-3 py-2 stencil text-xs tracking-widest hover:border-primary/50"
-                  >REAL</button>
+                  >
+                    REAL
+                  </button>
                   <button
-                    onClick={() => { setVerdict("FAKE"); setPhase("stamp"); }}
+                    onClick={() => {
+                      setVerdict("FAKE");
+                      setPhase("stamp");
+                    }}
                     className="rounded-md border-2 border-white/15 px-3 py-2 stencil text-xs tracking-widest hover:border-destructive/50"
-                  >FAKE</button>
+                  >
+                    FAKE
+                  </button>
                 </div>
               </div>
             )}
@@ -326,20 +394,36 @@ function Beat1Scam({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
             <div className="stencil text-[10px] tracking-[0.3em] text-primary">YOU JUST FACED</div>
             <div className="mt-1 text-lg font-semibold text-primary">IMPERSONATION</div>
             <p className="mt-2 text-sm text-white/80">
-              New number + urgency + a favor + refusal to verify out-of-band. Every scammer's signature.
-              Verdict: <b>{verdict}</b> · Confidence: <b>{confidence}%</b> · Smart-question rate: <b>{Math.round(smartRate * 100)}%</b>.
+              New number + urgency + a favor + refusal to verify out-of-band. Every scammer's
+              signature. Verdict: <b>{verdict}</b> · Confidence: <b>{confidence}%</b> ·
+              Smart-question rate: <b>{Math.round(smartRate * 100)}%</b>.
             </p>
           </div>
           <div className="rounded-md border border-white/15 bg-neutral-900 p-4">
-            <div className="stencil text-[10px] tracking-[0.3em] text-white/60 mb-2">CALIBRATION 2×2</div>
+            <div className="stencil text-[10px] tracking-[0.3em] text-white/60 mb-2">
+              CALIBRATION 2×2
+            </div>
             <div className="grid grid-cols-2 gap-2 text-[11px]">
-              <div className="rounded border border-emerald-500/40 bg-emerald-500/10 p-2 text-emerald-200"><b>CORRECT CALL</b><div>trust earned</div></div>
-              <div className="rounded border border-caution/40 bg-caution/10 p-2 text-caution"><b>FALSE ALARM</b><div>paranoia</div></div>
-              <div className="rounded border border-caution/40 bg-caution/10 p-2 text-caution"><b>MISSED SCAM</b><div>gullibility</div></div>
-              <div className="rounded border border-emerald-500/40 bg-emerald-500/10 p-2 text-emerald-200"><b>CORRECT PASS</b><div>trust kept</div></div>
+              <div className="rounded border border-emerald-500/40 bg-emerald-500/10 p-2 text-emerald-200">
+                <b>CORRECT CALL</b>
+                <div>trust earned</div>
+              </div>
+              <div className="rounded border border-caution/40 bg-caution/10 p-2 text-caution">
+                <b>FALSE ALARM</b>
+                <div>paranoia</div>
+              </div>
+              <div className="rounded border border-caution/40 bg-caution/10 p-2 text-caution">
+                <b>MISSED SCAM</b>
+                <div>gullibility</div>
+              </div>
+              <div className="rounded border border-emerald-500/40 bg-emerald-500/10 p-2 text-emerald-200">
+                <b>CORRECT PASS</b>
+                <div>trust kept</div>
+              </div>
             </div>
             <p className="mt-3 text-xs text-white/70">
-              This game punishes gullibility <b>AND</b> paranoia — we train <span className="text-primary">calibrated trust</span>, not suspicion.
+              This game punishes gullibility <b>AND</b> paranoia — we train{" "}
+              <span className="text-primary">calibrated trust</span>, not suspicion.
             </p>
           </div>
         </div>
@@ -359,18 +443,44 @@ const BOSS_STEPS: BossStep[] = [
   {
     msg: "Salaam. This is Kamran from your bank's fraud desk. Two charges from Bali on your card — INR 42,880 at a resort called 'Ubud Sanctuary'. Was that you? I'll walk you through the reversal.",
     choices: [
-      { text: "🔎 Reverse-image the resort", result: "Real resort. Photos check out on TripAdvisor. Ratings 4.6.", correct: true },
-      { text: "🔎 Cross-check the fraud desk number", result: "Number matches a real bank branch line. Even the hold music is real.", correct: true },
-      { text: "🔎 Check the charge amount format", result: "'INR 42,880' — exactly how your bank writes amounts in SMS.", correct: true },
+      {
+        text: "🔎 Reverse-image the resort",
+        result: "Real resort. Photos check out on TripAdvisor. Ratings 4.6.",
+        correct: true,
+      },
+      {
+        text: "🔎 Cross-check the fraud desk number",
+        result: "Number matches a real bank branch line. Even the hold music is real.",
+        correct: true,
+      },
+      {
+        text: "🔎 Check the charge amount format",
+        result: "'INR 42,880' — exactly how your bank writes amounts in SMS.",
+        correct: true,
+      },
     ],
     callout: "Every fact-check will CONFIRM his story. The scam is built from true facts.",
   },
   {
     msg: "I need you to read me the OTP that just arrived — that BLOCKS the fraudulent transaction. If you don't read it in 90 seconds it goes through and we can't reverse it.",
     choices: [
-      { text: "Read him the OTP — the resort was real, this is legit", result: "You handed the boss your account. Loss: PKR 480,000. He was never at your bank.", correct: false },
-      { text: "Hang up. Call the number printed on the back of your physical card.", result: "Your bank has no fraud alert on file. No Bali charges exist. The call was the scam.", correct: true },
-      { text: "Ask him to send an official email first", result: "He sends one — from bank-fraud-desk@gmail.com. You almost trust the domain. Almost.", correct: false },
+      {
+        text: "Read him the OTP — the resort was real, this is legit",
+        result: "You handed the boss your account. Loss: PKR 480,000. He was never at your bank.",
+        correct: false,
+      },
+      {
+        text: "Hang up. Call the number printed on the back of your physical card.",
+        result:
+          "Your bank has no fraud alert on file. No Bali charges exist. The call was the scam.",
+        correct: true,
+      },
+      {
+        text: "Ask him to send an official email first",
+        result:
+          "He sends one — from bank-fraud-desk@gmail.com. You almost trust the domain. Almost.",
+        correct: false,
+      },
     ],
   },
 ];
@@ -429,7 +539,11 @@ function Beat2Boss({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
             </div>
             <div className="border-t border-white/10 bg-neutral-950 p-2 space-y-1.5">
               <div className="stencil text-[9px] tracking-[0.25em] text-white/40 px-1">
-                {picked === null ? (step === 0 ? "PICK A FACT-CHECK" : "PICK YOUR PROTOCOL") : "RESULT"}
+                {picked === null
+                  ? step === 0
+                    ? "PICK A FACT-CHECK"
+                    : "PICK YOUR PROTOCOL"
+                  : "RESULT"}
               </div>
               {picked === null ? (
                 current.choices.map((c, i) => (
@@ -474,7 +588,9 @@ function Beat2Boss({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
       {showDoctrine && (
         <div className="mx-auto max-w-lg space-y-3">
           <div className="rounded-lg border-2 border-primary/60 bg-primary/10 p-5">
-            <div className="stencil text-[10px] tracking-[0.3em] text-primary">DOCTRINE UNLOCKED</div>
+            <div className="stencil text-[10px] tracking-[0.3em] text-primary">
+              DOCTRINE UNLOCKED
+            </div>
             <ul className="mt-3 space-y-2 text-sm text-white">
               {DOCTRINE_RULES.map((d) => (
                 <li key={d.n} className="flex gap-2">
@@ -485,7 +601,8 @@ function Beat2Boss({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
             </ul>
           </div>
           <p className="text-center text-xs text-white/70">
-            Fact-checking as taught today <b>fails</b> at boss level. Protocol wins. <span className="text-primary">That's the graduate lesson.</span>
+            Fact-checking as taught today <b>fails</b> at boss level. Protocol wins.{" "}
+            <span className="text-primary">That's the graduate lesson.</span>
           </p>
           <button
             onClick={onNext}
@@ -503,10 +620,26 @@ function Beat2Boss({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
 /* ---------- BEAT 3 — THE CITY IS BIGGER (auto-advancing panels) ---------- */
 
 const CITY_PANELS = [
-  { icon: Newspaper, title: "THE PAPER", body: "A daily newspaper where every story is false — published by a live human newsroom. Spot the forgery on the front page." },
-  { icon: BookOpen, title: "FIELD MANUAL", body: "Every tactic you name enters your Manual. A personal, growing dictionary of manipulation." },
-  { icon: Coins, title: "AAJ KA FORWARD", body: "Daily wager. Verify one viral forward. Winners take receipts; losers learn faster." },
-  { icon: Users, title: "STUDIO → ARCHIVE", body: "Players design the city's next cases. The community authors the curriculum." },
+  {
+    icon: Newspaper,
+    title: "THE PAPER",
+    body: "A daily newspaper where every story is false — published by a live human newsroom. Spot the forgery on the front page.",
+  },
+  {
+    icon: BookOpen,
+    title: "FIELD MANUAL",
+    body: "Every tactic you name enters your Manual. A personal, growing dictionary of manipulation.",
+  },
+  {
+    icon: Coins,
+    title: "AAJ KA FORWARD",
+    body: "Daily wager. Verify one viral forward. Winners take receipts; losers learn faster.",
+  },
+  {
+    icon: Users,
+    title: "STUDIO → ARCHIVE",
+    body: "Players design the city's next cases. The community authors the curriculum.",
+  },
 ];
 
 function Beat3City({ onNext, reducedMotion }: { onNext: () => void; reducedMotion: boolean }) {
@@ -532,7 +665,9 @@ function Beat3City({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
             <div
               key={p.title}
               className={`rounded-lg border p-4 transition-all ${
-                active ? "border-primary/60 bg-primary/10" : "border-white/10 bg-neutral-950 opacity-60"
+                active
+                  ? "border-primary/60 bg-primary/10"
+                  : "border-white/10 bg-neutral-950 opacity-60"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -551,7 +686,9 @@ function Beat3City({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
         >
           {paused ? "RESUME AUTO-ADVANCE" : "PAUSE"}
         </button>
-        <div className="stencil text-[10px] tracking-widest text-white/40">{i + 1} / {CITY_PANELS.length}</div>
+        <div className="stencil text-[10px] tracking-widest text-white/40">
+          {i + 1} / {CITY_PANELS.length}
+        </div>
         {i < CITY_PANELS.length - 1 ? (
           <button
             onClick={() => setI((x) => Math.min(x + 1, CITY_PANELS.length - 1))}
@@ -583,14 +720,30 @@ function Beat4License({ onNext }: { onNext: () => void }) {
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-lg border border-white/10 bg-neutral-950 p-5">
-          <div className="stencil text-[10px] tracking-[0.3em] text-primary">DRIVER'S ED — FOR PHONES</div>
+          <div className="stencil text-[10px] tracking-[0.3em] text-primary">
+            DRIVER'S ED — FOR PHONES
+          </div>
           <p className="mt-2 text-sm text-white/80">
-            10 lessons. Each one costs 30 seconds. Each one names a tactic.
-            The child graduates with a <b>license</b> — not a lecture.
+            10 lessons. Each one costs 30 seconds. Each one names a tactic. The child graduates with
+            a <b>license</b> — not a lecture.
           </p>
           <ol className="mt-4 grid grid-cols-2 gap-1.5 text-[11px]">
-            {["Stranger DM", "OTP Ask", "Deepfake voice", "Prize scam", "Group pressure", "Fake login", "Screenshot lie", "Deadline urgency", "Fake charity", "Family imposter"].map((l, i) => (
-              <li key={l} className="flex items-center gap-1.5 rounded border border-white/10 bg-neutral-900 px-2 py-1">
+            {[
+              "Stranger DM",
+              "OTP Ask",
+              "Deepfake voice",
+              "Prize scam",
+              "Group pressure",
+              "Fake login",
+              "Screenshot lie",
+              "Deadline urgency",
+              "Fake charity",
+              "Family imposter",
+            ].map((l, i) => (
+              <li
+                key={l}
+                className="flex items-center gap-1.5 rounded border border-white/10 bg-neutral-900 px-2 py-1"
+              >
                 <span className="stencil text-primary">{String(i + 1).padStart(2, "0")}</span>
                 <span className="text-white/80">{l}</span>
               </li>
@@ -601,9 +754,13 @@ function Beat4License({ onNext }: { onNext: () => void }) {
         {/* Specimen license */}
         <div className="relative overflow-hidden rounded-lg border-2 border-primary/50 bg-gradient-to-br from-neutral-900 to-black p-5">
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-10">
-            <div className="stencil rotate-[-18deg] text-6xl tracking-[0.4em] text-primary">SPECIMEN</div>
+            <div className="stencil rotate-[-18deg] text-6xl tracking-[0.4em] text-primary">
+              SPECIMEN
+            </div>
           </div>
-          <div className="stencil text-[10px] tracking-[0.3em] text-primary">FIRST PHONE LICENSE</div>
+          <div className="stencil text-[10px] tracking-[0.3em] text-primary">
+            FIRST PHONE LICENSE
+          </div>
           <div className="mt-2 flex items-start gap-3">
             <div className="flex h-16 w-16 items-center justify-center rounded-full border border-primary/60 bg-primary/10">
               <Shield className="h-7 w-7 text-primary" />
@@ -611,7 +768,9 @@ function Beat4License({ onNext }: { onNext: () => void }) {
             <div>
               <div className="text-lg font-semibold text-white">Aisha K.</div>
               <div className="font-mono text-[11px] text-white/60">LIC-FPL-000-042 · Class J</div>
-              <div className="mt-1 stencil text-[9px] tracking-widest text-emerald-300">CERTIFIED · 10/10 LESSONS</div>
+              <div className="mt-1 stencil text-[9px] tracking-widest text-emerald-300">
+                CERTIFIED · 10/10 LESSONS
+              </div>
             </div>
           </div>
           <div className="mt-4 border-t border-white/10 pt-3 text-[10px] font-mono text-white/50">
@@ -621,7 +780,8 @@ function Beat4License({ onNext }: { onNext: () => void }) {
       </div>
 
       <p className="mt-5 text-center text-sm italic text-white/85">
-        Other tools <b>childproof</b> the phone. MILVERSE <b className="text-primary">phone-proofs the child.</b>
+        Other tools <b>childproof</b> the phone. MILVERSE{" "}
+        <b className="text-primary">phone-proofs the child.</b>
       </p>
 
       <div className="mt-5 rounded-lg border border-white/10 bg-neutral-950 p-4">
@@ -648,7 +808,15 @@ function Beat4License({ onNext }: { onNext: () => void }) {
   );
 }
 
-function LadderCard({ icon: Icon, label, note }: { icon: typeof Sparkles; label: string; note: string }) {
+function LadderCard({
+  icon: Icon,
+  label,
+  note,
+}: {
+  icon: typeof Sparkles;
+  label: string;
+  note: string;
+}) {
   return (
     <div className="rounded border border-white/10 bg-neutral-900 p-2 text-center">
       <Icon className="mx-auto h-4 w-4 text-primary" />
@@ -668,13 +836,19 @@ function Beat5Departure() {
       </div>
       <div className="rounded-lg border border-primary/50 bg-primary/5 p-6 text-center">
         <p className="mx-auto max-w-2xl text-base text-white sm:text-lg">
-          <b>MILVERSE</b> turns media &amp; information literacy into a <b>city you walk through</b> —
-          and graduates kids into their first phone with a <b className="text-primary">license</b> instead of a lecture.
+          <b>MILVERSE</b> turns media &amp; information literacy into a <b>city you walk through</b>{" "}
+          — and graduates kids into their first phone with a <b className="text-primary">license</b>{" "}
+          instead of a lecture.
         </p>
       </div>
 
       <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <ExitDoor to="/" label="PLAY THE FULL CITY" hint="everything you just saw, unlocked" primary />
+        <ExitDoor
+          to="/"
+          label="PLAY THE FULL CITY"
+          hint="everything you just saw, unlocked"
+          primary
+        />
         <ExitDoor to="/educators" label="FOR EDUCATORS" hint="curriculum + pilot notes" />
         <ExitDoor to="/charter" label="THE CHARTER" hint="what we promise the player" />
         <ExitDoor to="/review" label="THE PILOT DATA" hint="live during pilot" />
@@ -689,7 +863,17 @@ function Beat5Departure() {
   );
 }
 
-function ExitDoor({ to, label, hint, primary }: { to: string; label: string; hint: string; primary?: boolean }) {
+function ExitDoor({
+  to,
+  label,
+  hint,
+  primary,
+}: {
+  to: string;
+  label: string;
+  hint: string;
+  primary?: boolean;
+}) {
   return (
     <Link
       to={to}
@@ -699,7 +883,11 @@ function ExitDoor({ to, label, hint, primary }: { to: string; label: string; hin
           : "border-white/15 bg-neutral-950 hover:bg-neutral-900"
       }`}
     >
-      <div className={`stencil text-[10px] tracking-[0.3em] ${primary ? "text-primary" : "text-white/70"}`}>{label} →</div>
+      <div
+        className={`stencil text-[10px] tracking-[0.3em] ${primary ? "text-primary" : "text-white/70"}`}
+      >
+        {label} →
+      </div>
       <div className="mt-1 text-xs text-white/60">{hint}</div>
     </Link>
   );

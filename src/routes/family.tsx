@@ -3,7 +3,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { TopBar } from "@/components/TopBar";
-import { registerFamilyCode, regenerateFamilyCode, fetchFamilyProgress, checkFamilyCodeJoin } from "@/lib/family.functions";
+import {
+  registerFamilyCode,
+  regenerateFamilyCode,
+  fetchFamilyProgress,
+  checkFamilyCodeJoin,
+} from "@/lib/family.functions";
 import { LESSONS, TOTAL_LESSONS, type JuniorTactic } from "@/lib/firstPhone/lessons";
 import { loadFirstPhone, joinFamily } from "@/lib/firstPhone/profile";
 import { manualDisplayForTactics } from "@/lib/firstPhone/tacticMap";
@@ -17,7 +22,10 @@ export const Route = createFileRoute("/family")({
   head: () => ({
     meta: [
       { title: "Family Code — MILVERSE" },
-      { name: "description", content: "Follow your kid's First Phone progress. You see skills, not chats." },
+      {
+        name: "description",
+        content: "Follow your kid's First Phone progress. You see skills, not chats.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -45,8 +53,12 @@ function FamilyPage() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [kidState, setKidState] = useState(() => ({
-    active: false, kidCityName: "", familyCode: null as string | null,
-    lessonsCompleted: [] as number[], licenseIssuedAt: null as number | null, licenseNumber: null as string | null,
+    active: false,
+    kidCityName: "",
+    familyCode: null as string | null,
+    lessonsCompleted: [] as number[],
+    licenseIssuedAt: null as number | null,
+    licenseNumber: null as string | null,
   }));
   const registerFn = useServerFn(registerFamilyCode);
   const regenerateFn = useServerFn(regenerateFamilyCode);
@@ -62,23 +74,27 @@ function FamilyPage() {
     return () => window.removeEventListener("milverse:firstphone", on);
   }, []);
 
-  const refresh = useCallback(async (code: string) => {
-    setErr(null);
-    try {
-      const r = await fetchProgress({ data: { code } });
-      setEntries((r.entries ?? []) as CloudEntry[]);
-    } catch (e) {
-      setErr((e as Error).message);
-      setEntries([]);
-    }
-  }, [fetchProgress]);
+  const refresh = useCallback(
+    async (code: string) => {
+      setErr(null);
+      try {
+        const r = await fetchProgress({ data: { code } });
+        setEntries((r.entries ?? []) as CloudEntry[]);
+      } catch (e) {
+        setErr((e as Error).message);
+        setEntries([]);
+      }
+    },
+    [fetchProgress],
+  );
 
   useEffect(() => {
     if (parentCode) refresh(parentCode);
   }, [parentCode, refresh]);
 
   async function createCode() {
-    setBusy(true); setErr(null);
+    setBusy(true);
+    setErr(null);
     try {
       const c = generateFamilyCode();
       await registerFn({ data: { code: c } });
@@ -95,7 +111,8 @@ function FamilyPage() {
 
   async function regenerate() {
     if (!parentCode) return;
-    setBusy(true); setErr(null);
+    setBusy(true);
+    setErr(null);
     try {
       const c = generateFamilyCode();
       await regenerateFn({ data: { oldCode: parentCode, newCode: c } });
@@ -154,14 +171,20 @@ function FamilyPage() {
     <div className="min-h-screen grain">
       <TopBar />
       <main className="mx-auto max-w-3xl px-4 py-10">
-        <Link to="/" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">← CITY</Link>
+        <Link
+          to="/"
+          className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
+        >
+          ← CITY
+        </Link>
 
         <div className="mt-6">
           <div className="font-mono text-[11px] tracking-widest text-primary">FAMILY CODE</div>
           <h1 className="mt-2 text-3xl sm:text-4xl font-semibold">Skills, not chats.</h1>
           <p className="mt-2 text-muted-foreground max-w-2xl">
-            Create a code, share it with your kid, and follow their progress through the First Phone Program.
-            You'll see lessons completed, skills mastered, and the license status — <strong>never message content</strong>.
+            Create a code, share it with your kid, and follow their progress through the First Phone
+            Program. You'll see lessons completed, skills mastered, and the license status —{" "}
+            <strong>never message content</strong>.
           </p>
           <div className="mt-3 rounded-md border border-primary/40 bg-primary/5 px-4 py-2 text-sm italic text-primary">
             "{JUNIOR_COPY.promise}"
@@ -176,8 +199,14 @@ function FamilyPage() {
           </div>
           {!parentCode ? (
             <>
-              <p className="mt-2 text-sm text-muted-foreground">Generate a family code, then share it with your kid.</p>
-              <button onClick={createCode} disabled={busy} className="mt-3 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50">
+              <p className="mt-2 text-sm text-muted-foreground">
+                Generate a family code, then share it with your kid.
+              </p>
+              <button
+                onClick={createCode}
+                disabled={busy}
+                className="mt-3 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+              >
                 {busy ? "Creating…" : "Create family code"}
               </button>
               {err && <p className="mt-2 text-xs text-destructive">{err}</p>}
@@ -189,13 +218,24 @@ function FamilyPage() {
                   {parentCode}
                 </div>
                 <button
-                  onClick={() => { navigator.clipboard.writeText(parentCode); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(parentCode);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 1500);
+                  }}
                   className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-2 text-sm"
                 >
-                  {copied ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
+                  {copied ? (
+                    <Check className="h-4 w-4 text-primary" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
                   {copied ? "Copied" : "Copy"}
                 </button>
-                <button onClick={() => refresh(parentCode)} className="text-xs text-muted-foreground hover:text-foreground">
+                <button
+                  onClick={() => refresh(parentCode)}
+                  className="text-xs text-muted-foreground hover:text-foreground"
+                >
                   Refresh
                 </button>
                 <button
@@ -208,7 +248,8 @@ function FamilyPage() {
                 </button>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                Have your kid paste this into the box below on their device. Regenerating invalidates the old code server-side.
+                Have your kid paste this into the box below on their device. Regenerating
+                invalidates the old code server-side.
               </p>
               {err && <p className="mt-2 text-xs text-destructive">{err}</p>}
             </>
@@ -222,7 +263,10 @@ function FamilyPage() {
             <span className="font-mono text-[10px] tracking-widest">KID · JOIN A CODE</span>
           </div>
           {kidState.familyCode ? (
-            <p className="mt-2 text-sm">Joined family code <span className="font-mono text-primary">{kidState.familyCode}</span>.</p>
+            <p className="mt-2 text-sm">
+              Joined family code{" "}
+              <span className="font-mono text-primary">{kidState.familyCode}</span>.
+            </p>
           ) : (
             <div className="mt-3 flex flex-wrap gap-2">
               <input
@@ -232,7 +276,10 @@ function FamilyPage() {
                 maxLength={6}
                 className="rounded-md border border-border bg-background px-3 py-2 text-sm font-mono tracking-widest w-40"
               />
-              <button onClick={joinAsKid} className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+              <button
+                onClick={joinAsKid}
+                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+              >
                 Join
               </button>
             </div>
@@ -242,14 +289,18 @@ function FamilyPage() {
         {/* Dashboard — ONLY skills, badges, calibration arrow, license status. */}
         {parentCode && (
           <section className="mt-4 rounded-2xl border-2 border-primary/40 bg-card p-6">
-            <div className="font-mono text-[10px] tracking-widest text-primary">DASHBOARD · CODE {parentCode}</div>
+            <div className="font-mono text-[10px] tracking-widest text-primary">
+              DASHBOARD · CODE {parentCode}
+            </div>
 
             {juniorEntries.length < K_ANON ? (
               <div className="mt-4 rounded-md border border-caution/40 bg-caution/5 p-4 text-sm">
-                <div className="font-mono text-[10px] tracking-widest text-caution mb-1">NOT ENOUGH DATA YET</div>
+                <div className="font-mono text-[10px] tracking-widest text-caution mb-1">
+                  NOT ENOUGH DATA YET
+                </div>
                 <p className="text-muted-foreground">
-                  Aggregated metrics are shown when the group is larger (at least {K_ANON} completed entries).
-                  Currently: {juniorEntries.length}.
+                  Aggregated metrics are shown when the group is larger (at least {K_ANON} completed
+                  entries). Currently: {juniorEntries.length}.
                 </p>
               </div>
             ) : (
@@ -257,18 +308,32 @@ function FamilyPage() {
                 <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <StatBox label="LESSONS" value={`${lessonList.length} / ${TOTAL_LESSONS}`} />
                   <StatBox label="TACTICS" value={String(tacticsMastered)} />
-                  <StatBox label="TREND" value={lessonList.length >= 3 ? "↑ improving" : "warming up"} />
-                  <StatBox label="LICENSE" value={licenseIssued ? "ISSUED" : "in progress"} tone={licenseIssued ? "good" : undefined} />
+                  <StatBox
+                    label="TREND"
+                    value={lessonList.length >= 3 ? "↑ improving" : "warming up"}
+                  />
+                  <StatBox
+                    label="LICENSE"
+                    value={licenseIssued ? "ISSUED" : "in progress"}
+                    tone={licenseIssued ? "good" : undefined}
+                  />
                 </div>
 
                 <div className="mt-6">
-                  <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-2">LESSONS COMPLETED</div>
+                  <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-2">
+                    LESSONS COMPLETED
+                  </div>
                   <ul className="space-y-1.5">
                     {LESSONS.map((l) => {
                       const done = lessonList.includes(l.n);
                       return (
-                        <li key={l.n} className={`flex items-center gap-3 text-sm ${done ? "text-foreground" : "text-muted-foreground"}`}>
-                          <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${done ? "bg-primary text-primary-foreground" : "border border-border"}`}>
+                        <li
+                          key={l.n}
+                          className={`flex items-center gap-3 text-sm ${done ? "text-foreground" : "text-muted-foreground"}`}
+                        >
+                          <span
+                            className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${done ? "bg-primary text-primary-foreground" : "border border-border"}`}
+                          >
                             {done ? "✓" : l.n}
                           </span>
                           <span>{l.title}</span>
@@ -280,10 +345,15 @@ function FamilyPage() {
 
                 {tacticsDisplay.length > 0 && (
                   <div className="mt-6">
-                    <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-2">TACTICS MASTERED · FIELD MANUAL</div>
+                    <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-2">
+                      TACTICS MASTERED · FIELD MANUAL
+                    </div>
                     <ul className="flex flex-wrap gap-2">
                       {tacticsDisplay.map((t) => (
-                        <li key={t} className="rounded-md border border-primary/30 bg-primary/5 px-2.5 py-1 text-xs text-primary">
+                        <li
+                          key={t}
+                          className="rounded-md border border-primary/30 bg-primary/5 px-2.5 py-1 text-xs text-primary"
+                        >
                           {t}
                         </li>
                       ))}
@@ -294,11 +364,14 @@ function FamilyPage() {
             )}
 
             <p className="mt-6 text-xs text-muted-foreground italic border-t border-border pt-4">
-              What you see: lesson count, skills mastered, calibration trend, license status. Day-level activity only — no exact timestamps.<br />
+              What you see: lesson count, skills mastered, calibration trend, license status.
+              Day-level activity only — no exact timestamps.
+              <br />
               What you don't: message content, conversations, per-answer detail. By design.
             </p>
             <p className="mt-3 text-[11px] italic text-muted-foreground">
-              Certifies completion of a learning pathway. Not a guarantee of online safety — the training continues in real life.
+              Certifies completion of a learning pathway. Not a guarantee of online safety — the
+              training continues in real life.
             </p>
           </section>
         )}
@@ -309,8 +382,12 @@ function FamilyPage() {
 
 function StatBox({ label, value, tone }: { label: string; value: string; tone?: "good" }) {
   return (
-    <div className={`rounded-md border p-3 text-center ${tone === "good" ? "border-primary bg-primary/10" : "border-border bg-background/40"}`}>
-      <div className={`text-xl font-semibold ${tone === "good" ? "text-primary" : ""}`}>{value}</div>
+    <div
+      className={`rounded-md border p-3 text-center ${tone === "good" ? "border-primary bg-primary/10" : "border-border bg-background/40"}`}
+    >
+      <div className={`text-xl font-semibold ${tone === "good" ? "text-primary" : ""}`}>
+        {value}
+      </div>
       <div className="stencil text-[9px] tracking-widest text-muted-foreground mt-1">{label}</div>
     </div>
   );

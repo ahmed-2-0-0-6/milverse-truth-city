@@ -26,8 +26,16 @@ export function HandlerDropLine({ correct, stake, streak, cacheKey }: Props) {
     return () => window.removeEventListener("milverse:profile", on);
   }, []);
 
-  const reading = useMemo(() => (profile ? computeReading(profile, feedTacticMap()) : null), [profile]);
-  const fallback = fallbackDropLine({ correct, stake, streak, seed: (profile?.playerId?.length ?? 1) * 7 + stake });
+  const reading = useMemo(
+    () => (profile ? computeReading(profile, feedTacticMap()) : null),
+    [profile],
+  );
+  const fallback = fallbackDropLine({
+    correct,
+    stake,
+    streak,
+    seed: (profile?.playerId?.length ?? 1) * 7 + stake,
+  });
 
   const line = useHandlerLine({
     surface: "drop-line",

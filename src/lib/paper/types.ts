@@ -8,8 +8,8 @@ export interface EditionLead {
   subhead: string;
   byline: string;
   dropCap?: boolean;
-  columns: string[];       // paragraphs of the lead article
-  caseId: string;          // references FEED_SCENARIOS[id] for the ground-truth play
+  columns: string[]; // paragraphs of the lead article
+  caseId: string; // references FEED_SCENARIOS[id] for the ground-truth play
   yourCallTitle?: string;
 }
 
@@ -39,7 +39,7 @@ export interface EditionSocial {
 export interface EditionClassified {
   title: string;
   body: string;
-  flags: string[];         // exact substrings inside body/title that are the "red flags"
+  flags: string[]; // exact substrings inside body/title that are the "red flags"
   tacticId?: string;
 }
 
@@ -49,15 +49,24 @@ export interface EditionPuzzle {
   kind: EditionPuzzleKind;
   clickbait: string;
   honest: string;
-  words: string[];         // shuffled words for autopsy; or bullet tells for spot_the_tell
+  words: string[]; // shuffled words for autopsy; or bullet tells for spot_the_tell
   reveal: string;
 }
 
-export interface EditionLedger { note?: string }
+export interface EditionLedger {
+  note?: string;
+}
 
-export interface EditionEditorial { fallback: string; signoff: string }
+export interface EditionEditorial {
+  fallback: string;
+  signoff: string;
+}
 
-export interface EditionRealWorld { lede: string; linkLabel: string; linkHref: string }
+export interface EditionRealWorld {
+  lede: string;
+  linkLabel: string;
+  linkHref: string;
+}
 
 export interface EditionContent {
   lead: EditionLead;
@@ -73,7 +82,7 @@ export interface EditionContent {
 export interface Edition {
   id: string;
   edition_number: number;
-  edition_date: string;         // YYYY-MM-DD
+  edition_date: string; // YYYY-MM-DD
   motto: string;
   status: EditionStatus;
   content: EditionContent;

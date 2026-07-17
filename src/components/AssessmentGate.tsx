@@ -17,16 +17,27 @@ export function AssessmentGate() {
     let cancelled = false;
     async function check() {
       const g = getActiveGroup();
-      if (!g) { setNeeded(null); return; }
+      if (!g) {
+        setNeeded(null);
+        return;
+      }
       const hash = await hashCodename(getCodename());
       let phase: "intake" | "exit" = "intake";
       try {
         const res = await fetchPhase({ data: { groupCode: g } as never });
         phase = (res as { phase: "intake" | "exit" }).phase;
-      } catch { /* offline OK */ }
+      } catch {
+        /* offline OK */
+      }
       if (cancelled) return;
-      if (phase === "intake" && !hasAttempt(g, hash, "intake")) { setNeeded("intake"); return; }
-      if (phase === "exit"   && !hasAttempt(g, hash, "exit"))   { setNeeded("exit"); return; }
+      if (phase === "intake" && !hasAttempt(g, hash, "intake")) {
+        setNeeded("intake");
+        return;
+      }
+      if (phase === "exit" && !hasAttempt(g, hash, "exit")) {
+        setNeeded("exit");
+        return;
+      }
       setNeeded(null);
     }
     void check();

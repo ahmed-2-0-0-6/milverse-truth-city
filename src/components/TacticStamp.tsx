@@ -7,7 +7,13 @@ import { getManualEntry, type TacticId } from "@/lib/manual/entries";
 import { useEffect, useState } from "react";
 import { unlockTactic } from "@/lib/manual/state";
 
-export function TacticStamp({ tacticId, autoUnlock = true }: { tacticId: TacticId; autoUnlock?: boolean }) {
+export function TacticStamp({
+  tacticId,
+  autoUnlock = true,
+}: {
+  tacticId: TacticId;
+  autoUnlock?: boolean;
+}) {
   const entry = getManualEntry(tacticId);
   const [justUnlocked, setJustUnlocked] = useState(false);
 
@@ -32,10 +38,15 @@ export function TacticStamp({ tacticId, autoUnlock = true }: { tacticId: TacticI
         <FileSearch className="h-3.5 w-3.5" />
         TACTIC IDENTIFIED
         {justUnlocked && (
-          <span className="ml-1 rounded-sm bg-primary/20 px-1.5 py-0.5 text-[9px] text-primary">+ NEW MANUAL ENTRY</span>
+          <span className="ml-1 rounded-sm bg-primary/20 px-1.5 py-0.5 text-[9px] text-primary">
+            + NEW MANUAL ENTRY
+          </span>
         )}
       </div>
-      <div className="mt-2 text-2xl font-black tracking-tight" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
+      <div
+        className="mt-2 text-2xl font-black tracking-tight"
+        style={{ fontFamily: '"Bebas Neue", sans-serif' }}
+      >
         {entry.name}
       </div>
       <p className="mt-1 text-sm text-muted-foreground italic">{entry.oneLine}</p>

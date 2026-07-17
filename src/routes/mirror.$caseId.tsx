@@ -5,8 +5,15 @@ import { TopBar } from "@/components/TopBar";
 import { VoiceNote } from "@/components/VoiceNote";
 import { getScenario, type EvidenceChip, type Scenario } from "@/lib/mirror/scenarios";
 import {
-  initState, respond, gradeProbe, idleNudge, verifyOutOfBand,
-  VOB_METHODS, type EngineState, type Message, type VobMethod,
+  initState,
+  respond,
+  gradeProbe,
+  idleNudge,
+  verifyOutOfBand,
+  VOB_METHODS,
+  type EngineState,
+  type Message,
+  type VobMethod,
 } from "@/lib/mirror/engine";
 import { generateContactReply } from "@/lib/mirror/ai.functions";
 import { ARTIFACT_LABEL } from "@/lib/mirror/voice";
@@ -26,7 +33,6 @@ import { ChatShell } from "@/components/chat/ChatShell";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ContactsSheet } from "@/components/chat/ContactsSheet";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
-
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
@@ -49,21 +55,20 @@ function CasePlay() {
   // In the "sim" phase, ChatShell owns the whole viewport (phone frame).
   // Every other phase keeps the normal MILVERSE app chrome.
   if (phase === "sim") {
-    return (
-      <Simulation
-        scenario={scenario}
-        onEnd={() => setPhase("verdict")}
-      />
-    );
+    return <Simulation scenario={scenario} onEnd={() => setPhase("verdict")} />;
   }
 
   return (
     <div className="min-h-screen grain">
       <TopBar />
-      <div className="mx-auto max-w-3xl px-4 pt-4"><RookieIntro /></div>
+      <div className="mx-auto max-w-3xl px-4 pt-4">
+        <RookieIntro />
+      </div>
       {phase === "dossier" && <Dossier scenario={scenario} onStart={() => setPhase("sim")} />}
       {phase === "verdict" && <Verdict scenario={scenario} onDone={() => setPhase("reveal")} />}
-      {phase === "reveal" && <VerdictReveal scenario={scenario} onDone={() => setPhase("debrief")} />}
+      {phase === "reveal" && (
+        <VerdictReveal scenario={scenario} onDone={() => setPhase("debrief")} />
+      )}
       {phase === "debrief" && <Debrief scenario={scenario} />}
     </div>
   );
@@ -74,13 +79,17 @@ function VerdictReveal({ scenario, onDone }: { scenario: Scenario; onDone: () =>
     try {
       const s = sessionStorage.getItem(VERDICT_KEY);
       return s ? (JSON.parse(s) as { verdict: "REAL" | "FAKE" }) : null;
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   }, []);
   const truthLabel: "REAL" | "FAKE" = scenario.truth === "REAL" ? "REAL" : "FAKE";
   const correct = raw?.verdict === truthLabel;
   const outcome: CalibrationOutcome = correct
     ? "correct"
-    : scenario.truth === "IMPOSTER" ? "missed_scam" : "false_alarm";
+    : scenario.truth === "IMPOSTER"
+      ? "missed_scam"
+      : "false_alarm";
   return (
     <VerdictMoment
       caseTitle={scenario.title || `Case ${scenario.id}`}
@@ -92,13 +101,15 @@ function VerdictReveal({ scenario, onDone }: { scenario: Scenario; onDone: () =>
   );
 }
 
-
 /* ─────────────────────────── DOSSIER ─────────────────────────── */
 
 function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => void }) {
   return (
     <main className="mx-auto max-w-2xl px-4 py-10">
-      <Link to="/mirror" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">
+      <Link
+        to="/mirror"
+        className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
+      >
         ← CASE FILES
       </Link>
 
@@ -109,7 +120,9 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
         <h1 className="mt-4 text-2xl font-semibold">{scenario.title}</h1>
 
         <section className="mt-6">
-          <div className="font-mono text-[11px] tracking-widest text-muted-foreground">WHO IS CONTACTING YOU</div>
+          <div className="font-mono text-[11px] tracking-widest text-muted-foreground">
+            WHO IS CONTACTING YOU
+          </div>
           <p className="mt-1 text-sm">{scenario.dossier.contactClaim}</p>
         </section>
 
@@ -191,7 +204,12 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
   const [contactsOpen, setContactsOpen] = useState(false);
 
   useEffect(() => {
-    const opener: Message = { role: "contact", kind: "text", text: scenario.opener, ts: Date.now() };
+    const opener: Message = {
+      role: "contact",
+      kind: "text",
+      text: scenario.opener,
+      ts: Date.now(),
+    };
     setMessages([opener]);
   }, [scenario.id]);
 
@@ -255,7 +273,13 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
     lastActivity.current = Date.now();
     nudged.current = false;
     const grade = gradeProbe(scenario, text);
-    const playerMsg: Message = { role: "player", kind: "text", text, ts: Date.now(), probeQuality: grade };
+    const playerMsg: Message = {
+      role: "player",
+      kind: "text",
+      text,
+      ts: Date.now(),
+      probeQuality: grade,
+    };
     setMessages((prev) => [...prev, playerMsg]);
     setInput("");
     setTyping(true);
@@ -334,7 +358,6 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
       }
     }
 
-
     const contactMsg: Message = {
       role: "contact",
       kind: reply.voice ? "voice" : "text",
@@ -354,7 +377,6 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
       setEndReason("contact_left");
     }
   }
-
 
   function togglePin(idx: number) {
     setPins((prev) => {
@@ -388,7 +410,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
           <>
             <ChatHeader
               name={scenario.claimedIdentity}
-              number={`+92 3xx ${String((scenario.id.length * 137) % 900 + 100)} ${String((scenario.id.length * 41) % 9000 + 1000)}`}
+              number={`+92 3xx ${String(((scenario.id.length * 137) % 900) + 100)} ${String(((scenario.id.length * 41) % 9000) + 1000)}`}
               isSaved={false}
               subtitle={`CLAIMED · TIER ${scenario.tier}${scenario.tier >= 3 ? " · TIMED" : ""}`}
               onContacts={() => setContactsOpen(true)}
@@ -400,7 +422,10 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 <span>{Math.round(state.meter)}</span>
               </div>
               <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-                <div className={`h-full transition-all duration-500 ${meterColor}`} style={{ width: `${state.meter}%` }} />
+                <div
+                  className={`h-full transition-all duration-500 ${meterColor}`}
+                  style={{ width: `${state.meter}%` }}
+                />
               </div>
               <div className="mt-2 flex gap-1">
                 {(["chat", "notes"] as const).map((t) => (
@@ -441,11 +466,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               mirrorNoHelp={true}
             />
             {showVob && (
-              <VobModal
-                onClose={() => setShowVob(false)}
-                onPick={useVob}
-                tier={scenario.tier}
-              />
+              <VobModal onClose={() => setShowVob(false)} onPick={useVob} tier={scenario.tier} />
             )}
           </>
         }
@@ -453,8 +474,13 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
           <div className="p-3">
             {aiDown && (
               <div className="mb-2 rounded-md border border-caution/40 bg-caution/10 p-2 text-[11px]">
-                <div className="font-mono text-[10px] tracking-widest text-caution mb-0.5">CONNECTION UNSTABLE</div>
-                The contact keeps freezing. <Link to="/quick-tour" className="text-primary underline">Quick Tour →</Link>
+                <div className="font-mono text-[10px] tracking-widest text-caution mb-0.5">
+                  CONNECTION UNSTABLE
+                </div>
+                The contact keeps freezing.{" "}
+                <Link to="/quick-tour" className="text-primary underline">
+                  Quick Tour →
+                </Link>
               </div>
             )}
             <div className="flex gap-2">
@@ -462,7 +488,9 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
-                placeholder={ended ? "Chat ended — make your call." : "Type anything you want to ask…"}
+                placeholder={
+                  ended ? "Chat ended — make your call." : "Type anything you want to ask…"
+                }
                 disabled={ended || typing}
                 className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-sm text-white outline-none focus:border-primary disabled:opacity-50"
               />
@@ -518,8 +546,18 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
 }
 
 function MessageRow({
-  m, pinned, onPin, speakerName, speakerVoiceDesc,
-}: { m: Message; pinned: boolean; onPin?: () => void; speakerName?: string; speakerVoiceDesc?: string }) {
+  m,
+  pinned,
+  onPin,
+  speakerName,
+  speakerVoiceDesc,
+}: {
+  m: Message;
+  pinned: boolean;
+  onPin?: () => void;
+  speakerName?: string;
+  speakerVoiceDesc?: string;
+}) {
   if (m.role === "system") {
     return (
       <div className="msg-in flex justify-center">
@@ -549,9 +587,13 @@ function MessageRow({
       {m.kind === "voice" && m.voice ? (
         <div className="flex flex-col gap-1">
           {m.text && (
-            <div className={`max-w-[80%] rounded-2xl px-3 py-1.5 text-xs italic ${
-              isPlayer ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-neutral-800 border border-white/10 rounded-bl-sm text-white/80"
-            }`}>
+            <div
+              className={`max-w-[80%] rounded-2xl px-3 py-1.5 text-xs italic ${
+                isPlayer
+                  ? "bg-primary text-primary-foreground rounded-br-sm"
+                  : "bg-neutral-800 border border-white/10 rounded-bl-sm text-white/80"
+              }`}
+            >
               {m.text}
             </div>
           )}
@@ -595,8 +637,14 @@ function TypingBubble({ name }: { name: string }) {
 }
 
 function VobModal({
-  onClose, onPick, tier,
-}: { onClose: () => void; onPick: (m: VobMethod) => void; tier: number }) {
+  onClose,
+  onPick,
+  tier,
+}: {
+  onClose: () => void;
+  onPick: (m: VobMethod) => void;
+  tier: number;
+}) {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-background/70 backdrop-blur p-4">
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-5 shadow-2xl">
@@ -612,7 +660,8 @@ function VobModal({
           </button>
         </div>
         <p className="text-xs text-muted-foreground mb-4">
-          The oldest, most reliable defence. {tier <= 3
+          The oldest, most reliable defence.{" "}
+          {tier <= 3
             ? "Small point fee at this tier — but a real contact won't mind if you're polite."
             : "At this tier, in-band tells are unreliable. This is often the only winning move."}
         </p>
@@ -635,8 +684,16 @@ function VobModal({
 }
 
 function NotesTab({
-  scenario, messages, pins, onUnpin,
-}: { scenario: Scenario; messages: Message[]; pins: number[]; onUnpin: (i: number) => void }) {
+  scenario,
+  messages,
+  pins,
+  onUnpin,
+}: {
+  scenario: Scenario;
+  messages: Message[];
+  pins: number[];
+  onUnpin: (i: number) => void;
+}) {
   return (
     <div className="h-full overflow-y-auto p-4 space-y-6">
       <section>
@@ -644,18 +701,26 @@ function NotesTab({
           <StickyNote className="h-3 w-3" /> DOSSIER
         </div>
         <p className="mt-2 text-xs text-muted-foreground">{scenario.dossier.contactClaim}</p>
-        <div className="mt-3 font-mono text-[10px] tracking-widest text-muted-foreground">KNOWN</div>
+        <div className="mt-3 font-mono text-[10px] tracking-widest text-muted-foreground">
+          KNOWN
+        </div>
         <ul className="mt-1 space-y-1 text-xs">
           {scenario.dossier.knownFacts.map((f, i) => (
             <li key={i} className="flex gap-2">
-              <span className="text-primary shrink-0">·</span><span>{f}</span>
+              <span className="text-primary shrink-0">·</span>
+              <span>{f}</span>
             </li>
           ))}
         </ul>
-        <div className="mt-3 font-mono text-[10px] tracking-widest text-muted-foreground">PUBLIC</div>
+        <div className="mt-3 font-mono text-[10px] tracking-widest text-muted-foreground">
+          PUBLIC
+        </div>
         <ul className="mt-1 space-y-1 text-xs text-muted-foreground">
           {scenario.dossier.publicFacts.map((f, i) => (
-            <li key={i} className="flex gap-2"><span className="shrink-0">·</span><span>{f}</span></li>
+            <li key={i} className="flex gap-2">
+              <span className="shrink-0">·</span>
+              <span>{f}</span>
+            </li>
           ))}
         </ul>
       </section>
@@ -672,7 +737,10 @@ function NotesTab({
         ) : (
           <ul className="mt-2 space-y-2">
             {pins.map((i) => (
-              <li key={i} className="rounded-md border border-caution/40 bg-caution/10 p-2 text-xs whitespace-pre-wrap">
+              <li
+                key={i}
+                className="rounded-md border border-caution/40 bg-caution/10 p-2 text-xs whitespace-pre-wrap"
+              >
                 {messages[i]?.text || "[voice note]"}
                 <button
                   onClick={() => onUnpin(i)}
@@ -695,7 +763,9 @@ function loadSim(): StoredSim | null {
   try {
     const raw = sessionStorage.getItem(SIM_KEY);
     return raw ? (JSON.parse(raw) as StoredSim) : null;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void }) {
@@ -705,9 +775,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
 
   const sim = useMemo(() => loadSim(), []);
   const pinIdxs: number[] = (sim?.state as EngineState & { pins?: number[] })?.pins ?? [];
-  const pinnedMsgs = pinIdxs
-    .map((i) => sim?.messages[i])
-    .filter((m): m is Message => !!m);
+  const pinnedMsgs = pinIdxs.map((i) => sim?.messages[i]).filter((m): m is Message => !!m);
   const voiceMsg = sim?.messages.find((m) => m.kind === "voice");
   const vobArtifact = sim?.vobArtifact;
   const usedVob = sim?.endReason === "vob_used";
@@ -720,7 +788,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
     if (!verdict) return;
     sessionStorage.setItem(
       VERDICT_KEY,
-      JSON.stringify({ verdict, picked, conclusion: conclusion.trim().slice(0, 300) })
+      JSON.stringify({ verdict, picked, conclusion: conclusion.trim().slice(0, 300) }),
     );
     onDone();
   }
@@ -746,7 +814,10 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
             </div>
             <ul className="space-y-1.5">
               {pinnedMsgs.map((m, i) => (
-                <li key={i} className="rounded-md border-l-2 border-caution bg-caution/5 pl-2.5 py-1.5 text-xs italic">
+                <li
+                  key={i}
+                  className="rounded-md border-l-2 border-caution bg-caution/5 pl-2.5 py-1.5 text-xs italic"
+                >
                   "{m.text || "[voice note]"}"
                 </li>
               ))}
@@ -760,7 +831,10 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
               VOICE NOTE
             </div>
             <div className="text-xs text-muted-foreground">
-              Artifact detected: <span className="text-foreground">{ARTIFACT_LABEL(voiceMsg.voice?.artifact ?? null)}</span>
+              Artifact detected:{" "}
+              <span className="text-foreground">
+                {ARTIFACT_LABEL(voiceMsg.voice?.artifact ?? null)}
+              </span>
             </div>
           </div>
         )}
@@ -792,7 +866,9 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
         <button
           onClick={() => setVerdict("REAL")}
           className={`rounded-xl border-2 p-6 text-center font-mono tracking-widest transition ${
-            verdict === "REAL" ? "border-primary bg-primary/10 text-primary" : "border-border hover:border-primary/50"
+            verdict === "REAL"
+              ? "border-primary bg-primary/10 text-primary"
+              : "border-border hover:border-primary/50"
           }`}
         >
           <div className="text-lg">REAL</div>
@@ -801,7 +877,9 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
         <button
           onClick={() => setVerdict("FAKE")}
           className={`rounded-xl border-2 p-6 text-center font-mono tracking-widest transition ${
-            verdict === "FAKE" ? "border-destructive bg-destructive/10 text-destructive" : "border-border hover:border-destructive/50"
+            verdict === "FAKE"
+              ? "border-destructive bg-destructive/10 text-destructive"
+              : "border-border hover:border-destructive/50"
           }`}
         >
           <div className="text-lg">FAKE</div>
@@ -858,7 +936,6 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
   );
 }
 
-
 /* ─────────────────────────── DEBRIEF ─────────────────────────── */
 
 function Debrief({ scenario }: { scenario: Scenario }) {
@@ -867,15 +944,18 @@ function Debrief({ scenario }: { scenario: Scenario }) {
   const verdictRaw = useMemo(() => {
     try {
       const raw = sessionStorage.getItem(VERDICT_KEY);
-      return raw ? (JSON.parse(raw) as { verdict: "REAL" | "FAKE"; picked: string[]; conclusion?: string }) : null;
-    } catch { return null; }
+      return raw
+        ? (JSON.parse(raw) as { verdict: "REAL" | "FAKE"; picked: string[]; conclusion?: string })
+        : null;
+    } catch {
+      return null;
+    }
   }, []);
 
   const result = useMemo(() => {
     if (!verdictRaw || !sim) return null;
     const truthLabel: "REAL" | "FAKE" = scenario.truth === "REAL" ? "REAL" : "FAKE";
     const correctVerdict = verdictRaw.verdict === truthLabel;
-
 
     const correctChipIds = scenario.evidenceChips.filter((c) => c.correct).map((c) => c.id);
     const pickedCorrect = verdictRaw.picked.filter((id) => correctChipIds.includes(id)).length;
@@ -887,9 +967,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     const wasted = playerMsgs.filter((m) => m.probeQuality === "wasted").length;
 
     // Quoted tells from the contact.
-    const tells = sim.messages
-      .filter((m) => m.role === "contact" && m.isTell)
-      .slice(0, 4);
+    const tells = sim.messages.filter((m) => m.role === "contact" && m.isTell).slice(0, 4);
 
     // Voice note (if any) — pull artifact from message
     const voiceMsg = sim.messages.find((m) => m.kind === "voice");
@@ -926,25 +1004,42 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     // 4-axis stars (each 0, 0.5, or 1) → total 0-4
     const starVerdict = correctVerdict ? 1 : 0;
     const starEvidence =
-      pickedCorrect >= 2 && pickedRedHerring <= 1 ? 1 :
-      pickedCorrect >= 1 && pickedRedHerring <= 2 ? 0.5 : 0;
-    const starProbing =
-      strong >= 2 && wasted === 0 ? 1 :
-      strong >= 1 && wasted <= 1 ? 0.5 : 0;
+      pickedCorrect >= 2 && pickedRedHerring <= 1
+        ? 1
+        : pickedCorrect >= 1 && pickedRedHerring <= 2
+          ? 0.5
+          : 0;
+    const starProbing = strong >= 2 && wasted === 0 ? 1 : strong >= 1 && wasted <= 1 ? 0.5 : 0;
     // Verification axis: at Tier 4-5, VOB is the right call; at low tiers,
     // strong in-band reasoning also counts.
-    const starVerification =
-      usedVob ? 1 :
-      scenario.tier <= 2 && correctVerdict && pickedCorrect >= 2 ? 1 :
-      scenario.tier === 3 && correctVerdict && pickedCorrect >= 2 ? 0.5 : 0;
+    const starVerification = usedVob
+      ? 1
+      : scenario.tier <= 2 && correctVerdict && pickedCorrect >= 2
+        ? 1
+        : scenario.tier === 3 && correctVerdict && pickedCorrect >= 2
+          ? 0.5
+          : 0;
     const stars = starVerdict + starEvidence + starProbing + starVerification;
 
     return {
-      correctVerdict, pickedCorrect, pickedRedHerring, strong, weak, wasted,
-      points, resultKind, truthLabel, tells, voiceArtifact, usedVob,
-      stars, starVerdict, starEvidence, starProbing, starVerification,
+      correctVerdict,
+      pickedCorrect,
+      pickedRedHerring,
+      strong,
+      weak,
+      wasted,
+      points,
+      resultKind,
+      truthLabel,
+      tells,
+      voiceArtifact,
+      usedVob,
+      stars,
+      starVerdict,
+      starEvidence,
+      starProbing,
+      starVerification,
     };
-
   }, [scenario, sim, verdictRaw]);
 
   const savedRef = useRef(false);
@@ -997,7 +1092,9 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           used_vob: result.usedVob,
         },
       });
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
     window.dispatchEvent(new Event("milverse:profile"));
     checkAndAwardBadges(p);
   }, [result, scenario.id, scenario.tier, scenario.truth, scenario.tactic, verdictRaw]);
@@ -1006,17 +1103,22 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-10 text-muted-foreground">
         No verdict recorded.{" "}
-        <Link to="/mirror" className="text-primary underline">Back to case files</Link>
+        <Link to="/mirror" className="text-primary underline">
+          Back to case files
+        </Link>
       </main>
     );
   }
 
   const verdictTone =
-    result.resultKind === "correct" ? "text-primary border-primary/40 bg-primary/5"
-    : result.resultKind === "lucky_guess" ? "text-caution border-caution/40 bg-caution/5"
-    : "text-destructive border-destructive/40 bg-destructive/5";
+    result.resultKind === "correct"
+      ? "text-primary border-primary/40 bg-primary/5"
+      : result.resultKind === "lucky_guess"
+        ? "text-caution border-caution/40 bg-caution/5"
+        : "text-destructive border-destructive/40 bg-destructive/5";
 
-  const truthHeadline = scenario.truth === "REAL" ? "This person was REAL." : "This was an IMPOSTER.";
+  const truthHeadline =
+    scenario.truth === "REAL" ? "This person was REAL." : "This was an IMPOSTER.";
 
   // Pick pivotal message: last isTell for missed_scam, first player msg for false_alarm.
   const pivotal =
@@ -1028,21 +1130,25 @@ function Debrief({ scenario }: { scenario: Scenario }) {
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8 space-y-6">
-      <CinematicResult
-        kind={result.resultKind}
-        truth={scenario.truth}
-        pivotal={pivotal?.text}
-      />
+      <CinematicResult kind={result.resultKind} truth={scenario.truth} pivotal={pivotal?.text} />
       <div className={`rounded-xl border-2 p-6 ${verdictTone}`}>
-        <div className="font-mono text-xs tracking-[0.3em] opacity-80">DEBRIEF · TIER {scenario.tier}</div>
+        <div className="font-mono text-xs tracking-[0.3em] opacity-80">
+          DEBRIEF · TIER {scenario.tier}
+        </div>
         <h1 className="mt-2 text-2xl font-semibold">{truthHeadline}</h1>
         <p className="mt-1 text-sm opacity-90">
           You said <b>{verdictRaw.verdict}</b> · Result:{" "}
           <b>{result.resultKind.replace("_", " ").toUpperCase()}</b>
-          {result.usedVob && <> · <b>OUT-OF-BAND VERIFIED</b></>}
+          {result.usedVob && (
+            <>
+              {" "}
+              · <b>OUT-OF-BAND VERIFIED</b>
+            </>
+          )}
         </p>
         <div className="mt-3 font-mono text-2xl">
-          {result.points >= 0 ? "+" : ""}{result.points} pts
+          {result.points >= 0 ? "+" : ""}
+          {result.points} pts
         </div>
         {scenario.tier === 5 && !result.usedVob && result.correctVerdict && (
           <p className="mt-3 text-xs opacity-90 border-t border-current/20 pt-3">
@@ -1060,9 +1166,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           <div className="font-mono text-xs tracking-widest text-muted-foreground">
             INVESTIGATOR RATING
           </div>
-          <div className="font-mono text-lg text-primary">
-            {result.stars.toFixed(1)} / 4.0
-          </div>
+          <div className="font-mono text-lg text-primary">{result.stars.toFixed(1)} / 4.0</div>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StarAxis label="Verdict" value={result.starVerdict} />
@@ -1078,12 +1182,9 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">
             YOUR CONCLUSION
           </div>
-          <p className="text-sm italic border-l-2 border-primary pl-3">
-            "{verdictRaw.conclusion}"
-          </p>
+          <p className="text-sm italic border-l-2 border-primary pl-3">"{verdictRaw.conclusion}"</p>
         </section>
       )}
-
 
       {/* Quoted tells from THIS conversation */}
       {result.tells.length > 0 && (
@@ -1097,7 +1198,9 @@ function Debrief({ scenario }: { scenario: Scenario }) {
                 <div className="text-sm italic">"{t.text || "[voice note]"}"</div>
                 {t.tellExplanation && (
                   <div className="mt-1.5 text-xs text-muted-foreground">
-                    <span className="font-mono text-[10px] tracking-widest text-caution mr-1.5">→</span>
+                    <span className="font-mono text-[10px] tracking-widest text-caution mr-1.5">
+                      →
+                    </span>
                     {t.tellExplanation}
                   </div>
                 )}
@@ -1114,7 +1217,9 @@ function Debrief({ scenario }: { scenario: Scenario }) {
             VOICE NOTE ANALYSIS
           </div>
           <p className="text-sm">
-            <span className="font-mono text-[11px] tracking-widest text-primary mr-2">ARTIFACT</span>
+            <span className="font-mono text-[11px] tracking-widest text-primary mr-2">
+              ARTIFACT
+            </span>
             {ARTIFACT_LABEL(result.voiceArtifact)}
           </p>
           {result.voiceArtifact === null ? (
@@ -1139,12 +1244,17 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           {scenario.evidenceChips.map((c) => {
             const picked = verdictRaw.picked.includes(c.id);
             if (!picked && !c.correct) return null;
-            const tone = c.correct ? "border-primary/40 bg-primary/5 text-primary"
+            const tone = c.correct
+              ? "border-primary/40 bg-primary/5 text-primary"
               : "border-destructive/40 bg-destructive/5 text-destructive";
             return (
-              <li key={c.id} className={`rounded-md border p-2.5 ${picked ? tone : "border-border/60 opacity-60"}`}>
+              <li
+                key={c.id}
+                className={`rounded-md border p-2.5 ${picked ? tone : "border-border/60 opacity-60"}`}
+              >
                 <div className="text-xs font-semibold">
-                  {picked ? (c.correct ? "✓ " : "✗ ") : "· "}{c.label}
+                  {picked ? (c.correct ? "✓ " : "✗ ") : "· "}
+                  {c.label}
                 </div>
                 <div className="mt-1 text-[11px] opacity-80">{c.explain}</div>
               </li>
@@ -1167,9 +1277,12 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           {(sim?.messages ?? [])
             .filter((m) => m.role === "player")
             .map((m, i) => {
-              const c = m.probeQuality === "strong" ? "border-l-primary text-foreground"
-                : m.probeQuality === "wasted" ? "border-l-destructive text-muted-foreground"
-                : "border-l-caution text-muted-foreground";
+              const c =
+                m.probeQuality === "strong"
+                  ? "border-l-primary text-foreground"
+                  : m.probeQuality === "wasted"
+                    ? "border-l-destructive text-muted-foreground"
+                    : "border-l-caution text-muted-foreground";
               return (
                 <li key={i} className={`border-l-2 pl-3 py-1 text-xs ${c}`}>
                   <span className="font-mono text-[10px] tracking-widest opacity-70 mr-2">
@@ -1201,8 +1314,6 @@ function Debrief({ scenario }: { scenario: Scenario }) {
 
       <RealCaseFile caseId={scenario.id} inline={scenario.inspiredBy} />
 
-
-
       <div className="flex gap-3">
         <Link
           to="/mirror"
@@ -1223,20 +1334,33 @@ function Debrief({ scenario }: { scenario: Scenario }) {
 
 function StarAxis({ label, value }: { label: string; value: number }) {
   const filled = value >= 1 ? "★" : value >= 0.5 ? "⯪" : "☆";
-  const tone = value >= 1 ? "text-primary" : value >= 0.5 ? "text-caution" : "text-muted-foreground/40";
+  const tone =
+    value >= 1 ? "text-primary" : value >= 0.5 ? "text-caution" : "text-muted-foreground/40";
   return (
     <div className="rounded-md border border-border bg-background/50 p-3 text-center">
       <div className={`text-2xl ${tone}`}>{filled}</div>
-      <div className="mt-1 font-mono text-[10px] tracking-widest text-muted-foreground">{label}</div>
+      <div className="mt-1 font-mono text-[10px] tracking-widest text-muted-foreground">
+        {label}
+      </div>
     </div>
   );
 }
 
-function ProbeStat({ n, label, tone }: { n: number; label: string; tone: "good" | "warn" | "bad" }) {
-
-  const c = tone === "good" ? "text-primary border-primary/40 bg-primary/10"
-    : tone === "warn" ? "text-caution border-caution/40 bg-caution/10"
-    : "text-destructive border-destructive/40 bg-destructive/10";
+function ProbeStat({
+  n,
+  label,
+  tone,
+}: {
+  n: number;
+  label: string;
+  tone: "good" | "warn" | "bad";
+}) {
+  const c =
+    tone === "good"
+      ? "text-primary border-primary/40 bg-primary/10"
+      : tone === "warn"
+        ? "text-caution border-caution/40 bg-caution/10"
+        : "text-destructive border-destructive/40 bg-destructive/10";
   return (
     <div className={`rounded-md border p-3 ${c}`}>
       <div className="text-2xl font-mono">{n}</div>
@@ -1270,16 +1394,18 @@ function pauseText(s: Scenario, k: "P" | "A" | "U" | "S" | "E"): string {
     }[k];
   }
   return {
-    P: "Look for manufactured urgency — countdowns, deadlines, \"before EOD.\" That's the lever.",
+    P: 'Look for manufactured urgency — countdowns, deadlines, "before EOD." That\'s the lever.',
     A: "They resisted every out-of-band verification. A real contact welcomes it.",
-    U: "Claims you couldn't check (\"reverse OTP,\" \"security app,\" \"temp SIM\") — made-up policy is a red flag.",
+    U: 'Claims you couldn\'t check ("reverse OTP," "security app," "temp SIM") — made-up policy is a red flag.',
     S: "Emotional escalation, guilt, or authority. The story is a tool, not a fact.",
     E: "The dossier is your ground truth. Contradictions on dossier facts are catchable lies.",
   }[k];
 }
 
 function CinematicResult({
-  kind, truth, pivotal,
+  kind,
+  truth,
+  pivotal,
 }: {
   kind: "correct" | "missed_scam" | "false_alarm" | "lucky_guess";
   truth: "REAL" | "IMPOSTER";
@@ -1289,15 +1415,20 @@ function CinematicResult({
     return (
       <div className="msg-in rounded-2xl border-2 border-destructive/50 bg-destructive/10 p-8 text-center">
         <div className="font-mono text-[10px] tracking-[0.4em] text-destructive">MISSED SCAM</div>
-        <div className="mt-4 text-4xl sm:text-5xl font-semibold text-destructive">₨15,000 gone.</div>
+        <div className="mt-4 text-4xl sm:text-5xl font-semibold text-destructive">
+          ₨15,000 gone.
+        </div>
         {pivotal && (
           <div className="mt-6 mx-auto max-w-md rounded-lg border-l-2 border-destructive bg-background/50 p-3 text-left">
-            <div className="font-mono text-[10px] tracking-widest text-destructive mb-1">THE MESSAGE WHERE THE TRAP CLOSED</div>
+            <div className="font-mono text-[10px] tracking-widest text-destructive mb-1">
+              THE MESSAGE WHERE THE TRAP CLOSED
+            </div>
             <div className="text-sm italic">"{pivotal}"</div>
           </div>
         )}
         <p className="mt-4 text-sm text-muted-foreground max-w-md mx-auto">
-          Once money leaves — especially via gift cards, wallet, or crypto — it doesn't come back. Verification, not spotting, is the only defence.
+          Once money leaves — especially via gift cards, wallet, or crypto — it doesn't come back.
+          Verification, not spotting, is the only defence.
         </p>
       </div>
     );
@@ -1315,7 +1446,8 @@ function CinematicResult({
             : "You just accused a real person of being an imposter."}
         </p>
         <p className="mt-4 text-xs text-muted-foreground max-w-md mx-auto">
-          Wrongly accusing a real person costs the relationship — that IS a loss. The skill is calibration, not suspicion.
+          Wrongly accusing a real person costs the relationship — that IS a loss. The skill is
+          calibration, not suspicion.
         </p>
       </div>
     );
@@ -1328,7 +1460,8 @@ function CinematicResult({
           You verified without insulting.
         </div>
         <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto">
-          That's the skill. Caught the imposter OR trusted the real person — with reasoning, not luck.
+          That's the skill. Caught the imposter OR trusted the real person — with reasoning, not
+          luck.
         </p>
       </div>
     );
@@ -1338,7 +1471,8 @@ function CinematicResult({
       <div className="font-mono text-[10px] tracking-[0.4em] text-caution">LUCKY GUESS</div>
       <div className="mt-4 text-2xl font-semibold">Right verdict, thin reasoning.</div>
       <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto">
-        You got there — but the evidence you tagged wouldn't have held up. Next time, tag the tells that made it click.
+        You got there — but the evidence you tagged wouldn't have held up. Next time, tag the tells
+        that made it click.
       </p>
     </div>
   );

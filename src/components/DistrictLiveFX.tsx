@@ -12,12 +12,21 @@ import { useVisualMode } from "@/lib/visual-quality";
 
 export type DistrictKey = "mirror" | "feed" | "studio" | "archive" | "cleanroom";
 
-export function DistrictLiveFX({ district, intensity = "normal" }: { district: DistrictKey; intensity?: "normal" | "soft" }) {
+export function DistrictLiveFX({
+  district,
+  intensity = "normal",
+}: {
+  district: DistrictKey;
+  intensity?: "normal" | "soft";
+}) {
   const { mode } = useVisualMode();
   if (mode !== "cinematic") return null;
   const dim = intensity === "soft" ? "opacity-60" : "";
   return (
-    <div aria-hidden className={`district-fx pointer-events-none absolute inset-0 overflow-hidden ${dim}`}>
+    <div
+      aria-hidden
+      className={`district-fx pointer-events-none absolute inset-0 overflow-hidden ${dim}`}
+    >
       {district === "mirror" && <MirrorFX />}
       {district === "feed" && <FeedFX />}
       {district === "studio" && <StudioFX />}
@@ -36,14 +45,21 @@ function MirrorFX() {
       <div className="fx-lightning fx-lightning-a absolute inset-0" />
       <div className="fx-lightning fx-lightning-b absolute inset-0" />
       {/* forked bolt SVG that occasionally strikes */}
-      <svg className="fx-bolt absolute inset-0 h-full w-full" viewBox="0 0 400 300" preserveAspectRatio="none">
+      <svg
+        className="fx-bolt absolute inset-0 h-full w-full"
+        viewBox="0 0 400 300"
+        preserveAspectRatio="none"
+      >
         <path
           d="M240 0 L215 90 L245 95 L190 210 L215 215 L165 300"
           fill="none"
           stroke="rgba(200,225,255,0.95)"
           strokeWidth="1.4"
           strokeLinejoin="round"
-          style={{ filter: "drop-shadow(0 0 6px rgba(180,215,255,0.9)) drop-shadow(0 0 14px rgba(120,180,255,0.6))" }}
+          style={{
+            filter:
+              "drop-shadow(0 0 6px rgba(180,215,255,0.9)) drop-shadow(0 0 14px rgba(120,180,255,0.6))",
+          }}
         />
       </svg>
     </>

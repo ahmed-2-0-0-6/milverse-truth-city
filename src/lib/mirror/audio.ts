@@ -9,14 +9,22 @@ const MUTE_KEY = "milverse.muted";
 if (typeof window !== "undefined") {
   try {
     muted = localStorage.getItem(MUTE_KEY) === "1";
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
-export function isMuted(): boolean { return muted; }
+export function isMuted(): boolean {
+  return muted;
+}
 export function setMuted(m: boolean) {
   muted = m;
   if (typeof window !== "undefined") {
-    try { localStorage.setItem(MUTE_KEY, m ? "1" : "0"); } catch { /* ignore */ }
+    try {
+      localStorage.setItem(MUTE_KEY, m ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
     window.dispatchEvent(new Event("milverse:mute"));
   }
 }
@@ -26,10 +34,14 @@ export function getCtx(): AudioContext | null {
   if (!ctx) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const AC = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext | undefined;
+      const AC = (window.AudioContext || (window as any).webkitAudioContext) as
+        | typeof AudioContext
+        | undefined;
       if (!AC) return null;
       ctx = new AC();
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   }
   if (ctx && ctx.state === "suspended") ctx.resume().catch(() => {});
   return ctx;
@@ -81,7 +93,11 @@ export function glitch(durationMs = 60, gain = 0.06) {
   const c = getCtx();
   if (!c) return;
   const t = c.currentTime;
-  const buf = c.createBuffer(1, Math.max(1, Math.floor((durationMs / 1000) * c.sampleRate)), c.sampleRate);
+  const buf = c.createBuffer(
+    1,
+    Math.max(1, Math.floor((durationMs / 1000) * c.sampleRate)),
+    c.sampleRate,
+  );
   const data = buf.getChannelData(0);
   for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
   const src = c.createBufferSource();
@@ -118,7 +134,9 @@ export function startAmbience(): { stop: (whenSec?: number) => void } | null {
       try {
         // Sharp cut — no fade — that's the artifact.
         src.stop(c.currentTime + whenSec);
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     },
   };
 }

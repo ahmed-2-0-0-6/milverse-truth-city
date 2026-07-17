@@ -9,19 +9,19 @@ import type { TacticId } from "@/lib/manual/entries";
 // Gullible (missed scams dominate) ←→ Paranoid (false alarms dominate).
 // Signed lean score = missed - falseAlarms, normalized against calls.
 export type LeanId =
-  | "soft-target"        // very gullible
-  | "drifting-trusting"  // mildly gullible
-  | "calibrated"         // balanced
-  | "jumpy"              // mildly paranoid
-  | "fortress-mind"      // very paranoid
-  | "rookie";            // < 5 cases
+  | "soft-target" // very gullible
+  | "drifting-trusting" // mildly gullible
+  | "calibrated" // balanced
+  | "jumpy" // mildly paranoid
+  | "fortress-mind" // very paranoid
+  | "rookie"; // < 5 cases
 
 export interface LeanReading {
   id: LeanId;
-  code: string;    // e.g. "L-02"
-  label: string;   // ALL-CAPS noir label
-  blurb: string;   // one-line deterministic description
-  score: number;   // -1..+1 (negative = gullible, positive = paranoid)
+  code: string; // e.g. "L-02"
+  label: string; // ALL-CAPS noir label
+  blurb: string; // one-line deterministic description
+  score: number; // -1..+1 (negative = gullible, positive = paranoid)
   totalCalls: number;
 }
 
@@ -36,7 +36,8 @@ function pressureCallsFromHistory(h: HistoryEntry[]) {
 function pressureCallsFromDaily(d: DailyPlayEntry[]) {
   // A wrong LEGIT call on a SCAM/MISLEADING artifact = missed scam.
   // A wrong SCAM call on a LEGIT artifact = false alarm.
-  let missed = 0, alarms = 0;
+  let missed = 0,
+    alarms = 0;
   for (const e of d) {
     if (e.correct) continue;
     if (e.truth === "LEGIT" && e.verdict !== "LEGIT") alarms++;
@@ -79,11 +80,27 @@ export function computeLean(profile: TrustProfile): LeanReading {
   else id = abs > 0.5 ? "fortress-mind" : "jumpy";
 
   const map: Record<Exclude<LeanId, "rookie">, { code: string; label: string; blurb: string }> = {
-    "soft-target":       { code: "L-01", label: "SOFT TARGET",       blurb: `${missed} scams walked past you. They don't fool you — they rush you.` },
-    "drifting-trusting": { code: "L-02", label: "DRIFTING TRUSTING", blurb: `You lean in a little too fast. Fixable.` },
-    "calibrated":        { code: "L-03", label: "CALIBRATED",        blurb: `Balanced. Keep the head cold.` },
-    "jumpy":             { code: "L-04", label: "JUMPY",             blurb: `${alarms} clean messages flagged. Real people paid the price.` },
-    "fortress-mind":     { code: "L-05", label: "FORTRESS MIND",     blurb: `Nothing gets through — including things that should. That's a cost.` },
+    "soft-target": {
+      code: "L-01",
+      label: "SOFT TARGET",
+      blurb: `${missed} scams walked past you. They don't fool you — they rush you.`,
+    },
+    "drifting-trusting": {
+      code: "L-02",
+      label: "DRIFTING TRUSTING",
+      blurb: `You lean in a little too fast. Fixable.`,
+    },
+    calibrated: { code: "L-03", label: "CALIBRATED", blurb: `Balanced. Keep the head cold.` },
+    jumpy: {
+      code: "L-04",
+      label: "JUMPY",
+      blurb: `${alarms} clean messages flagged. Real people paid the price.`,
+    },
+    "fortress-mind": {
+      code: "L-05",
+      label: "FORTRESS MIND",
+      blurb: `Nothing gets through — including things that should. That's a cost.`,
+    },
   };
   return { id, ...map[id], score, totalCalls };
 }
@@ -93,11 +110,14 @@ export interface TacticStat {
   tactic: TacticId | "unknown";
   seen: number;
   wrong: number;
-  wrongRate: number;   // 0..1
+  wrongRate: number; // 0..1
 }
 
 /** Only Feed carries a first-class tacticId today; hook Mirror in via caseId later. */
-export function computeTacticStats(profile: TrustProfile, feedTacticById: Map<string, TacticId>): TacticStat[] {
+export function computeTacticStats(
+  profile: TrustProfile,
+  feedTacticById: Map<string, TacticId>,
+): TacticStat[] {
   const buckets = new Map<TacticId | "unknown", { seen: number; wrong: number }>();
   for (const e of profile.dailyPlays ?? []) {
     const t = feedTacticById.get(e.caseId) ?? "unknown";
@@ -115,8 +135,13 @@ export function computeTacticStats(profile: TrustProfile, feedTacticById: Map<st
   }
   return Array.from(buckets.entries())
     .filter(([t]) => t !== "unknown")
-    .map(([tactic, v]) => ({ tactic, seen: v.seen, wrong: v.wrong, wrongRate: v.wrong / Math.max(1, v.seen) }))
-    .sort((a, b) => (b.wrongRate - a.wrongRate) || (b.wrong - a.wrong));
+    .map(([tactic, v]) => ({
+      tactic,
+      seen: v.seen,
+      wrong: v.wrong,
+      wrongRate: v.wrong / Math.max(1, v.seen),
+    }))
+    .sort((a, b) => b.wrongRate - a.wrongRate || b.wrong - a.wrong);
 }
 
 /** Which tactic to prescribe training on. `null` if evidence too thin. */
@@ -139,19 +164,49 @@ export interface WagerReading {
 export function computeWagerRead(profile: TrustProfile): WagerReading {
   const plays = profile.dailyPlays ?? [];
   if (plays.length < 4) {
-    return { id: "insufficient", label: "—", blurb: "Not enough Drops played to read the wager.", avgStakeOnWrong: 0, avgStakeOnRight: 0, samples: plays.length };
+    return {
+      id: "insufficient",
+      label: "—",
+      blurb: "Not enough Drops played to read the wager.",
+      avgStakeOnWrong: 0,
+      avgStakeOnRight: 0,
+      samples: plays.length,
+    };
   }
   const right = plays.filter((p) => p.correct);
   const wrong = plays.filter((p) => !p.correct);
-  const avg = (a: DailyPlayEntry[]) => (a.length ? a.reduce((s, p) => s + p.stake, 0) / a.length : 0);
-  const rW = avg(wrong), rR = avg(right);
+  const avg = (a: DailyPlayEntry[]) =>
+    a.length ? a.reduce((s, p) => s + p.stake, 0) / a.length : 0;
+  const rW = avg(wrong),
+    rR = avg(right);
   if (wrong.length >= 2 && rW > rR * 1.4 && rW >= 20) {
-    return { id: "overconfident", label: "OVERCONFIDENT", blurb: `Big stakes on wrong calls — average ${Math.round(rW)}.`, avgStakeOnWrong: rW, avgStakeOnRight: rR, samples: plays.length };
+    return {
+      id: "overconfident",
+      label: "OVERCONFIDENT",
+      blurb: `Big stakes on wrong calls — average ${Math.round(rW)}.`,
+      avgStakeOnWrong: rW,
+      avgStakeOnRight: rR,
+      samples: plays.length,
+    };
   }
   if (right.length >= 2 && rR < rW * 0.7 && rR <= 15) {
-    return { id: "timid", label: "TIMID", blurb: `Tiny stakes on right calls — average ${Math.round(rR)}. Trust your read.`, avgStakeOnWrong: rW, avgStakeOnRight: rR, samples: plays.length };
+    return {
+      id: "timid",
+      label: "TIMID",
+      blurb: `Tiny stakes on right calls — average ${Math.round(rR)}. Trust your read.`,
+      avgStakeOnWrong: rW,
+      avgStakeOnRight: rR,
+      samples: plays.length,
+    };
   }
-  return { id: "measured", label: "MEASURED", blurb: `Stakes track the read. Keep it.`, avgStakeOnWrong: rW, avgStakeOnRight: rR, samples: plays.length };
+  return {
+    id: "measured",
+    label: "MEASURED",
+    blurb: `Stakes track the read. Keep it.`,
+    avgStakeOnWrong: rW,
+    avgStakeOnRight: rR,
+    samples: plays.length,
+  };
 }
 
 // ── Strongest skill (a small win to hand back) ───────────────────
@@ -165,17 +220,17 @@ export function strongestSkill(profile: TrustProfile, stats: TacticStat[]): stri
 
 export function labelForTactic(t: TacticId): string {
   const m: Record<TacticId, string> = {
-    "impersonation":    "impersonation plays",
-    "urgency-fear":     "urgency-and-fear rushes",
-    "out-of-context":   "out-of-context photos",
-    "engagement-bait":  "engagement bait",
-    "imposter-outlet":  "fake news outlets",
-    "phishing":         "phishing bait",
-    "trust-farming":    "trust-farming warmups",
-    "ai-generated":     "AI-generated fakes",
-    "mis-dis-mal":      "mis/dis/mal information",
-    "forgery-engine":   "forged documents",
-    "outrage-machine":  "the outrage machine",
+    impersonation: "impersonation plays",
+    "urgency-fear": "urgency-and-fear rushes",
+    "out-of-context": "out-of-context photos",
+    "engagement-bait": "engagement bait",
+    "imposter-outlet": "fake news outlets",
+    phishing: "phishing bait",
+    "trust-farming": "trust-farming warmups",
+    "ai-generated": "AI-generated fakes",
+    "mis-dis-mal": "mis/dis/mal information",
+    "forgery-engine": "forged documents",
+    "outrage-machine": "the outrage machine",
   };
   return m[t] ?? String(t);
 }
@@ -196,7 +251,10 @@ export interface HandlerReading {
   };
 }
 
-export function computeReading(profile: TrustProfile, feedTacticById: Map<string, TacticId>): HandlerReading {
+export function computeReading(
+  profile: TrustProfile,
+  feedTacticById: Map<string, TacticId>,
+): HandlerReading {
   const lean = computeLean(profile);
   const wager = computeWagerRead(profile);
   const stats = computeTacticStats(profile, feedTacticById);
@@ -207,7 +265,8 @@ export function computeReading(profile: TrustProfile, feedTacticById: Map<string
   // overconfident → low-stake precision; timid → stake up on high-confidence reads.
   let directive: string;
   if (lean.id === "soft-target" || lean.id === "drifting-trusting") {
-    directive = "Slow down before you agree. When the clock's loud, that IS the attack — probe first.";
+    directive =
+      "Slow down before you agree. When the clock's loud, that IS the attack — probe first.";
   } else if (lean.id === "jumpy" || lean.id === "fortress-mind") {
     directive = "Not every stranger is a threat. Prove REAL as hard as you prove FAKE.";
   } else if (wager.id === "overconfident") {
@@ -245,7 +304,10 @@ export interface WeeklyDelta {
   nextGoal: string;
 }
 
-export function computeWeekly(profile: TrustProfile, feedTacticById: Map<string, TacticId>): WeeklyDelta | null {
+export function computeWeekly(
+  profile: TrustProfile,
+  feedTacticById: Map<string, TacticId>,
+): WeeklyDelta | null {
   const plays = profile.dailyPlays ?? [];
   const days = new Set(plays.map((p) => p.dateKey));
   if (days.size < 7) return null;
@@ -255,11 +317,13 @@ export function computeWeekly(profile: TrustProfile, feedTacticById: Map<string,
   const early = sorted.slice(0, half);
   const late = sorted.slice(half);
   const leanScore = (arr: DailyPlayEntry[]) => {
-    let missed = 0, alarms = 0;
-    for (const e of arr) if (!e.correct) {
-      if (e.truth === "LEGIT" && e.verdict !== "LEGIT") alarms++;
-      else if (e.truth !== "LEGIT" && e.verdict === "LEGIT") missed++;
-    }
+    let missed = 0,
+      alarms = 0;
+    for (const e of arr)
+      if (!e.correct) {
+        if (e.truth === "LEGIT" && e.verdict !== "LEGIT") alarms++;
+        else if (e.truth !== "LEGIT" && e.verdict === "LEGIT") missed++;
+      }
     const d = Math.max(3, missed + alarms);
     return (alarms - missed) / d;
   };
@@ -267,8 +331,7 @@ export function computeWeekly(profile: TrustProfile, feedTacticById: Map<string,
   const lScore = leanScore(late);
   const drift = Math.abs(lScore) - Math.abs(eScore);
   const leanTrend =
-    Math.abs(drift) < 0.1 ? "steady" :
-    drift < 0 ? "toward-calibrated" : "away-from-calibrated";
+    Math.abs(drift) < 0.1 ? "steady" : drift < 0 ? "toward-calibrated" : "away-from-calibrated";
 
   // Best-improved tactic
   const improved: WeeklyDelta["tacticImprovement"] = (() => {
@@ -284,7 +347,8 @@ export function computeWeekly(profile: TrustProfile, feedTacticById: Map<string,
       }
       return m;
     };
-    const e = bucket(early), l = bucket(late);
+    const e = bucket(early),
+      l = bucket(late);
     let best: WeeklyDelta["tacticImprovement"] = null;
     let bestDelta = 0;
     for (const [t, lv] of l.entries()) {
@@ -293,15 +357,20 @@ export function computeWeekly(profile: TrustProfile, feedTacticById: Map<string,
       const before = ev.wrong / ev.seen;
       const after = lv.wrong / lv.seen;
       const d = before - after;
-      if (d > bestDelta) { bestDelta = d; best = { tactic: t, before, after }; }
+      if (d > bestDelta) {
+        bestDelta = d;
+        best = { tactic: t, before, after };
+      }
     }
     return best;
   })();
 
   const nextGoal =
-    leanTrend === "toward-calibrated" ? "Hold the drift toward calibrated. One Drop a day."
-    : leanTrend === "away-from-calibrated" ? "Reset. Do three Feed cases before the next Drop."
-    : "Push into an unfamiliar tactic this week.";
+    leanTrend === "toward-calibrated"
+      ? "Hold the drift toward calibrated. One Drop a day."
+      : leanTrend === "away-from-calibrated"
+        ? "Reset. Do three Feed cases before the next Drop."
+        : "Push into an unfamiliar tactic this week.";
 
   return { daysPlayed: days.size, leanTrend, tacticImprovement: improved, nextGoal };
 }

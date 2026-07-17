@@ -21,15 +21,55 @@ export interface RankInfo {
 }
 
 export const RANKS: RankInfo[] = [
-  { id: "citizen",       code: "R0", name: "CITIZEN",        tagline: "You just walked into the city.",           minXp: 0 },
-  { id: "spotter",       code: "R1", name: "SPOTTER",        tagline: "You've started to notice the pattern.",     minXp: 60 },
-  { id: "analyst",       code: "R2", name: "ANALYST",        tagline: "You name the tactic before you react.",     minXp: 180 },
-  { id: "investigator",  code: "R3", name: "INVESTIGATOR",   tagline: "You verify before you believe.",            minXp: 380 },
-  { id: "editor",        code: "R4", name: "EDITOR",         tagline: "You correct without breaking people.",      minXp: 640 },
-  { id: "city-designer", code: "R5", name: "CITY DESIGNER",  tagline: "You design the future of MIL.",             minXp: 960 },
+  {
+    id: "citizen",
+    code: "R0",
+    name: "CITIZEN",
+    tagline: "You just walked into the city.",
+    minXp: 0,
+  },
+  {
+    id: "spotter",
+    code: "R1",
+    name: "SPOTTER",
+    tagline: "You've started to notice the pattern.",
+    minXp: 60,
+  },
+  {
+    id: "analyst",
+    code: "R2",
+    name: "ANALYST",
+    tagline: "You name the tactic before you react.",
+    minXp: 180,
+  },
+  {
+    id: "investigator",
+    code: "R3",
+    name: "INVESTIGATOR",
+    tagline: "You verify before you believe.",
+    minXp: 380,
+  },
+  {
+    id: "editor",
+    code: "R4",
+    name: "EDITOR",
+    tagline: "You correct without breaking people.",
+    minXp: 640,
+  },
+  {
+    id: "city-designer",
+    code: "R5",
+    name: "CITY DESIGNER",
+    tagline: "You design the future of MIL.",
+    minXp: 960,
+  },
 ];
 
-export function computeXp(profile: TrustProfile | null, manualUnlocks: number, publishedStudioCount = 0): number {
+export function computeXp(
+  profile: TrustProfile | null,
+  manualUnlocks: number,
+  publishedStudioCount = 0,
+): number {
   if (!profile) return 0;
   const wins = profile.correctVerdicts * 25;
   const plays = profile.casesPlayed * 5;
@@ -39,7 +79,11 @@ export function computeXp(profile: TrustProfile | null, manualUnlocks: number, p
   return wins + plays + cal + manual + studio;
 }
 
-export function rankFromXp(xp: number): { current: RankInfo; next: RankInfo | null; progress: number } {
+export function rankFromXp(xp: number): {
+  current: RankInfo;
+  next: RankInfo | null;
+  progress: number;
+} {
   let idx = 0;
   for (let i = 0; i < RANKS.length; i++) if (xp >= RANKS[i].minXp) idx = i;
   const current = RANKS[idx];

@@ -48,7 +48,9 @@ export function loadPilotLog(code: string): PilotEntry[] {
   try {
     const raw = localStorage.getItem(key(code));
     return raw ? (JSON.parse(raw) as PilotEntry[]) : [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 /** Fire-and-forget: always write to localStorage. If a group is active, also
@@ -100,7 +102,8 @@ export function summarize(log: PilotEntry[]) {
   const lucky = log.filter((e) => e.result === "lucky_guess").length;
   const missRate = total ? missed / total : 0;
   const faRate = total ? falseAlarm / total : 0;
-  let calibration: "Calibrated" | "Too Trusting" | "Too Paranoid" | "Miscalibrated" | "Warming up" = "Warming up";
+  let calibration: "Calibrated" | "Too Trusting" | "Too Paranoid" | "Miscalibrated" | "Warming up" =
+    "Warming up";
   if (total >= 3) {
     if (missRate < 0.2 && faRate < 0.2) calibration = "Calibrated";
     else if (missRate > 0.4 && faRate < 0.2) calibration = "Too Trusting";

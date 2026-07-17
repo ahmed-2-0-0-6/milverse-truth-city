@@ -16,14 +16,14 @@ export interface HistoryEntry {
 
 /** A single Daily Drop play (date-keyed). */
 export interface DailyPlayEntry {
-  dateKey: string;         // YYYY-MM-DD in UTC+5
+  dateKey: string; // YYYY-MM-DD in UTC+5
   caseId: string;
   verdict: "LEGIT" | "SCAM" | "MISLEADING";
   truth: "LEGIT" | "SCAM" | "MISLEADING";
   correct: boolean;
-  stake: number;           // Trust wagered
-  delta: number;           // +win / -loss applied to trust
-  probesUsed: number;      // 0..2
+  stake: number; // Trust wagered
+  delta: number; // +win / -loss applied to trust
+  probesUsed: number; // 0..2
   ts: number;
 }
 
@@ -42,10 +42,10 @@ export interface TrustProfile {
   publishedCount: number;
   history: HistoryEntry[];
   /** Daily Drop layer — fictional city currency, streak, and per-day play log. */
-  trust: number;                    // current Trust balance
-  dailyStreak: number;              // consecutive days on watch
-  lastDailyDate: string | null;     // last date the drop was played (UTC+5)
-  dailyPlays: DailyPlayEntry[];     // append-only, most recent last
+  trust: number; // current Trust balance
+  dailyStreak: number; // consecutive days on watch
+  lastDailyDate: string | null; // last date the drop was played (UTC+5)
+  dailyPlays: DailyPlayEntry[]; // append-only, most recent last
 }
 
 const KEY = "milverse.profile.v2";
@@ -83,7 +83,12 @@ export function loadProfile(): TrustProfile {
       return p;
     }
     const parsed = JSON.parse(raw) as Partial<TrustProfile>;
-    return { ...newProfile(), ...parsed, history: parsed.history ?? [], dailyPlays: parsed.dailyPlays ?? [] };
+    return {
+      ...newProfile(),
+      ...parsed,
+      history: parsed.history ?? [],
+      dailyPlays: parsed.dailyPlays ?? [],
+    };
   } catch {
     return newProfile();
   }
@@ -135,14 +140,19 @@ export function tierWins(p: TrustProfile, tier: TierId): number {
 }
 
 /** Literacy level from cases played + correct verdicts. Cosmetic only. */
-export function operatorRank(p: TrustProfile): { rank: string; code: string; next: string | null; progress: number } {
+export function operatorRank(p: TrustProfile): {
+  rank: string;
+  code: string;
+  next: string | null;
+  progress: number;
+} {
   const c = p.correctVerdicts;
   const tiers: { code: string; rank: string; min: number }[] = [
-    { code: "L1", rank: "Reader",        min: 0  },
-    { code: "L2", rank: "Fact-checker",  min: 3  },
-    { code: "L3", rank: "Analyst",       min: 8  },
-    { code: "L4", rank: "Researcher",    min: 16 },
-    { code: "L5", rank: "Editor",        min: 28 },
+    { code: "L1", rank: "Reader", min: 0 },
+    { code: "L2", rank: "Fact-checker", min: 3 },
+    { code: "L3", rank: "Analyst", min: 8 },
+    { code: "L4", rank: "Researcher", min: 16 },
+    { code: "L5", rank: "Editor", min: 28 },
   ];
   let idx = 0;
   for (let i = 0; i < tiers.length; i++) if (c >= tiers[i].min) idx = i;
@@ -154,11 +164,14 @@ export function operatorRank(p: TrustProfile): { rank: string; code: string; nex
 
 /** Short callsign derived from playerId — persistent, no PII. */
 export function operatorCallsign(p: TrustProfile): string {
-  const alpha = "ALPHA BRAVO CHARLIE DELTA ECHO FOXTROT GOLF HOTEL INDIA JULIET KILO LIMA MIKE NOVEMBER OSCAR PAPA QUEBEC ROMEO SIERRA TANGO UNIFORM VICTOR WHISKEY XRAY YANKEE ZULU".split(" ");
+  const alpha =
+    "ALPHA BRAVO CHARLIE DELTA ECHO FOXTROT GOLF HOTEL INDIA JULIET KILO LIMA MIKE NOVEMBER OSCAR PAPA QUEBEC ROMEO SIERRA TANGO UNIFORM VICTOR WHISKEY XRAY YANKEE ZULU".split(
+      " ",
+    );
   // stable hash from playerId
   let h = 0;
   for (let i = 0; i < p.playerId.length; i++) h = (h * 31 + p.playerId.charCodeAt(i)) >>> 0;
   const word = alpha[h % alpha.length];
-  const num = (h >> 8) % 900 + 100;
+  const num = ((h >> 8) % 900) + 100;
   return `${word}-${num}`;
 }

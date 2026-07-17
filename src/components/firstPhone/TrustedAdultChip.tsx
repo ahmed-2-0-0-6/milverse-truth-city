@@ -19,10 +19,14 @@ export function TrustedAdultChip({ scene, onResolved, className }: Props) {
 
   if (stage === "calling") {
     return (
-      <div className={`rounded-xl border border-primary/40 bg-primary/5 p-5 shadow-sm ${className ?? ""}`}>
+      <div
+        className={`rounded-xl border border-primary/40 bg-primary/5 p-5 shadow-sm ${className ?? ""}`}
+      >
         <div className="flex items-center gap-2 text-primary">
           <PhoneCall className="h-4 w-4 animate-pulse" />
-          <span className="font-mono text-[11px] tracking-widest">CALLING {scene.who.toUpperCase()}…</span>
+          <span className="font-mono text-[11px] tracking-widest">
+            CALLING {scene.who.toUpperCase()}…
+          </span>
         </div>
         <button
           onClick={() => setStage("done")}
@@ -36,16 +40,25 @@ export function TrustedAdultChip({ scene, onResolved, className }: Props) {
 
   if (stage === "done") {
     return (
-      <div className={`rounded-xl border border-primary/40 bg-primary/10 p-5 shadow-sm ${className ?? ""}`}>
-        <div className="font-mono text-[11px] tracking-widest text-primary">{scene.who.toUpperCase()} SAYS</div>
+      <div
+        className={`rounded-xl border border-primary/40 bg-primary/10 p-5 shadow-sm ${className ?? ""}`}
+      >
+        <div className="font-mono text-[11px] tracking-widest text-primary">
+          {scene.who.toUpperCase()} SAYS
+        </div>
         <p className="mt-2 text-base leading-relaxed">"{scene.line}"</p>
         <div className="mt-4 flex items-center gap-2 text-primary">
           <Check className="h-4 w-4" />
           <span className="text-sm font-medium">{JUNIOR_COPY.trustedAdultCelebrate}</span>
         </div>
         <div className="mt-4 rounded-md border border-caution/30 bg-caution/5 p-3 text-xs">
-          <div className="font-mono text-[10px] tracking-widest text-caution mb-1">NO ADULT AROUND?</div>
-          <p>Don't reply. Don't pay. Don't forward. Save it. Show someone later — a parent, teacher, or librarian.</p>
+          <div className="font-mono text-[10px] tracking-widest text-caution mb-1">
+            NO ADULT AROUND?
+          </div>
+          <p>
+            Don't reply. Don't pay. Don't forward. Save it. Show someone later — a parent, teacher,
+            or librarian.
+          </p>
         </div>
         <button
           onClick={onResolved}
@@ -63,7 +76,9 @@ export function TrustedAdultChip({ scene, onResolved, className }: Props) {
       className={`w-full rounded-xl border-2 border-primary/50 bg-primary/10 hover:bg-primary/20 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-all p-4 flex items-center justify-center gap-2 ${className ?? ""}`}
     >
       <Shield className="h-4 w-4 text-primary" />
-      <span className="font-mono text-[11px] tracking-widest text-primary">{JUNIOR_COPY.trustedAdultChip}</span>
+      <span className="font-mono text-[11px] tracking-widest text-primary">
+        {JUNIOR_COPY.trustedAdultChip}
+      </span>
     </button>
   );
 }

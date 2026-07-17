@@ -3,19 +3,19 @@
 import { FORMS, type AssessmentItem, type FormId, type Verdict } from "./items";
 
 export interface ItemResponse {
-  itemId: string;      // "A1".."B6"
+  itemId: string; // "A1".."B6"
   verdict: Verdict;
-  confidence: number;  // 50–100
+  confidence: number; // 50–100
 }
 
 export interface Metrics {
-  accuracy: number;              // 0..6
-  meanConfidence: number;        // 50..100
-  calibrationGap: number;        // (mean confidence − accuracy%) signed
-  overconfidentErrors: number;   // wrong at >=80% confidence
-  missedScams: number;           // FALSE items judged LEGIT
-  falseAlarms: number;           // LEGIT items judged FALSE
-  unverifiableRecognized: number;// 0 or 1 (unverifiable item marked CANT_VERIFY)
+  accuracy: number; // 0..6
+  meanConfidence: number; // 50..100
+  calibrationGap: number; // (mean confidence − accuracy%) signed
+  overconfidentErrors: number; // wrong at >=80% confidence
+  missedScams: number; // FALSE items judged LEGIT
+  falseAlarms: number; // LEGIT items judged FALSE
+  unverifiableRecognized: number; // 0 or 1 (unverifiable item marked CANT_VERIFY)
 }
 
 function itemById(form: FormId, id: string): AssessmentItem | undefined {
@@ -72,7 +72,7 @@ export interface CohortAttempt {
 export interface CohortRollup {
   nIntake: number;
   nExit: number;
-  nPaired: number;              // participants who did BOTH
+  nPaired: number; // participants who did BOTH
   meanIntake: Metrics | null;
   meanExit: Metrics | null;
   perTactic: Array<{
@@ -108,28 +108,33 @@ export function rollupCohort(attempts: CohortAttempt[]): CohortRollup {
   const exit = attempts.filter((a) => a.phase === "exit");
   const intakeByStudent = new Map<string, CohortAttempt>();
   const exitByStudent = new Map<string, CohortAttempt>();
-  intake.forEach((a) => { if (!intakeByStudent.has(a.codenameHash)) intakeByStudent.set(a.codenameHash, a); });
-  exit.forEach((a)   => { if (!exitByStudent.has(a.codenameHash))   exitByStudent.set(a.codenameHash, a); });
+  intake.forEach((a) => {
+    if (!intakeByStudent.has(a.codenameHash)) intakeByStudent.set(a.codenameHash, a);
+  });
+  exit.forEach((a) => {
+    if (!exitByStudent.has(a.codenameHash)) exitByStudent.set(a.codenameHash, a);
+  });
 
-  const studentSet = new Set<string>([
-    ...intakeByStudent.keys(),
-    ...exitByStudent.keys(),
-  ]);
+  const studentSet = new Set<string>([...intakeByStudent.keys(), ...exitByStudent.keys()]);
   const paired = [...studentSet].filter((k) => intakeByStudent.has(k) && exitByStudent.has(k));
 
   // per-tactic correctness (paired participants only, so the delta is honest)
-  const perTactic = ["P1","P2","P3","P4","P5","P6"].map((pairId) => {
-    const label = ({
-      P1: "Legit friend text",
-      P2: "Prize / lottery bait",
-      P3: "Sourced headline",
-      P4: "Bank / wallet phish",
-      P5: "Out-of-context image",
-      P6: "Unverifiable forward",
-    } as Record<string,string>)[pairId] ?? pairId;
+  const perTactic = ["P1", "P2", "P3", "P4", "P5", "P6"].map((pairId) => {
+    const label =
+      (
+        {
+          P1: "Legit friend text",
+          P2: "Prize / lottery bait",
+          P3: "Sourced headline",
+          P4: "Bank / wallet phish",
+          P5: "Out-of-context image",
+          P6: "Unverifiable forward",
+        } as Record<string, string>
+      )[pairId] ?? pairId;
     const scoreFor = (phase: "intake" | "exit"): number | null => {
       const bucket = phase === "intake" ? intakeByStudent : exitByStudent;
-      let seen = 0, right = 0;
+      let seen = 0,
+        right = 0;
       for (const hash of paired) {
         const a = bucket.get(hash);
         if (!a) continue;
@@ -143,13 +148,18 @@ export function rollupCohort(attempts: CohortAttempt[]): CohortRollup {
       }
       return seen === 0 ? null : Math.round((right / seen) * 100);
     };
-    return { pairId, label, intakeCorrectPct: scoreFor("intake"), exitCorrectPct: scoreFor("exit") };
+    return {
+      pairId,
+      label,
+      intakeCorrectPct: scoreFor("intake"),
+      exitCorrectPct: scoreFor("exit"),
+    };
   });
 
   const perStudent = [...studentSet].sort().map((hash) => ({
     codenameHash: hash,
     intakeAt: intakeByStudent.get(hash)?.ts ?? null,
-    exitAt:   exitByStudent.get(hash)?.ts ?? null,
+    exitAt: exitByStudent.get(hash)?.ts ?? null,
   }));
 
   return {
@@ -157,7 +167,7 @@ export function rollupCohort(attempts: CohortAttempt[]): CohortRollup {
     nExit: exitByStudent.size,
     nPaired: paired.length,
     meanIntake: meanMetrics(paired.map((h) => intakeByStudent.get(h)!.metrics)),
-    meanExit:   meanMetrics(paired.map((h) => exitByStudent.get(h)!.metrics)),
+    meanExit: meanMetrics(paired.map((h) => exitByStudent.get(h)!.metrics)),
     perTactic,
     perStudent,
   };
@@ -166,13 +176,13 @@ export function rollupCohort(attempts: CohortAttempt[]): CohortRollup {
 /** Headline sentence for the /review dashboard. */
 export function headlineSentence(days: number, r: CohortRollup): string | null {
   if (!r.meanIntake || !r.meanExit || r.nPaired === 0) return null;
-  const accPre  = Math.round((r.meanIntake.accuracy / 6) * 100);
-  const accPost = Math.round((r.meanExit.accuracy   / 6) * 100);
+  const accPre = Math.round((r.meanIntake.accuracy / 6) * 100);
+  const accPost = Math.round((r.meanExit.accuracy / 6) * 100);
   const accDelta = accPost - accPre;
-  const gapPre  = r.meanIntake.calibrationGap;
+  const gapPre = r.meanIntake.calibrationGap;
   const gapPost = r.meanExit.calibrationGap;
-  const missDeltaPct  = pctChange(r.meanIntake.missedScams, r.meanExit.missedScams);
-  const faDeltaPct    = pctChange(r.meanIntake.falseAlarms, r.meanExit.falseAlarms);
+  const missDeltaPct = pctChange(r.meanIntake.missedScams, r.meanExit.missedScams);
+  const faDeltaPct = pctChange(r.meanIntake.falseAlarms, r.meanExit.falseAlarms);
   const sign = (n: number) => (n >= 0 ? `+${n}` : `${n}`);
   return `After ${days} day${days === 1 ? "" : "s"} in the city: accuracy ${sign(accDelta)}pp, calibration gap ${gapPre}→${gapPost}, missed scams ${sign(-missDeltaPct)}%, false alarms ${sign(-faDeltaPct)}%.`;
 }

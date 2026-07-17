@@ -23,9 +23,16 @@ export const Route = createFileRoute("/paper")({
   head: () => ({
     meta: [
       { title: "THE DAILY MIRAGE — MILVERSE" },
-      { name: "description", content: "The city's only honest newspaper. Every story in it is false." },
+      {
+        name: "description",
+        content: "The city's only honest newspaper. Every story in it is false.",
+      },
       { property: "og:title", content: "THE DAILY MIRAGE" },
-      { property: "og:description", content: "Every story in it is false. Your job is to catch them. One edition a day, hand-published." },
+      {
+        property: "og:description",
+        content:
+          "Every story in it is false. Your job is to catch them. One edition a day, hand-published.",
+      },
     ],
   }),
   component: PaperPage,
@@ -42,9 +49,21 @@ function PaperPage() {
   useEffect(() => {
     let alive = true;
     fetchEdition()
-      .then((row) => { if (alive) { setEdition(row as unknown as Edition | null); setLoading(false); } })
-      .catch((e) => { if (alive) { setErr((e as Error).message); setLoading(false); } });
-    return () => { alive = false; };
+      .then((row) => {
+        if (alive) {
+          setEdition(row as unknown as Edition | null);
+          setLoading(false);
+        }
+      })
+      .catch((e) => {
+        if (alive) {
+          setErr((e as Error).message);
+          setLoading(false);
+        }
+      });
+    return () => {
+      alive = false;
+    };
   }, [fetchEdition]);
 
   if (loading) {
@@ -69,7 +88,9 @@ function PaperPage() {
           <button
             onClick={() => nav({ to: "/" })}
             className="mt-6 paper-mono text-xs underline decoration-dotted"
-          >← back to the city</button>
+          >
+            ← back to the city
+          </button>
         </div>
       </div>
     );
@@ -78,7 +99,10 @@ function PaperPage() {
   const today = dropDateKey();
   const isToday = edition.edition_date === today;
   const dateLabel = new Date(edition.edition_date + "T00:00:00Z").toLocaleDateString("en-GB", {
-    weekday: "long", year: "numeric", month: "long", day: "numeric",
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   return (
@@ -91,7 +115,10 @@ function PaperPage() {
       <main className="mx-auto max-w-5xl px-4 sm:px-8 py-8 sm:py-12 paper-unfold">
         {/* Back link (dark on paper) */}
         <div className="no-print mb-6 flex items-center justify-between">
-          <Link to="/" className="paper-mono text-xs inline-flex items-center gap-1 hover:underline">
+          <Link
+            to="/"
+            className="paper-mono text-xs inline-flex items-center gap-1 hover:underline"
+          >
             <ArrowLeft className="h-3 w-3" /> CITY
           </Link>
           <div className="flex items-center gap-3">
@@ -105,14 +132,21 @@ function PaperPage() {
             <button
               onClick={() => setShowArchive((v) => !v)}
               className="paper-mono text-xs underline decoration-dotted"
-            >{showArchive ? "TODAY" : "YESTERDAY'S PAPERS"}</button>
+            >
+              {showArchive ? "TODAY" : "YESTERDAY'S PAPERS"}
+            </button>
           </div>
         </div>
 
         {/* Masthead */}
-        <header className="text-center border-y-4 double border-current" style={{ borderColor: "var(--paper-ink)" }}>
+        <header
+          className="text-center border-y-4 double border-current"
+          style={{ borderColor: "var(--paper-ink)" }}
+        >
           <div className="paper-mono text-[10px] tracking-[0.3em] pt-3">
-            {isToday ? "TODAY'S EDITION" : `LATEST EDITION — ${dateLabel.toUpperCase()}. THE PRESSES ARE WARMING FOR THE NEXT RUN.`}
+            {isToday
+              ? "TODAY'S EDITION"
+              : `LATEST EDITION — ${dateLabel.toUpperCase()}. THE PRESSES ARE WARMING FOR THE NEXT RUN.`}
           </div>
           <h1 className="paper-blackletter text-5xl sm:text-7xl md:text-8xl leading-none py-2 sm:py-3">
             The Daily Mirage
@@ -128,14 +162,25 @@ function PaperPage() {
         </header>
 
         {showArchive ? (
-          <YesterdaysPapers currentNumber={edition.edition_number} onOpen={(n) => { setShowArchive(false); void n; }} />
+          <YesterdaysPapers
+            currentNumber={edition.edition_number}
+            onOpen={(n) => {
+              setShowArchive(false);
+              void n;
+            }}
+          />
         ) : (
           <EditionBody edition={edition} />
         )}
 
-        <footer className="no-print mt-16 pt-6 border-t border-current/40 paper-mono text-[10px] tracking-[0.2em] text-center text-[color:var(--paper-muted)]" style={{ borderColor: "var(--paper-rule)" }}>
+        <footer
+          className="no-print mt-16 pt-6 border-t border-current/40 paper-mono text-[10px] tracking-[0.2em] text-center text-[color:var(--paper-muted)]"
+          style={{ borderColor: "var(--paper-rule)" }}
+        >
           THE DAILY MIRAGE · A FICTIONAL NEWSPAPER FOR MEDIA LITERACY REHEARSAL ·
-          <Link to="/manual" className="ml-2 underline">FIELD MANUAL</Link>
+          <Link to="/manual" className="ml-2 underline">
+            FIELD MANUAL
+          </Link>
         </footer>
       </main>
     </div>
@@ -158,12 +203,21 @@ function EditionBody({ edition }: { edition: Edition }) {
   return (
     <>
       {/* A — FRONT PAGE */}
-      <PaperFrontPage lead={c.lead} editionNumber={edition.edition_number} editionDate={edition.edition_date} onDone={refresh} />
+      <PaperFrontPage
+        lead={c.lead}
+        editionNumber={edition.edition_number}
+        editionDate={edition.edition_date}
+        onDone={refresh}
+      />
 
       <Divider label="THE FORGERY COLUMN" />
 
       {/* B — FORGERY COLUMN */}
-      <PaperForgeryColumn forgery={c.forgery} editionNumber={edition.edition_number} onDone={refresh} />
+      <PaperForgeryColumn
+        forgery={c.forgery}
+        editionNumber={edition.edition_number}
+        onDone={refresh}
+      />
 
       <Divider label="THE SOCIAL PAGE" />
 
@@ -173,7 +227,11 @@ function EditionBody({ edition }: { edition: Edition }) {
       <Divider label="CLASSIFIEDS" />
 
       {/* D — CLASSIFIEDS */}
-      <PaperClassifieds items={c.classifieds} editionNumber={edition.edition_number} onDone={refresh} />
+      <PaperClassifieds
+        items={c.classifieds}
+        editionNumber={edition.edition_number}
+        onDone={refresh}
+      />
 
       <Divider label="THE PUZZLE CORNER" />
 
@@ -198,7 +256,10 @@ function EditionBody({ edition }: { edition: Edition }) {
       {/* Cover-to-cover stamp */}
       {record?.coverToCoverAt && (
         <div className="no-print mt-8 flex justify-end">
-          <div className="paper-stamp inline-block border-4 border-[oklch(0.5_0.2_25)] px-4 py-2 paper-mono text-xs tracking-[0.3em] text-[oklch(0.4_0.2_25)]" style={{ transform: "rotate(-8deg)" }}>
+          <div
+            className="paper-stamp inline-block border-4 border-[oklch(0.5_0.2_25)] px-4 py-2 paper-mono text-xs tracking-[0.3em] text-[oklch(0.4_0.2_25)]"
+            style={{ transform: "rotate(-8deg)" }}
+          >
             READ COVER TO COVER · +15 TRUST
           </div>
         </div>
@@ -209,32 +270,68 @@ function EditionBody({ edition }: { edition: Edition }) {
 
 function Divider({ label }: { label: string }) {
   return (
-    <div className="paper-ornament my-8" aria-label={label}>{label}</div>
+    <div className="paper-ornament my-8" aria-label={label}>
+      {label}
+    </div>
   );
 }
 
-function YesterdaysPapers({ currentNumber, onOpen }: { currentNumber: number; onOpen: (n: number) => void }) {
+function YesterdaysPapers({
+  currentNumber,
+  onOpen,
+}: {
+  currentNumber: number;
+  onOpen: (n: number) => void;
+}) {
   const fetchArchive = useServerFn(listArchive);
-  const [rows, setRows] = useState<Array<{ edition_number: number; edition_date: string; content: EditionContent }>>([]);
+  const [rows, setRows] = useState<
+    Array<{ edition_number: number; edition_date: string; content: EditionContent }>
+  >([]);
   useEffect(() => {
-    fetchArchive().then((r) => setRows((r as { rows: typeof rows }).rows.filter((x) => x.edition_number !== currentNumber))).catch(() => setRows([]));
+    fetchArchive()
+      .then((r) =>
+        setRows(
+          (r as { rows: typeof rows }).rows.filter((x) => x.edition_number !== currentNumber),
+        ),
+      )
+      .catch(() => setRows([]));
   }, [fetchArchive, currentNumber]);
 
   return (
     <section className="mt-8">
       <div className="paper-ornament mb-6">YESTERDAY'S PAPERS · THE SHELF</div>
       {rows.length === 0 ? (
-        <p className="paper-body no-dropcap text-center">The shelf is empty. Today is the first edition.</p>
+        <p className="paper-body no-dropcap text-center">
+          The shelf is empty. Today is the first edition.
+        </p>
       ) : (
         <ul className="grid sm:grid-cols-2 gap-6">
           {rows.map((r) => (
-            <li key={r.edition_number} className="border border-current/40 p-4 rounded-sm" style={{ borderColor: "var(--paper-rule)" }}>
+            <li
+              key={r.edition_number}
+              className="border border-current/40 p-4 rounded-sm"
+              style={{ borderColor: "var(--paper-rule)" }}
+            >
               <div className="paper-mono text-[10px] tracking-[0.3em] text-[color:var(--paper-muted)]">
-                No. {String(r.edition_number).padStart(3, "0")} · {new Date(r.edition_date + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                No. {String(r.edition_number).padStart(3, "0")} ·{" "}
+                {new Date(r.edition_date + "T00:00:00Z").toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
               </div>
-              <h3 className="paper-serif text-xl mt-1" style={{ fontWeight: 900 }}>{r.content?.lead?.headline ?? "Untitled"}</h3>
-              <p className="paper-body no-dropcap text-sm mt-1 line-clamp-2">{r.content?.lead?.subhead ?? ""}</p>
-              <button onClick={() => onOpen(r.edition_number)} className="paper-mono text-[10px] tracking-[0.2em] mt-3 underline decoration-dotted">READ (READ-ONLY)</button>
+              <h3 className="paper-serif text-xl mt-1" style={{ fontWeight: 900 }}>
+                {r.content?.lead?.headline ?? "Untitled"}
+              </h3>
+              <p className="paper-body no-dropcap text-sm mt-1 line-clamp-2">
+                {r.content?.lead?.subhead ?? ""}
+              </p>
+              <button
+                onClick={() => onOpen(r.edition_number)}
+                className="paper-mono text-[10px] tracking-[0.2em] mt-3 underline decoration-dotted"
+              >
+                READ (READ-ONLY)
+              </button>
             </li>
           ))}
         </ul>
@@ -242,4 +339,3 @@ function YesterdaysPapers({ currentNumber, onOpen }: { currentNumber: number; on
     </section>
   );
 }
-

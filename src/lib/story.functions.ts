@@ -36,7 +36,8 @@ function serverClient() {
     global: {
       fetch: (input, init) => {
         const h = new Headers(init?.headers);
-        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+          h.delete("Authorization");
         h.set("apikey", key);
         return fetch(input, { ...init, headers: h });
       },
@@ -46,10 +47,12 @@ function serverClient() {
 
 export const submitStory = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({
-      story: StorySchema,
-      deviceId: z.string().min(8).max(64).optional(),
-    }).parse(input),
+    z
+      .object({
+        story: StorySchema,
+        deviceId: z.string().min(8).max(64).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     const blob = JSON.stringify(data.story);
@@ -97,11 +100,13 @@ export const listPendingSubmissions = createServerFn({ method: "POST" })
 
 export const rejectSubmission = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({
-      passcode: z.string().min(1),
-      id: z.string().uuid(),
-      reason: z.string().min(3).max(400),
-    }).parse(input),
+    z
+      .object({
+        passcode: z.string().min(1),
+        id: z.string().uuid(),
+        reason: z.string().min(3).max(400),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     checkPasscode(data.passcode);
@@ -116,12 +121,14 @@ export const rejectSubmission = createServerFn({ method: "POST" })
 
 export const approveSubmissionAndPublish = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({
-      passcode: z.string().min(1),
-      id: z.string().uuid(),
-      shareCode: z.string().regex(/^[A-Z0-9]{6}$/),
-      scenario: z.any(),
-    }).parse(input),
+    z
+      .object({
+        passcode: z.string().min(1),
+        id: z.string().uuid(),
+        shareCode: z.string().regex(/^[A-Z0-9]{6}$/),
+        scenario: z.any(),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     checkPasscode(data.passcode);
@@ -144,15 +151,14 @@ export const approveSubmissionAndPublish = createServerFn({ method: "POST" })
     return { ok: true, shareCode: data.shareCode };
   });
 
-export const listCommunityCases = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const supabase = serverClient();
-    const { data, error } = await supabase
-      .from("citizen_cases")
-      .select("share_code, scenario_config, created_at, source")
-      .eq("source", "community_story")
-      .order("created_at", { ascending: false })
-      .limit(50);
-    if (error) throw new Error(error.message);
-    return { rows: data ?? [] };
-  });
+export const listCommunityCases = createServerFn({ method: "GET" }).handler(async () => {
+  const supabase = serverClient();
+  const { data, error } = await supabase
+    .from("citizen_cases")
+    .select("share_code, scenario_config, created_at, source")
+    .eq("source", "community_story")
+    .order("created_at", { ascending: false })
+    .limit(50);
+  if (error) throw new Error(error.message);
+  return { rows: data ?? [] };
+});

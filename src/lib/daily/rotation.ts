@@ -56,7 +56,9 @@ export function secondsToNextDrop(now: Date = new Date()): number {
 export function rotationIndexForDate(dateKey: string): number {
   // Days since 1970-01-01 in the shifted zone; stable seed.
   const days = Math.floor(new Date(dateKey + "T00:00:00Z").getTime() / 86400000);
-  return ((days % DAILY_ROTATION_IDS.length) + DAILY_ROTATION_IDS.length) % DAILY_ROTATION_IDS.length;
+  return (
+    ((days % DAILY_ROTATION_IDS.length) + DAILY_ROTATION_IDS.length) % DAILY_ROTATION_IDS.length
+  );
 }
 
 /** Return the FeedScenario scheduled for a given date. */

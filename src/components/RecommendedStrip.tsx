@@ -30,8 +30,12 @@ export function RecommendedStrip() {
             className="group rounded-sm border border-primary/30 bg-primary/5 p-4 hover:border-primary transition"
           >
             <div className="stencil text-[9px] text-primary/80">{r.tag.replace("_", " ")}</div>
-            <div className="mt-1.5 text-sm font-semibold group-hover:text-primary">{r.scenario.title}</div>
-            <div className="mt-1 text-xs text-muted-foreground">Tier {r.scenario.tier} · {r.scenario.teaser}</div>
+            <div className="mt-1.5 text-sm font-semibold group-hover:text-primary">
+              {r.scenario.title}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              Tier {r.scenario.tier} · {r.scenario.teaser}
+            </div>
             <div className="mt-3 border-t border-primary/20 pt-2 text-[11px] text-caution italic">
               {r.reason}
             </div>

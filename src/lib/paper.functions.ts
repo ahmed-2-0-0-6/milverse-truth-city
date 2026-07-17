@@ -22,7 +22,8 @@ function pubClient() {
     global: {
       fetch: (input, init) => {
         const h = new Headers(init?.headers);
-        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+          h.delete("Authorization");
         h.set("apikey", key);
         return fetch(input, { ...init, headers: h });
       },
@@ -35,7 +36,9 @@ export const getLatestEdition = createServerFn({ method: "GET" }).handler(async 
   const sb = pubClient();
   const { data, error } = await sb
     .from("editions" as never)
-    .select("id, edition_number, edition_date, motto, status, content, published_at, created_at, updated_at")
+    .select(
+      "id, edition_number, edition_date, motto, status, content, published_at, created_at, updated_at",
+    )
     .in("status", ["published", "locked"])
     .order("edition_date", { ascending: false })
     .order("edition_number", { ascending: false })
@@ -63,7 +66,9 @@ export const getEdition = createServerFn({ method: "POST" })
     const sb = pubClient();
     const { data: row, error } = await sb
       .from("editions" as never)
-      .select("id, edition_number, edition_date, motto, status, content, published_at, created_at, updated_at")
+      .select(
+        "id, edition_number, edition_date, motto, status, content, published_at, created_at, updated_at",
+      )
       .eq("edition_number", data.number)
       .in("status", ["published", "locked"])
       .maybeSingle();
@@ -72,24 +77,37 @@ export const getEdition = createServerFn({ method: "POST" })
   });
 
 export const getPaperSplit = createServerFn({ method: "POST" })
-  .inputValidator((i: unknown) => z.object({ number: z.number().int(), section: z.string().min(1).max(40) }).parse(i))
+  .inputValidator((i: unknown) =>
+    z.object({ number: z.number().int(), section: z.string().min(1).max(40) }).parse(i),
+  )
   .handler(async ({ data }) => {
     const sb = pubClient();
-    const { data: rows, error } = await sb.rpc("get_paper_split" as never, {
-      _edition_number: data.number, _section: data.section,
-    } as never);
+    const { data: rows, error } = await sb.rpc(
+      "get_paper_split" as never,
+      {
+        _edition_number: data.number,
+        _section: data.section,
+      } as never,
+    );
     if (error) throw new Error(error.message);
-    const row = Array.isArray(rows) && rows.length > 0 ? rows[0] as { total: number; correct_count: number } : { total: 0, correct_count: 0 };
+    const row =
+      Array.isArray(rows) && rows.length > 0
+        ? (rows[0] as { total: number; correct_count: number })
+        : { total: 0, correct_count: 0 };
     return { total: row.total ?? 0, correct: row.correct_count ?? 0 };
   });
 
 export const logPaperInteraction = createServerFn({ method: "POST" })
-  .inputValidator((i: unknown) => z.object({
-    number: z.number().int(),
-    section: z.enum(["lead", "forgery", "social", "classified", "puzzle"]),
-    correct: z.boolean(),
-    deviceId: z.string().max(64).optional(),
-  }).parse(i))
+  .inputValidator((i: unknown) =>
+    z
+      .object({
+        number: z.number().int(),
+        section: z.enum(["lead", "forgery", "social", "classified", "puzzle"]),
+        correct: z.boolean(),
+        deviceId: z.string().max(64).optional(),
+      })
+      .parse(i),
+  )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin.from("paper_interactions" as never).insert({
@@ -117,7 +135,9 @@ export const pressroomList = createServerFn({ method: "POST" })
   });
 
 export const pressroomGet = createServerFn({ method: "POST" })
-  .inputValidator((i: unknown) => z.object({ passcode: z.string().min(1), number: z.number().int() }).parse(i))
+  .inputValidator((i: unknown) =>
+    z.object({ passcode: z.string().min(1), number: z.number().int() }).parse(i),
+  )
   .handler(async ({ data }) => {
     checkPass(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -131,45 +151,58 @@ export const pressroomGet = createServerFn({ method: "POST" })
   });
 
 export const pressroomSave = createServerFn({ method: "POST" })
-  .inputValidator((i: unknown) => z.object({
-    passcode: z.string().min(1),
-    number: z.number().int().positive(),
-    edition_date: z.string().min(10).max(10),
-    content: z.any(),
-  }).parse(i))
+  .inputValidator((i: unknown) =>
+    z
+      .object({
+        passcode: z.string().min(1),
+        number: z.number().int().positive(),
+        edition_date: z.string().min(10).max(10),
+        content: z.any(),
+      })
+      .parse(i),
+  )
   .handler(async ({ data }) => {
     checkPass(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // If exists → update (only if not locked). Else insert as draft.
     const { data: existing } = await supabaseAdmin
-      .from("editions" as never).select("id, status").eq("edition_number", data.number).maybeSingle();
+      .from("editions" as never)
+      .select("id, status")
+      .eq("edition_number", data.number)
+      .maybeSingle();
     if (existing && (existing as { status: string }).status === "locked") {
       throw new Error("Edition is locked. Typo-fix mode not implemented in prototype.");
     }
     if (existing) {
-      const { error } = await supabaseAdmin.from("editions" as never)
-        .update({ edition_date: data.edition_date, content: data.content as EditionContent } as never)
+      const { error } = await supabaseAdmin
+        .from("editions" as never)
+        .update({
+          edition_date: data.edition_date,
+          content: data.content as EditionContent,
+        } as never)
         .eq("edition_number", data.number);
       if (error) throw new Error(error.message);
     } else {
-      const { error } = await supabaseAdmin.from("editions" as never)
-        .insert({
-          edition_number: data.number,
-          edition_date: data.edition_date,
-          status: "draft",
-          content: data.content as EditionContent,
-        } as never);
+      const { error } = await supabaseAdmin.from("editions" as never).insert({
+        edition_number: data.number,
+        edition_date: data.edition_date,
+        status: "draft",
+        content: data.content as EditionContent,
+      } as never);
       if (error) throw new Error(error.message);
     }
     return { ok: true };
   });
 
 export const pressroomPublish = createServerFn({ method: "POST" })
-  .inputValidator((i: unknown) => z.object({ passcode: z.string().min(1), number: z.number().int().positive() }).parse(i))
+  .inputValidator((i: unknown) =>
+    z.object({ passcode: z.string().min(1), number: z.number().int().positive() }).parse(i),
+  )
   .handler(async ({ data }) => {
     checkPass(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("editions" as never)
+    const { error } = await supabaseAdmin
+      .from("editions" as never)
       .update({ status: "published", published_at: new Date().toISOString() } as never)
       .eq("edition_number", data.number);
     if (error) throw new Error(error.message);

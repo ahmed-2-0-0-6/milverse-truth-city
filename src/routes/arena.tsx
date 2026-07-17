@@ -5,7 +5,11 @@ export const Route = createFileRoute("/arena")({
   head: () => ({
     meta: [
       { title: "The Arena — Blueprint — MILVERSE" },
-      { name: "description", content: "MILVERSE district blueprint: human-vs-human imposter duels. Play the mask, or spot it. Vote on what opens next." },
+      {
+        name: "description",
+        content:
+          "MILVERSE district blueprint: human-vs-human imposter duels. Play the mask, or spot it. Vote on what opens next.",
+      },
     ],
   }),
   component: () => (

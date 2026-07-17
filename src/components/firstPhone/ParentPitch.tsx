@@ -14,15 +14,20 @@ export function ParentPitch({ onStart }: { onStart: () => void }) {
   return (
     <div className="space-y-8">
       <header>
-        <div className="font-mono text-[11px] tracking-widest text-primary">FIRST PHONE PROGRAM</div>
+        <div className="font-mono text-[11px] tracking-widest text-primary">
+          FIRST PHONE PROGRAM
+        </div>
         <h1 className="mt-2 text-4xl sm:text-5xl font-semibold leading-tight">
           Your first phone shouldn't be real.
         </h1>
         <p className="mt-3 text-lg text-muted-foreground max-w-2xl">
-          A 10-lesson program that gives kids a phone that <em>feels</em> real inside MILVERSE — scams, forwards, impersonators and all — so their first real phone isn't their first real test.
+          A 10-lesson program that gives kids a phone that <em>feels</em> real inside MILVERSE —
+          scams, forwards, impersonators and all — so their first real phone isn't their first real
+          test.
         </p>
         <p className="mt-3 text-sm italic text-muted-foreground max-w-2xl">
-          Certifies completion of a learning pathway. Not a guarantee of online safety — the training continues in real life.
+          Certifies completion of a learning pathway. Not a guarantee of online safety — the
+          training continues in real life.
         </p>
       </header>
 
@@ -49,10 +54,13 @@ export function ParentPitch({ onStart }: { onStart: () => void }) {
           </ul>
         </div>
         <div className="rounded-xl border border-caution/40 bg-caution/5 p-5">
-          <div className="font-mono text-[10px] tracking-widest text-caution">WHAT'S EXPLICITLY NOT</div>
+          <div className="font-mono text-[10px] tracking-widest text-caution">
+            WHAT'S EXPLICITLY NOT
+          </div>
           <p className="mt-3 text-sm">
-            This program does <strong>not</strong> simulate predatory contact, romance, or body-image pressure.
-            That domain belongs to child-safety professionals — see our resources page for organizations that specialize in it.
+            This program does <strong>not</strong> simulate predatory contact, romance, or
+            body-image pressure. That domain belongs to child-safety professionals — see our
+            resources page for organizations that specialize in it.
           </p>
         </div>
       </section>
@@ -63,9 +71,12 @@ export function ParentPitch({ onStart }: { onStart: () => void }) {
           <span className="font-mono text-[10px] tracking-widest">FAMILY CODE</span>
         </div>
         <p className="mt-2 text-sm">
-          Create a code, share it with your kid. You see skills, badges, and the license status — never conversation content.
+          Create a code, share it with your kid. You see skills, badges, and the license status —
+          never conversation content.
         </p>
-        <Link to="/family" className="mt-3 inline-block text-sm text-primary hover:underline">Set up a Family Code →</Link>
+        <Link to="/family" className="mt-3 inline-block text-sm text-primary hover:underline">
+          Set up a Family Code →
+        </Link>
       </section>
 
       <section className="rounded-xl border border-border bg-card p-5">
@@ -74,14 +85,17 @@ export function ParentPitch({ onStart }: { onStart: () => void }) {
           <span className="font-mono text-[10px] tracking-widest">THE LICENSE</span>
         </div>
         <p className="mt-2 text-sm">
-          Finish all 10 lessons and the city issues the <strong>First Phone License</strong> — a printable card frameable on the fridge.
-          Ten endorsements, city seal, license number. Zero personal data required.
+          Finish all 10 lessons and the city issues the <strong>First Phone License</strong> — a
+          printable card frameable on the fridge. Ten endorsements, city seal, license number. Zero
+          personal data required.
         </p>
       </section>
 
       <div className="rounded-2xl border-2 border-primary/60 bg-primary/10 p-6">
         <div className="font-mono text-[10px] tracking-widest text-primary">READY?</div>
-        <label className="block mt-3 text-xs text-muted-foreground">Kid's chosen city-name (for the license — nickname is fine)</label>
+        <label className="block mt-3 text-xs text-muted-foreground">
+          Kid's chosen city-name (for the license — nickname is fine)
+        </label>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}

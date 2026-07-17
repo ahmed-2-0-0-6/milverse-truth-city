@@ -15,7 +15,10 @@ export const Route = createFileRoute("/city-hall")({
   head: () => ({
     meta: [
       { title: "City Hall — MILVERSE" },
-      { name: "description", content: "Your record on the wall. Cases run, calls made, calibration honest." },
+      {
+        name: "description",
+        content: "Your record on the wall. Cases run, calls made, calibration honest.",
+      },
     ],
   }),
   component: CityHall,
@@ -27,7 +30,10 @@ function CityHall() {
   useEffect(() => {
     setP(loadProfile());
     setEarned(loadEarnedBadges());
-    const on = () => { setP(loadProfile()); setEarned(loadEarnedBadges()); };
+    const on = () => {
+      setP(loadProfile());
+      setEarned(loadEarnedBadges());
+    };
     window.addEventListener("milverse:profile", on);
     window.addEventListener("milverse:badge", on);
     return () => {
@@ -63,7 +69,9 @@ function CityHall() {
           <div className="flex items-center gap-3 mb-3">
             <div className="stencil text-[10px] text-primary">// READER PROFILE · SESSION</div>
             <div className="h-px flex-1 bg-primary/20" />
-            <div className="stencil text-[10px] text-muted-foreground">{new Date().toISOString().slice(0, 10)}</div>
+            <div className="stencil text-[10px] text-muted-foreground">
+              {new Date().toISOString().slice(0, 10)}
+            </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div>
@@ -107,9 +115,21 @@ function CityHall() {
             <div className="mt-4 relative aspect-square max-w-xs mx-auto">
               <div className="grid grid-cols-2 gap-2 h-full">
                 <Quadrant label="CALIBRATED" active={missRate < 0.2 && faRate < 0.2} tone="good" />
-                <Quadrant label="TOO PARANOID" active={faRate >= 0.4 && missRate < 0.2} tone="warn" />
-                <Quadrant label="TOO TRUSTING" active={missRate >= 0.4 && faRate < 0.2} tone="warn" />
-                <Quadrant label="MISCALIBRATED" active={missRate >= 0.2 && faRate >= 0.2} tone="bad" />
+                <Quadrant
+                  label="TOO PARANOID"
+                  active={faRate >= 0.4 && missRate < 0.2}
+                  tone="warn"
+                />
+                <Quadrant
+                  label="TOO TRUSTING"
+                  active={missRate >= 0.4 && faRate < 0.2}
+                  tone="warn"
+                />
+                <Quadrant
+                  label="MISCALIBRATED"
+                  active={missRate >= 0.2 && faRate >= 0.2}
+                  tone="bad"
+                />
               </div>
               {/* Player dot: x = missRate (→ too trusting), y = faRate (→ too paranoid, inverted) */}
               {p.casesPlayed > 0 && (
@@ -163,7 +183,9 @@ function CityHall() {
                 >
                   <div className={`text-2xl ${has ? "" : "grayscale"}`}>{b.emoji}</div>
                   <div className="min-w-0">
-                    <div className={`text-sm font-semibold truncate ${has ? "text-foreground" : "text-muted-foreground"}`}>
+                    <div
+                      className={`text-sm font-semibold truncate ${has ? "text-foreground" : "text-muted-foreground"}`}
+                    >
                       {b.name}
                     </div>
                     <div className="text-[10px] text-muted-foreground line-clamp-2">{b.blurb}</div>
@@ -175,9 +197,7 @@ function CityHall() {
         </div>
 
         <div className="rounded-sm border border-border bg-card p-6 mb-8 hud-frame">
-          <div className="stencil text-[10px] text-primary mb-4">
-            // CASE LOG · LAST 10
-          </div>
+          <div className="stencil text-[10px] text-primary mb-4">// CASE LOG · LAST 10</div>
           {p.history.length === 0 ? (
             <div className="text-sm text-muted-foreground">
               No cases logged yet.{" "}
@@ -187,23 +207,30 @@ function CityHall() {
             </div>
           ) : (
             <ul className="space-y-1.5">
-              {p.history.slice().reverse().slice(0, 10).map((h, i) => (
-                <li key={i} className="flex items-center justify-between text-sm font-mono border-l-2 border-border pl-3 py-1 hover:border-primary transition-colors">
-                  <span className="text-muted-foreground">{h.caseId}</span>
-                  <span
-                    className={
-                      h.result === "correct"
-                        ? "text-primary"
-                        : h.result === "lucky_guess"
-                          ? "text-caution"
-                          : "text-destructive"
-                    }
+              {p.history
+                .slice()
+                .reverse()
+                .slice(0, 10)
+                .map((h, i) => (
+                  <li
+                    key={i}
+                    className="flex items-center justify-between text-sm font-mono border-l-2 border-border pl-3 py-1 hover:border-primary transition-colors"
                   >
-                    {h.result.replace("_", " ").toUpperCase()} · {h.points > 0 ? "+" : ""}
-                    {h.points}
-                  </span>
-                </li>
-              ))}
+                    <span className="text-muted-foreground">{h.caseId}</span>
+                    <span
+                      className={
+                        h.result === "correct"
+                          ? "text-primary"
+                          : h.result === "lucky_guess"
+                            ? "text-caution"
+                            : "text-destructive"
+                      }
+                    >
+                      {h.result.replace("_", " ").toUpperCase()} · {h.points > 0 ? "+" : ""}
+                      {h.points}
+                    </span>
+                  </li>
+                ))}
             </ul>
           )}
         </div>
@@ -219,16 +246,34 @@ function CityHall() {
   );
 }
 
-function Stat({ label, value, accent }: { label: string; value: string | number; accent?: boolean }) {
+function Stat({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: string | number;
+  accent?: boolean;
+}) {
   return (
     <div className="rounded-sm border border-border bg-card p-5 hud-frame">
       <div className="stencil text-[10px] text-muted-foreground">{label}</div>
-      <div className={`mt-2 text-3xl font-semibold tracking-tight ${accent ? "text-primary" : ""}`}>{value}</div>
+      <div className={`mt-2 text-3xl font-semibold tracking-tight ${accent ? "text-primary" : ""}`}>
+        {value}
+      </div>
     </div>
   );
 }
 
-function Row({ label, value, tone }: { label: string; value: number; tone: "good" | "warn" | "bad" }) {
+function Row({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "good" | "warn" | "bad";
+}) {
   const c =
     tone === "good" ? "text-primary" : tone === "warn" ? "text-caution" : "text-destructive";
   return (

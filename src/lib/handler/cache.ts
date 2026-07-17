@@ -11,8 +11,8 @@ export type HandlerSurface =
 const KEY = "milverse.handler.cache.v1";
 
 interface CacheEntry {
-  dateKey: string;     // YYYY-MM-DD UTC+5
-  hash: string;        // input fingerprint — invalidates when inputs change
+  dateKey: string; // YYYY-MM-DD UTC+5
+  hash: string; // input fingerprint — invalidates when inputs change
   text: string;
   source: "ai" | "fallback";
   ts: number;
@@ -28,8 +28,11 @@ export function dropDateKey(now = new Date()): string {
 
 function load(): CacheShape {
   if (typeof window === "undefined") return {};
-  try { return JSON.parse(localStorage.getItem(KEY) ?? "{}") as CacheShape; }
-  catch { return {}; }
+  try {
+    return JSON.parse(localStorage.getItem(KEY) ?? "{}") as CacheShape;
+  } catch {
+    return {};
+  }
 }
 
 function save(c: CacheShape) {
@@ -46,7 +49,12 @@ export function readCache(surface: HandlerSurface, hash: string): CacheEntry | n
   return e;
 }
 
-export function writeCache(surface: HandlerSurface, hash: string, text: string, source: "ai" | "fallback") {
+export function writeCache(
+  surface: HandlerSurface,
+  hash: string,
+  text: string,
+  source: "ai" | "fallback",
+) {
   const c = load();
   c[surface] = { dateKey: dropDateKey(), hash, text, source, ts: Date.now() };
   save(c);

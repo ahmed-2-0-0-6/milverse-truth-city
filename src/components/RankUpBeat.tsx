@@ -77,12 +77,19 @@ export function RankUpBeat() {
       aria-live="polite"
       style={{ animation: "rankup-dim 0.35s ease-out both" }}
     >
-      <div className="pointer-events-none absolute inset-0" style={{
-        background: "radial-gradient(circle at 50% 50%, rgba(34,211,238,0.20) 0%, transparent 60%)",
-        animation: "rankup-surge 1.6s ease-out both",
-      }} />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(circle at 50% 50%, rgba(34,211,238,0.20) 0%, transparent 60%)",
+          animation: "rankup-surge 1.6s ease-out both",
+        }}
+      />
       <div className="relative flex flex-col items-center gap-5 px-6 text-center">
-        <div className="stencil text-[11px] tracking-[0.45em] text-primary/80" style={{ animation: "rankup-fadein 0.5s ease-out 0.2s both" }}>
+        <div
+          className="stencil text-[11px] tracking-[0.45em] text-primary/80"
+          style={{ animation: "rankup-fadein 0.5s ease-out 0.2s both" }}
+        >
           RANK UP
         </div>
         <div
@@ -92,11 +99,14 @@ export function RankUpBeat() {
             animation: "rankup-forge 1.4s cubic-bezier(.2,.6,.2,1) both",
           }}
         >
-          <div className="absolute inset-0 rounded-2xl" style={{
-            background: "linear-gradient(180deg, rgba(255,180,80,0.35), rgba(34,211,238,0.15))",
-            mixBlendMode: "screen",
-            animation: "rankup-pour 1.4s ease-out both",
-          }} />
+          <div
+            className="absolute inset-0 rounded-2xl"
+            style={{
+              background: "linear-gradient(180deg, rgba(255,180,80,0.35), rgba(34,211,238,0.15))",
+              mixBlendMode: "screen",
+              animation: "rankup-pour 1.4s ease-out both",
+            }}
+          />
           <Icon className="relative h-14 w-14 text-primary" strokeWidth={1.4} />
         </div>
         <div
@@ -105,7 +115,10 @@ export function RankUpBeat() {
         >
           <div
             className="text-4xl sm:text-5xl font-black tracking-tight text-primary"
-            style={{ fontFamily: '"Bebas Neue", sans-serif', textShadow: "0 0 22px rgba(34,211,238,0.6)" }}
+            style={{
+              fontFamily: '"Bebas Neue", sans-serif',
+              textShadow: "0 0 22px rgba(34,211,238,0.6)",
+            }}
           >
             {rankUp.name}
           </div>

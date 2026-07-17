@@ -15,21 +15,45 @@ interface Props {
 }
 
 export function ChatHeader({
-  name, number, isSaved, subtitle, avatarInitials,
-  onContacts, onBack, onCall, right, accent = "primary",
+  name,
+  number,
+  isSaved,
+  subtitle,
+  avatarInitials,
+  onContacts,
+  onBack,
+  onCall,
+  right,
+  accent = "primary",
 }: Props) {
-  const initials = avatarInitials ?? name.split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
-  const accentBg = accent === "destructive" ? "bg-red-500/20 text-red-300 border-red-500/40" : "bg-primary/15 text-primary border-primary/30";
+  const initials =
+    avatarInitials ??
+    name
+      .split(/\s+/)
+      .map((w) => w[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  const accentBg =
+    accent === "destructive"
+      ? "bg-red-500/20 text-red-300 border-red-500/40"
+      : "bg-primary/15 text-primary border-primary/30";
 
   return (
     <div className="border-b border-white/10 bg-neutral-950/90 backdrop-blur shadow-[0_1px_0_0_rgba(255,255,255,0.03)]">
       <div className="flex items-center gap-2 px-3 py-2.5">
         {onBack && (
-          <button onClick={onBack} className="p-1.5 -ml-1.5 rounded-md text-white/70 hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors" aria-label="Back">
+          <button
+            onClick={onBack}
+            className="p-1.5 -ml-1.5 rounded-md text-white/70 hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors"
+            aria-label="Back"
+          >
             <ChevronLeft className="h-5 w-5" />
           </button>
         )}
-        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-semibold shadow-sm ${accentBg}`}>
+        <div
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-semibold shadow-sm ${accentBg}`}
+        >
           {initials.slice(0, 2) || "?"}
         </div>
         <div className="min-w-0 flex-1">
@@ -42,16 +66,24 @@ export function ChatHeader({
             )}
           </div>
           <div className="truncate font-mono text-[10px] text-white/50 tracking-wider">
-            {subtitle ?? (number ?? "—")}
+            {subtitle ?? number ?? "—"}
           </div>
         </div>
         {onCall && (
-          <button onClick={onCall} className="p-2 rounded-md text-white/70 hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors" aria-label="Call">
+          <button
+            onClick={onCall}
+            className="p-2 rounded-md text-white/70 hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors"
+            aria-label="Call"
+          >
             <Phone className="h-4 w-4" />
           </button>
         )}
         {onContacts && (
-          <button onClick={onContacts} className="p-2 rounded-md text-white/70 hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors" aria-label="Contacts">
+          <button
+            onClick={onContacts}
+            className="p-2 rounded-md text-white/70 hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors"
+            aria-label="Contacts"
+          >
             <Users className="h-4 w-4" />
           </button>
         )}

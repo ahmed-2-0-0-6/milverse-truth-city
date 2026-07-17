@@ -16,7 +16,7 @@ const FORBIDDEN_PATTERNS: RegExp[] = [
   /\bi am an? ai\b/i,
   /\bi'?m an? ai\b/i,
   /\ba\.i\.\b/i,
-  /(?<![a-z0-9])ai(?![a-z0-9])/i,           // bare "AI" token
+  /(?<![a-z0-9])ai(?![a-z0-9])/i, // bare "AI" token
   /\blanguage model\b/i,
   /\blarge language model\b/i,
   /\bllm\b/i,
@@ -81,8 +81,10 @@ export function sanitizeReply(raw: string): string | null {
   if (s.length > 240) {
     const window = s.slice(0, 240);
     const lastBoundary = Math.max(
-      window.lastIndexOf("."), window.lastIndexOf("!"),
-      window.lastIndexOf("?"), window.lastIndexOf("…"),
+      window.lastIndexOf("."),
+      window.lastIndexOf("!"),
+      window.lastIndexOf("?"),
+      window.lastIndexOf("…"),
     );
     s = lastBoundary > 80 ? window.slice(0, lastBoundary + 1) : window.trimEnd() + "…";
   }

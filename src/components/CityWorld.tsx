@@ -5,15 +5,39 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useReducedMotion } from "framer-motion";
-import { Play, X, Home, Landmark as LandmarkIcon, Clapperboard, Library, Eye, Newspaper, Store, Swords } from "lucide-react";
 import {
-  WORLD_W, WORLD_H, MIRROR_COLOR, FEED_COLOR,
-  buildMirrorStations, buildFeedStations, smoothPath, LANDMARKS,
-  type Station, type Landmark as WorldLandmark,
+  Play,
+  X,
+  Home,
+  Landmark as LandmarkIcon,
+  Clapperboard,
+  Library,
+  Eye,
+  Newspaper,
+  Store,
+  Swords,
+} from "lucide-react";
+import {
+  WORLD_W,
+  WORLD_H,
+  MIRROR_COLOR,
+  FEED_COLOR,
+  buildMirrorStations,
+  buildFeedStations,
+  smoothPath,
+  LANDMARKS,
+  type Station,
+  type Landmark as WorldLandmark,
 } from "@/lib/city/world-data";
 import { loadProfile, type TrustProfile } from "@/lib/mirror/profile";
 import { getMirrorRecommendations } from "@/lib/recommendations";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 /* ── camera constants ─────────────────────────────────────────── */
 const ZOOM_LEVELS = [0.35, 0.7, 1.25]; // overview / quarter / street
@@ -55,7 +79,11 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
   /* ── camera state ─────────────────────────────────────────── */
   const viewportRef = useRef<HTMLDivElement>(null);
   const [vp, setVp] = useState({ w: 0, h: 0 });
-  const [cam, setCam] = useState({ x: WORLD_W / 2, y: WORLD_H / 2, z: ZOOM_LEVELS[DEFAULT_ZOOM_IDX] });
+  const [cam, setCam] = useState({
+    x: WORLD_W / 2,
+    y: WORLD_H / 2,
+    z: ZOOM_LEVELS[DEFAULT_ZOOM_IDX],
+  });
   const camRef = useRef(cam);
   camRef.current = cam;
 
@@ -71,19 +99,22 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
   }, []);
 
   // clamp camera to world bounds so viewport never leaves the map
-  const clampCam = useCallback((c: typeof cam) => {
-    const halfW = vp.w / (2 * c.z);
-    const halfH = vp.h / (2 * c.z);
-    const minX = halfW;
-    const maxX = WORLD_W - halfW;
-    const minY = halfH;
-    const maxY = WORLD_H - halfH;
-    return {
-      z: c.z,
-      x: minX <= maxX ? Math.max(minX, Math.min(maxX, c.x)) : WORLD_W / 2,
-      y: minY <= maxY ? Math.max(minY, Math.min(maxY, c.y)) : WORLD_H / 2,
-    };
-  }, [vp.w, vp.h]);
+  const clampCam = useCallback(
+    (c: typeof cam) => {
+      const halfW = vp.w / (2 * c.z);
+      const halfH = vp.h / (2 * c.z);
+      const minX = halfW;
+      const maxX = WORLD_W - halfW;
+      const minY = halfH;
+      const maxY = WORLD_H - halfH;
+      return {
+        z: c.z,
+        x: minX <= maxX ? Math.max(minX, Math.min(maxX, c.x)) : WORLD_W / 2,
+        y: minY <= maxY ? Math.max(minY, Math.min(maxY, c.y)) : WORLD_H / 2,
+      };
+    },
+    [vp.w, vp.h],
+  );
 
   // recompute clamp when viewport size changes
   useEffect(() => {
@@ -92,31 +123,39 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
 
   /* ── fly-to (eased tween) ─────────────────────────────────── */
   const flyRafRef = useRef<number | null>(null);
-  const flyTo = useCallback((tx: number, ty: number, tz?: number, ms = 700) => {
-    if (flyRafRef.current) cancelAnimationFrame(flyRafRef.current);
-    if (prefersReduced) {
-      setCam((c) => clampCam({ x: tx, y: ty, z: tz ?? c.z }));
-      return;
-    }
-    const start = performance.now();
-    const from = { ...camRef.current };
-    const to = { x: tx, y: ty, z: tz ?? from.z };
-    const step = (t: number) => {
-      const p = Math.min(1, (t - start) / ms);
-      const e = 1 - Math.pow(1 - p, 3); // easeOutCubic
-      const next = {
-        x: from.x + (to.x - from.x) * e,
-        y: from.y + (to.y - from.y) * e,
-        z: from.z + (to.z - from.z) * e,
+  const flyTo = useCallback(
+    (tx: number, ty: number, tz?: number, ms = 700) => {
+      if (flyRafRef.current) cancelAnimationFrame(flyRafRef.current);
+      if (prefersReduced) {
+        setCam((c) => clampCam({ x: tx, y: ty, z: tz ?? c.z }));
+        return;
+      }
+      const start = performance.now();
+      const from = { ...camRef.current };
+      const to = { x: tx, y: ty, z: tz ?? from.z };
+      const step = (t: number) => {
+        const p = Math.min(1, (t - start) / ms);
+        const e = 1 - Math.pow(1 - p, 3); // easeOutCubic
+        const next = {
+          x: from.x + (to.x - from.x) * e,
+          y: from.y + (to.y - from.y) * e,
+          z: from.z + (to.z - from.z) * e,
+        };
+        setCam(clampCam(next));
+        if (p < 1) flyRafRef.current = requestAnimationFrame(step);
+        else flyRafRef.current = null;
       };
-      setCam(clampCam(next));
-      if (p < 1) flyRafRef.current = requestAnimationFrame(step);
-      else flyRafRef.current = null;
-    };
-    flyRafRef.current = requestAnimationFrame(step);
-  }, [clampCam, prefersReduced]);
+      flyRafRef.current = requestAnimationFrame(step);
+    },
+    [clampCam, prefersReduced],
+  );
 
-  useEffect(() => () => { if (flyRafRef.current) cancelAnimationFrame(flyRafRef.current); }, []);
+  useEffect(
+    () => () => {
+      if (flyRafRef.current) cancelAnimationFrame(flyRafRef.current);
+    },
+    [],
+  );
 
   /* ── cinematic intro (once) ───────────────────────────────── */
   const INTRO_KEY = "milverse.world.intro.seen";
@@ -130,16 +169,20 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
     introCancelRef.current = false;
     const stops: { x: number; y: number; z: number; ms: number }[] = [
       { x: WORLD_W / 2, y: WORLD_H / 2, z: ZOOM_LEVELS[0], ms: 0 },
-      { x: 500,        y: 500,          z: ZOOM_LEVELS[1], ms: 1000 },
-      { x: 2500,       y: 500,          z: ZOOM_LEVELS[1], ms: 1000 },
-      { x: 1500,       y: 1300,         z: ZOOM_LEVELS[0], ms: 900 },
+      { x: 500, y: 500, z: ZOOM_LEVELS[1], ms: 1000 },
+      { x: 2500, y: 500, z: ZOOM_LEVELS[1], ms: 1000 },
+      { x: 1500, y: 1300, z: ZOOM_LEVELS[0], ms: 900 },
     ];
     // land on YOU-ARE-HERE (Mirror current)
-    if (mirrorCurrent) stops.push({ x: mirrorCurrent.x, y: mirrorCurrent.y, z: ZOOM_LEVELS[2], ms: 1100 });
+    if (mirrorCurrent)
+      stops.push({ x: mirrorCurrent.x, y: mirrorCurrent.y, z: ZOOM_LEVELS[2], ms: 1100 });
 
     let i = 0;
     const runNext = () => {
-      if (introCancelRef.current) { setIntroRunning(false); return; }
+      if (introCancelRef.current) {
+        setIntroRunning(false);
+        return;
+      }
       const s = stops[i];
       if (!s) {
         setIntroRunning(false);
@@ -152,7 +195,9 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
       setTimeout(runNext, s.ms + 50);
     };
     runNext();
-    return () => { introCancelRef.current = true; };
+    return () => {
+      introCancelRef.current = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vp.w, vp.h]);
 
@@ -165,11 +210,25 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
 
   /* ── drag pan + inertia ───────────────────────────────────── */
   const pointersRef = useRef(new Map<number, { x: number; y: number }>());
-  const dragRef = useRef<{ startX: number; startY: number; startCamX: number; startCamY: number; lastT: number; vx: number; vy: number; moved: boolean } | null>(null);
+  const dragRef = useRef<{
+    startX: number;
+    startY: number;
+    startCamX: number;
+    startCamY: number;
+    lastT: number;
+    vx: number;
+    vy: number;
+    moved: boolean;
+  } | null>(null);
   const pinchRef = useRef<{ startDist: number; startZ: number } | null>(null);
   const inertiaRafRef = useRef<number | null>(null);
 
-  const stopInertia = () => { if (inertiaRafRef.current) { cancelAnimationFrame(inertiaRafRef.current); inertiaRafRef.current = null; } };
+  const stopInertia = () => {
+    if (inertiaRafRef.current) {
+      cancelAnimationFrame(inertiaRafRef.current);
+      inertiaRafRef.current = null;
+    }
+  };
 
   const startInertia = (vx: number, vy: number) => {
     stopInertia();
@@ -180,8 +239,11 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
       last = t;
       vx *= Math.pow(0.94, dt / 16);
       vy *= Math.pow(0.94, dt / 16);
-      setCam((c) => clampCam({ ...c, x: c.x - vx * dt / c.z, y: c.y - vy * dt / c.z }));
-      if (Math.abs(vx) < 0.02 && Math.abs(vy) < 0.02) { inertiaRafRef.current = null; return; }
+      setCam((c) => clampCam({ ...c, x: c.x - (vx * dt) / c.z, y: c.y - (vy * dt) / c.z }));
+      if (Math.abs(vx) < 0.02 && Math.abs(vy) < 0.02) {
+        inertiaRafRef.current = null;
+        return;
+      }
       inertiaRafRef.current = requestAnimationFrame(step);
     };
     inertiaRafRef.current = requestAnimationFrame(step);
@@ -195,9 +257,14 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
     pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointersRef.current.size === 1) {
       dragRef.current = {
-        startX: e.clientX, startY: e.clientY,
-        startCamX: camRef.current.x, startCamY: camRef.current.y,
-        lastT: performance.now(), vx: 0, vy: 0, moved: false,
+        startX: e.clientX,
+        startY: e.clientY,
+        startCamX: camRef.current.x,
+        startCamY: camRef.current.y,
+        lastT: performance.now(),
+        vx: 0,
+        vy: 0,
+        moved: false,
       };
     } else if (pointersRef.current.size === 2) {
       const [a, b] = Array.from(pointersRef.current.values());
@@ -216,7 +283,7 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
       if (Math.abs(dx) + Math.abs(dy) > 4) d.moved = true;
       const now = performance.now();
       const dt = Math.max(1, now - d.lastT);
-      d.vx = (d.vx * 0.6) + ((e.clientX - d.startX - (d.vx * 0)) / dt) * 0.4; // rough
+      d.vx = d.vx * 0.6 + ((e.clientX - d.startX - d.vx * 0) / dt) * 0.4; // rough
       // simpler velocity: use last-frame delta
       d.vx = (e.movementX ?? 0) / dt;
       d.vy = (e.movementY ?? 0) / dt;
@@ -226,7 +293,10 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
       const [a, b] = Array.from(pointersRef.current.values());
       const dist = Math.hypot(a.x - b.x, a.y - b.y);
       const ratio = dist / pinchRef.current.startDist;
-      const nextZ = Math.max(ZOOM_LEVELS[0], Math.min(ZOOM_LEVELS[2], pinchRef.current.startZ * ratio));
+      const nextZ = Math.max(
+        ZOOM_LEVELS[0],
+        Math.min(ZOOM_LEVELS[2], pinchRef.current.startZ * ratio),
+      );
       setCam((c) => clampCam({ ...c, z: nextZ }));
     }
   };
@@ -249,7 +319,13 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
     // find nearest level then step
     let idx = 0;
     let best = Infinity;
-    ZOOM_LEVELS.forEach((z, i) => { const d = Math.abs(z - cur); if (d < best) { best = d; idx = i; } });
+    ZOOM_LEVELS.forEach((z, i) => {
+      const d = Math.abs(z - cur);
+      if (d < best) {
+        best = d;
+        idx = i;
+      }
+    });
     const nextIdx = Math.max(0, Math.min(ZOOM_LEVELS.length - 1, idx + dir));
     const nextZ = ZOOM_LEVELS[nextIdx];
     if (nextZ === cur) return;
@@ -297,15 +373,78 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
   };
 
   /* ── quick-travel dock ────────────────────────────────────── */
-  const dockItems: { id: string; label: string; Icon: typeof Eye; onClick: () => void; color?: string; beacon?: boolean }[] = [
-    { id: "you", label: "YOU", Icon: Home, onClick: () => mirrorCurrent && flyTo(mirrorCurrent.x, mirrorCurrent.y, ZOOM_LEVELS[2], 500), color: MIRROR_COLOR, beacon: recIds.size > 0 },
-    { id: "mirror", label: "MIRROR", Icon: Eye, onClick: () => flyTo(500, 800, ZOOM_LEVELS[1], 600), color: MIRROR_COLOR },
-    { id: "feed", label: "FEED", Icon: Newspaper, onClick: () => flyTo(2500, 800, ZOOM_LEVELS[1], 600), color: FEED_COLOR },
-    { id: "hall", label: "HALL", Icon: LandmarkIcon, onClick: () => flyTo(1500, 1050, ZOOM_LEVELS[1], 600) },
-    { id: "studio", label: "STUDIO", Icon: Clapperboard, onClick: () => { flyTo(1180, 1700, ZOOM_LEVELS[2], 600); setTimeout(() => nav({ to: "/studio" }), 700); } },
-    { id: "archive", label: "ARCHIVE", Icon: Library, onClick: () => { flyTo(1820, 1700, ZOOM_LEVELS[2], 600); setTimeout(() => nav({ to: "/archive" }), 700); } },
-    { id: "market", label: "MARKET", Icon: Store, onClick: () => { flyTo(420, 1820, ZOOM_LEVELS[2], 600); setTimeout(() => setScaffoldOpen("market"), 600); } },
-    { id: "arena", label: "ARENA", Icon: Swords, onClick: () => { flyTo(2580, 1820, ZOOM_LEVELS[2], 600); setTimeout(() => setScaffoldOpen("arena"), 600); } },
+  const dockItems: {
+    id: string;
+    label: string;
+    Icon: typeof Eye;
+    onClick: () => void;
+    color?: string;
+    beacon?: boolean;
+  }[] = [
+    {
+      id: "you",
+      label: "YOU",
+      Icon: Home,
+      onClick: () => mirrorCurrent && flyTo(mirrorCurrent.x, mirrorCurrent.y, ZOOM_LEVELS[2], 500),
+      color: MIRROR_COLOR,
+      beacon: recIds.size > 0,
+    },
+    {
+      id: "mirror",
+      label: "MIRROR",
+      Icon: Eye,
+      onClick: () => flyTo(500, 800, ZOOM_LEVELS[1], 600),
+      color: MIRROR_COLOR,
+    },
+    {
+      id: "feed",
+      label: "FEED",
+      Icon: Newspaper,
+      onClick: () => flyTo(2500, 800, ZOOM_LEVELS[1], 600),
+      color: FEED_COLOR,
+    },
+    {
+      id: "hall",
+      label: "HALL",
+      Icon: LandmarkIcon,
+      onClick: () => flyTo(1500, 1050, ZOOM_LEVELS[1], 600),
+    },
+    {
+      id: "studio",
+      label: "STUDIO",
+      Icon: Clapperboard,
+      onClick: () => {
+        flyTo(1180, 1700, ZOOM_LEVELS[2], 600);
+        setTimeout(() => nav({ to: "/studio" }), 700);
+      },
+    },
+    {
+      id: "archive",
+      label: "ARCHIVE",
+      Icon: Library,
+      onClick: () => {
+        flyTo(1820, 1700, ZOOM_LEVELS[2], 600);
+        setTimeout(() => nav({ to: "/archive" }), 700);
+      },
+    },
+    {
+      id: "market",
+      label: "MARKET",
+      Icon: Store,
+      onClick: () => {
+        flyTo(420, 1820, ZOOM_LEVELS[2], 600);
+        setTimeout(() => setScaffoldOpen("market"), 600);
+      },
+    },
+    {
+      id: "arena",
+      label: "ARENA",
+      Icon: Swords,
+      onClick: () => {
+        flyTo(2580, 1820, ZOOM_LEVELS[2], 600);
+        setTimeout(() => setScaffoldOpen("arena"), 600);
+      },
+    },
   ];
 
   /* ── mini-map click handler ───────────────────────────────── */
@@ -354,10 +493,14 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
             feedCurrent={feedCurrent}
             played={played}
             recIds={recIds}
-            onStation={(s) => { focusStation(s); setSelected(s); }}
+            onStation={(s) => {
+              focusStation(s);
+              setSelected(s);
+            }}
             onLandmark={(l) => {
               doubleTapLandmark(l);
-              if (l.kind === "scaffold") setTimeout(() => setScaffoldOpen(l.id as "market" | "arena"), 600);
+              if (l.kind === "scaffold")
+                setTimeout(() => setScaffoldOpen(l.id as "market" | "arena"), 600);
               else if (l.to) setTimeout(() => nav({ to: l.to! }), 700);
             }}
             prefersReduced={!!prefersReduced}
@@ -370,7 +513,12 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
       <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-2 gap-2">
         <div className="pointer-events-auto flex items-center gap-1 rounded-sm border border-primary/40 bg-background/70 backdrop-blur px-1 py-1 stencil text-[10px]">
           <button className="px-2 py-1 rounded-sm bg-primary text-primary-foreground">MAP</button>
-          <button onClick={onSwitchToList} className="px-2 py-1 rounded-sm text-muted-foreground hover:text-foreground">LIST</button>
+          <button
+            onClick={onSwitchToList}
+            className="px-2 py-1 rounded-sm text-muted-foreground hover:text-foreground"
+          >
+            LIST
+          </button>
         </div>
         <div className="pointer-events-auto flex items-center gap-2">
           <button
@@ -404,7 +552,10 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
             {it.beacon && (
               <span
                 className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full"
-                style={{ background: it.color ?? "#22d3ee", boxShadow: `0 0 8px ${it.color ?? "#22d3ee"}` }}
+                style={{
+                  background: it.color ?? "#22d3ee",
+                  boxShadow: `0 0 8px ${it.color ?? "#22d3ee"}`,
+                }}
               />
             )}
           </button>
@@ -413,12 +564,31 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
 
       {/* Mini-map */}
       <div className="pointer-events-auto absolute bottom-2 right-2 rounded-sm border border-primary/40 bg-background/80 backdrop-blur p-1">
-        <svg width={miniW} height={miniH} viewBox={`0 0 ${WORLD_W} ${WORLD_H}`} onClick={miniClick} className="cursor-pointer block">
+        <svg
+          width={miniW}
+          height={miniH}
+          viewBox={`0 0 ${WORLD_W} ${WORLD_H}`}
+          onClick={miniClick}
+          className="cursor-pointer block"
+        >
           <rect width={WORLD_W} height={WORLD_H} fill="#0a1020" />
-          <path d={mirrorPath} stroke={MIRROR_COLOR} strokeWidth={22} fill="none" strokeOpacity={0.7} />
+          <path
+            d={mirrorPath}
+            stroke={MIRROR_COLOR}
+            strokeWidth={22}
+            fill="none"
+            strokeOpacity={0.7}
+          />
           <path d={feedPath} stroke={FEED_COLOR} strokeWidth={22} fill="none" strokeOpacity={0.7} />
           {LANDMARKS.map((l) => (
-            <circle key={l.id} cx={l.x} cy={l.y} r={l.kind === "landmark" ? 40 : 30} fill={l.kind === "scaffold" ? "#5b6270" : "#93c5fd"} opacity={0.9} />
+            <circle
+              key={l.id}
+              cx={l.x}
+              cy={l.y}
+              r={l.kind === "landmark" ? 40 : 30}
+              fill={l.kind === "scaffold" ? "#5b6270" : "#93c5fd"}
+              opacity={0.9}
+            />
           ))}
           {/* viewport rect */}
           <rect
@@ -431,7 +601,9 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
             strokeWidth={18}
           />
         </svg>
-        <div className="stencil text-[8px] text-muted-foreground text-center mt-0.5">MINI-MAP · TAP</div>
+        <div className="stencil text-[8px] text-muted-foreground text-center mt-0.5">
+          MINI-MAP · TAP
+        </div>
       </div>
 
       {/* Zoom controls */}
@@ -453,7 +625,9 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
         <div className="pointer-events-none absolute inset-0 flex items-end justify-center pb-24">
           <div className="pointer-events-auto flex items-center gap-3 rounded-sm border border-primary/40 bg-background/85 backdrop-blur px-3 py-2 stencil text-[10px] text-muted-foreground">
             <span className="hud-blink text-primary">◉ FLYOVER</span>
-            <button onClick={skipIntro} className="text-primary hover:underline">SKIP →</button>
+            <button onClick={skipIntro} className="text-primary hover:underline">
+              SKIP →
+            </button>
           </div>
         </div>
       )}
@@ -466,7 +640,9 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="stencil text-primary">
-              {scaffoldOpen === "market" ? "THE MARKET · UNDER CONSTRUCTION" : "THE ARENA · UNDER CONSTRUCTION"}
+              {scaffoldOpen === "market"
+                ? "THE MARKET · UNDER CONSTRUCTION"
+                : "THE ARENA · UNDER CONSTRUCTION"}
             </DialogTitle>
             <DialogDescription>
               {scaffoldOpen === "market"
@@ -476,7 +652,11 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
           </DialogHeader>
           <div className="flex justify-end">
             <button
-              onClick={() => { const to = scaffoldOpen === "market" ? "/market" : "/arena"; setScaffoldOpen(null); nav({ to }); }}
+              onClick={() => {
+                const to = scaffoldOpen === "market" ? "/market" : "/arena";
+                setScaffoldOpen(null);
+                nav({ to });
+              }}
               className="stencil text-[11px] rounded-sm border border-primary/60 bg-primary/10 text-primary px-4 py-2 hover:bg-primary/20 transition"
             >
               OPEN BLUEPRINT · VOTE →
@@ -490,13 +670,26 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
 
 /* ══════════════════════════════════════════════════════════════ */
 function WorldSvg({
-  mirror, feed, mirrorPath, feedPath, mirrorCurrent, feedCurrent,
-  played, recIds, onStation, onLandmark, prefersReduced,
+  mirror,
+  feed,
+  mirrorPath,
+  feedPath,
+  mirrorCurrent,
+  feedCurrent,
+  played,
+  recIds,
+  onStation,
+  onLandmark,
+  prefersReduced,
 }: {
-  mirror: Station[]; feed: Station[];
-  mirrorPath: string; feedPath: string;
-  mirrorCurrent: Station | undefined; feedCurrent: Station | undefined;
-  played: Set<string>; recIds: Set<string>;
+  mirror: Station[];
+  feed: Station[];
+  mirrorPath: string;
+  feedPath: string;
+  mirrorCurrent: Station | undefined;
+  feedCurrent: Station | undefined;
+  played: Set<string>;
+  recIds: Set<string>;
   onStation: (s: Station) => void;
   onLandmark: (l: WorldLandmark) => void;
   prefersReduced: boolean;
@@ -516,7 +709,10 @@ function WorldSvg({
         </radialGradient>
         <filter id="cw-glow" x="-30%" y="-30%" width="160%" height="160%">
           <feGaussianBlur stdDeviation="6" result="b" />
-          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+          <feMerge>
+            <feMergeNode in="b" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
         </filter>
         <pattern id="cw-streets" width="120" height="120" patternUnits="userSpaceOnUse">
           <path d="M0 0H120V120" fill="none" stroke="#1c2540" strokeWidth="1" />
@@ -535,15 +731,77 @@ function WorldSvg({
       <CitySilhouettes prefersReduced={prefersReduced} />
 
       {/* neighborhood labels */}
-      <text x={500}  y={120} fontSize={44} textAnchor="middle" fill="#22d3ee" opacity={0.5} className="stencil">MIRROR QUARTER</text>
-      <text x={2500} y={120} fontSize={44} textAnchor="middle" fill="#f5b942" opacity={0.5} className="stencil">FEED QUARTER</text>
-      <text x={1500} y={950} fontSize={30} textAnchor="middle" fill="#93c5fd" opacity={0.7} className="stencil">CIVIC CORE</text>
+      <text
+        x={500}
+        y={120}
+        fontSize={44}
+        textAnchor="middle"
+        fill="#22d3ee"
+        opacity={0.5}
+        className="stencil"
+      >
+        MIRROR QUARTER
+      </text>
+      <text
+        x={2500}
+        y={120}
+        fontSize={44}
+        textAnchor="middle"
+        fill="#f5b942"
+        opacity={0.5}
+        className="stencil"
+      >
+        FEED QUARTER
+      </text>
+      <text
+        x={1500}
+        y={950}
+        fontSize={30}
+        textAnchor="middle"
+        fill="#93c5fd"
+        opacity={0.7}
+        className="stencil"
+      >
+        CIVIC CORE
+      </text>
 
       {/* transit lines — dim base + bright glow */}
-      <path d={mirrorPath} stroke={MIRROR_COLOR} strokeOpacity={0.2} strokeWidth={22} fill="none" strokeLinecap="round" strokeDasharray="2 26" />
-      <path d={mirrorPath} stroke={MIRROR_COLOR} strokeWidth={12} fill="none" strokeLinecap="round" filter="url(#cw-glow)" opacity={0.95} />
-      <path d={feedPath} stroke={FEED_COLOR} strokeOpacity={0.2} strokeWidth={22} fill="none" strokeLinecap="round" strokeDasharray="2 26" />
-      <path d={feedPath} stroke={FEED_COLOR} strokeWidth={12} fill="none" strokeLinecap="round" filter="url(#cw-glow)" opacity={0.95} />
+      <path
+        d={mirrorPath}
+        stroke={MIRROR_COLOR}
+        strokeOpacity={0.2}
+        strokeWidth={22}
+        fill="none"
+        strokeLinecap="round"
+        strokeDasharray="2 26"
+      />
+      <path
+        d={mirrorPath}
+        stroke={MIRROR_COLOR}
+        strokeWidth={12}
+        fill="none"
+        strokeLinecap="round"
+        filter="url(#cw-glow)"
+        opacity={0.95}
+      />
+      <path
+        d={feedPath}
+        stroke={FEED_COLOR}
+        strokeOpacity={0.2}
+        strokeWidth={22}
+        fill="none"
+        strokeLinecap="round"
+        strokeDasharray="2 26"
+      />
+      <path
+        d={feedPath}
+        stroke={FEED_COLOR}
+        strokeWidth={12}
+        fill="none"
+        strokeLinecap="round"
+        filter="url(#cw-glow)"
+        opacity={0.95}
+      />
 
       {/* signal packets (SMIL) */}
       {!prefersReduced && (
@@ -601,9 +859,18 @@ function WorldSvg({
 function CitySilhouettes({ prefersReduced }: { prefersReduced: boolean }) {
   // Deterministic pseudo-random buildings
   const items = useMemo(() => {
-    const list: { x: number; y: number; w: number; h: number; lights: { lx: number; ly: number; delay: number }[] }[] = [];
+    const list: {
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+      lights: { lx: number; ly: number; delay: number }[];
+    }[] = [];
     let seed = 42;
-    const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+    const rnd = () => {
+      seed = (seed * 9301 + 49297) % 233280;
+      return seed / 233280;
+    };
     // scatter around whole world, avoiding transit lanes lightly
     for (let i = 0; i < 220; i++) {
       const x = rnd() * (WORLD_W - 60);
@@ -631,7 +898,15 @@ function CitySilhouettes({ prefersReduced }: { prefersReduced: boolean }) {
           {b.lights.map((L, li) => {
             const color = (i + li) % 5 === 0 ? "#f5b942" : "#7dd3fc";
             return (
-              <rect key={li} x={L.lx} y={L.ly} width={2.5} height={3} fill={color} opacity={prefersReduced ? 0.7 : 0.55}>
+              <rect
+                key={li}
+                x={L.lx}
+                y={L.ly}
+                width={2.5}
+                height={3}
+                fill={color}
+                opacity={prefersReduced ? 0.7 : 0.55}
+              >
                 {!prefersReduced && (
                   <animate
                     attributeName="opacity"
@@ -651,7 +926,17 @@ function CitySilhouettes({ prefersReduced }: { prefersReduced: boolean }) {
 }
 
 /* ── signal packets travelling the line ──────────────────────── */
-function SignalPackets({ pathId, d, color, dur }: { pathId: string; d: string; color: string; dur: number }) {
+function SignalPackets({
+  pathId,
+  d,
+  color,
+  dur,
+}: {
+  pathId: string;
+  d: string;
+  color: string;
+  dur: number;
+}) {
   return (
     <g>
       <path id={pathId} d={d} fill="none" stroke="none" />
@@ -675,9 +960,20 @@ function renderTierChecks(list: Station[], color: string) {
       const x = (list[i].x + list[i - 1].x) / 2;
       marks.push(
         <g key={`${color}-tc-${i}`} transform={`translate(${x} ${y})`}>
-          <rect x={-40} y={-18} width={80} height={36} rx={4} fill="#0b1224" stroke={color} strokeWidth={2} />
-          <text y={7} textAnchor="middle" fontSize={20} className="stencil" fill={color}>T{list[i].tier}</text>
-        </g>
+          <rect
+            x={-40}
+            y={-18}
+            width={80}
+            height={36}
+            rx={4}
+            fill="#0b1224"
+            stroke={color}
+            strokeWidth={2}
+          />
+          <text y={7} textAnchor="middle" fontSize={20} className="stencil" fill={color}>
+            T{list[i].tier}
+          </text>
+        </g>,
       );
     }
   }
@@ -689,13 +985,47 @@ function LandmarkNode({ l, onClick }: { l: WorldLandmark; onClick: () => void })
   const isScaffold = l.kind === "scaffold";
   const stroke = isScaffold ? "#93c5fd" : "#7dd3fc";
   return (
-    <g transform={`translate(${l.x} ${l.y})`} onClick={onClick} style={{ cursor: "pointer" }} role="button" aria-label={l.label}>
+    <g
+      transform={`translate(${l.x} ${l.y})`}
+      onClick={onClick}
+      style={{ cursor: "pointer" }}
+      role="button"
+      aria-label={l.label}
+    >
       {/* base */}
-      <rect x={-48} y={-48} width={96} height={96} rx={6} fill="#0f1a30" stroke={stroke} strokeWidth={2} strokeDasharray={isScaffold ? "8 6" : undefined} />
+      <rect
+        x={-48}
+        y={-48}
+        width={96}
+        height={96}
+        rx={6}
+        fill="#0f1a30"
+        stroke={stroke}
+        strokeWidth={2}
+        strokeDasharray={isScaffold ? "8 6" : undefined}
+      />
       {isScaffold && (
         <>
-          <line x1={-48} y1={-48} x2={48} y2={48} stroke={stroke} strokeWidth={1.5} strokeDasharray="4 4" opacity={0.7} />
-          <line x1={48} y1={-48} x2={-48} y2={48} stroke={stroke} strokeWidth={1.5} strokeDasharray="4 4" opacity={0.7} />
+          <line
+            x1={-48}
+            y1={-48}
+            x2={48}
+            y2={48}
+            stroke={stroke}
+            strokeWidth={1.5}
+            strokeDasharray="4 4"
+            opacity={0.7}
+          />
+          <line
+            x1={48}
+            y1={-48}
+            x2={-48}
+            y2={48}
+            stroke={stroke}
+            strokeWidth={1.5}
+            strokeDasharray="4 4"
+            opacity={0.7}
+          />
           {/* crane */}
           <line x1={-30} y1={-48} x2={-30} y2={-100} stroke={stroke} strokeWidth={2} />
           <line x1={-30} y1={-100} x2={30} y2={-90} stroke={stroke} strokeWidth={2} />
@@ -705,61 +1035,148 @@ function LandmarkNode({ l, onClick }: { l: WorldLandmark; onClick: () => void })
       {/* roof */}
       {!isScaffold && <rect x={-52} y={-58} width={104} height={12} fill={stroke} opacity={0.4} />}
       {/* label plate */}
-      <rect x={-70} y={54} width={140} height={l.id === "archive" ? 34 : 22} rx={2} fill="#0b1224" stroke={stroke} strokeWidth={1} />
-      <text y={70} textAnchor="middle" fontSize={13} className="stencil" fill={stroke}>{l.label}</text>
-      {l.id === "archive" && <text y={83} textAnchor="middle" fontSize={9} className="stencil" fill={stroke} opacity={0.75}>CITY LIBRARY</text>}
-      {isScaffold && <text y={-4} textAnchor="middle" fontSize={11} className="stencil" fill={stroke}>BLUEPRINT</text>}
+      <rect
+        x={-70}
+        y={54}
+        width={140}
+        height={l.id === "archive" ? 34 : 22}
+        rx={2}
+        fill="#0b1224"
+        stroke={stroke}
+        strokeWidth={1}
+      />
+      <text y={70} textAnchor="middle" fontSize={13} className="stencil" fill={stroke}>
+        {l.label}
+      </text>
+      {l.id === "archive" && (
+        <text
+          y={83}
+          textAnchor="middle"
+          fontSize={9}
+          className="stencil"
+          fill={stroke}
+          opacity={0.75}
+        >
+          CITY LIBRARY
+        </text>
+      )}
+      {isScaffold && (
+        <text y={-4} textAnchor="middle" fontSize={11} className="stencil" fill={stroke}>
+          BLUEPRINT
+        </text>
+      )}
     </g>
   );
 }
 
-
 /* ── station node ───────────────────────────────────────────── */
 function StationNode({
-  s, color, isCurrent, isPlayed, isBeacon, onClick, prefersReduced,
+  s,
+  color,
+  isCurrent,
+  isPlayed,
+  isBeacon,
+  onClick,
+  prefersReduced,
 }: {
-  s: Station; color: string; isCurrent: boolean; isPlayed: boolean; isBeacon: boolean;
-  onClick: () => void; prefersReduced: boolean;
+  s: Station;
+  color: string;
+  isCurrent: boolean;
+  isPlayed: boolean;
+  isBeacon: boolean;
+  onClick: () => void;
+  prefersReduced: boolean;
 }) {
   return (
-    <g transform={`translate(${s.x} ${s.y})`} onClick={onClick} style={{ cursor: "pointer" }} role="button" aria-label={`Station ${s.code}`}>
+    <g
+      transform={`translate(${s.x} ${s.y})`}
+      onClick={onClick}
+      style={{ cursor: "pointer" }}
+      role="button"
+      aria-label={`Station ${s.code}`}
+    >
       {/* beacon */}
       {isBeacon && !isPlayed && (
         <circle r={30} fill={color} opacity={0.2}>
-          {!prefersReduced && <animate attributeName="r" values="24;42;24" dur="2s" repeatCount="indefinite" />}
-          {!prefersReduced && <animate attributeName="opacity" values="0.35;0.05;0.35" dur="2s" repeatCount="indefinite" />}
+          {!prefersReduced && (
+            <animate attributeName="r" values="24;42;24" dur="2s" repeatCount="indefinite" />
+          )}
+          {!prefersReduced && (
+            <animate
+              attributeName="opacity"
+              values="0.35;0.05;0.35"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          )}
         </circle>
       )}
       {/* current pulse */}
       {isCurrent && (
         <circle r={26} fill="none" stroke={color} strokeWidth={3}>
-          {!prefersReduced && <animate attributeName="r" values="22;40;22" dur="1.6s" repeatCount="indefinite" />}
-          {!prefersReduced && <animate attributeName="opacity" values="1;0;1" dur="1.6s" repeatCount="indefinite" />}
+          {!prefersReduced && (
+            <animate attributeName="r" values="22;40;22" dur="1.6s" repeatCount="indefinite" />
+          )}
+          {!prefersReduced && (
+            <animate attributeName="opacity" values="1;0;1" dur="1.6s" repeatCount="indefinite" />
+          )}
         </circle>
       )}
       <circle r={16} fill={isPlayed ? color : "#0b1224"} stroke={color} strokeWidth={4} />
       {isPlayed && <circle r={5} fill="#fff" />}
       {isCurrent && (
         <g transform="translate(0 -44)">
-          <rect x={-52} y={-14} width={104} height={20} rx={2} fill="#0b1224" stroke={color} strokeWidth={1} />
-          <text y={0} textAnchor="middle" fontSize={11} className="stencil" fill={color}>YOU · HERE</text>
+          <rect
+            x={-52}
+            y={-14}
+            width={104}
+            height={20}
+            rx={2}
+            fill="#0b1224"
+            stroke={color}
+            strokeWidth={1}
+          />
+          <text y={0} textAnchor="middle" fontSize={11} className="stencil" fill={color}>
+            YOU · HERE
+          </text>
         </g>
       )}
-      <text y={38} textAnchor="middle" fontSize={13} className="stencil" fill={color}>{s.code}</text>
-      <text y={54} textAnchor="middle" fontSize={11} fill="#cbd5e1">{truncate(s.scenario.title, 24)}</text>
+      <text y={38} textAnchor="middle" fontSize={13} className="stencil" fill={color}>
+        {s.code}
+      </text>
+      <text y={54} textAnchor="middle" fontSize={11} fill="#cbd5e1">
+        {truncate(s.scenario.title, 24)}
+      </text>
     </g>
   );
 }
 
-function truncate(s: string, n: number) { return s.length > n ? s.slice(0, n - 1) + "…" : s; }
+function truncate(s: string, n: number) {
+  return s.length > n ? s.slice(0, n - 1) + "…" : s;
+}
 
 /* ── chips ───────────────────────────────────────────────────── */
-function ChipLine({ color, label, done, total }: { color: string; label: string; done: number; total: number }) {
+function ChipLine({
+  color,
+  label,
+  done,
+  total,
+}: {
+  color: string;
+  label: string;
+  done: number;
+  total: number;
+}) {
   return (
     <div className="pointer-events-auto flex items-center gap-1.5 rounded-sm border border-primary/30 bg-background/70 backdrop-blur px-2 py-1">
-      <span className="h-2 w-2 rounded-full" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
+      <span
+        className="h-2 w-2 rounded-full"
+        style={{ background: color, boxShadow: `0 0 8px ${color}` }}
+      />
       <span className="stencil text-[10px] text-foreground">{label}</span>
-      <span className="stencil text-[10px] text-muted-foreground">{done}/{total}</span>
+      <span className="stencil text-[10px] text-muted-foreground">
+        {done}/{total}
+      </span>
     </div>
   );
 }
@@ -774,13 +1191,22 @@ function StationDialog({ station, onClose }: { station: Station | null; onClose:
   return (
     <Dialog open={!!station} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md">
-        <button onClick={onClose} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground" aria-label="Close">
+        <button
+          onClick={onClose}
+          className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+          aria-label="Close"
+        >
           <X className="h-4 w-4" />
         </button>
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full" style={{ background: color, boxShadow: `0 0 10px ${color}` }} />
-            <span className="stencil text-[10px]" style={{ color }}>{station.code}</span>
+            <span
+              className="h-2 w-2 rounded-full"
+              style={{ background: color, boxShadow: `0 0 10px ${color}` }}
+            />
+            <span className="stencil text-[10px]" style={{ color }}>
+              {station.code}
+            </span>
             <span className="stencil text-[10px] text-muted-foreground">· TIER {station.tier}</span>
           </div>
           <DialogTitle className="text-lg leading-tight">{station.scenario.title}</DialogTitle>
@@ -789,9 +1215,14 @@ function StationDialog({ station, onClose }: { station: Station | null; onClose:
           </DialogDescription>
         </DialogHeader>
         <div className="flex items-center justify-between pt-2">
-          <div className="stencil text-[10px] text-muted-foreground">{isMirror ? "MIRROR LINE" : "FEED LINE"}</div>
+          <div className="stencil text-[10px] text-muted-foreground">
+            {isMirror ? "MIRROR LINE" : "FEED LINE"}
+          </div>
           <button
-            onClick={() => { onClose(); nav({ to, params: { caseId: station.scenario.id } }); }}
+            onClick={() => {
+              onClose();
+              nav({ to, params: { caseId: station.scenario.id } });
+            }}
             className="inline-flex items-center gap-2 rounded-sm px-4 py-2 stencil text-[11px]"
             style={{ background: color, color: "#0b1224", boxShadow: `0 0 20px ${color}55` }}
           >

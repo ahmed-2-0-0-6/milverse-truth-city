@@ -15,7 +15,8 @@ function serverClient() {
     global: {
       fetch: (input, init) => {
         const h = new Headers(init?.headers);
-        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+          h.delete("Authorization");
         h.set("apikey", key);
         return fetch(input, { ...init, headers: h });
       },
@@ -27,20 +28,25 @@ const CODE_RE = /^[A-Z0-9]{4,6}$/;
 
 export const logPilotEntryToCloud = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({
-      groupCode: z.string().regex(CODE_RE),
-      deviceId: z.string().min(8).max(64),
-      wing: z.enum(["mirror", "feed", "daily"]),
-      caseId: z.string().max(120),
-      tier: z.number().int().min(1).max(5).optional(),
-      result: z.enum(["correct", "missed_scam", "false_alarm", "lucky_guess", "pyrrhic"]),
-      points: z.number().int(),
-      probeStats: z.object({
-        strong: z.number().int().min(0).default(0),
-        weak: z.number().int().min(0).default(0),
-        wasted: z.number().int().min(0).default(0),
-      }).partial().optional(),
-    }).parse(input),
+    z
+      .object({
+        groupCode: z.string().regex(CODE_RE),
+        deviceId: z.string().min(8).max(64),
+        wing: z.enum(["mirror", "feed", "daily"]),
+        caseId: z.string().max(120),
+        tier: z.number().int().min(1).max(5).optional(),
+        result: z.enum(["correct", "missed_scam", "false_alarm", "lucky_guess", "pyrrhic"]),
+        points: z.number().int(),
+        probeStats: z
+          .object({
+            strong: z.number().int().min(0).default(0),
+            weak: z.number().int().min(0).default(0),
+            wasted: z.number().int().min(0).default(0),
+          })
+          .partial()
+          .optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     const supabase = serverClient();

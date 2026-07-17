@@ -3,8 +3,14 @@ import { useEffect, useRef, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import { getFeedScenario, type FeedScenario, type FeedVerdict } from "@/lib/feed/scenarios";
 import {
-  initFeedState, senderReact, runAction, gradeVerdict, classifyTone,
-  type FeedMessage, type FeedState, type FeedOutcome,
+  initFeedState,
+  senderReact,
+  runAction,
+  gradeVerdict,
+  classifyTone,
+  type FeedMessage,
+  type FeedState,
+  type FeedOutcome,
 } from "@/lib/feed/engine";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
 import { checkAndAwardBadges } from "@/lib/mirror/badges";
@@ -46,9 +52,11 @@ function FeedPlay() {
   const [finalReply, setFinalReply] = useState("");
   const [conclusion, setConclusion] = useState("");
 
-
   useEffect(() => {
-    track("case_start", { case_id: scenario.id, payload: { district: "feed", tactic: scenario.tacticId ?? "unknown" } });
+    track("case_start", {
+      case_id: scenario.id,
+      payload: { district: "feed", tactic: scenario.tacticId ?? "unknown" },
+    });
   }, [scenario.id, scenario.tacticId]);
 
   useEffect(() => {
@@ -67,9 +75,7 @@ function FeedPlay() {
 
   useEffect(() => {
     if (phase === "sim" && messages.length === 0) {
-      setMessages([
-        { role: "sender", text: scenario.opener, ts: Date.now() },
-      ]);
+      setMessages([{ role: "sender", text: scenario.opener, ts: Date.now() }]);
     }
   }, [phase, scenario.opener, messages.length]);
 
@@ -90,7 +96,9 @@ function FeedPlay() {
   return (
     <div className="min-h-screen grain">
       <TopBar />
-      <div className="mx-auto max-w-3xl px-4 pt-4"><RookieIntro /></div>
+      <div className="mx-auto max-w-3xl px-4 pt-4">
+        <RookieIntro />
+      </div>
       {phase === "brief" && <Brief scenario={scenario} onStart={() => setPhase("sim")} />}
       {phase === "verdict" && (
         <VerdictScreen
@@ -103,7 +111,6 @@ function FeedPlay() {
           conclusion={conclusion}
           setConclusion={setConclusion}
           onConfirm={() => {
-
             if (!verdict) return;
             const oc = gradeVerdict(scenario, state, verdict, finalReply);
             setOutcome(oc);
@@ -117,14 +124,17 @@ function FeedPlay() {
             if (oc.result === "pyrrhic") p.falseAlarms += 1; // treated as calibration failure
             p.history.push({
               caseId: `feed:${scenario.id}`,
-              tier: (scenario.tier as unknown) as 1 | 2 | 3 | 4 | 5,
+              tier: scenario.tier as unknown as 1 | 2 | 3 | 4 | 5,
               verdict: verdict === "TRUE" ? "REAL" : "FAKE",
               truth: scenario.verdict === "TRUE" ? "REAL" : "IMPOSTER",
               result:
-                oc.result === "correct" ? "correct" :
-                oc.result === "missed_fake" ? "missed_scam" :
-                oc.result === "false_alarm" ? "false_alarm" :
-                "false_alarm",
+                oc.result === "correct"
+                  ? "correct"
+                  : oc.result === "missed_fake"
+                    ? "missed_scam"
+                    : oc.result === "false_alarm"
+                      ? "false_alarm"
+                      : "false_alarm",
               points: oc.points,
               ts: Date.now(),
             });
@@ -133,11 +143,15 @@ function FeedPlay() {
               wing: "feed",
               caseId: scenario.id,
               result:
-                oc.result === "correct" ? "correct" :
-                oc.result === "missed_fake" ? "missed_scam" :
-                oc.result === "false_alarm" ? "false_alarm" :
-                oc.result === "pyrrhic" ? "pyrrhic" :
-                "false_alarm",
+                oc.result === "correct"
+                  ? "correct"
+                  : oc.result === "missed_fake"
+                    ? "missed_scam"
+                    : oc.result === "false_alarm"
+                      ? "false_alarm"
+                      : oc.result === "pyrrhic"
+                        ? "pyrrhic"
+                        : "false_alarm",
               points: oc.points,
               ts: Date.now(),
             });
@@ -153,18 +167,25 @@ function FeedPlay() {
           caseId={scenario.id}
           stampLabel={verdict ?? "UNVERIFIED"}
           outcome={
-            (outcome.result === "correct" ? "correct"
-              : outcome.result === "missed_fake" ? "missed_scam"
-              : "false_alarm") as CalibrationOutcome
+            (outcome.result === "correct"
+              ? "correct"
+              : outcome.result === "missed_fake"
+                ? "missed_scam"
+                : "false_alarm") as CalibrationOutcome
           }
           onDone={() => setPhase("debrief")}
         />
       )}
       {phase === "debrief" && outcome && (
-        <Debrief scenario={scenario} outcome={outcome} state={state} verdict={verdict} conclusion={conclusion} finalReply={finalReply} />
+        <Debrief
+          scenario={scenario}
+          outcome={outcome}
+          state={state}
+          verdict={verdict}
+          conclusion={conclusion}
+          finalReply={finalReply}
+        />
       )}
-
-
     </div>
   );
 }
@@ -173,27 +194,49 @@ function FeedPlay() {
 function Brief({ scenario, onStart }: { scenario: FeedScenario; onStart: () => void }) {
   return (
     <main className="mx-auto max-w-2xl px-4 py-10">
-      <Link to="/feed" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">← FEED</Link>
+      <Link
+        to="/feed"
+        className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
+      >
+        ← FEED
+      </Link>
       <div className="mt-6 rounded-xl border border-caution/30 bg-caution/5 p-6">
         <div className="flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-caution">
           <ShieldAlert className="h-4 w-4" /> INCOMING FORWARD · TIER {scenario.tier}
         </div>
         <h1 className="mt-4 text-2xl font-semibold">{scenario.title}</h1>
         <section className="mt-6">
-          <div className="font-mono text-[11px] tracking-widest text-muted-foreground">WHO SENT IT</div>
-          <p className="mt-1 text-sm">{scenario.sender.name} — {scenario.sender.relationship}</p>
+          <div className="font-mono text-[11px] tracking-widest text-muted-foreground">
+            WHO SENT IT
+          </div>
+          <p className="mt-1 text-sm">
+            {scenario.sender.name} — {scenario.sender.relationship}
+          </p>
         </section>
         <section className="mt-6">
-          <div className="font-mono text-[11px] tracking-widest text-muted-foreground">WHY THEY SENT IT</div>
+          <div className="font-mono text-[11px] tracking-widest text-muted-foreground">
+            WHY THEY SENT IT
+          </div>
           <p className="mt-1 text-sm">{scenario.senderMotive}</p>
         </section>
         <section className="mt-6 rounded-md border border-primary/30 bg-primary/5 p-4 text-sm">
           <div className="font-mono text-[11px] tracking-widest text-primary mb-2">TWO JOBS</div>
-          <div className="flex gap-2"><Search className="h-4 w-4 text-primary shrink-0 mt-0.5" /><span>Judge the CLAIM: <b>TRUE</b>, <b>FALSE</b>, or <b>MISLEADING</b>.</span></div>
-          <div className="mt-2 flex gap-2"><Heart className="h-4 w-4 text-primary shrink-0 mt-0.5" /><span>Protect the RELATIONSHIP. Being right rudely = the lie survives.</span></div>
+          <div className="flex gap-2">
+            <Search className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+            <span>
+              Judge the CLAIM: <b>TRUE</b>, <b>FALSE</b>, or <b>MISLEADING</b>.
+            </span>
+          </div>
+          <div className="mt-2 flex gap-2">
+            <Heart className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+            <span>Protect the RELATIONSHIP. Being right rudely = the lie survives.</span>
+          </div>
         </section>
       </div>
-      <button onClick={onStart} className="mt-6 w-full rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground transition-transform hover:scale-[1.01]">
+      <button
+        onClick={onStart}
+        className="mt-6 w-full rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground transition-transform hover:scale-[1.01]"
+      >
         OPEN THE CHAT
       </button>
     </main>
@@ -202,7 +245,12 @@ function Brief({ scenario, onStart }: { scenario: FeedScenario; onStart: () => v
 
 /* ─────────── SIM ─────────── */
 function Sim({
-  scenario, state, setState, messages, setMessages, onDeliverVerdict,
+  scenario,
+  state,
+  setState,
+  messages,
+  setMessages,
+  onDeliverVerdict,
 }: {
   scenario: FeedScenario;
   state: FeedState;
@@ -273,7 +321,10 @@ function Sim({
                 <span>{Math.round(state.dignity)}</span>
               </div>
               <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-                <div className={`h-full transition-all duration-500 ${dignityColor}`} style={{ width: `${state.dignity}%` }} />
+                <div
+                  className={`h-full transition-all duration-500 ${dignityColor}`}
+                  style={{ width: `${state.dignity}%` }}
+                />
               </div>
               <div className="mt-2 flex gap-1">
                 {(["chat", "toolkit"] as const).map((t) => (
@@ -284,7 +335,9 @@ function Sim({
                       tab === t ? "bg-primary/15 text-primary" : "text-white/50 hover:text-white"
                     }`}
                   >
-                    {t === "chat" ? "CHAT" : `TOOLKIT · ${state.actionsUsed.length}/${scenario.actions.length}`}
+                    {t === "chat"
+                      ? "CHAT"
+                      : `TOOLKIT · ${state.actionsUsed.length}/${scenario.actions.length}`}
                   </button>
                 ))}
                 <div className="flex-1" />
@@ -309,7 +362,11 @@ function Sim({
                 placeholder="Reply to them…"
                 className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-sm text-white outline-none focus:border-primary"
               />
-              <button onClick={send} disabled={!input.trim()} className="rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40">
+              <button
+                onClick={send}
+                disabled={!input.trim()}
+                className="rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40"
+              >
                 <Send className="h-4 w-4" />
               </button>
             </div>
@@ -321,8 +378,15 @@ function Sim({
       >
         {tab === "chat" ? (
           <div ref={scroller} className="flex-1 overflow-y-auto p-3 space-y-3">
-            <FormatFrame format={scenario.format ?? "whatsapp"} senderName={scenario.sender.name} forward={scenario.forward} aiGenerated={scenario.aiGenerated} />
-            {messages.map((m, i) => <FeedRow key={i} m={m} />)}
+            <FormatFrame
+              format={scenario.format ?? "whatsapp"}
+              senderName={scenario.sender.name}
+              forward={scenario.forward}
+              aiGenerated={scenario.aiGenerated}
+            />
+            {messages.map((m, i) => (
+              <FeedRow key={i} m={m} />
+            ))}
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto p-3">
@@ -348,7 +412,9 @@ function FeedRow({ m }: { m: FeedMessage }) {
   if (m.role === "system") {
     return (
       <div className="rounded-md border border-primary/40 bg-primary/10 p-3 text-xs">
-        <div className="font-mono text-[10px] tracking-widest text-primary">{m.isAction ? "VERIFICATION" : "SYSTEM"}</div>
+        <div className="font-mono text-[10px] tracking-widest text-primary">
+          {m.isAction ? "VERIFICATION" : "SYSTEM"}
+        </div>
         <div className="mt-1 text-white/90">{m.text}</div>
       </div>
     );
@@ -356,17 +422,30 @@ function FeedRow({ m }: { m: FeedMessage }) {
   const isPlayer = m.role === "player";
   return (
     <div className={`msg-in flex ${isPlayer ? "justify-end" : "justify-start"}`}>
-      <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
-        isPlayer ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-neutral-800 border border-white/10 text-white rounded-bl-sm"
-      }`}>{m.text}</div>
+      <div
+        className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
+          isPlayer
+            ? "bg-primary text-primary-foreground rounded-br-sm"
+            : "bg-neutral-800 border border-white/10 text-white rounded-bl-sm"
+        }`}
+      >
+        {m.text}
+      </div>
     </div>
   );
 }
 
-
 /* ─────────── VERDICT ─────────── */
 function VerdictScreen({
-  scenario, state, verdict, setVerdict, finalReply, setFinalReply, conclusion, setConclusion, onConfirm,
+  scenario,
+  state,
+  verdict,
+  setVerdict,
+  finalReply,
+  setFinalReply,
+  conclusion,
+  setConclusion,
+  onConfirm,
 }: {
   scenario: FeedScenario;
   state: FeedState;
@@ -380,7 +459,11 @@ function VerdictScreen({
 }) {
   const tone = classifyTone(finalReply);
   const toneColor =
-    tone === "rude" ? "text-destructive" : tone === "respectful" ? "text-primary" : "text-muted-foreground";
+    tone === "rude"
+      ? "text-destructive"
+      : tone === "respectful"
+        ? "text-primary"
+        : "text-muted-foreground";
   const usedActions = scenario.actions.filter((a) => state.actionsUsed.includes(a.id));
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
@@ -392,9 +475,7 @@ function VerdictScreen({
           CASE FILE · AUTO-COLLECTED
         </div>
         <div>
-          <div className="font-mono text-[10px] tracking-widest text-primary mb-1.5">
-            THE CLAIM
-          </div>
+          <div className="font-mono text-[10px] tracking-widest text-primary mb-1.5">THE CLAIM</div>
           <p className="text-xs italic border-l-2 border-primary/40 pl-2.5">"{scenario.opener}"</p>
         </div>
         <div>
@@ -402,7 +483,9 @@ function VerdictScreen({
             VERIFICATION STEPS USED · {usedActions.length}/{scenario.actions.length}
           </div>
           {usedActions.length === 0 ? (
-            <p className="text-xs text-muted-foreground">No toolkit actions used — you're calling this cold.</p>
+            <p className="text-xs text-muted-foreground">
+              No toolkit actions used — you're calling this cold.
+            </p>
           ) : (
             <ul className="text-xs text-muted-foreground space-y-1">
               {usedActions.map((a) => (
@@ -414,7 +497,8 @@ function VerdictScreen({
       </section>
 
       <p className="mt-6 text-sm text-muted-foreground">
-        MISLEADING = the core is true but the framing (photo, date, context) is not. That's the most common type.
+        MISLEADING = the core is true but the framing (photo, date, context) is not. That's the most
+        common type.
       </p>
 
       <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -424,10 +508,13 @@ function VerdictScreen({
             onClick={() => setVerdict(v)}
             className={`rounded-md border-2 p-4 font-mono text-xs tracking-widest transition ${
               verdict === v
-                ? v === "TRUE" ? "border-primary bg-primary/10 text-primary" :
-                  v === "MISLEADING" ? "border-caution bg-caution/10 text-caution" :
-                  v === "UNVERIFIED" ? "border-muted-foreground bg-muted/40 text-foreground" :
-                  "border-destructive bg-destructive/10 text-destructive"
+                ? v === "TRUE"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : v === "MISLEADING"
+                    ? "border-caution bg-caution/10 text-caution"
+                    : v === "UNVERIFIED"
+                      ? "border-muted-foreground bg-muted/40 text-foreground"
+                      : "border-destructive bg-destructive/10 text-destructive"
                 : "border-border hover:border-primary/50"
             }`}
           >
@@ -436,7 +523,8 @@ function VerdictScreen({
         ))}
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
-        UNVERIFIED = the claim can neither be confirmed nor disproved. Refusing to forward fear you can't check is the correct move.
+        UNVERIFIED = the claim can neither be confirmed nor disproved. Refusing to forward fear you
+        can't check is the correct move.
       </p>
 
       <div className="mt-6">
@@ -466,7 +554,9 @@ function VerdictScreen({
           placeholder="In one line: why this verdict? (max 300 chars)"
           className="w-full rounded-md border border-input bg-background p-3 text-sm outline-none focus:border-primary"
         />
-        <div className="mt-1 text-right font-mono text-[10px] text-muted-foreground">{conclusion.length}/300</div>
+        <div className="mt-1 text-right font-mono text-[10px] text-muted-foreground">
+          {conclusion.length}/300
+        </div>
       </div>
 
       <button
@@ -481,14 +571,34 @@ function VerdictScreen({
 }
 
 /* ─────────── DEBRIEF ─────────── */
-function Debrief({ scenario, outcome, state, verdict, conclusion, finalReply }: { scenario: FeedScenario; outcome: FeedOutcome; state: FeedState; verdict: FeedVerdict | null; conclusion: string; finalReply: string }) {
-
+function Debrief({
+  scenario,
+  outcome,
+  state,
+  verdict,
+  conclusion,
+  finalReply,
+}: {
+  scenario: FeedScenario;
+  outcome: FeedOutcome;
+  state: FeedState;
+  verdict: FeedVerdict | null;
+  conclusion: string;
+  finalReply: string;
+}) {
   const navigate = useNavigate();
-  const Icon = outcome.result === "correct" ? CheckCircle2 : outcome.result === "pyrrhic" ? Heart : AlertTriangle;
+  const Icon =
+    outcome.result === "correct"
+      ? CheckCircle2
+      : outcome.result === "pyrrhic"
+        ? Heart
+        : AlertTriangle;
   const border =
-    outcome.result === "correct" ? "border-primary bg-primary/10 text-primary" :
-    outcome.result === "pyrrhic" ? "border-caution bg-caution/10 text-caution" :
-    "border-destructive bg-destructive/10 text-destructive";
+    outcome.result === "correct"
+      ? "border-primary bg-primary/10 text-primary"
+      : outcome.result === "pyrrhic"
+        ? "border-caution bg-caution/10 text-caution"
+        : "border-destructive bg-destructive/10 text-destructive";
 
   // 4-axis stars (each 0, 0.5, or 1) → total 0–4
   const tone = classifyTone(finalReply);
@@ -497,7 +607,8 @@ function Debrief({ scenario, outcome, state, verdict, conclusion, finalReply }: 
   const usedRatio = state.actionsUsed.length / total;
   const starDecision = correctVerdict ? (outcome.result === "pyrrhic" ? 0.5 : 1) : 0;
   const starEvidence = usedRatio >= 0.6 ? 1 : usedRatio >= 0.3 ? 0.5 : 0;
-  const starVerification = state.actionsUsed.length >= 2 ? 1 : state.actionsUsed.length >= 1 ? 0.5 : 0;
+  const starVerification =
+    state.actionsUsed.length >= 2 ? 1 : state.actionsUsed.length >= 1 ? 0.5 : 0;
   const starReasoning =
     (tone === "respectful" ? 1 : tone === "neutral" ? 0.5 : 0) +
     (conclusion.trim().length >= 20 ? 0.25 : 0);
@@ -508,7 +619,10 @@ function Debrief({ scenario, outcome, state, verdict, conclusion, finalReply }: 
     <main className="mx-auto max-w-2xl px-4 py-8 space-y-4">
       <div className={`rounded-xl border-2 p-6 ${border}`}>
         <Icon className="h-8 w-8 mb-3" />
-        <div className="font-mono text-xs tracking-[0.3em] opacity-80">{outcome.result.replace("_", " ").toUpperCase()} · {outcome.points > 0 ? "+" : ""}{outcome.points}</div>
+        <div className="font-mono text-xs tracking-[0.3em] opacity-80">
+          {outcome.result.replace("_", " ").toUpperCase()} · {outcome.points > 0 ? "+" : ""}
+          {outcome.points}
+        </div>
         <div className="mt-1 text-xl font-semibold">{outcome.headline}</div>
         <p className="mt-2 text-sm">{outcome.detail}</p>
       </div>
@@ -532,35 +646,47 @@ function Debrief({ scenario, outcome, state, verdict, conclusion, finalReply }: 
 
       {conclusion.trim() && (
         <div className="rounded-xl border border-border bg-card p-6">
-          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">YOUR CONCLUSION</div>
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">
+            YOUR CONCLUSION
+          </div>
           <p className="text-sm italic border-l-2 border-primary pl-3">"{conclusion.trim()}"</p>
         </div>
       )}
 
-
       <div className="rounded-xl border border-border bg-card p-6">
-        <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">WHAT'S ACTUALLY TRUE</div>
+        <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">
+          WHAT'S ACTUALLY TRUE
+        </div>
         <p className="text-sm">{scenario.truthNote}</p>
       </div>
 
       <div className="rounded-xl border border-primary/30 bg-primary/5 p-6">
-        <div className="font-mono text-xs tracking-widest text-primary mb-2">A REPLY THAT WOULD HAVE WORKED</div>
+        <div className="font-mono text-xs tracking-widest text-primary mb-2">
+          A REPLY THAT WOULD HAVE WORKED
+        </div>
         <p className="text-sm italic">"{scenario.respectfulScript}"</p>
       </div>
 
       <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between text-sm">
         <span className="text-muted-foreground">Actions used</span>
-        <span className="font-mono">{state.actionsUsed.length} / {scenario.actions.length}</span>
+        <span className="font-mono">
+          {state.actionsUsed.length} / {scenario.actions.length}
+        </span>
       </div>
 
       <RealCaseFile caseId={scenario.id} inline={scenario.inspiredBy} />
 
       <div className="flex gap-2">
-
-        <button onClick={() => navigate({ to: "/feed" })} className="flex-1 rounded-md bg-primary py-3 font-mono text-xs tracking-widest text-primary-foreground">
+        <button
+          onClick={() => navigate({ to: "/feed" })}
+          className="flex-1 rounded-md bg-primary py-3 font-mono text-xs tracking-widest text-primary-foreground"
+        >
           BACK TO THE FEED
         </button>
-        <button onClick={() => navigate({ to: "/city-hall" })} className="flex-1 rounded-md border border-border py-3 font-mono text-xs tracking-widest hover:border-primary/50">
+        <button
+          onClick={() => navigate({ to: "/city-hall" })}
+          className="flex-1 rounded-md border border-border py-3 font-mono text-xs tracking-widest hover:border-primary/50"
+        >
           VIEW CALIBRATION →
         </button>
       </div>
@@ -570,11 +696,14 @@ function Debrief({ scenario, outcome, state, verdict, conclusion, finalReply }: 
 
 function FeedStarAxis({ label, value }: { label: string; value: number }) {
   const filled = value >= 1 ? "★" : value >= 0.5 ? "⯪" : "☆";
-  const tone = value >= 1 ? "text-primary" : value >= 0.5 ? "text-caution" : "text-muted-foreground/40";
+  const tone =
+    value >= 1 ? "text-primary" : value >= 0.5 ? "text-caution" : "text-muted-foreground/40";
   return (
     <div className="rounded-md border border-border bg-background/50 p-3 text-center">
       <div className={`text-2xl ${tone}`}>{filled}</div>
-      <div className="mt-1 font-mono text-[10px] tracking-widest text-muted-foreground">{label}</div>
+      <div className="mt-1 font-mono text-[10px] tracking-widest text-muted-foreground">
+        {label}
+      </div>
     </div>
   );
 }

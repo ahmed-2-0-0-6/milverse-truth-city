@@ -1,7 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { TopBar } from "@/components/TopBar";
-import { loadProfile, calibrationLabel, operatorCallsign, type TrustProfile } from "@/lib/mirror/profile";
+import {
+  loadProfile,
+  calibrationLabel,
+  operatorCallsign,
+  type TrustProfile,
+} from "@/lib/mirror/profile";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp, RANKS } from "@/lib/ranks";
@@ -26,7 +31,10 @@ function ProfilePage() {
   useEffect(() => {
     setProfile(loadProfile());
     setManualUnlocks(loadUnlocked().size);
-    const on = () => { setProfile(loadProfile()); setManualUnlocks(loadUnlocked().size); };
+    const on = () => {
+      setProfile(loadProfile());
+      setManualUnlocks(loadUnlocked().size);
+    };
     window.addEventListener("milverse:profile", on);
     window.addEventListener("milverse:manual", on);
     return () => {
@@ -36,7 +44,10 @@ function ProfilePage() {
   }, []);
 
   const publishedCount = profile?.publishedCount ?? 0;
-  const xp = useMemo(() => computeXp(profile, manualUnlocks, publishedCount), [profile, manualUnlocks, publishedCount]);
+  const xp = useMemo(
+    () => computeXp(profile, manualUnlocks, publishedCount),
+    [profile, manualUnlocks, publishedCount],
+  );
   const rankInfo = useMemo(() => rankFromXp(xp), [xp]);
   const cal = profile ? calibrationLabel(profile) : { label: "Recruit", tone: "neutral" as const };
   const callsign = profile ? operatorCallsign(profile) : "———";
@@ -76,35 +87,60 @@ function ProfilePage() {
     <div className="min-h-screen grain">
       <TopBar />
       <main className="mx-auto max-w-3xl px-4 py-10">
-        <Link to="/" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">← CITY</Link>
+        <Link
+          to="/"
+          className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
+        >
+          ← CITY
+        </Link>
 
         <div className="mt-6 rounded-2xl border-2 border-primary/40 bg-card p-6 sm:p-8 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-[0.04]" style={{
-            backgroundImage: "radial-gradient(rgba(34,211,238,0.6) 1px, transparent 1px)",
-            backgroundSize: "6px 6px",
-          }} />
+          <div
+            className="absolute inset-0 opacity-[0.04]"
+            style={{
+              backgroundImage: "radial-gradient(rgba(34,211,238,0.6) 1px, transparent 1px)",
+              backgroundSize: "6px 6px",
+            }}
+          />
           <div className="relative">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="stencil text-[10px] tracking-[0.3em] text-muted-foreground">OPERATOR PROFILE</div>
+                <div className="stencil text-[10px] tracking-[0.3em] text-muted-foreground">
+                  OPERATOR PROFILE
+                </div>
                 <div className="mt-1 stencil text-primary text-sm">{callsign}</div>
-                <h1 className="mt-2 text-5xl sm:text-6xl font-black tracking-tight" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
+                <h1
+                  className="mt-2 text-5xl sm:text-6xl font-black tracking-tight"
+                  style={{ fontFamily: '"Bebas Neue", sans-serif' }}
+                >
                   {rankInfo.current.name}
                 </h1>
-                <div className="stencil text-[10px] tracking-widest text-primary mt-1">{rankInfo.current.code} · {rankInfo.current.tagline}</div>
+                <div className="stencil text-[10px] tracking-widest text-primary mt-1">
+                  {rankInfo.current.code} · {rankInfo.current.tagline}
+                </div>
               </div>
               <div className="text-right">
                 <div className="stencil text-[9px] tracking-widest text-muted-foreground">XP</div>
-                <div className="text-4xl font-black text-primary tabular-nums" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>{xp}</div>
+                <div
+                  className="text-4xl font-black text-primary tabular-nums"
+                  style={{ fontFamily: '"Bebas Neue", sans-serif' }}
+                >
+                  {xp}
+                </div>
                 {rankInfo.next && (
-                  <div className="stencil text-[9px] text-muted-foreground mt-1">NEXT · {rankInfo.next.name}</div>
+                  <div className="stencil text-[9px] text-muted-foreground mt-1">
+                    NEXT · {rankInfo.next.name}
+                  </div>
                 )}
               </div>
             </div>
 
             {rankInfo.next && (
               <div className="mt-5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                <div className="h-full bg-primary transition-all" style={{ width: `${Math.round(rankInfo.progress * 100)}%` }} />
+                <div
+                  className="h-full bg-primary transition-all"
+                  style={{ width: `${Math.round(rankInfo.progress * 100)}%` }}
+                />
               </div>
             )}
 
@@ -117,20 +153,28 @@ function ProfilePage() {
 
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="rounded-md border border-border bg-background/50 p-3">
-                <div className="stencil text-[10px] tracking-widest text-muted-foreground">CALIBRATION</div>
+                <div className="stencil text-[10px] tracking-widest text-muted-foreground">
+                  CALIBRATION
+                </div>
                 <div className="mt-1 text-lg font-semibold">{cal.label}</div>
               </div>
               <div className="rounded-md border border-border bg-background/50 p-3">
-                <div className="stencil text-[10px] tracking-widest text-muted-foreground">FIELD MANUAL</div>
+                <div className="stencil text-[10px] tracking-widest text-muted-foreground">
+                  FIELD MANUAL
+                </div>
                 <div className="mt-1 flex items-center gap-2">
-                  <div className="text-lg font-semibold">{manualUnlocks} / {MANUAL_ENTRIES.length}</div>
+                  <div className="text-lg font-semibold">
+                    {manualUnlocks} / {MANUAL_ENTRIES.length}
+                  </div>
                   <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
                     <div className="h-full bg-primary" style={{ width: `${manualPct}%` }} />
                   </div>
                 </div>
               </div>
               <div className="rounded-md border border-border bg-background/50 p-3">
-                <div className="stencil text-[10px] tracking-widest text-muted-foreground">CASES DESIGNED</div>
+                <div className="stencil text-[10px] tracking-widest text-muted-foreground">
+                  CASES DESIGNED
+                </div>
                 <div className="mt-1 text-lg font-semibold">{publishedCount}</div>
               </div>
             </div>
@@ -145,7 +189,13 @@ function ProfilePage() {
               <button
                 onClick={() => {
                   if (navigator.share) {
-                    navigator.share({ title: "MILVERSE — Operator Profile", text: `${callsign} · ${rankInfo.current.name} · ${xp} XP`, url: window.location.href }).catch(() => {});
+                    navigator
+                      .share({
+                        title: "MILVERSE — Operator Profile",
+                        text: `${callsign} · ${rankInfo.current.name} · ${xp} XP`,
+                        url: window.location.href,
+                      })
+                      .catch(() => {});
                   } else {
                     navigator.clipboard?.writeText(window.location.href);
                   }
@@ -163,15 +213,27 @@ function ProfilePage() {
         <WeeklyEval />
 
         <section className="mt-6">
-          <div className="stencil text-[10px] tracking-widest text-muted-foreground mb-2">RANK LADDER</div>
+          <div className="stencil text-[10px] tracking-widest text-muted-foreground mb-2">
+            RANK LADDER
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {RANKS.map((r) => {
               const cur = r.id === rankInfo.current.id;
               const reached = xp >= r.minXp;
               return (
-                <div key={r.id} className={`rounded-md border p-3 ${cur ? "border-primary bg-primary/10" : reached ? "border-border bg-card" : "border-dashed border-border bg-muted/10 opacity-70"}`}>
-                  <div className="stencil text-[9px] tracking-widest text-muted-foreground">{r.code} · {r.minXp}xp</div>
-                  <div className="mt-1 font-black text-lg tracking-tight" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>{r.name}</div>
+                <div
+                  key={r.id}
+                  className={`rounded-md border p-3 ${cur ? "border-primary bg-primary/10" : reached ? "border-border bg-card" : "border-dashed border-border bg-muted/10 opacity-70"}`}
+                >
+                  <div className="stencil text-[9px] tracking-widest text-muted-foreground">
+                    {r.code} · {r.minXp}xp
+                  </div>
+                  <div
+                    className="mt-1 font-black text-lg tracking-tight"
+                    style={{ fontFamily: '"Bebas Neue", sans-serif' }}
+                  >
+                    {r.name}
+                  </div>
                   <div className="text-[11px] text-muted-foreground italic">{r.tagline}</div>
                 </div>
               );
@@ -183,32 +245,59 @@ function ProfilePage() {
   );
 }
 
-function Stat({ label, value, tone }: { label: string; value: number; tone?: "good" | "bad" | "warn" }) {
+function Stat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone?: "good" | "bad" | "warn";
+}) {
   const color =
-    tone === "good" ? "text-primary"
-    : tone === "bad" ? "text-destructive"
-    : tone === "warn" ? "text-caution"
-    : "text-foreground";
+    tone === "good"
+      ? "text-primary"
+      : tone === "bad"
+        ? "text-destructive"
+        : tone === "warn"
+          ? "text-caution"
+          : "text-foreground";
   return (
     <div className="rounded-md border border-border bg-background/50 p-3 text-center">
-      <div className={`text-2xl font-black tabular-nums ${color}`} style={{ fontFamily: '"Bebas Neue", sans-serif' }}>{value}</div>
+      <div
+        className={`text-2xl font-black tabular-nums ${color}`}
+        style={{ fontFamily: '"Bebas Neue", sans-serif' }}
+      >
+        {value}
+      </div>
       <div className="stencil text-[9px] tracking-widest text-muted-foreground mt-1">{label}</div>
     </div>
   );
 }
 
 interface CardData {
-  callsign: string; rank: string; rankCode: string; tagline: string; xp: number;
-  calibration: string; correct: number; total: number; missed: number; falseAlarms: number;
-  manualPct: number; designed: number;
+  callsign: string;
+  rank: string;
+  rankCode: string;
+  tagline: string;
+  xp: number;
+  calibration: string;
+  correct: number;
+  total: number;
+  missed: number;
+  falseAlarms: number;
+  manualPct: number;
+  designed: number;
 }
 
 /** Noir ID-card, rendered client-side to a PNG blob. No external service. */
 function renderProfileCardPng(d: CardData): Promise<Blob> {
   return new Promise((resolve) => {
-    const W = 1200, H = 630;
+    const W = 1200,
+      H = 630;
     const canvas = document.createElement("canvas");
-    canvas.width = W; canvas.height = H;
+    canvas.width = W;
+    canvas.height = H;
     const ctx = canvas.getContext("2d")!;
 
     // Background gradient
@@ -228,8 +317,17 @@ function renderProfileCardPng(d: CardData): Promise<Blob> {
     ctx.strokeRect(20, 20, W - 40, H - 40);
     ctx.strokeStyle = "rgba(34,211,238,0.7)";
     ctx.lineWidth = 3;
-    [[20,20],[W-60,20],[20,H-60],[W-60,H-60]].forEach(([x,y]) => {
-      ctx.beginPath(); ctx.moveTo(x, y+40); ctx.lineTo(x, y); ctx.lineTo(x+40, y); ctx.stroke();
+    [
+      [20, 20],
+      [W - 60, 20],
+      [20, H - 60],
+      [W - 60, H - 60],
+    ].forEach(([x, y]) => {
+      ctx.beginPath();
+      ctx.moveTo(x, y + 40);
+      ctx.lineTo(x, y);
+      ctx.lineTo(x + 40, y);
+      ctx.stroke();
     });
 
     // Header
@@ -278,7 +376,8 @@ function renderProfileCardPng(d: CardData): Promise<Blob> {
     ctx.font = "500 15px ui-monospace, Menlo, monospace";
     ctx.fillText(
       `CALIBRATION · ${d.calibration.toUpperCase()}    ·    MANUAL · ${d.manualPct}%    ·    DESIGNED · ${d.designed}`,
-      60, 550
+      60,
+      550,
     );
     ctx.fillStyle = "#22d3ee";
     ctx.font = "500 14px ui-monospace, Menlo, monospace";
@@ -301,4 +400,3 @@ function renderProfileCardPng(d: CardData): Promise<Blob> {
     canvas.toBlob((blob) => resolve(blob ?? new Blob()), "image/png");
   });
 }
-

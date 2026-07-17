@@ -12,7 +12,11 @@ export const Route = createFileRoute("/archive/submit")({
   head: () => ({
     meta: [
       { title: "Share Your Story — The Archive — MILVERSE" },
-      { name: "description", content: "Turn what happened to you into a training mission. No real names, numbers, or links." },
+      {
+        name: "description",
+        content:
+          "Turn what happened to you into a training mission. No real names, numbers, or links.",
+      },
     ],
   }),
   component: SubmitStory,
@@ -32,7 +36,9 @@ function localPiiCheck(...vals: string[]): string | null {
 
 function SubmitStory() {
   const [what, setWhat] = useState("");
-  const [channel, setChannel] = useState<"text" | "call" | "forward" | "in_person" | "other">("text");
+  const [channel, setChannel] = useState<"text" | "call" | "forward" | "in_person" | "other">(
+    "text",
+  );
   const [wanted, setWanted] = useState("");
   const [tell, setTell] = useState("");
   const [country, setCountry] = useState("Pakistan");
@@ -43,7 +49,12 @@ function SubmitStory() {
   const [err, setErr] = useState<string | null>(null);
   const submit = useServerFn(submitStory);
 
-  const canSubmit = what.trim().length >= 30 && wanted.trim().length >= 3 && tell.trim().length >= 3 && country && year;
+  const canSubmit =
+    what.trim().length >= 30 &&
+    wanted.trim().length >= 3 &&
+    tell.trim().length >= 3 &&
+    country &&
+    year;
 
   async function onSubmit() {
     setErr(null);
@@ -70,7 +81,10 @@ function SubmitStory() {
           deviceId: getDeviceId(),
         } as never,
       });
-      toast.success("Story received", { description: "A human reviewer will read it and, if approved, turn it into a training mission." });
+      toast.success("Story received", {
+        description:
+          "A human reviewer will read it and, if approved, turn it into a training mission.",
+      });
       setDone(true);
     } catch (e) {
       const msg = (e as Error).message ?? "Submission failed. Try again.";
@@ -88,10 +102,13 @@ function SubmitStory() {
           <CheckCircle2 className="mx-auto h-12 w-12 text-primary mb-4" />
           <h1 className="text-3xl font-semibold uppercase">Received.</h1>
           <p className="mt-3 text-muted-foreground">
-            A human reviewer will read it and, if approved, turn it into a playable mission on the Community shelf.
-            Nothing you submitted is public yet.
+            A human reviewer will read it and, if approved, turn it into a playable mission on the
+            Community shelf. Nothing you submitted is public yet.
           </p>
-          <Link to="/archive" className="mt-8 inline-block rounded-sm border border-primary bg-primary/10 px-4 py-2 stencil text-[10px] text-primary hover:bg-primary/20">
+          <Link
+            to="/archive"
+            className="mt-8 inline-block rounded-sm border border-primary bg-primary/10 px-4 py-2 stencil text-[10px] text-primary hover:bg-primary/20"
+          >
             ← BACK TO THE ARCHIVE
           </Link>
         </main>
@@ -103,25 +120,33 @@ function SubmitStory() {
     <div className="min-h-screen grain">
       <TopBar />
       <main className="mx-auto max-w-2xl px-4 py-10">
-        <Link to="/archive" className="inline-flex items-center gap-1 stencil text-[10px] text-muted-foreground hover:text-foreground">
+        <Link
+          to="/archive"
+          className="inline-flex items-center gap-1 stencil text-[10px] text-muted-foreground hover:text-foreground"
+        >
           <ArrowLeft className="h-3 w-3" /> ARCHIVE
         </Link>
         <h1 className="mt-3 text-3xl sm:text-4xl font-semibold uppercase">Share Your Story</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Turn what happened to you (or someone you know) into a training mission for the next person.
+          Turn what happened to you (or someone you know) into a training mission for the next
+          person.
         </p>
 
         <div className="mt-4 rounded-sm border border-caution/50 bg-caution/5 p-3 text-xs text-caution flex gap-2">
           <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
           <div>
-            <b>No real names, numbers, links, or account details.</b> If you include any, the system will reject the submission. We publish TACTICS — not identities.
+            <b>No real names, numbers, links, or account details.</b> If you include any, the system
+            will reject the submission. We publish TACTICS — not identities.
           </div>
         </div>
 
         {/* Step 1 */}
         <section className="mt-6 rounded-sm border border-border bg-card p-5">
           <div className="stencil text-[10px] text-primary">STEP 1 · WHAT HAPPENED</div>
-          <p className="mt-1 text-xs text-muted-foreground">Tell us in your own words, step by step. What did they say first? What did they say next?</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Tell us in your own words, step by step. What did they say first? What did they say
+            next?
+          </p>
           <textarea
             value={what}
             onChange={(e) => setWhat(e.target.value)}
@@ -129,7 +154,9 @@ function SubmitStory() {
             placeholder="e.g. I got a message saying I'd won a prize from a well-known brand. The person on the other end asked me to..."
             maxLength={2000}
           />
-          <div className="mt-1 text-[10px] text-muted-foreground text-right">{what.length}/2000</div>
+          <div className="mt-1 text-[10px] text-muted-foreground text-right">
+            {what.length}/2000
+          </div>
         </section>
 
         {/* Step 2 */}
@@ -163,7 +190,9 @@ function SubmitStory() {
 
         {/* Step 4 */}
         <section className="mt-4 rounded-sm border border-border bg-card p-5">
-          <div className="stencil text-[10px] text-primary">STEP 4 · WHAT TIPPED YOU OFF (OR HOW YOU FOUND OUT TOO LATE)</div>
+          <div className="stencil text-[10px] text-primary">
+            STEP 4 · WHAT TIPPED YOU OFF (OR HOW YOU FOUND OUT TOO LATE)
+          </div>
           <textarea
             value={tell}
             onChange={(e) => setTell(e.target.value)}
@@ -179,21 +208,42 @@ function SubmitStory() {
           <div className="mt-3 grid grid-cols-2 gap-3">
             <label className="block">
               <div className="text-xs text-muted-foreground mb-1">Country</div>
-              <input value={country} onChange={(e) => setCountry(e.target.value)} className="w-full rounded-sm border border-border bg-background p-2 text-sm" maxLength={60} />
+              <input
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="w-full rounded-sm border border-border bg-background p-2 text-sm"
+                maxLength={60}
+              />
             </label>
             <label className="block">
               <div className="text-xs text-muted-foreground mb-1">Rough year</div>
-              <input type="number" value={year} onChange={(e) => setYear(Number(e.target.value))} className="w-full rounded-sm border border-border bg-background p-2 text-sm" min={1990} max={new Date().getFullYear()} />
+              <input
+                type="number"
+                value={year}
+                onChange={(e) => setYear(Number(e.target.value))}
+                className="w-full rounded-sm border border-border bg-background p-2 text-sm"
+                min={1990}
+                max={new Date().getFullYear()}
+              />
             </label>
           </div>
           <label className="block mt-3">
-            <div className="text-xs text-muted-foreground mb-1">Pattern name (optional — e.g. "prize SMS scam")</div>
-            <input value={pattern} onChange={(e) => setPattern(e.target.value)} className="w-full rounded-sm border border-border bg-background p-2 text-sm" maxLength={120} />
+            <div className="text-xs text-muted-foreground mb-1">
+              Pattern name (optional — e.g. "prize SMS scam")
+            </div>
+            <input
+              value={pattern}
+              onChange={(e) => setPattern(e.target.value)}
+              className="w-full rounded-sm border border-border bg-background p-2 text-sm"
+              maxLength={120}
+            />
           </label>
         </section>
 
         {err && (
-          <div className="mt-4 rounded-sm border border-destructive/50 bg-destructive/10 p-3 text-xs text-destructive">{err}</div>
+          <div className="mt-4 rounded-sm border border-destructive/50 bg-destructive/10 p-3 text-xs text-destructive">
+            {err}
+          </div>
         )}
 
         <button

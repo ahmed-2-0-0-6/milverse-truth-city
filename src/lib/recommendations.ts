@@ -18,13 +18,19 @@ export function getMirrorRecommendations(p: TrustProfile | null): Recommendation
   if (!p) {
     // Cold-start: recommend two Tier 1 openers.
     const t1 = SCENARIOS.filter((s) => s.tier === 1).slice(0, 2);
-    return t1.map((s) => ({ scenario: s, reason: "Start here — Tier 1 warm-up.", tag: "MIXED" as const }));
+    return t1.map((s) => ({
+      scenario: s,
+      reason: "Start here — Tier 1 warm-up.",
+      tag: "MIXED" as const,
+    }));
   }
 
   const missed = p.missedScams;
   const falseAlarm = p.falseAlarms;
   const total = Math.max(1, p.casesPlayed);
-  const weakRatio = (p.weakProbesTotal + p.wastedPressureTotal) / Math.max(1, p.strongProbesTotal + p.weakProbesTotal + p.wastedPressureTotal);
+  const weakRatio =
+    (p.weakProbesTotal + p.wastedPressureTotal) /
+    Math.max(1, p.strongProbesTotal + p.weakProbesTotal + p.wastedPressureTotal);
 
   const unplayed = SCENARIOS.filter((s) => !played(p, s.id));
   const imposters = unplayed.filter((s) => s.truth === "IMPOSTER");

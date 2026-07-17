@@ -11,25 +11,27 @@ const PHONE_RE = /\+?\d[\d\s\-()]{6,}/;
 const EMAIL_RE = /[\w.+-]+@[\w-]+\.[\w.-]+/;
 const URL_RE = /(https?:\/\/|www\.)[\w./?=&%-]+/i;
 
-const ScenarioConfig = z.object({
-  id: z.string().min(1).max(64),
-  title: z.string().min(3).max(120),
-  teaser: z.string().max(240).optional().default(""),
-  channel: z.literal("text"),
-  tier: z.number().int().min(1).max(5),
-  truth: z.enum(["REAL", "IMPOSTER"]),
-  claimedIdentity: z.string().max(120),
-  agenda: z.string().max(240).optional(),
-  dossier: z.object({
-    contactClaim: z.string().max(400),
-    knownFacts: z.array(z.string().max(400)).max(20),
-    publicFacts: z.array(z.string().max(400)).max(20),
-  }),
-  facts: z.array(z.any()).max(20),
-  opener: z.string().min(1).max(600),
-  persona: z.any(),
-  evidenceChips: z.array(z.any()).max(20),
-}).passthrough();
+const ScenarioConfig = z
+  .object({
+    id: z.string().min(1).max(64),
+    title: z.string().min(3).max(120),
+    teaser: z.string().max(240).optional().default(""),
+    channel: z.literal("text"),
+    tier: z.number().int().min(1).max(5),
+    truth: z.enum(["REAL", "IMPOSTER"]),
+    claimedIdentity: z.string().max(120),
+    agenda: z.string().max(240).optional(),
+    dossier: z.object({
+      contactClaim: z.string().max(400),
+      knownFacts: z.array(z.string().max(400)).max(20),
+      publicFacts: z.array(z.string().max(400)).max(20),
+    }),
+    facts: z.array(z.any()).max(20),
+    opener: z.string().min(1).max(600),
+    persona: z.any(),
+    evidenceChips: z.array(z.any()).max(20),
+  })
+  .passthrough();
 
 function scanForPii(cfg: unknown): string | null {
   const blob = JSON.stringify(cfg);
@@ -49,7 +51,8 @@ function serverClient() {
     global: {
       fetch: (input, init) => {
         const h = new Headers(init?.headers);
-        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+          h.delete("Authorization");
         h.set("apikey", key);
         return fetch(input, { ...init, headers: h });
       },
@@ -57,7 +60,9 @@ function serverClient() {
   });
 }
 
-async function aiSafetyCheck(scenario: unknown): Promise<{ ok: boolean; reason?: string; checked: boolean }> {
+async function aiSafetyCheck(
+  scenario: unknown,
+): Promise<{ ok: boolean; reason?: string; checked: boolean }> {
   const key = process.env.LOVABLE_API_KEY;
   if (!key) return { ok: true, checked: false };
   try {
@@ -83,10 +88,23 @@ Respond with STRICT JSON only, no prose, no markdown:
 CASE CONFIG:
 ${JSON.stringify(scenario).slice(0, 6000)}`;
     const result = await generateText({ model, prompt });
-    const raw = (result.text || "").trim().replace(/^```(json)?/i, "").replace(/```$/, "").trim();
+    const raw = (result.text || "")
+      .trim()
+      .replace(/^```(json)?/i, "")
+      .replace(/```$/, "")
+      .trim();
     let parsed: { ok?: boolean; reason?: string } = {};
-    try { parsed = JSON.parse(raw); } catch { return { ok: true, checked: false }; }
-    if (parsed.ok === false) return { ok: false, reason: parsed.reason || "Case flagged by safety review.", checked: true };
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return { ok: true, checked: false };
+    }
+    if (parsed.ok === false)
+      return {
+        ok: false,
+        reason: parsed.reason || "Case flagged by safety review.",
+        checked: true,
+      };
     return { ok: true, checked: true };
   } catch {
     return { ok: true, checked: false };
@@ -95,16 +113,19 @@ ${JSON.stringify(scenario).slice(0, 6000)}`;
 
 export const publishCitizenCase = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({
-      shareCode: z.string().regex(CODE_RE),
-      scenario: ScenarioConfig,
-      deviceId: z.string().min(8).max(64).optional(),
-      lane: z.enum(["private", "community"]).default("private"),
-    }).parse(input),
+    z
+      .object({
+        shareCode: z.string().regex(CODE_RE),
+        scenario: ScenarioConfig,
+        deviceId: z.string().min(8).max(64).optional(),
+        lane: z.enum(["private", "community"]).default("private"),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     const piiKind = scanForPii(data.scenario);
-    if (piiKind) throw new Error(`Case rejected: contains ${piiKind}. Keep scenarios fully fictional.`);
+    if (piiKind)
+      throw new Error(`Case rejected: contains ${piiKind}. Keep scenarios fully fictional.`);
 
     // AI safety gate — both lanes.
     const safety = await aiSafetyCheck(data.scenario);
@@ -119,7 +140,12 @@ export const publishCitizenCase = createServerFn({ method: "POST" })
         device_id: data.deviceId ?? null,
       });
       if (error) throw new Error(error.message);
-      return { ok: true, shareCode: data.shareCode, lane: "community" as const, aiChecked: safety.checked };
+      return {
+        ok: true,
+        shareCode: data.shareCode,
+        lane: "community" as const,
+        aiChecked: safety.checked,
+      };
     }
 
     // Private lane → share-code only, never on public shelves.
@@ -130,10 +156,16 @@ export const publishCitizenCase = createServerFn({ method: "POST" })
       device_id: data.deviceId ?? null,
     });
     if (error) {
-      if (error.code === "23505") throw new Error("That share code is already taken. Publish again to mint a new one.");
+      if (error.code === "23505")
+        throw new Error("That share code is already taken. Publish again to mint a new one.");
       throw new Error(error.message);
     }
-    return { ok: true, shareCode: data.shareCode, lane: "private" as const, aiChecked: safety.checked };
+    return {
+      ok: true,
+      shareCode: data.shareCode,
+      lane: "private" as const,
+      aiChecked: safety.checked,
+    };
   });
 
 export const fetchCitizenCase = createServerFn({ method: "GET" })

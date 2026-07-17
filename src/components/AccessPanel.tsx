@@ -3,7 +3,14 @@
 
 import { Accessibility, Volume2, VolumeX } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useAccess, type TextSize } from "@/lib/access";
 import { isMuted, setMuted } from "@/lib/mirror/audio";
 
@@ -91,10 +98,15 @@ export function AccessPanel() {
           <div className="flex items-center justify-between rounded border border-border p-3">
             <div>
               <div className="text-sm text-foreground">Sound</div>
-              <div className="text-xs text-muted-foreground">Applies to voice notes, stings, and callback audio.</div>
+              <div className="text-xs text-muted-foreground">
+                Applies to voice notes, stings, and callback audio.
+              </div>
             </div>
             <button
-              onClick={() => { setMuted(!muted); setLocalMuted(!muted); }}
+              onClick={() => {
+                setMuted(!muted);
+                setLocalMuted(!muted);
+              }}
               className="flex items-center gap-2 rounded border border-border px-3 py-2 text-sm text-foreground hover:bg-accent"
               aria-label={muted ? "Unmute sound" : "Mute sound"}
             >
@@ -111,9 +123,9 @@ export function AccessPanel() {
           </button>
 
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Keyboard shortcut: <kbd className="rounded border border-border px-1">Tab</kbd> moves through
-            controls; <kbd className="rounded border border-border px-1">Esc</kbd> closes overlays;
-            arrow keys adjust sliders.
+            Keyboard shortcut: <kbd className="rounded border border-border px-1">Tab</kbd> moves
+            through controls; <kbd className="rounded border border-border px-1">Esc</kbd> closes
+            overlays; arrow keys adjust sliders.
           </p>
         </div>
       </SheetContent>
@@ -122,14 +134,24 @@ export function AccessPanel() {
 }
 
 function ToggleRow({
-  id, label, help, checked, onChange,
+  id,
+  label,
+  help,
+  checked,
+  onChange,
 }: {
-  id: string; label: string; help: string; checked: boolean; onChange: (v: boolean) => void;
+  id: string;
+  label: string;
+  help: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
 }) {
   return (
     <div className="flex items-start justify-between gap-3 rounded border border-border p-3">
       <div className="min-w-0">
-        <label htmlFor={id} className="text-sm text-foreground cursor-pointer">{label}</label>
+        <label htmlFor={id} className="text-sm text-foreground cursor-pointer">
+          {label}
+        </label>
         <div className="text-xs text-muted-foreground mt-1">{help}</div>
       </div>
       <button

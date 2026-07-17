@@ -17,7 +17,8 @@ function serverClient() {
     global: {
       fetch: (input, init) => {
         const h = new Headers(init?.headers);
-        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+          h.delete("Authorization");
         h.set("apikey", key);
         return fetch(input, { ...init, headers: h });
       },
@@ -52,10 +53,12 @@ export const registerFamilyCode = createServerFn({ method: "POST" })
 /** Parent regenerates: revokes old, registers new. Old code stops working. */
 export const regenerateFamilyCode = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({
-      oldCode: z.string().regex(CODE_RE),
-      newCode: z.string().regex(CODE_RE),
-    }).parse(input),
+    z
+      .object({
+        oldCode: z.string().regex(CODE_RE),
+        newCode: z.string().regex(CODE_RE),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     const supabase = serverClient();
@@ -92,6 +95,7 @@ export const checkFamilyCodeJoin = createServerFn({ method: "POST" })
     const allowed = await touchRateLimit(supabase, data.code);
     if (!allowed) throw new Error("Too many attempts for this code. Try again in an hour.");
     const active = await isActive(supabase, data.code);
-    if (!active) throw new Error("This family code is no longer active. Ask your parent for a new one.");
+    if (!active)
+      throw new Error("This family code is no longer active. Ask your parent for a new one.");
     return { ok: true };
   });

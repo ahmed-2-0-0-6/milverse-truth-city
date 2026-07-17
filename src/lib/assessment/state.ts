@@ -42,7 +42,8 @@ export function getCodename(): string {
 export async function hashCodename(codename: string): Promise<string> {
   const buf = new TextEncoder().encode(codename);
   const digest = await crypto.subtle.digest("SHA-256", buf);
-  return [...new Uint8Array(digest)].slice(0, 8)
+  return [...new Uint8Array(digest)]
+    .slice(0, 8)
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 }
@@ -66,7 +67,9 @@ export function loadLocal(): StoredAttempt[] {
   try {
     const raw = localStorage.getItem(LOCAL_KEY);
     return raw ? (JSON.parse(raw) as StoredAttempt[]) : [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 function saveLocal(list: StoredAttempt[]) {
@@ -76,7 +79,9 @@ function saveLocal(list: StoredAttempt[]) {
 
 /** Idempotent: one intake and one exit per (group, codenameHash) locally. */
 export function hasAttempt(groupCode: string, hash: string, phase: "intake" | "exit"): boolean {
-  return loadLocal().some((a) => a.groupCode === groupCode && a.codenameHash === hash && a.phase === phase);
+  return loadLocal().some(
+    (a) => a.groupCode === groupCode && a.codenameHash === hash && a.phase === phase,
+  );
 }
 
 export function recordAttempt(input: {
@@ -94,7 +99,12 @@ export function recordAttempt(input: {
     synced: false,
   };
   const list = loadLocal().filter(
-    (a) => !(a.groupCode === rec.groupCode && a.codenameHash === rec.codenameHash && a.phase === rec.phase),
+    (a) =>
+      !(
+        a.groupCode === rec.groupCode &&
+        a.codenameHash === rec.codenameHash &&
+        a.phase === rec.phase
+      ),
   );
   list.push(rec);
   saveLocal(list);

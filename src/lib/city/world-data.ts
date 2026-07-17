@@ -9,7 +9,7 @@ export const WORLD_W = 3000;
 export const WORLD_H = 2000;
 
 export const MIRROR_COLOR = "#22d3ee"; // cyan
-export const FEED_COLOR = "#f5b942";   // amber
+export const FEED_COLOR = "#f5b942"; // amber
 
 export type LineId = "mirror" | "feed";
 
@@ -20,8 +20,14 @@ export interface StationBase {
   tier: number;
   line: LineId;
 }
-export interface MirrorStation extends StationBase { line: "mirror"; scenario: Scenario; }
-export interface FeedStation extends StationBase { line: "feed"; scenario: FeedScenario; }
+export interface MirrorStation extends StationBase {
+  line: "mirror";
+  scenario: Scenario;
+}
+export interface FeedStation extends StationBase {
+  line: "feed";
+  scenario: FeedScenario;
+}
 export type Station = MirrorStation | FeedStation;
 
 /** Path along which stations are laid — Mirror quarter (upper-left). */
@@ -46,7 +52,14 @@ export function buildMirrorStations(): MirrorStation[] {
   return sorted.map((s, i) => {
     const tierPos = sorted.slice(0, i + 1).filter((x) => x.tier === s.tier).length;
     const { x, y } = mirrorAt(i, sorted.length);
-    return { line: "mirror" as const, scenario: s, tier: s.tier, code: `M${s.tier}-${tierPos}`, x, y };
+    return {
+      line: "mirror" as const,
+      scenario: s,
+      tier: s.tier,
+      code: `M${s.tier}-${tierPos}`,
+      x,
+      y,
+    };
   });
 }
 
@@ -55,7 +68,14 @@ export function buildFeedStations(): FeedStation[] {
   return sorted.map((s, i) => {
     const tierPos = sorted.slice(0, i + 1).filter((x) => x.tier === s.tier).length;
     const { x, y } = feedAt(i, sorted.length);
-    return { line: "feed" as const, scenario: s, tier: s.tier, code: `F${s.tier}-${tierPos}`, x, y };
+    return {
+      line: "feed" as const,
+      scenario: s,
+      tier: s.tier,
+      code: `F${s.tier}-${tierPos}`,
+      x,
+      y,
+    };
   });
 }
 
@@ -73,16 +93,29 @@ export function smoothPath(points: { x: number; y: number }[]): string {
     const c1y = p1.y + (p2.y - p0.y) / 6;
     const c2x = p2.x - (p3.x - p1.x) / 6;
     const c2y = p2.y - (p3.y - p1.y) / 6;
-    d.push(`C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`);
+    d.push(
+      `C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`,
+    );
   }
   return d.join(" ");
 }
 
 /* ── Landmarks (world positions) ─────────────────────────────── */
 export interface Landmark {
-  id: "mirror-tower" | "feed-antenna" | "city-hall" | "studio" | "archive" | "market" | "arena" | "manual" | "profile" | "educators";
+  id:
+    | "mirror-tower"
+    | "feed-antenna"
+    | "city-hall"
+    | "studio"
+    | "archive"
+    | "market"
+    | "arena"
+    | "manual"
+    | "profile"
+    | "educators";
   label: string;
-  x: number; y: number;
+  x: number;
+  y: number;
   kind: "hub" | "landmark" | "scaffold";
   district?: LineId;
   to?: string;
@@ -90,12 +123,12 @@ export interface Landmark {
 export const LANDMARKS: Landmark[] = [
   { id: "mirror-tower", label: "MIRROR TOWER", x: 480, y: 200, kind: "hub", district: "mirror" },
   { id: "feed-antenna", label: "FEED SIGNAL", x: 2520, y: 200, kind: "hub", district: "feed" },
-  { id: "city-hall",   label: "CITY HALL",     x: 1500, y: 1050, kind: "landmark", to: "/city-hall" },
-  { id: "studio",      label: "THE STUDIO",    x: 1180, y: 1700, kind: "landmark", to: "/studio" },
-  { id: "archive",     label: "THE ARCHIVE",   x: 1820, y: 1700, kind: "landmark", to: "/archive" },
-  { id: "manual",      label: "FIELD MANUAL",  x: 1500, y: 640,  kind: "landmark", to: "/manual" },
-  { id: "profile",     label: "OPERATOR CARD", x: 900,  y: 1050, kind: "landmark", to: "/profile" },
-  { id: "educators",   label: "FOR EDUCATORS", x: 2100, y: 1050, kind: "landmark", to: "/educators" },
-  { id: "market",      label: "THE MARKET",    x: 420,  y: 1820, kind: "scaffold", to: "/market" },
-  { id: "arena",       label: "THE ARENA",     x: 2580, y: 1820, kind: "scaffold", to: "/arena" },
+  { id: "city-hall", label: "CITY HALL", x: 1500, y: 1050, kind: "landmark", to: "/city-hall" },
+  { id: "studio", label: "THE STUDIO", x: 1180, y: 1700, kind: "landmark", to: "/studio" },
+  { id: "archive", label: "THE ARCHIVE", x: 1820, y: 1700, kind: "landmark", to: "/archive" },
+  { id: "manual", label: "FIELD MANUAL", x: 1500, y: 640, kind: "landmark", to: "/manual" },
+  { id: "profile", label: "OPERATOR CARD", x: 900, y: 1050, kind: "landmark", to: "/profile" },
+  { id: "educators", label: "FOR EDUCATORS", x: 2100, y: 1050, kind: "landmark", to: "/educators" },
+  { id: "market", label: "THE MARKET", x: 420, y: 1820, kind: "scaffold", to: "/market" },
+  { id: "arena", label: "THE ARENA", x: 2580, y: 1820, kind: "scaffold", to: "/arena" },
 ];

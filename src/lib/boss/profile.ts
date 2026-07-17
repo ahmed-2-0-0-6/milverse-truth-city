@@ -26,7 +26,9 @@ export function loadBossProfile(): BossProfile {
   try {
     const raw = localStorage.getItem(KEY);
     return raw ? { ...empty, ...(JSON.parse(raw) as BossProfile) } : empty;
-  } catch { return empty; }
+  } catch {
+    return empty;
+  }
 }
 
 export function saveBossProfile(p: BossProfile) {

@@ -27,17 +27,13 @@ export function PageHeader({
     >
       <div className="min-w-0">
         {eyebrow ? (
-          <div className="stencil text-[10px] text-muted-foreground mb-2 truncate">
-            {eyebrow}
-          </div>
+          <div className="stencil text-[10px] text-muted-foreground mb-2 truncate">{eyebrow}</div>
         ) : null}
         <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground truncate">
           {title}
         </h1>
         {description ? (
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            {description}
-          </p>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{description}</p>
         ) : null}
       </div>
       {actions ? <div className="shrink-0 flex items-center gap-2">{actions}</div> : null}
@@ -45,20 +41,9 @@ export function PageHeader({
   );
 }
 
-export function LoadingState({
-  label = "Loading…",
-  rows = 3,
-}: {
-  label?: string;
-  rows?: number;
-}) {
+export function LoadingState({ label = "Loading…", rows = 3 }: { label?: string; rows?: number }) {
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      aria-busy="true"
-      className="space-y-3 py-8"
-    >
+    <div role="status" aria-live="polite" aria-busy="true" className="space-y-3 py-8">
       <span className="sr-only">{label}</span>
       {Array.from({ length: rows }).map((_, i) => (
         <Skeleton key={i} className="h-16 w-full rounded-lg" />
@@ -98,9 +83,7 @@ export function EmptyState({
       </div>
       <h3 className="text-base font-semibold text-foreground">{title}</h3>
       {description ? (
-        <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
-          {description}
-        </p>
+        <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">{description}</p>
       ) : null}
       {action ? <div className="mt-5 flex justify-center">{action}</div> : null}
     </div>
@@ -127,9 +110,7 @@ export function ErrorState({
         <AlertTriangle className="h-6 w-6" aria-hidden="true" />
       </div>
       <h3 className="text-base font-semibold text-foreground">{title}</h3>
-      <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
-        {description}
-      </p>
+      <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">{description}</p>
       {onRetry ? (
         <div className="mt-5">
           <Button variant="outline" onClick={onRetry} className="gap-2">

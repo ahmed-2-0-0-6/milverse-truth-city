@@ -10,7 +10,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 export type TextSize = "default" | "large" | "xl";
 export interface AccessPrefs {
   textSize: TextSize;
-  highLegibility: boolean;   // plain dark bg, no grain/flicker/vignette, denser leading
+  highLegibility: boolean; // plain dark bg, no grain/flicker/vignette, denser leading
   forceReduceMotion: boolean; // additive to system prefers-reduced-motion
   transcriptsAlwaysOpen: boolean;
 }
@@ -60,7 +60,9 @@ export function AccessProvider({ children }: { children: ReactNode }) {
   const set = <K extends keyof AccessPrefs>(k: K, v: AccessPrefs[K]) => {
     setPrefs((prev) => {
       const next = { ...prev, [k]: v };
-      try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
+      try {
+        localStorage.setItem(KEY, JSON.stringify(next));
+      } catch {}
       apply(next);
       if (typeof window !== "undefined") window.dispatchEvent(new Event("milverse:access"));
       return next;
@@ -69,7 +71,9 @@ export function AccessProvider({ children }: { children: ReactNode }) {
 
   const reset = () => {
     setPrefs(DEFAULTS);
-    try { localStorage.removeItem(KEY); } catch {}
+    try {
+      localStorage.removeItem(KEY);
+    } catch {}
     apply(DEFAULTS);
     if (typeof window !== "undefined") window.dispatchEvent(new Event("milverse:access"));
   };
@@ -77,7 +81,9 @@ export function AccessProvider({ children }: { children: ReactNode }) {
   return <AccessCtx.Provider value={{ prefs, set, reset }}>{children}</AccessCtx.Provider>;
 }
 
-export function useAccess() { return useContext(AccessCtx); }
+export function useAccess() {
+  return useContext(AccessCtx);
+}
 
 /** Query helper for imperative code (audio, animations). Reads live from the DOM. */
 export function shouldReduceMotion(): boolean {
