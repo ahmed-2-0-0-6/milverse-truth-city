@@ -524,7 +524,7 @@ function BossPlay() {
             {win ? (
               <div className="mt-4 space-y-3">
                 <div className="flex items-center gap-2 text-emerald-300">
-                  <Award className="w-4 h-4" /> Badge unlocked: <b>{boss.badge.label}</b>
+                  <Award className="w-4 h-4" /> Badge earned: <b>{boss.badge.label}</b>
                 </div>
                 <p className="text-white/80">{variant.debriefLine}</p>
                 <div className="border-t border-emerald-500/30 pt-3 mt-3">
