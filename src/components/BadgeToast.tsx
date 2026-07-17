@@ -27,7 +27,7 @@ export function BadgeToast() {
       >
         <div className="text-4xl">{badge.emoji}</div>
         <div className="text-left">
-          <div className="font-mono text-[10px] tracking-[0.3em] text-primary">BADGE UNLOCKED</div>
+          <div className="font-mono text-[10px] tracking-[0.3em] text-primary">BADGE EARNED</div>
           <div className="mt-0.5 text-lg font-semibold">{badge.name}</div>
           <div className="text-xs text-muted-foreground">{badge.blurb}</div>
         </div>
