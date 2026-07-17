@@ -12,6 +12,7 @@ import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp, RANKS } from "@/lib/ranks";
 import { HandlersReading } from "@/components/handler/HandlersReading";
 import { WeeklyEval } from "@/components/handler/WeeklyEval";
+import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
 import { Download, Share2 } from "lucide-react";
 
 export const Route = createFileRoute("/profile")({
