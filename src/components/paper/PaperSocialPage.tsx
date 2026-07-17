@@ -75,7 +75,7 @@ export function PaperSocialPage({
         ) : (
           <div className="mt-4">
             <div
-              className={`paper-stamp inline-block border-4 px-3 py-1 paper-mono text-xs tracking-[0.3em] ${call === social.truth ? "text-[oklch(0.35_0.15_140)] border-[oklch(0.4_0.15_140)]" : "text-[oklch(0.4_0.2_25)] border-[oklch(0.5_0.2_25)]"}`}
+              className={`paper-stamp inline-block border-4 px-3 py-1 paper-mono text-xs tracking-[0.3em] ${call === social.truth ? "paper-stamp-pass" : "paper-stamp-fail"}`}
             >
               TRUTH: {social.truth}
             </div>
