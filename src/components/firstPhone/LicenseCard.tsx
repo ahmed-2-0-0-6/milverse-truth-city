@@ -149,7 +149,7 @@ export function LicenseCard({ onClose }: Props) {
           <div className="font-mono text-[11px] tracking-widest text-primary">
             FIRST PHONE LICENSE
           </div>
-          <h2 className="text-2xl font-semibold mt-1">Congratulations — you're cleared.</h2>
+          <h2 className="text-2xl font-semibold mt-1">You made it. Ten lessons. Cleared.</h2>
         </div>
         {onClose && (
           <button onClick={onClose} className="text-sm text-muted-foreground hover:text-foreground">
