@@ -79,29 +79,22 @@ function FeedIndex() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {cases.map((s) => (
-                  <Link
+                  <CaseCard
                     key={s.id}
                     to="/feed/$caseId"
                     params={{ caseId: s.id }}
-                    className="group rounded-xl border border-border bg-card p-6 transition-all hover:border-primary/50 hover:-translate-y-0.5 hover:shadow-[0_0_32px_oklch(0.82_0.15_210/0.15)]"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 text-primary">
-                        <Newspaper className="h-5 w-5" />
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
+                    icon={<Newspaper className="h-5 w-5" />}
+                    metaTopRight={
+                      <>
                         <FormatBadge format={s.format ?? "whatsapp"} aiGenerated={s.aiGenerated} />
                         <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[9px] font-mono tracking-widest text-primary">
                           <Share2 className="h-2.5 w-2.5" /> T{s.tier}
                         </span>
-                      </div>
-                    </div>
-                    <h3 className="mt-5 text-lg font-semibold">{s.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{s.teaser}</p>
-                    <div className="mt-4 font-mono text-xs tracking-widest text-primary opacity-0 transition-opacity group-hover:opacity-100">
-                      OPEN CASE →
-                    </div>
-                  </Link>
+                      </>
+                    }
+                    title={s.title}
+                    teaser={s.teaser}
+                  />
                 ))}
               </div>
             </section>
