@@ -220,10 +220,11 @@ export function TopBar() {
                             <SheetClose asChild>
                               <Link
                                 to={item.to}
-                                className={`flex flex-col rounded px-3 py-2 transition-colors ${
+                                aria-current={active ? "page" : undefined}
+                                className={`flex flex-col rounded px-3 py-2 border-l-2 transition-colors ${
                                   active
-                                    ? "bg-primary/10 text-primary"
-                                    : "text-foreground hover:bg-accent"
+                                    ? "bg-primary/10 text-primary border-primary"
+                                    : "text-foreground hover:bg-accent border-transparent"
                                 }`}
                               >
                                 <span className="text-sm font-medium">{item.label}</span>
@@ -235,6 +236,7 @@ export function TopBar() {
                               </Link>
                             </SheetClose>
                           </li>
+
                         );
                       })}
                     </ul>
