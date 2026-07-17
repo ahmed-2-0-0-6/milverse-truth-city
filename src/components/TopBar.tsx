@@ -98,7 +98,7 @@ export function TopBar() {
       <div className="mx-auto grid max-w-6xl grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-2.5">
         <Link to="/" className="flex items-center gap-3 group min-w-0">
           <div className="relative h-7 w-7 shrink-0">
-            <div className="absolute inset-0 rounded-sm bg-primary shadow-[0_0_18px_oklch(0.82_0.16_85/0.7)] group-hover:animate-pulse" />
+            <div className="absolute inset-0 rounded-sm bg-primary shadow-[0_0_18px_oklch(0.82_0.14_195/0.7)] group-hover:animate-pulse" />
             <div className="absolute inset-1 rounded-sm border border-background/60" />
           </div>
           <div className="min-w-0">
@@ -122,7 +122,7 @@ export function TopBar() {
                   aria-current={active ? "page" : undefined}
                   className={`relative stencil text-[10px] tracking-widest rounded px-2.5 py-1.5 transition-colors ${
                     active
-                      ? "text-primary bg-primary/10 after:absolute after:left-2 after:right-2 after:-bottom-[9px] after:h-[2px] after:bg-primary after:shadow-[0_0_8px_oklch(0.82_0.16_85/0.7)]"
+                      ? "text-primary bg-primary/10 after:absolute after:left-2 after:right-2 after:-bottom-[9px] after:h-[2px] after:bg-primary after:shadow-[0_0_8px_oklch(0.82_0.14_195/0.7)]"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent"
                   }`}
                 >

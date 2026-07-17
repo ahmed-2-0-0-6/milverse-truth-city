@@ -256,7 +256,7 @@ function Intro({ onDone }: { onDone: () => void }) {
             if (i + 1 < slides.length) setI(i + 1);
             else onDone();
           }}
-          className="rounded-sm bg-primary px-6 py-2.5 text-primary-foreground border-2 border-primary shadow-[0_4px_20px_oklch(0.60_0.19_258/0.35)]"
+          className="rounded-sm bg-primary px-6 py-2.5 text-primary-foreground border-2 border-primary shadow-[0_4px_20px_oklch(0.82_0.14_195/0.35)]"
         >
           {i + 1 < slides.length ? "NEXT →" : "ENTER THE CITY →"}
         </button>

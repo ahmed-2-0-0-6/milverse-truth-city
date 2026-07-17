@@ -29,7 +29,7 @@ export function BadgeToast() {
     >
       <button
         onClick={() => setBadge(null)}
-        className="msg-in pointer-events-auto flex items-center gap-4 rounded-xl border-2 border-primary bg-card/95 backdrop-blur px-6 py-4 shadow-[0_0_40px_oklch(0.82_0.16_85/0.35)] max-w-md"
+        className="msg-in pointer-events-auto flex items-center gap-4 rounded-xl border-2 border-primary bg-card/95 backdrop-blur px-6 py-4 shadow-[0_0_40px_oklch(0.82_0.14_195/0.35)] max-w-md"
       >
         <div className="text-4xl">{badge.emoji}</div>
         <div className="text-left">

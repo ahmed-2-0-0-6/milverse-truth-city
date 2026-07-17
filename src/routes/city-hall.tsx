@@ -89,7 +89,7 @@ function CityHall() {
               </div>
               <div className="h-2 w-full bg-muted rounded-sm overflow-hidden">
                 <div
-                  className="h-full bg-primary transition-all duration-700 shadow-[0_0_12px_oklch(0.82_0.16_85/0.6)]"
+                  className="h-full bg-primary transition-all duration-700 shadow-[0_0_12px_oklch(0.82_0.14_195/0.6)]"
                   style={{ width: `${Math.round(rank.progress * 100)}%` }}
                 />
               </div>
@@ -134,7 +134,7 @@ function CityHall() {
               {/* Player dot: x = missRate (→ too trusting), y = faRate (→ too paranoid, inverted) */}
               {p.casesPlayed > 0 && (
                 <div
-                  className="absolute h-4 w-4 rounded-full bg-primary shadow-[0_0_18px_oklch(0.82_0.16_85)] transition-all duration-700 -translate-x-1/2 -translate-y-1/2 ring-2 ring-background"
+                  className="absolute h-4 w-4 rounded-full bg-primary shadow-[0_0_18px_oklch(0.82_0.14_195)] transition-all duration-700 -translate-x-1/2 -translate-y-1/2 ring-2 ring-background"
                   style={{
                     left: `${Math.min(0.95, Math.max(0.05, missRate * 2)) * 100}%`,
                     top: `${Math.min(0.95, Math.max(0.05, faRate * 2)) * 100}%`,

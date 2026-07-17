@@ -45,30 +45,30 @@
 
 :root {
   --radius: 0.375rem;
-  /* MILVERSE — Modern Research Lab. Crisp whites, deep navy, vivid blue accent. */
-  --background: oklch(0.985 0.003 250); /* #fafbfc */
-  --foreground: oklch(0.22 0.06 265); /* deep navy #0f1b3d */
-  --card: oklch(1 0 0); /* pure white */
-  --card-foreground: oklch(0.22 0.06 265);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.06 265);
-  --primary: oklch(0.6 0.19 258); /* vivid blue #3b82f6 */
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.94 0.01 255); /* pale slate */
-  --secondary-foreground: oklch(0.22 0.06 265);
-  --muted: oklch(0.955 0.008 250); /* #e8ecf1 */
-  --muted-foreground: oklch(
-    0.72 0.02 260
-  ); /* raised from 0.5 → ≥4.5:1 on noir bg (case metadata, chat timestamps, paper bylines) */
-  --accent: oklch(0.93 0.03 260); /* soft blue tint */
-  --accent-foreground: oklch(0.22 0.06 265);
-  --destructive: oklch(0.58 0.22 25); /* editorial red */
-  --destructive-foreground: oklch(0.99 0.003 250);
-  --caution: oklch(0.75 0.15 70); /* archival amber */
-  --caution-foreground: oklch(0.22 0.06 265);
-  --border: oklch(0.88 0.012 258);
-  --input: oklch(0.92 0.01 258);
-  --ring: oklch(0.6 0.19 258);
+  /* MILVERSE — Night City Desk. Deep ink, signal cyan, archival amber.
+     The city is dark; evidence glows. Artifacts (posts, chats, newsprint)
+     stay bright on purpose — a lightbox on a noir desk. */
+  --background: oklch(0.17 0.03 255); /* deep ink navy */
+  --foreground: oklch(0.94 0.01 240); /* cool paper-white */
+  --card: oklch(0.21 0.03 255); /* raised panel */
+  --card-foreground: oklch(0.94 0.01 240);
+  --popover: oklch(0.19 0.03 255);
+  --popover-foreground: oklch(0.94 0.01 240);
+  --primary: oklch(0.82 0.14 195); /* signal cyan — the searchlight */
+  --primary-foreground: oklch(0.15 0.03 255); /* ink on cyan */
+  --secondary: oklch(0.26 0.03 255);
+  --secondary-foreground: oklch(0.94 0.01 240);
+  --muted: oklch(0.25 0.025 255);
+  --muted-foreground: oklch(0.72 0.02 245); /* ≥4.5:1 on ink (case metadata, timestamps, bylines) */
+  --accent: oklch(0.27 0.04 235); /* hover wash, cyan-tinted */
+  --accent-foreground: oklch(0.94 0.01 240);
+  --destructive: oklch(0.64 0.21 22); /* neon signal red */
+  --destructive-foreground: oklch(0.98 0.005 240);
+  --caution: oklch(0.8 0.14 80); /* archival amber — sodium lamp */
+  --caution-foreground: oklch(0.15 0.03 255);
+  --border: oklch(0.32 0.03 255);
+  --input: oklch(0.28 0.03 255);
+  --ring: oklch(0.82 0.14 195);
 }
 
 @layer base {
@@ -108,19 +108,19 @@
   }
 }
 
-/* Subtle paper grain — like a research report, not a battlefield */
+/* Subtle city grain — light motes on dark ink, like dust in a projector beam */
 @utility grain {
-  background-image: radial-gradient(oklch(0.22 0.06 265 / 0.025) 1px, transparent 1px);
+  background-image: radial-gradient(oklch(0.94 0.01 240 / 0.03) 1px, transparent 1px);
   background-size: 4px 4px;
 }
 
-/* Faint horizontal rules — like a lined notebook / lab log */
+/* Faint horizontal rules — case-log lines under lamplight */
 @utility scanlines {
   background-image: repeating-linear-gradient(
     to bottom,
     transparent 0,
     transparent 28px,
-    oklch(0.22 0.06 265 / 0.04) 29px
+    oklch(0.94 0.01 240 / 0.045) 29px
   );
 }
 
@@ -218,7 +218,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, transparent, oklch(0.6 0.19 258 / 0.06), transparent);
+  background: linear-gradient(to bottom, transparent, oklch(0.82 0.14 195 / 0.06), transparent);
   animation: scan-sweep 5s linear infinite;
   pointer-events: none;
 }
@@ -276,7 +276,7 @@
 }
 .atmo-flicker {
   background:
-    radial-gradient(ellipse at 20% 30%, oklch(0.6 0.19 258 / 0.25), transparent 45%),
+    radial-gradient(ellipse at 20% 30%, oklch(0.82 0.14 195 / 0.25), transparent 45%),
     radial-gradient(ellipse at 80% 70%, oklch(0.75 0.15 70 / 0.2), transparent 45%);
   animation: atmo-flicker 7s infinite;
 }
@@ -286,13 +286,13 @@
   0%,
   100% {
     box-shadow:
-      0 4px 20px oklch(0.6 0.19 258 / 0.35),
-      0 0 0 0 oklch(0.6 0.19 258 / 0.5);
+      0 4px 20px oklch(0.82 0.14 195 / 0.35),
+      0 0 0 0 oklch(0.82 0.14 195 / 0.5);
   }
   50% {
     box-shadow:
-      0 6px 28px oklch(0.6 0.19 258 / 0.55),
-      0 0 0 6px oklch(0.6 0.19 258 / 0);
+      0 6px 28px oklch(0.82 0.14 195 / 0.55),
+      0 0 0 6px oklch(0.82 0.14 195 / 0);
   }
 }
 .cta-glow {
@@ -325,11 +325,11 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    oklch(0.6 0.19 258 / 0) 20%,
-    oklch(0.6 0.19 258 / 0.7) 48%,
+    oklch(0.82 0.14 195 / 0) 20%,
+    oklch(0.82 0.14 195 / 0.7) 48%,
     oklch(0.85 0.15 200 / 0.9) 50%,
-    oklch(0.6 0.19 258 / 0.7) 52%,
-    oklch(0.6 0.19 258 / 0) 80%,
+    oklch(0.82 0.14 195 / 0.7) 52%,
+    oklch(0.82 0.14 195 / 0) 80%,
     transparent 100%
   );
   transform: translateX(-100%);
@@ -1230,6 +1230,28 @@ html[data-force-reduce-motion="on"] .marquee-track {
 
 /* ── Print stylesheet — one clean A4 for the field kit ── */
 @media print {
+  /* The site theme is night-desk dark; paper is not. Re-ink every token so
+     printouts (field kit, paper editions, receipts) come out ink-on-white. */
+  :root {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.2 0.02 255);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.2 0.02 255);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.2 0.02 255);
+    --primary: oklch(0.45 0.1 240);
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.95 0.005 250);
+    --secondary-foreground: oklch(0.2 0.02 255);
+    --muted: oklch(0.95 0.005 250);
+    --muted-foreground: oklch(0.45 0.015 250);
+    --accent: oklch(0.95 0.005 250);
+    --accent-foreground: oklch(0.2 0.02 255);
+    --caution: oklch(0.5 0.12 80);
+    --caution-foreground: oklch(1 0 0);
+    --border: oklch(0.85 0.01 250);
+    --input: oklch(0.9 0.01 250);
+  }
   body {
     background: white !important;
   }
