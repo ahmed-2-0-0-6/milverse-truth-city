@@ -57,7 +57,7 @@ function JuniorLockScreen({ districtName }: { districtName: string }) {
           </h1>
           <p className="mt-3 text-muted-foreground">
             You're enrolled in the First Phone Program. Adult cases can carry heavier stakes and
-            situations — you'll unlock them when you graduate.
+            situations — those doors open when you graduate.
           </p>
 
           <div className="mt-6 rounded-md border border-primary/30 bg-primary/5 p-4 text-sm">
