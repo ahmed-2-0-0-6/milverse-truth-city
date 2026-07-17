@@ -1,18 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { TopBar } from "@/components/TopBar";
-import { GraduationCap, Shield, BookOpen, Printer } from "lucide-react";
+import { GraduationCap, Shield, BookOpen, Printer, Play, Search, Award } from "lucide-react";
 
 export const Route = createFileRoute("/educators")({
   head: () => ({
     meta: [
       { title: "For Educators — MILVERSE" },
-      { name: "description", content: "MILVERSE is a Media & Information Literacy training simulator for classrooms." },
+      { name: "description", content: "MILVERSE is a Media & Information Literacy training simulator for classrooms. No signup, works on shared devices, aligns with UNESCO MIL." },
       { property: "og:title", content: "For Educators — MILVERSE" },
       { property: "og:description", content: "Media & Information Literacy training simulator: rehearse manipulation safely, name the tactic, master real verification tools." },
+      { property: "og:url", content: "https://milverse-truth-city.lovable.app/educators" },
+      { property: "og:type", content: "article" },
     ],
+    links: [{ rel: "canonical", href: "https://milverse-truth-city.lovable.app/educators" }],
   }),
   component: EducatorsPage,
 });
+
+const HOW_IT_WORKS = [
+  { icon: Play, label: "REHEARSE", body: "Students meet the scam in-world — a WhatsApp forward, a viral post, a doctored screenshot. No lecture, just the artifact." },
+  { icon: Search, label: "VERIFY", body: "They probe the dossier and run four real tools: reverse image, source check, cross-check, date/metadata." },
+  { icon: Award, label: "CALIBRATE", body: "Verdict plus confidence gets scored against ground truth. The score they chase is calibration, not certainty." },
+];
 
 const COMPETENCIES = [
   {
