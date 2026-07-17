@@ -31,7 +31,6 @@ function localPiiCheck(...vals: string[]): string | null {
 }
 
 function SubmitStory() {
-  const [, setStep] = useState(1); void setStep;
   const [what, setWhat] = useState("");
   const [channel, setChannel] = useState<"text" | "call" | "forward" | "in_person" | "other">("text");
   const [wanted, setWanted] = useState("");
