@@ -106,19 +106,25 @@ function PilotPage() {
     };
   }, [refreshLocal, refreshCloud]);
 
-  function create() { setActiveGroup(generateGroupCode()); }
+  function create() {
+    const c = generateGroupCode();
+    setActiveGroup(c);
+    toast.success("Pilot group created", { description: `Share code ${c} with your class.` });
+  }
   function join() {
     const c = code.trim().toUpperCase();
-    if (c.length < 4) return;
+    if (c.length < 4) { toast.error("Enter a 4-6 character code"); return; }
     setActiveGroup(c);
     setCode("");
+    toast.success(`Joined group ${c}`);
   }
-  function leave() { setActiveGroup(null); }
+  function leave() { setActiveGroup(null); toast("Left the pilot group"); }
   function copy() {
     if (!active) return;
     navigator.clipboard?.writeText(active);
     setCopied(true);
     setTimeout(() => setCopied(false), 1200);
+    toast.success("Code copied to clipboard");
   }
 
   const effectiveCloud = sample ? SAMPLE_ENTRIES : cloud;
