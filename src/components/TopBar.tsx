@@ -93,7 +93,7 @@ export function TopBar() {
           </div>
           <div className="min-w-0">
             <div className="stencil text-sm text-foreground leading-none">MILVERSE</div>
-            <div className="stencil text-[9px] text-primary/70 mt-0.5 hidden sm:block truncate">
+            <div className="stencil text-[9px] text-primary/70 mt-0.5 hidden sm:block lg:hidden xl:block truncate">
               MEDIA &amp; INFORMATION LITERACY LAB
             </div>
           </div>
