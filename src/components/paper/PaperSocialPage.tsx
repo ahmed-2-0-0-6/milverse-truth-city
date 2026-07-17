@@ -36,7 +36,7 @@ export function PaperSocialPage({
   }
 
   return (
-    <section className="mt-2 grid md:grid-cols-[300px_minmax(0,1fr)] gap-6 items-start">
+    <section className="paper-section grid md:grid-cols-[300px_minmax(0,1fr)] gap-6 items-start">
       <div className="mx-auto md:mx-0 w-[280px] rounded-[2.2rem] border-8 border-[oklch(0.18_0.02_60)] p-2 bg-[oklch(0.18_0.02_60)] shadow-xl">
         <div className="rounded-[1.6rem] overflow-hidden bg-white">
           <div className="paper-halftone flex items-center justify-center h-52 text-7xl">
@@ -59,26 +59,19 @@ export function PaperSocialPage({
         </div>
       </div>
       <div>
-        <div className="paper-mono text-[10px] tracking-[0.3em] text-[color:var(--paper-muted)]">
-          THIS PULLED {social.likes.toLocaleString()} LIKES YESTERDAY.
+        <div className="paper-section-kicker">
+          PULLED {social.likes.toLocaleString()} LIKES OVERNIGHT
         </div>
-        <h3 className="paper-serif text-3xl mt-1" style={{ fontWeight: 900 }}>
-          The Social Page
-        </h3>
-        <p className="paper-body no-dropcap mt-2">A viral post moved through the city. Call it.</p>
+        <p className="paper-section-lede">A viral post moved through the city. Call it.</p>
         {!call ? (
-          <div className="mt-3 grid grid-cols-3 gap-2 max-w-md">
+          <div className="mt-4 grid grid-cols-3 gap-2 max-w-md">
             {(["TRUE", "FALSE", "MISLEADING"] as const).map((v) => (
-              <button
-                key={v}
-                onClick={() => submit(v)}
-                className="border-2 py-2 paper-mono text-xs tracking-widest hover:bg-black/5"
-                style={{ borderColor: "var(--paper-ink)" }}
-              >
+              <button key={v} onClick={() => submit(v)} className="paper-btn">
                 {v}
               </button>
             ))}
           </div>
+
         ) : (
           <div className="mt-4">
             <div

@@ -18,21 +18,16 @@ export function PaperClassifieds({
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   if (!items.length) return null;
   return (
-    <section className="mt-4">
-      <div className="paper-mono text-[10px] tracking-[0.3em] text-[color:var(--paper-muted)]">
-        TODAY'S SUSPECT COLUMN INCHES
-      </div>
-      <h3 className="paper-serif text-3xl mt-1" style={{ fontWeight: 900 }}>
-        Classifieds
-      </h3>
-      <p className="paper-body no-dropcap text-sm mt-2">
-        Three ads landed at the desk today. Tap one — circle the tells.
+    <section className="paper-section">
+      <div className="paper-section-kicker">TODAY'S SUSPECT COLUMN INCHES · {items.length} ADS</div>
+      <p className="paper-section-lede">
+        Three ads landed at the desk. Tap one — circle the tells.
       </p>
       <ul className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {items.map((c, i) => (
           <li
             key={i}
-            className="border border-current/40 p-3 rounded-sm cursor-pointer hover:bg-black/5"
+            className="border border-current/40 p-3 rounded-sm cursor-pointer hover:bg-black/5 transition-colors"
             style={{ borderColor: "var(--paper-rule)" }}
             onClick={() => setOpenIdx(i)}
           >
@@ -40,12 +35,13 @@ export function PaperClassifieds({
               {c.title}
             </h4>
             <p className="paper-body no-dropcap text-sm mt-1 line-clamp-4">{c.body}</p>
-            <div className="paper-mono text-[10px] mt-2 underline decoration-dotted">
+            <div className="paper-mono text-[10px] mt-2 tracking-[0.25em] underline decoration-dotted text-[color:var(--paper-muted)]">
               TAP TO INSPECT →
             </div>
           </li>
         ))}
       </ul>
+
       {openIdx !== null && (
         <FlagFinder
           item={items[openIdx]}
@@ -156,26 +152,19 @@ function FlagFinder({
           )}
         </div>
         <div className="mt-4 flex items-center gap-3">
-          <div className="paper-mono text-[10px]">
-            {hits}/{item.flags.length} circled
+          <div className="paper-mono text-[10px] tracking-[0.2em] text-[color:var(--paper-muted)]">
+            {hits}/{item.flags.length} CIRCLED
           </div>
           <div className="flex-1" />
           {!revealed ? (
-            <button
-              onClick={submit}
-              className="border-4 double px-3 py-2 paper-mono text-xs tracking-widest"
-              style={{ borderColor: "var(--paper-ink)" }}
-            >
+            <button onClick={submit} className="paper-btn-primary">
               REVEAL
             </button>
           ) : (
-            <button
-              onClick={onClose}
-              className="border-4 double px-3 py-2 paper-mono text-xs tracking-widest"
-              style={{ borderColor: "var(--paper-ink)" }}
-            >
+            <button onClick={onClose} className="paper-btn-primary">
               CLOSE
             </button>
+
           )}
         </div>
         {revealed && (

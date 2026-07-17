@@ -67,16 +67,15 @@ export function PaperEditorial({
   }, [editionNumber]);
 
   return (
-    <section className="mt-2 max-w-3xl mx-auto">
-      <div className="paper-mono text-[10px] tracking-[0.3em] text-center text-[color:var(--paper-muted)]">
-        THE HANDLER'S EDITORIAL
-      </div>
+    <section className="paper-section max-w-3xl mx-auto">
+      <div className="paper-section-kicker text-center">THE HANDLER'S EDITORIAL</div>
       <blockquote className="paper-serif italic text-xl sm:text-2xl leading-relaxed mt-3 text-center px-4">
         “{line}”
       </blockquote>
-      <div className="paper-mono text-[10px] tracking-[0.25em] mt-2 text-center text-[color:var(--paper-muted)]">
-        {editorial.signoff}
+      <div className="paper-mono text-[10px] tracking-[0.25em] mt-3 text-center text-[color:var(--paper-muted)]">
+        — {editorial.signoff}
       </div>
+
     </section>
   );
 }

@@ -26,11 +26,10 @@ export function PaperLedger({ editionNumber, note }: { editionNumber: number; no
   const forgPct = forg && forg.total ? Math.round((forg.correct / forg.total) * 100) : null;
 
   return (
-    <section className="mt-2">
-      <div className="paper-mono text-[10px] tracking-[0.3em] text-[color:var(--paper-muted)]">
-        THE LEDGER · CITY DESK
-      </div>
-      <div className="mt-2 border-y-4 double" style={{ borderColor: "var(--paper-ink)" }}>
+    <section className="paper-section">
+      <div className="paper-section-kicker">THE LEDGER · CITY DESK</div>
+      <div className="mt-3 border-y-4 double" style={{ borderColor: "var(--paper-ink)" }}>
+
         <div
           className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-current/30 paper-mono text-xs"
           style={{ divideColor: "var(--paper-rule)" } as never}

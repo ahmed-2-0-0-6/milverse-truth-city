@@ -204,13 +204,13 @@ function PlayFlow({
                   setVerdict(v);
                   setStage("wager");
                 }}
-                className="border-2 py-3 rounded-sm paper-mono text-xs tracking-widest hover:bg-black/5"
-                style={{ borderColor: "var(--paper-ink)" }}
+                className="paper-btn py-3 text-[13px] tracking-[0.22em]"
               >
                 {v}
               </button>
             ))}
           </div>
+
         </>
       )}
       {stage === "wager" && verdict && (
@@ -242,13 +242,10 @@ function PlayFlow({
               ← change verdict
             </button>
             <div className="flex-1" />
-            <button
-              onClick={commit}
-              className="border-4 double px-4 py-2 paper-mono text-xs tracking-widest bg-[oklch(0.18_0.02_60)] text-[oklch(0.95_0.02_85)] hover:opacity-90"
-              style={{ borderColor: "var(--paper-ink)" }}
-            >
+            <button onClick={commit} className="paper-btn-primary">
               SLAM THE STAMP
             </button>
+
           </div>
         </div>
       )}
