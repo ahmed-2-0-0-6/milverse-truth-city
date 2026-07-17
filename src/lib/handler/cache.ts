@@ -1,6 +1,8 @@
 // MILVERSE — Per-day / per-surface caching for Handler AI outputs.
 // Rule: at most ONE AI generation per surface per profile per UTC+5 day.
 
+import { dropDateKey } from "@/lib/daily/rotation";
+
 export type HandlerSurface =
   | "reading"
   | "assignment-reaction"
@@ -20,11 +22,9 @@ interface CacheEntry {
 
 type CacheShape = Partial<Record<HandlerSurface, CacheEntry>>;
 
-/** UTC+5 day key — matches Daily Drop rollover. */
-export function dropDateKey(now = new Date()): string {
-  const shifted = new Date(now.getTime() + 5 * 60 * 60 * 1000);
-  return shifted.toISOString().slice(0, 10);
-}
+// Day key comes from daily/rotation.ts so the Handler cache and the Daily
+// Drop always roll over together.
+export { dropDateKey };
 
 function load(): CacheShape {
   if (typeof window === "undefined") return {};

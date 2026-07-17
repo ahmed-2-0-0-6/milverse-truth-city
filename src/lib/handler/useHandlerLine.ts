@@ -69,12 +69,13 @@ export function useHandlerLine(input: HandlerLineInput): HandlerLineState {
     // 2) show fallback INSTANTLY, upgrade if AI beats the timeout.
     setState({ text: input.fallback, source: "fallback", loading: true });
     let done = false;
+    let cancelled = false;
     const timer = setTimeout(() => {
       if (done) return;
       done = true;
       // Fallback wins; cache it so we don't retry today.
       writeCache(input.surface, hash, input.fallback, "fallback");
-      setState((s) => ({ ...s, loading: false }));
+      if (!cancelled) setState((s) => ({ ...s, loading: false }));
     }, AI_TIMEOUT_MS);
 
     (async () => {
@@ -86,17 +87,18 @@ export function useHandlerLine(input: HandlerLineInput): HandlerLineState {
         done = true;
         clearTimeout(timer);
         writeCache(input.surface, hash, res.text, res.source);
-        setState({ text: res.text, source: res.source, loading: false });
+        if (!cancelled) setState({ text: res.text, source: res.source, loading: false });
       } catch {
         if (done) return;
         done = true;
         clearTimeout(timer);
         writeCache(input.surface, hash, input.fallback, "fallback");
-        setState({ text: input.fallback, source: "fallback", loading: false });
+        if (!cancelled) setState({ text: input.fallback, source: "fallback", loading: false });
       }
     })();
 
     return () => {
+      cancelled = true;
       clearTimeout(timer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
