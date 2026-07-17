@@ -12,7 +12,7 @@ import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp } from "@/lib/ranks";
 import { DistrictIntro } from "@/components/DistrictIntro";
 import studioArt from "@/assets/district-studio.jpg";
-import { Clapperboard, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { Clapperboard, ChevronLeft, ChevronRight, Sparkles, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
