@@ -66,7 +66,7 @@ export function sanitizeReply(raw: string): string | null {
   // Strip HTML tags
   s = s.replace(/<\/?[a-z][^>]*>/gi, "");
   // Strip stage directions in brackets/asterisks
-  s = s.replace(/[\[\(]?\*[^*]{2,80}\*[\]\)]?/g, "");
+  s = s.replace(/[[(]?\*[^*]{2,80}\*[\])]?/g, "");
   // Collapse whitespace
   s = s.replace(/\s+/g, " ").trim();
   // Strip leading role prefix

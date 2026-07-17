@@ -31,7 +31,7 @@ function preferredDefaultView(): "map" | "list" {
   try {
     const stored = localStorage.getItem(VIEW_KEY);
     if (stored === "map" || stored === "list") return stored;
-  } catch {}
+  } catch { /* localStorage unavailable */ }
   const prefersReduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   // @ts-expect-error saveData non-standard
   const saveData = navigator.connection?.saveData === true;
@@ -58,7 +58,7 @@ function CityMap() {
     setView(v);
     try {
       localStorage.setItem(VIEW_KEY, v);
-    } catch {}
+    } catch { /* localStorage unavailable */ }
   };
 
   return (

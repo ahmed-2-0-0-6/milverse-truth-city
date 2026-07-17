@@ -698,7 +698,7 @@ function SubmissionCard({
     `Claims to be ${suggestedPattern.toLowerCase()}.`,
   );
   const [opener, setOpener] = useState(
-    row.story.whatHappened.split(/(?<=\.|\!|\?)\s/)[0] ?? row.story.whatHappened.slice(0, 200),
+    row.story.whatHappened.split(/(?<=[.!?])\s/)[0] ?? row.story.whatHappened.slice(0, 200),
   );
   const [agenda, setAgenda] = useState(row.story.whatScammerWanted);
 
@@ -932,6 +932,3 @@ function SubmissionCard({
     </article>
   );
 }
-
-// Silence unused-var lint from destructured passcode
-useEffect;
