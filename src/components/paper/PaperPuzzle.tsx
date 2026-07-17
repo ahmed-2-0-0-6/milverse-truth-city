@@ -113,21 +113,21 @@ export function PaperPuzzle({
         </div>
       )}
 
-      <div className="mt-4 flex items-center gap-2">
+      <div className="mt-4 flex items-center gap-3">
         {!revealed ? (
           <>
             <button
               onClick={reveal}
               disabled={chosen.length === 0}
-              className="border-4 double px-3 py-2 paper-mono text-xs tracking-widest disabled:opacity-40"
-              style={{ borderColor: "var(--paper-ink)" }}
+              className="paper-btn-primary"
             >
               REVEAL HONEST HEADLINE
             </button>
-            <button onClick={reset} className="paper-mono text-[10px] underline decoration-dotted">
-              reset
+            <button onClick={reset} className="paper-mono text-[10px] tracking-[0.2em] underline decoration-dotted text-[color:var(--paper-muted)]">
+              RESET
             </button>
           </>
+
         ) : (
           <div>
             <div
