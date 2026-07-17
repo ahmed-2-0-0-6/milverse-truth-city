@@ -82,7 +82,7 @@ function PaperPage() {
         <div className="mx-auto max-w-5xl px-4 py-24 text-center">
           <div className="paper-blackletter text-4xl">The Daily Mirage</div>
           <p className="mt-6 paper-body no-dropcap max-w-md mx-auto">
-            The presses are cold. No edition has been sent to the compositor yet.
+            Presses are cold. Nothing's gone to the compositor.
             {err && <span className="block mt-3 text-xs opacity-60">{err}</span>}
           </p>
           <button

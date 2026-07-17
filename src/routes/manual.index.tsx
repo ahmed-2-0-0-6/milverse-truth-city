@@ -65,9 +65,9 @@ function ManualIndex() {
             NAME THE TACTIC. LEARN THE COUNTER-MOVE.
           </h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Redacted files unlock as you face each tactic in play. This is your growing dossier of
-            how deception works — and how to shut it down. MILVERSE never tells you a specific claim
-            is true. This manual teaches your hand so YOU can.
+            Files stay redacted until you meet the tactic in play. Then they open. This is your
+            dossier of how deception works — and how to shut it down. MILVERSE never rules on a
+            specific claim. This manual sharpens the hand that does.
           </p>
         </div>
 
@@ -135,7 +135,7 @@ function ManualIndex() {
                   {isUnlocked ? e.name : "▓▓▓▓▓▓▓▓▓▓"}
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground italic">
-                  {isUnlocked ? e.oneLine : "Face this tactic in play to unlock the file."}
+                  {isUnlocked ? e.oneLine : "Face this tactic in play to declassify the file."}
                 </p>
               </Link>
             );

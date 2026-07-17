@@ -61,7 +61,7 @@ function DevIntelPage() {
       const b = await listBriefsFn({ data: { passcode } });
       setBriefs((b as unknown as { rows: typeof briefs }).rows);
       setAuthed(true);
-      toast.success("Intel desk unlocked");
+      toast.success("Intel desk open");
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Access denied.";
       setErr(msg);
@@ -277,7 +277,7 @@ function BoardTab({
 
       <Card title="WAGER HEALTH">
         {Object.keys(intel.wager.buckets).length === 0 ? (
-          <div className="text-xs text-muted-foreground">No wagers yet.</div>
+          <div className="text-xs text-muted-foreground">Nobody's wagered yet.</div>
         ) : (
           <div className="space-y-1.5">
             {Object.entries(intel.wager.buckets).map(([bucket, count]) => {
@@ -304,7 +304,7 @@ function BoardTab({
 
       <Card title="DAILY DROP RETENTION" chip="14d">
         {intel.dropRetention.length === 0 ? (
-          <div className="text-xs text-muted-foreground">No drops played yet.</div>
+          <div className="text-xs text-muted-foreground">Drop board's cold this week.</div>
         ) : (
           <div className="flex items-end gap-1 h-24">
             {intel.dropRetention.map((d) => {
@@ -413,7 +413,7 @@ function BriefsTab({
       </div>
       {briefs.length === 0 && (
         <div className="text-sm text-muted-foreground">
-          No briefs yet. Trigger one from the Precinct Board.
+          Nothing filed. Trigger a brief from the Precinct Board.
         </div>
       )}
       {briefs.map((b) => (

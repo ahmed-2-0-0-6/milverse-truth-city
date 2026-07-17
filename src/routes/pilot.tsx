@@ -252,7 +252,7 @@ function PilotPage() {
 
   function exportCsv() {
     if (!cloud.length) {
-      toast.error("No cloud entries to export yet");
+      toast.error("Nothing in the cloud to export");
       return;
     }
     const rows = [
@@ -506,7 +506,7 @@ function PilotPage() {
               </div>
               {merged.length === 0 ? (
                 <div className="text-sm text-muted-foreground">
-                  No cases yet.{" "}
+                  Board's empty.{" "}
                   <Link to="/mirror" className="text-primary underline">
                     Open The Mirror
                   </Link>{" "}
@@ -514,7 +514,7 @@ function PilotPage() {
                   <Link to="/feed" className="text-primary underline">
                     The Feed
                   </Link>{" "}
-                  to start.
+                  and file a call.
                 </div>
               ) : (
                 <ul className="space-y-1.5 max-h-64 overflow-y-auto">

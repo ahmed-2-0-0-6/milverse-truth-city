@@ -315,7 +315,7 @@ function AssessmentTab({ passcode }: { passcode: string }) {
   function exportCsv() {
     if (!loadedCode) return;
     if (!rows.length) {
-      toast.error("No responses to export yet");
+      toast.error("Nothing to export");
       return;
     }
     const header = [
@@ -589,7 +589,7 @@ function AssessmentTab({ passcode }: { passcode: string }) {
                     {rollup.perStudent.length === 0 && (
                       <tr>
                         <td colSpan={3} className="py-3 text-muted-foreground">
-                          No attempts yet.
+                          Nobody's attempted this yet.
                         </td>
                       </tr>
                     )}

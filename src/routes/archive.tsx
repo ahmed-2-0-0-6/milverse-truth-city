@@ -244,7 +244,7 @@ function ArchivePage() {
               <EmptyRow
                 msg={
                   community.length === 0
-                    ? "No community missions published yet. Be the first — share a scam you experienced."
+                    ? "Nothing filed yet. First survivor breaks the silence."
                     : "Nothing matches those filters."
                 }
               />
