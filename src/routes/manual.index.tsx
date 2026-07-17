@@ -108,37 +108,54 @@ function ManualIndex() {
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {MANUAL_ENTRIES.map((e) => {
             const isUnlocked = unlocked.has(e.id);
-            return (
-              <Link
-                key={e.id}
-                to="/manual/$entryId"
-                params={{ entryId: e.id }}
-                className={`group rounded-xl border p-5 transition ${
-                  isUnlocked
-                    ? "border-primary/40 bg-card hover:border-primary hover:-translate-y-0.5"
-                    : "border-dashed border-border bg-muted/20 hover:border-primary/40"
-                }`}
-              >
+            const inner = (
+              <>
                 <div className="flex items-center justify-between">
                   <div className="stencil text-[10px] tracking-widest text-muted-foreground">
-                    {e.code}
+                    FILE · {e.code}
                   </div>
                   {isUnlocked ? (
-                    <FileText className="h-4 w-4 text-primary" />
+                    <span className="inline-flex items-center gap-1 stencil text-[9px] tracking-widest text-primary">
+                      <FileText className="h-3 w-3" /> DECLASSIFIED
+                    </span>
                   ) : (
-                    <Lock className="h-4 w-4 text-muted-foreground" />
+                    <span className="inline-flex items-center gap-1 stencil text-[9px] tracking-widest text-muted-foreground">
+                      <Lock className="h-3 w-3" /> REDACTED
+                    </span>
                   )}
                 </div>
                 <div
-                  className="mt-3 text-2xl font-black tracking-tight"
+                  className="mt-3 text-2xl font-black tracking-tight leading-tight"
                   style={{ fontFamily: '"Bebas Neue", sans-serif' }}
                 >
-                  {isUnlocked ? e.name : "▓▓▓▓▓▓▓▓▓▓"}
+                  {isUnlocked ? e.name : <RedactedTitle text={e.name} />}
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground italic">
                   {isUnlocked ? e.oneLine : "Face this tactic in play to declassify the file."}
                 </p>
+              </>
+            );
+            const skin = isUnlocked
+              ? "border-primary/40 bg-card hover:border-primary hover:-translate-y-0.5"
+              : "border-dashed border-border bg-muted/20 cursor-not-allowed";
+            return isUnlocked ? (
+              <Link
+                key={e.id}
+                to="/manual/$entryId"
+                params={{ entryId: e.id }}
+                className={`group rounded-xl border p-5 transition ${skin}`}
+              >
+                {inner}
               </Link>
+            ) : (
+              <div
+                key={e.id}
+                className={`rounded-xl border p-5 ${skin}`}
+                title="Face this tactic in play to declassify."
+                aria-disabled="true"
+              >
+                {inner}
+              </div>
             );
           })}
         </div>
