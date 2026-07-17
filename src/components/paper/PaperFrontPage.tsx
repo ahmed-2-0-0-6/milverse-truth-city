@@ -204,13 +204,13 @@ function PlayFlow({
                   setVerdict(v);
                   setStage("wager");
                 }}
-                className="border-2 py-3 rounded-sm paper-mono text-xs tracking-widest hover:bg-black/5"
-                style={{ borderColor: "var(--paper-ink)" }}
+                className="paper-btn py-3 text-[13px] tracking-[0.22em]"
               >
                 {v}
               </button>
             ))}
           </div>
+
         </>
       )}
       {stage === "wager" && verdict && (
