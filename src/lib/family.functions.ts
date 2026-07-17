@@ -78,13 +78,20 @@ export const fetchFamilyProgress = createServerFn({ method: "POST" })
     if (!allowed) throw new Error("Too many attempts for this code. Try again in an hour.");
     const active = await isActive(supabase, data.code);
     if (!active) throw new Error("This family code is no longer active. Generate a new one.");
-    const { data: rows, error } = await supabase
-      .from("pilot_entries")
-      .select("device_id, wing, case_id, result")
-      .eq("group_code", data.code)
-      .limit(5000);
+    // Group-scoped SECURITY DEFINER read — direct SELECT on pilot_entries is
+    // closed to the anon role (migration 20260717060500).
+    const { data: rows, error } = await supabase.rpc("get_pilot_group_entries", {
+      _code: data.code,
+    });
     if (error) throw new Error(error.message);
-    return { entries: rows ?? [] };
+    return {
+      entries: (rows ?? []).map((r) => ({
+        device_id: r.device_id,
+        wing: r.wing,
+        case_id: r.case_id,
+        result: r.result,
+      })),
+    };
   });
 
 /** Rate-limited check the kid runs when joining. */

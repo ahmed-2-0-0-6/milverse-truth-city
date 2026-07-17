@@ -70,12 +70,11 @@ export const fetchPilotGroup = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const supabase = serverClient();
-    const { data: rows, error } = await supabase
-      .from("pilot_entries")
-      .select("device_id, wing, case_id, tier, result, points, probe_stats, created_at")
-      .eq("group_code", data.groupCode)
-      .order("created_at", { ascending: true })
-      .limit(5000);
+    // Group-scoped SECURITY DEFINER read — direct SELECT on pilot_entries is
+    // closed to the anon role (migration 20260717060500).
+    const { data: rows, error } = await supabase.rpc("get_pilot_group_entries", {
+      _code: data.groupCode,
+    });
     if (error) throw new Error(error.message);
     return { entries: rows ?? [] };
   });

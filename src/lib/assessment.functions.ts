@@ -81,14 +81,11 @@ export const fetchAssessmentGroup = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const supabase = serverClient();
-    const { data: rows, error } = await supabase
-      .from("assessment_entries")
-      .select(
-        "codename_hash, phase, form, items, accuracy, mean_confidence, calibration_gap, overconfident_errors, missed_scams, false_alarms, unverifiable_recognized, created_at",
-      )
-      .eq("group_code", data.groupCode)
-      .order("created_at", { ascending: true })
-      .limit(5000);
+    // Group-scoped SECURITY DEFINER read — direct SELECT on assessment_entries
+    // is closed to the anon role (migration 20260717060500).
+    const { data: rows, error } = await supabase.rpc("get_assessment_group_entries", {
+      _code: data.groupCode,
+    });
     if (error) throw new Error(error.message);
     const { data: phaseRow } = await supabase
       .from("assessment_phase")
