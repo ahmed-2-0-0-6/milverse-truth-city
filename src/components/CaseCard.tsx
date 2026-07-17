@@ -68,10 +68,7 @@ export function TierMeter({ tier, max = 5 }: { tier: number; max?: number }) {
   return (
     <div className="flex items-center gap-1 font-mono text-[10px] tracking-widest">
       {Array.from({ length: max }).map((_, i) => (
-        <span
-          key={i}
-          className={`h-1.5 w-4 rounded-sm ${i < tier ? "bg-primary" : "bg-muted"}`}
-        />
+        <span key={i} className={`h-1.5 w-4 rounded-sm ${i < tier ? "bg-primary" : "bg-muted"}`} />
       ))}
     </div>
   );
