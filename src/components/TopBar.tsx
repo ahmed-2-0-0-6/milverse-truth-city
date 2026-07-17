@@ -94,7 +94,7 @@ export function TopBar() {
           : "text-muted-foreground border-border";
 
   return (
-    <header className="sticky top-0 z-50 border-b-2 border-primary/30 bg-background/90 backdrop-blur">
+    <header className="print:hidden sticky top-0 z-50 border-b-2 border-primary/30 bg-background/90 backdrop-blur">
       <div className="mx-auto grid max-w-6xl grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-2.5">
         <Link to="/" className="flex items-center gap-3 group min-w-0">
           <div className="relative h-7 w-7 shrink-0">

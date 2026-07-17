@@ -1240,6 +1240,13 @@ html[data-force-reduce-motion="on"] .marquee-track {
   .no-print {
     display: none !important;
   }
+  /* Global atmosphere never belongs on paper: grain, glow cursor,
+     route wipe, marquee. TopBar + site footer opt out via print:hidden. */
+  [class*="atmo-"],
+  .route-wipe,
+  .marquee-track {
+    display: none !important;
+  }
   .paper-body p:first-of-type::first-letter {
     font-size: 2.5em;
   }
