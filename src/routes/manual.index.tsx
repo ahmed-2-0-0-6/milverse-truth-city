@@ -197,7 +197,7 @@ function ManualIndex() {
                     className="mt-3 text-2xl font-black tracking-tight"
                     style={{ fontFamily: '"Bebas Neue", sans-serif' }}
                   >
-                    {dc ? b.methodPage.codename : "▓▓▓▓▓▓▓"}
+                    {dc ? b.methodPage.codename : <RedactedTitle text={b.methodPage.codename} tone="danger" />}
                   </div>
                   {dc ? (
                     <div className="mt-2 space-y-2 text-xs text-muted-foreground">
