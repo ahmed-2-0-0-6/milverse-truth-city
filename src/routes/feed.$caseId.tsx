@@ -17,6 +17,8 @@ import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
 import { Send, Search, Heart, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
+import { CAST } from "@/lib/cast";
+
 import { FormatFrame } from "@/components/feed/FormatFrame";
 import { Toolbelt } from "@/components/feed/Toolbelt";
 import { TacticStamp } from "@/components/TacticStamp";
