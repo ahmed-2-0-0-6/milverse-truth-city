@@ -71,7 +71,10 @@ export interface FeedScenario {
   truthNote: string;
   respectfulScript: string;
   inspiredBy?: InspiredByCase;
+  /** Optional in-character aside from the recurring cast — colour only. */
+  castAfterword?: CastAfterword;
 }
+
 
 export const FEED_SCENARIOS: FeedScenario[] = [
   /* ── T1 FALSE — the bank rumor ─────────────────────────────── */
