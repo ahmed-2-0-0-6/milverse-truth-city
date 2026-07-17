@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { TopBar } from "@/components/TopBar";
 import { saveCitizenCase } from "@/lib/mirror/scenarios";
 import type { Scenario, EvidenceChip } from "@/lib/mirror/scenarios";
