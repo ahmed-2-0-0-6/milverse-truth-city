@@ -178,7 +178,7 @@ function Studio() {
 
   async function publish(lane: "private" | "community") {
     const err = validate(draft);
-    if (err) { setError(err); return; }
+    if (err) { setError(err); toast.error("Fix before publishing", { description: err }); return; }
     setPublishing(true);
     setError(null);
     const s = buildScenario(draft);
@@ -196,13 +196,18 @@ function Studio() {
       // Successful publish → increment XP-layer counter (feeds ranks + prestige).
       incrementPublishedCount();
       if (res.lane === "community") {
-        alert(`Submitted to the Community Library — queued for human review.\n\nShare code (playable now for you & anyone you send it to): ${code}\n\nAI safety check: ${res.aiChecked ? "passed ✓" : "unavailable — will be reviewed manually"}`);
+        toast.success("Submitted to the Community Library", {
+          description: `Queued for human review · share code ${code}${res.aiChecked ? " · AI safety check passed" : " · manual review pending"}`,
+        });
       } else {
-        alert(`Published as a PRIVATE case.\n\nShare code: ${code}\n\nAnyone with this code can play it. It never appears on public shelves.\n\nAI safety check: ${res.aiChecked ? "passed ✓" : "unavailable — will be reviewed if you submit to the community later"}`);
+        toast.success("Published as a private case", {
+          description: `Share code ${code}${res.aiChecked ? " · AI safety check passed" : ""}`,
+        });
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Cloud sync failed.";
       setError(msg);
+      toast.error("Publish failed", { description: msg });
       setPublishing(false);
       return;
     }
