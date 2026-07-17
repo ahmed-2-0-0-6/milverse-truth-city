@@ -467,16 +467,17 @@ export const SCENARIOS: Scenario[] = [
     persona: {
       voice: "calm, authoritative, uses sir/ma'am, call-centre script",
       fillers: [
-        "Please stay with me.",
-        "I'm here to help you sir.",
-        "For your protection.",
-        "Standard fraud protocol.",
+        "Please stay on the line sir.",
+        "I'm here to help you sir, don't worry.",
+        "This is for your own account safety.",
+        "Standard fraud protocol sir, one moment.",
       ],
       urgencyLines: [
-        "We have less than 60 seconds.",
-        "If you delay, the money is gone.",
-        "Sir every second matters.",
+        "Sir hum ke paas 60 second se bhi kam hai.",
+        "Sir agar aap ne delay kiya to paisay chalay jayenge.",
+        "Sir har second mein transaction process ho raha hai.",
       ],
+
       pushLines: [
         "Please read out the 6-digit code you just received on SMS.",
         "I need that OTP to cancel the transaction — nothing else works.",
