@@ -42,32 +42,20 @@ export function PaperForgeryColumn({
   const cityPct = split && split.total > 0 ? Math.round((split.correct / split.total) * 100) : null;
 
   return (
-    <section className="mt-2 grid md:grid-cols-[minmax(0,1fr)_260px] gap-6">
+    <section className="paper-section grid md:grid-cols-[minmax(0,1fr)_260px] gap-6">
       <div>
-        <div className="paper-mono text-[10px] tracking-[0.3em] text-[color:var(--paper-muted)]">
-          REAL OR ENGINE-MADE?
-        </div>
-        <h3 className="paper-serif text-3xl mt-1" style={{ fontWeight: 900 }}>
-          The Forgery Column
-        </h3>
-        <p className="paper-body no-dropcap mt-2">{forgery.prompt}</p>
+        <div className="paper-section-kicker">REAL OR ENGINE-MADE?</div>
+        <p className="paper-section-lede">{forgery.prompt}</p>
         {!revealed ? (
-          <div className="mt-4 flex gap-2">
-            <button
-              onClick={() => submit("REAL")}
-              className="border-2 py-2 px-4 paper-mono text-xs tracking-widest hover:bg-black/5"
-              style={{ borderColor: "var(--paper-ink)" }}
-            >
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button onClick={() => submit("REAL")} className="paper-btn">
               REAL CAMERA
             </button>
-            <button
-              onClick={() => submit("AI")}
-              className="border-2 py-2 px-4 paper-mono text-xs tracking-widest hover:bg-black/5"
-              style={{ borderColor: "var(--paper-ink)" }}
-            >
+            <button onClick={() => submit("AI")} className="paper-btn">
               ENGINE-MADE
             </button>
           </div>
+
         ) : (
           <div className="mt-4">
             <div
