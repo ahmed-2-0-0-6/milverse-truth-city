@@ -6,7 +6,7 @@ import {
   markHandoverSeen,
   setActive,
 } from "@/lib/firstPhone/profile";
-import { useReducedMotion } from "@/lib/access";
+import { shouldReduceMotion } from "@/lib/access";
 import { Gift, Check } from "lucide-react";
 
 interface Props {
