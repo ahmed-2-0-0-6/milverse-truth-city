@@ -3,6 +3,7 @@ import { TopBar } from "@/components/TopBar";
 import { FEED_SCENARIOS } from "@/lib/feed/scenarios";
 import { FormatBadge } from "@/components/feed/FormatFrame";
 import { DistrictIntro } from "@/components/DistrictIntro";
+import { CaseCard } from "@/components/CaseCard";
 import feedArt from "@/assets/district-feed.jpg";
 import { Newspaper, Share2 } from "lucide-react";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
