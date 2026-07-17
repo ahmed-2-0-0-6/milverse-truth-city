@@ -590,6 +590,12 @@ function Debrief({
   finalReply: string;
 }) {
   const navigate = useNavigate();
+  const [profileSnap, setProfileSnap] = useState(() => loadProfile());
+  useEffect(() => {
+    const on = () => setProfileSnap(loadProfile());
+    window.addEventListener("milverse:profile", on);
+    return () => window.removeEventListener("milverse:profile", on);
+  }, []);
   const Icon =
     outcome.result === "correct"
       ? CheckCircle2
