@@ -22,6 +22,7 @@ import { loadProfile, unlockedMaxTier, tierWins, type TrustProfile } from "@/lib
 import { fetchCitizenCase } from "@/lib/citizen.functions";
 import { RecommendedStrip } from "@/components/RecommendedStrip";
 import { DistrictIntro } from "@/components/DistrictIntro";
+import { CaseCard, TierMeter } from "@/components/CaseCard";
 import mirrorArt from "@/assets/district-mirror.jpg";
 import mirrorVideo from "@/assets/mirror.mp4.asset.json";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
@@ -221,61 +222,36 @@ function CaseFiles() {
                     const done = profile?.history.some(
                       (h) => h.caseId === s.id && h.result === "correct",
                     );
-                    const card = (
-                      <div
-                        className={`group relative overflow-hidden rounded-xl border p-6 transition-all ${
-                          isUnlocked
-                            ? "border-border bg-card hover:border-primary/50 hover:-translate-y-0.5 hover:shadow-[0_0_32px_oklch(0.82_0.15_210/0.15)]"
-                            : "border-border/60 bg-card/40 opacity-60"
-                        }`}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 text-primary">
-                            <MessageSquare className="h-5 w-5" />
-                          </div>
-                          <div className="flex items-center gap-1 font-mono text-[10px] tracking-widest">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                              <span
-                                key={i}
-                                className={`h-1.5 w-4 rounded-sm ${i < s.tier ? "bg-primary" : "bg-muted"}`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <h3 className="mt-5 text-lg font-semibold">{s.title}</h3>
-                        <p className="mt-1 text-sm text-muted-foreground">{s.teaser}</p>
-
-                        <div className="mt-4 flex flex-wrap items-center gap-2">
-                          {s.isSurvivorStory && (
-                            <span className="inline-flex items-center gap-1.5 rounded-full border border-caution/40 bg-caution/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest text-caution">
-                              <ShieldAlert className="h-3 w-3" /> Survivor donated
-                            </span>
-                          )}
-                          {done && (
-                            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest text-primary">
-                              <CheckCircle2 className="h-3 w-3" /> Solved
-                            </span>
-                          )}
-                          {!isUnlocked && (
-                            <span className="inline-flex items-center gap-1.5 rounded-full border border-muted-foreground/30 bg-muted px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                              <Lock className="h-3 w-3" /> Locked
-                            </span>
-                          )}
-                        </div>
-
-                        {isUnlocked && (
-                          <div className="mt-5 font-mono text-xs tracking-widest text-primary opacity-0 transition-opacity group-hover:opacity-100">
-                            OPEN CASE →
-                          </div>
-                        )}
-                      </div>
-                    );
-                    return isUnlocked ? (
-                      <Link key={s.id} to="/mirror/$caseId" params={{ caseId: s.id }}>
-                        {card}
-                      </Link>
-                    ) : (
-                      <div key={s.id}>{card}</div>
+                    return (
+                      <CaseCard
+                        key={s.id}
+                        to="/mirror/$caseId"
+                        params={{ caseId: s.id }}
+                        locked={!isUnlocked}
+                        icon={<MessageSquare className="h-5 w-5" />}
+                        metaTopRight={<TierMeter tier={s.tier} />}
+                        title={s.title}
+                        teaser={s.teaser}
+                        badges={
+                          <>
+                            {s.isSurvivorStory && (
+                              <span className="inline-flex items-center gap-1.5 rounded-full border border-caution/40 bg-caution/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest text-caution">
+                                <ShieldAlert className="h-3 w-3" /> Survivor donated
+                              </span>
+                            )}
+                            {done && (
+                              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest text-primary">
+                                <CheckCircle2 className="h-3 w-3" /> Solved
+                              </span>
+                            )}
+                            {!isUnlocked && (
+                              <span className="inline-flex items-center gap-1.5 rounded-full border border-muted-foreground/30 bg-muted px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                                <Lock className="h-3 w-3" /> Locked
+                              </span>
+                            )}
+                          </>
+                        }
+                      />
                     );
                   })}
                 </div>
@@ -308,17 +284,14 @@ function CaseFiles() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {citizen.map((s) => (
-                <Link
+                <CaseCard
                   key={s.id}
                   to="/mirror/$caseId"
                   params={{ caseId: s.id }}
-                  className="group rounded-xl border border-primary/30 bg-card p-6 hover:border-primary/60 transition"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 text-primary">
-                      <MessageSquare className="h-5 w-5" />
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
+                  tone="citizen"
+                  icon={<MessageSquare className="h-5 w-5" />}
+                  metaTopRight={
+                    <>
                       <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[9px] font-mono tracking-widest text-primary">
                         DESIGNED BY A CITIZEN
                       </span>
@@ -327,17 +300,19 @@ function CaseFiles() {
                           <Building2 className="h-2.5 w-2.5" /> CITY DESIGNER
                         </span>
                       )}
-                    </div>
-                  </div>
-                  <h3 className="mt-4 text-base font-semibold">{s.title}</h3>
-                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{s.teaser}</p>
-                  <div className="mt-3 font-mono text-[10px] tracking-widest text-muted-foreground">
-                    {s.designerRank && (
-                      <span className="mr-2 text-primary/80">BYLINE · {s.designerRank}</span>
-                    )}
-                    CODE: {s.id.replace("citizen-", "").toUpperCase().slice(0, 6)}
-                  </div>
-                </Link>
+                    </>
+                  }
+                  title={s.title}
+                  teaser={s.teaser}
+                  badges={
+                    <span className="font-mono text-[10px] tracking-widest text-muted-foreground">
+                      {s.designerRank && (
+                        <span className="mr-2 text-primary/80">BYLINE · {s.designerRank}</span>
+                      )}
+                      CODE · {s.id.replace("citizen-", "").toUpperCase().slice(0, 6)}
+                    </span>
+                  }
+                />
               ))}
             </div>
           )}
