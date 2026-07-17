@@ -19,14 +19,14 @@ export function TrustedAdultChip({ scene, onResolved, className }: Props) {
 
   if (stage === "calling") {
     return (
-      <div className={`rounded-xl border border-primary/40 bg-primary/5 p-5 ${className ?? ""}`}>
+      <div className={`rounded-xl border border-primary/40 bg-primary/5 p-5 shadow-sm ${className ?? ""}`}>
         <div className="flex items-center gap-2 text-primary">
           <PhoneCall className="h-4 w-4 animate-pulse" />
           <span className="font-mono text-[11px] tracking-widest">CALLING {scene.who.toUpperCase()}…</span>
         </div>
         <button
           onClick={() => setStage("done")}
-          className="mt-4 rounded-md bg-primary px-4 py-2 text-primary-foreground text-sm font-medium"
+          className="mt-4 rounded-md bg-primary px-4 py-2 text-primary-foreground text-sm font-medium shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-all"
         >
           Connect
         </button>
@@ -36,7 +36,7 @@ export function TrustedAdultChip({ scene, onResolved, className }: Props) {
 
   if (stage === "done") {
     return (
-      <div className={`rounded-xl border border-primary/40 bg-primary/10 p-5 ${className ?? ""}`}>
+      <div className={`rounded-xl border border-primary/40 bg-primary/10 p-5 shadow-sm ${className ?? ""}`}>
         <div className="font-mono text-[11px] tracking-widest text-primary">{scene.who.toUpperCase()} SAYS</div>
         <p className="mt-2 text-base leading-relaxed">"{scene.line}"</p>
         <div className="mt-4 flex items-center gap-2 text-primary">
@@ -49,7 +49,7 @@ export function TrustedAdultChip({ scene, onResolved, className }: Props) {
         </div>
         <button
           onClick={onResolved}
-          className="mt-4 rounded-md bg-primary px-4 py-2 text-primary-foreground text-sm font-medium"
+          className="mt-4 rounded-md bg-primary px-4 py-2 text-primary-foreground text-sm font-medium shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-all"
         >
           Continue
         </button>
@@ -60,7 +60,7 @@ export function TrustedAdultChip({ scene, onResolved, className }: Props) {
   return (
     <button
       onClick={() => setStage("calling")}
-      className={`w-full rounded-xl border-2 border-primary/50 bg-primary/10 hover:bg-primary/20 transition-colors p-4 flex items-center justify-center gap-2 ${className ?? ""}`}
+      className={`w-full rounded-xl border-2 border-primary/50 bg-primary/10 hover:bg-primary/20 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-all p-4 flex items-center justify-center gap-2 ${className ?? ""}`}
     >
       <Shield className="h-4 w-4 text-primary" />
       <span className="font-mono text-[11px] tracking-widest text-primary">{JUNIOR_COPY.trustedAdultChip}</span>

@@ -99,9 +99,9 @@ export function LessonPath() {
                 <button
                   onClick={() => unlocked && setOpenLesson(l.n)}
                   disabled={!unlocked}
-                  className={`w-full text-left rounded-lg border p-4 transition-colors ${
-                    complete ? "border-primary/40 bg-primary/5"
-                    : unlocked ? "border-border bg-card hover:border-primary/50"
+                  className={`w-full text-left rounded-lg border p-4 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
+                    complete ? "border-primary/40 bg-primary/5 shadow-sm"
+                    : unlocked ? "border-border bg-card hover:border-primary/50 hover:shadow-md hover:-translate-y-px"
                     : "border-dashed border-border bg-muted/20 opacity-60 cursor-not-allowed"
                   }`}
                 >
@@ -157,7 +157,7 @@ function LessonView({ lesson, onComplete }: { lesson: Lesson; onComplete: (caseI
             <button
               key={o.id}
               onClick={() => choose(o)}
-              className="w-full text-left rounded-lg border border-border bg-card px-4 py-3 hover:border-primary/50 transition-colors"
+              className="w-full text-left rounded-lg border border-border bg-card px-4 py-3 hover:border-primary/50 hover:shadow-md hover:-translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-all"
             >
               {o.label}
             </button>

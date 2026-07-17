@@ -71,17 +71,17 @@ export function BankConfirmSheet({
       aria-labelledby="bank-sheet-title"
       className="absolute inset-0 z-50 flex items-end bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="w-full bg-neutral-950 rounded-t-2xl border-t border-white/10 flex flex-col max-h-[92%] animate-in slide-in-from-bottom duration-200">
+      <div className="w-full bg-neutral-950 rounded-t-2xl border-t border-white/10 flex flex-col max-h-[92%] animate-in slide-in-from-bottom duration-200 shadow-2xl shadow-black/60">
         {/* Bank-app header — noir, not iOS-clone */}
         <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-indigo-950 to-neutral-950 border-b border-white/10">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-indigo-500 text-white text-xs font-black">CP</div>
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-indigo-500 text-white text-xs font-black shadow-md shadow-indigo-500/30">CP</div>
             <div>
               <div id="bank-sheet-title" className="text-sm font-semibold text-white">CitizenPay — Confirm transfer</div>
               <div className="text-[10px] font-mono tracking-wider text-white/50">Confirm transfer</div>
             </div>
           </div>
-          <button onClick={onCancel} className="p-1.5 min-h-11 min-w-11 flex items-center justify-center text-white/60 hover:text-white" aria-label="Cancel transfer">
+          <button onClick={onCancel} className="p-1.5 min-h-11 min-w-11 flex items-center justify-center rounded-md text-white/60 hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 transition-colors" aria-label="Cancel transfer">
             <X className="h-5 w-5" />
           </button>
         </div>
