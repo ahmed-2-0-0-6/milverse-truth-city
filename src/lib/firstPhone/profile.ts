@@ -6,8 +6,8 @@ const KEY = "milverse.firstphone.v1";
 export interface FirstPhoneState {
   active: boolean;
   kidCityName: string;
-  familyCode: string | null;   // parent-created code the kid joined
-  lessonsCompleted: number[];  // e.g. [1,2,3]
+  familyCode: string | null; // parent-created code the kid joined
+  lessonsCompleted: number[]; // e.g. [1,2,3]
   licenseIssuedAt: number | null;
   licenseNumber: string | null;
 }
@@ -29,7 +29,9 @@ export function loadFirstPhone(): FirstPhoneState {
     const raw = localStorage.getItem(KEY);
     if (!raw) return fresh();
     return { ...fresh(), ...(JSON.parse(raw) as Partial<FirstPhoneState>) };
-  } catch { return fresh(); }
+  } catch {
+    return fresh();
+  }
 }
 
 export function saveFirstPhone(s: FirstPhoneState) {
@@ -77,10 +79,12 @@ export function markLessonComplete(n: number) {
             const id = JUNIOR_TO_MANUAL[t];
             if (id) unlockTactic(id);
           });
-        }
+        },
       );
     });
-  } catch { /* SSR / storage-off — silent */ }
+  } catch {
+    /* SSR / storage-off — silent */
+  }
   return s;
 }
 

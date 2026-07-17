@@ -56,13 +56,12 @@ function JuniorLockScreen({ districtName }: { districtName: string }) {
             {districtName} is for older operators.
           </h1>
           <p className="mt-3 text-muted-foreground">
-            You're enrolled in the First Phone Program. Adult cases can carry
-            heavier stakes and situations — you'll unlock them when you graduate.
+            You're enrolled in the First Phone Program. Adult cases can carry heavier stakes and
+            situations — you'll unlock them when you graduate.
           </p>
 
           <div className="mt-6 rounded-md border border-primary/30 bg-primary/5 p-4 text-sm">
-            Stay on the path. Ten lessons, one license — and then the whole
-            city opens up.
+            Stay on the path. Ten lessons, one license — and then the whole city opens up.
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2">

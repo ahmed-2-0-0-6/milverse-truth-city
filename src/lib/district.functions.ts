@@ -18,7 +18,8 @@ function serverClient() {
     global: {
       fetch: (input, init) => {
         const h = new Headers(init?.headers);
-        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+          h.delete("Authorization");
         h.set("apikey", key);
         return fetch(input, { ...init, headers: h });
       },
@@ -28,16 +29,19 @@ function serverClient() {
 
 export const castDistrictVote = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({
-      district: z.enum(["market", "arena"]),
-      suggestion: z.string().max(140).optional(),
-      deviceId: z.string().min(8).max(64).optional(),
-    }).parse(input),
+    z
+      .object({
+        district: z.enum(["market", "arena"]),
+        suggestion: z.string().max(140).optional(),
+        deviceId: z.string().min(8).max(64).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     const s = data.suggestion?.trim();
     if (s && s.length > 0) {
-      if (PHONE_RE.test(s)) throw new Error("Suggestion rejected: contains a phone number. Keep it fictional.");
+      if (PHONE_RE.test(s))
+        throw new Error("Suggestion rejected: contains a phone number. Keep it fictional.");
       if (EMAIL_RE.test(s)) throw new Error("Suggestion rejected: contains an email.");
       if (URL_RE.test(s)) throw new Error("Suggestion rejected: contains a link.");
     }
@@ -51,21 +55,20 @@ export const castDistrictVote = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const fetchDistrictTallies = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const supabase = serverClient();
-    const { data, error } = await supabase
-      .from("district_votes")
-      .select("district, suggestion, created_at")
-      .order("created_at", { ascending: false })
-      .limit(500);
-    if (error) throw new Error(error.message);
-    const rows = data ?? [];
-    const market = rows.filter((r) => r.district === "market").length;
-    const arena = rows.filter((r) => r.district === "arena").length;
-    const suggestions = rows
-      .filter((r) => r.suggestion && r.suggestion.trim().length > 0)
-      .slice(0, 12)
-      .map((r) => ({ district: r.district, suggestion: r.suggestion!, at: r.created_at }));
-    return { market, arena, suggestions };
-  });
+export const fetchDistrictTallies = createServerFn({ method: "GET" }).handler(async () => {
+  const supabase = serverClient();
+  const { data, error } = await supabase
+    .from("district_votes")
+    .select("district, suggestion, created_at")
+    .order("created_at", { ascending: false })
+    .limit(500);
+  if (error) throw new Error(error.message);
+  const rows = data ?? [];
+  const market = rows.filter((r) => r.district === "market").length;
+  const arena = rows.filter((r) => r.district === "arena").length;
+  const suggestions = rows
+    .filter((r) => r.suggestion && r.suggestion.trim().length > 0)
+    .slice(0, 12)
+    .map((r) => ({ district: r.district, suggestion: r.suggestion!, at: r.created_at }));
+  return { market, arena, suggestions };
+});

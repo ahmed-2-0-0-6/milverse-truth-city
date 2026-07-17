@@ -20,16 +20,16 @@ export const JUNIOR_TO_MANUAL: Record<JuniorTactic, TacticId | null> = {
   // Real photo, wrong caption — the manual's T-03 exactly.
   "out-of-context": "out-of-context",
   // "New number, it's me" — the manual's T-01.
-  "impersonation": "impersonation",
+  impersonation: "impersonation",
   // Anger-first stories with no witness — mis/dis/mal in family circulation.
-  "rumor": "mis-dis-mal",
+  rumor: "mis-dis-mal",
   // AI voice / face — the Forgery Engine, T-10.
   "ai-forgery": "forgery-engine",
   // Group-chat "forward or lose your account" — urgency-fear pressure.
   "group-chat": "urgency-fear",
   // Junior-only skill (HOLD / can't-verify + urgency). Kept junior; no
   // adult equivalent worth force-mapping. Named "Trusted-adult HOLD".
-  "unverifiable": null,
+  unverifiable: null,
 };
 
 export interface TacticDisplay {
@@ -43,11 +43,11 @@ const JUNIOR_LABEL: Record<JuniorTactic, string> = {
   "chain-forward": "Chain forwards",
   "giveaway-scam": "Prize / giveaway scams",
   "out-of-context": "Out-of-context photos",
-  "impersonation": "Impersonation",
-  "rumor": "Angry rumors",
+  impersonation: "Impersonation",
+  rumor: "Angry rumors",
   "ai-forgery": "AI-generated voices & images",
   "group-chat": "Group-chat pressure",
-  "unverifiable": "HOLD when you can't verify",
+  unverifiable: "HOLD when you can't verify",
 };
 
 export function describeTactic(t: JuniorTactic): TacticDisplay {

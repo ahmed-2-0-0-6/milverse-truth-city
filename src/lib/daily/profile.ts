@@ -1,10 +1,15 @@
 // MILVERSE — Daily Drop profile helpers.
 // Operates on the shared TrustProfile: trust balance, streak, and one-play-per-day.
 
-import { loadProfile, saveProfile, type TrustProfile, type DailyPlayEntry } from "@/lib/mirror/profile";
+import {
+  loadProfile,
+  saveProfile,
+  type TrustProfile,
+  type DailyPlayEntry,
+} from "@/lib/mirror/profile";
 import { dropDateKey } from "@/lib/daily/rotation";
 
-const FLOOR_LOAN = 50;   // "city fronts you 50" — never hard-lock a learner out
+const FLOOR_LOAN = 50; // "city fronts you 50" — never hard-lock a learner out
 const MIN_STAKE = 10;
 const MAX_STAKE = 100;
 
@@ -33,7 +38,9 @@ export function readDailyStatus(): DailyStatus {
 function nextStreak(prev: TrustProfile, today: string): number {
   if (!prev.lastDailyDate) return 1;
   if (prev.lastDailyDate === today) return prev.dailyStreak; // shouldn't happen (one-per-day guard)
-  const y = new Date(new Date(today + "T00:00:00Z").getTime() - 86400000).toISOString().slice(0, 10);
+  const y = new Date(new Date(today + "T00:00:00Z").getTime() - 86400000)
+    .toISOString()
+    .slice(0, 10);
   return prev.lastDailyDate === y ? prev.dailyStreak + 1 : 1;
 }
 
@@ -47,11 +54,11 @@ export interface DailyPayoutInput {
 
 export interface DailyPayoutResult {
   correct: boolean;
-  delta: number;                     // +win / -loss (city loan applied AFTER)
+  delta: number; // +win / -loss (city loan applied AFTER)
   outcome: "correct" | "missed_scam" | "false_alarm";
   newTrust: number;
   newStreak: number;
-  fronted: boolean;                  // city fronted 50 after zero
+  fronted: boolean; // city fronted 50 after zero
   entry: DailyPlayEntry;
 }
 
@@ -73,7 +80,10 @@ export function commitDailyPlay(input: DailyPayoutInput): DailyPayoutResult | nu
   const delta = correct ? clampedStake : -clampedStake;
   let newTrust = p.trust + delta;
   let fronted = false;
-  if (newTrust <= 0) { newTrust = FLOOR_LOAN; fronted = true; }
+  if (newTrust <= 0) {
+    newTrust = FLOOR_LOAN;
+    fronted = true;
+  }
 
   const streak = nextStreak(p, today);
 

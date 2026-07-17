@@ -14,7 +14,10 @@ export function Marquee() {
     <div className="relative overflow-hidden border-y border-primary/30 bg-black/40 backdrop-blur-sm">
       <div className="marquee-track flex whitespace-nowrap py-2">
         {[...items, ...items, ...items].map((t, i) => (
-          <span key={i} className="stencil text-[10px] text-cyan-200/80 px-6 flex items-center gap-6">
+          <span
+            key={i}
+            className="stencil text-[10px] text-cyan-200/80 px-6 flex items-center gap-6"
+          >
             <span className="h-1.5 w-1.5 rounded-full bg-amber-300/80 shadow-[0_0_8px_rgba(245,185,66,0.9)]" />
             {t}
           </span>

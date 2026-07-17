@@ -31,11 +31,7 @@ export function ChatShell({ header, children, composer, overlay, className }: Pr
         >
           {children}
         </div>
-        {composer && (
-          <div className="border-t border-white/10 bg-neutral-950/95">
-            {composer}
-          </div>
-        )}
+        {composer && <div className="border-t border-white/10 bg-neutral-950/95">{composer}</div>}
         {overlay}
       </div>
     </div>

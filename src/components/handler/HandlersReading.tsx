@@ -10,7 +10,8 @@ import { fallbackReading, assignmentReason } from "@/lib/handler/copy";
 import { feedTacticMap } from "@/lib/handler/feedTactics";
 import { useHandlerLine } from "@/lib/handler/useHandlerLine";
 
-const REDUCED = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+const REDUCED =
+  typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 export function HandlersReading() {
   const [profile, setProfile] = useState<ReturnType<typeof loadProfile> | null>(null);
@@ -22,33 +23,57 @@ export function HandlersReading() {
     return () => window.removeEventListener("milverse:profile", on);
   }, []);
 
-  const reading = useMemo(() => (profile ? computeReading(profile, feedTacticMap()) : null), [profile]);
+  const reading = useMemo(
+    () => (profile ? computeReading(profile, feedTacticMap()) : null),
+    [profile],
+  );
 
-  const fallback = useMemo(() => (reading ? fallbackReading(reading, profile?.playerId ? hash(profile.playerId) : 0) : ""), [reading, profile?.playerId]);
+  const fallback = useMemo(
+    () => (reading ? fallbackReading(reading, profile?.playerId ? hash(profile.playerId) : 0) : ""),
+    [reading, profile?.playerId],
+  );
 
   const line = useHandlerLine({
     surface: "reading",
     fallback,
     enabled: !!reading && reading.lean.id !== "rookie",
     cacheKey: profile?.playerId,
-    summary: reading ? {
-      lean: reading.lean.label,
-      leanBlurb: reading.lean.blurb,
-      strength: reading.strength,
-      directive: reading.directive,
-      weakestTactic: reading.weakness ? String(reading.weakness.tactic) : null,
-      weakestWrong: reading.weakness?.wrong ?? 0,
-      weakestSeen: reading.weakness?.seen ?? 0,
-      wager: reading.wager.label,
-      dailyStreak: profile?.dailyStreak ?? 0,
-    } : { lean: "", leanBlurb: "", strength: "", directive: "", weakestTactic: null, weakestWrong: 0, weakestSeen: 0, wager: "—", dailyStreak: 0 },
+    summary: reading
+      ? {
+          lean: reading.lean.label,
+          leanBlurb: reading.lean.blurb,
+          strength: reading.strength,
+          directive: reading.directive,
+          weakestTactic: reading.weakness ? String(reading.weakness.tactic) : null,
+          weakestWrong: reading.weakness?.wrong ?? 0,
+          weakestSeen: reading.weakness?.seen ?? 0,
+          wager: reading.wager.label,
+          dailyStreak: profile?.dailyStreak ?? 0,
+        }
+      : {
+          lean: "",
+          leanBlurb: "",
+          strength: "",
+          directive: "",
+          weakestTactic: null,
+          weakestWrong: 0,
+          weakestSeen: 0,
+          wager: "—",
+          dailyStreak: 0,
+        },
   });
 
   // Typewriter reveal on `line.text`.
   const [typed, setTyped] = useState("");
   useEffect(() => {
-    if (!line.text) { setTyped(""); return; }
-    if (REDUCED) { setTyped(line.text); return; }
+    if (!line.text) {
+      setTyped("");
+      return;
+    }
+    if (REDUCED) {
+      setTyped(line.text);
+      return;
+    }
     setTyped("");
     let i = 0;
     const t = window.setInterval(() => {
@@ -64,18 +89,26 @@ export function HandlersReading() {
 
   return (
     <section className="mt-6 rounded-2xl border border-primary/40 bg-[#050813] p-5 sm:p-6 relative overflow-hidden">
-      <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{
-        backgroundImage: "repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 4px)",
-      }} />
+      <div
+        className="absolute inset-0 opacity-[0.06] pointer-events-none"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 4px)",
+        }}
+      />
       <div className="relative">
         <div className="flex items-baseline justify-between">
           <div>
-            <div className="stencil text-[10px] tracking-[0.35em] text-primary">THE HANDLER'S READING</div>
+            <div className="stencil text-[10px] tracking-[0.35em] text-primary">
+              THE HANDLER'S READING
+            </div>
             <div className="stencil text-[9px] tracking-widest text-muted-foreground mt-0.5">
               CASE FILE · {reading.lean.code} · {reading.lean.label}
             </div>
           </div>
-          <div className="stencil text-[9px] tracking-widest text-muted-foreground">REFRESHES DAILY</div>
+          <div className="stencil text-[9px] tracking-widest text-muted-foreground">
+            REFRESHES DAILY
+          </div>
         </div>
 
         {rookie ? (
@@ -91,10 +124,20 @@ export function HandlersReading() {
 
         {!rookie && (
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
-            <Chip label="LEAN"     value={reading.lean.label} />
-            <Chip label="WAGER"    value={reading.wager.label} />
-            <Chip label="WEAKEST"  value={reading.weakness ? String(reading.weakness.tactic).toUpperCase() : "—"} />
-            <Chip label="STREAK"   value={String(profile?.dailyStreak ?? 0) + " DAY" + ((profile?.dailyStreak ?? 0) === 1 ? "" : "S")} />
+            <Chip label="LEAN" value={reading.lean.label} />
+            <Chip label="WAGER" value={reading.wager.label} />
+            <Chip
+              label="WEAKEST"
+              value={reading.weakness ? String(reading.weakness.tactic).toUpperCase() : "—"}
+            />
+            <Chip
+              label="STREAK"
+              value={
+                String(profile?.dailyStreak ?? 0) +
+                " DAY" +
+                ((profile?.dailyStreak ?? 0) === 1 ? "" : "S")
+              }
+            />
           </div>
         )}
 
@@ -105,12 +148,24 @@ export function HandlersReading() {
               {reading.assignment.district === "feed" && "Feed District — verify the next artifact"}
               {reading.assignment.district === "mirror" && "Mirror District — take the next call"}
               {reading.assignment.district === "drop" && "AAJ KA FORWARD — one drop, one stake"}
-              {reading.assignment.tactic && <span className="ml-2 stencil text-[10px] tracking-widest text-muted-foreground">· FOCUS · {String(reading.assignment.tactic).toUpperCase()}</span>}
+              {reading.assignment.tactic && (
+                <span className="ml-2 stencil text-[10px] tracking-widest text-muted-foreground">
+                  · FOCUS · {String(reading.assignment.tactic).toUpperCase()}
+                </span>
+              )}
             </div>
-            <div className="text-[12px] text-muted-foreground italic mt-1">{assignmentReason(reading)}</div>
+            <div className="text-[12px] text-muted-foreground italic mt-1">
+              {assignmentReason(reading)}
+            </div>
             <div className="mt-3 flex gap-2">
               <Link
-                to={reading.assignment.district === "feed" ? "/feed" : reading.assignment.district === "mirror" ? "/mirror" : "/drop"}
+                to={
+                  reading.assignment.district === "feed"
+                    ? "/feed"
+                    : reading.assignment.district === "mirror"
+                      ? "/mirror"
+                      : "/drop"
+                }
                 className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 stencil text-[10px] tracking-widest text-primary-foreground"
               >
                 REPORT FOR DUTY

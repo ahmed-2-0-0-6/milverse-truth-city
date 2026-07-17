@@ -20,7 +20,10 @@ export function waveformBars(text: string, count = 36): number[] {
   }
   const bars: number[] = [];
   for (let i = 0; i < count; i++) {
-    h ^= h << 13; h ^= h >>> 17; h ^= h << 5; h >>>= 0;
+    h ^= h << 13;
+    h ^= h >>> 17;
+    h ^= h << 5;
+    h >>>= 0;
     const v = (h % 1000) / 1000;
     // Shape it — small edges, fuller middle
     const shape = 0.35 + 0.65 * Math.sin((i / count) * Math.PI);
@@ -35,12 +38,135 @@ export type SpeakerGender = "male" | "female" | "neutral";
 export function inferGender(name?: string, voiceDesc?: string): SpeakerGender {
   const hay = `${name ?? ""} ${voiceDesc ?? ""}`.toLowerCase();
   // Explicit voice-description signals win.
-  if (/\b(male|man|guy|boy|bhai|uncle|sir|father|dad|brother|husband|boyfriend|him|his|he\b)\b/.test(hay)) return "male";
-  if (/\b(female|woman|girl|lady|aunty|apa|baji|mother|mom|sister|wife|girlfriend|her|she\b)\b/.test(hay)) return "female";
+  if (
+    /\b(male|man|guy|boy|bhai|uncle|sir|father|dad|brother|husband|boyfriend|him|his|he\b)\b/.test(
+      hay,
+    )
+  )
+    return "male";
+  if (
+    /\b(female|woman|girl|lady|aunty|apa|baji|mother|mom|sister|wife|girlfriend|her|she\b)\b/.test(
+      hay,
+    )
+  )
+    return "female";
   // Name-based fallback: common South-Asian + Western male/female first names.
   const first = (name ?? "").trim().split(/\s+/)[0]?.toLowerCase() ?? "";
-  const male = ["ali","ahmed","ahmad","hassan","hussain","usman","bilal","omar","umar","asad","faisal","fahad","imran","kamran","rehan","salman","zain","zayan","hamza","haris","danish","junaid","waqas","adnan","arsalan","tariq","kashif","noman","raza","saad","talha","yasir","abdul","mohammed","muhammad","syed","waleed","adam","noah","liam","james","john","david","michael","daniel","chris","tom","alex","ben","sam","jake","ryan","mark","paul","peter","brian","kevin","steve","richard","robert","thomas","william"];
-  const female = ["ayesha","aisha","fatima","hira","sana","sara","sarah","zara","zainab","mariam","maryam","noor","nida","amna","laiba","iqra","kiran","rabia","saima","nadia","farah","zoya","hina","huma","sadia","tania","mahnoor","rida","emma","olivia","ava","sophia","isabella","mia","charlotte","amelia","lily","chloe","hannah","grace","zoe","anna","kate","laura","emily","sarah","rachel","jessica","ashley"];
+  const male = [
+    "ali",
+    "ahmed",
+    "ahmad",
+    "hassan",
+    "hussain",
+    "usman",
+    "bilal",
+    "omar",
+    "umar",
+    "asad",
+    "faisal",
+    "fahad",
+    "imran",
+    "kamran",
+    "rehan",
+    "salman",
+    "zain",
+    "zayan",
+    "hamza",
+    "haris",
+    "danish",
+    "junaid",
+    "waqas",
+    "adnan",
+    "arsalan",
+    "tariq",
+    "kashif",
+    "noman",
+    "raza",
+    "saad",
+    "talha",
+    "yasir",
+    "abdul",
+    "mohammed",
+    "muhammad",
+    "syed",
+    "waleed",
+    "adam",
+    "noah",
+    "liam",
+    "james",
+    "john",
+    "david",
+    "michael",
+    "daniel",
+    "chris",
+    "tom",
+    "alex",
+    "ben",
+    "sam",
+    "jake",
+    "ryan",
+    "mark",
+    "paul",
+    "peter",
+    "brian",
+    "kevin",
+    "steve",
+    "richard",
+    "robert",
+    "thomas",
+    "william",
+  ];
+  const female = [
+    "ayesha",
+    "aisha",
+    "fatima",
+    "hira",
+    "sana",
+    "sara",
+    "sarah",
+    "zara",
+    "zainab",
+    "mariam",
+    "maryam",
+    "noor",
+    "nida",
+    "amna",
+    "laiba",
+    "iqra",
+    "kiran",
+    "rabia",
+    "saima",
+    "nadia",
+    "farah",
+    "zoya",
+    "hina",
+    "huma",
+    "sadia",
+    "tania",
+    "mahnoor",
+    "rida",
+    "emma",
+    "olivia",
+    "ava",
+    "sophia",
+    "isabella",
+    "mia",
+    "charlotte",
+    "amelia",
+    "lily",
+    "chloe",
+    "hannah",
+    "grace",
+    "zoe",
+    "anna",
+    "kate",
+    "laura",
+    "emily",
+    "sarah",
+    "rachel",
+    "jessica",
+    "ashley",
+  ];
   if (male.includes(first)) return "male";
   if (female.includes(first)) return "female";
   return "neutral";
@@ -52,8 +178,10 @@ function pickVoice(gender: SpeakerGender = "neutral"): SpeechSynthesisVoice | un
   const voices = window.speechSynthesis.getVoices();
   if (!voices.length) return undefined;
 
-  const maleRe = /male|david|daniel|alex|fred|mark|thomas|tom|george|oliver|arthur|ravi|rishi|aaron/i;
-  const femaleRe = /female|samantha|karen|serena|zira|susan|victoria|allison|ava|kate|tessa|veena|rishi|monica|isha/i;
+  const maleRe =
+    /male|david|daniel|alex|fred|mark|thomas|tom|george|oliver|arthur|ravi|rishi|aaron/i;
+  const femaleRe =
+    /female|samantha|karen|serena|zira|susan|victoria|allison|ava|kate|tessa|veena|rishi|monica|isha/i;
   const enRe = /en[-_]?(us|gb|in|au)/i;
 
   if (gender === "male") {
@@ -72,7 +200,9 @@ function pickVoice(gender: SpeakerGender = "neutral"): SpeechSynthesisVoice | un
       voices[0]
     );
   }
-  return voices.find((v) => enRe.test(v.lang)) || voices.find((v) => /en/i.test(v.lang)) || voices[0];
+  return (
+    voices.find((v) => enRe.test(v.lang)) || voices.find((v) => /en/i.test(v.lang)) || voices[0]
+  );
 }
 
 export interface PlaybackHandle {
@@ -138,12 +268,21 @@ export function playVoiceNote(
       const b = words.slice(splitAt).join(" ");
       const u1 = new SpeechSynthesisUtterance(a);
       const u2 = new SpeechSynthesisUtterance(b);
-      if (v) { u1.voice = v; u2.voice = v; }
-      u1.rate = 1.0; u2.rate = 1.0;
-      if (isMuted()) { u1.volume = 0; u2.volume = 0; }
+      if (v) {
+        u1.voice = v;
+        u2.voice = v;
+      }
+      u1.rate = 1.0;
+      u2.rate = 1.0;
+      if (isMuted()) {
+        u1.volume = 0;
+        u2.volume = 0;
+      }
       u1.onend = () => {
         if (cancelled) return;
-        setTimeout(() => { if (!cancelled) synth.speak(u2); }, 900);
+        setTimeout(() => {
+          if (!cancelled) synth.speak(u2);
+        }, 900);
       };
       synth.speak(u1);
       return;
@@ -160,8 +299,13 @@ export function playVoiceNote(
       parts.forEach((chunk, i) => {
         const u = new SpeechSynthesisUtterance(chunk);
         if (v) u.voice = v;
-        if (i === 1) { u.rate = 0.72; u.pitch = 0.55; }
-        else { u.rate = 1.0; u.pitch = 1.0; }
+        if (i === 1) {
+          u.rate = 0.72;
+          u.pitch = 0.55;
+        } else {
+          u.rate = 1.0;
+          u.pitch = 1.0;
+        }
         if (isMuted()) u.volume = 0;
         synth.speak(u);
       });
@@ -171,7 +315,8 @@ export function playVoiceNote(
     // Default utterance for glitch / cut / clean
     const u = new SpeechSynthesisUtterance(text);
     if (v) u.voice = v;
-    u.rate = 1.0; u.pitch = 1.0;
+    u.rate = 1.0;
+    u.pitch = 1.0;
     if (isMuted()) u.volume = 0;
     synth.speak(u);
   };
@@ -181,11 +326,15 @@ export function playVoiceNote(
   // Schedule audio-only artifacts (glitch/cut) via WebAudio at artifactPos.
   const artifactMs = duration * 1000 * artifactPos;
   if (artifact === "glitch") {
-    setTimeout(() => { if (!cancelled) glitch(50 + Math.random() * 40, 0.05); }, artifactMs);
+    setTimeout(() => {
+      if (!cancelled) glitch(50 + Math.random() * 40, 0.05);
+    }, artifactMs);
   } else if (artifact === "cut") {
     const amb = startAmbience();
     if (amb) {
-      setTimeout(() => { if (!cancelled) amb.stop(); }, artifactMs);
+      setTimeout(() => {
+        if (!cancelled) amb.stop();
+      }, artifactMs);
       // Also stop when playback ends.
       setTimeout(() => amb.stop(), (duration + 0.5) * 1000);
     }

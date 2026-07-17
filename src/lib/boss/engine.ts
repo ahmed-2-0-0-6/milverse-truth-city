@@ -8,7 +8,7 @@ export interface BossState {
   variantId: string;
   phaseIdx: number;
   turnCount: number;
-  factChecksUsed: string[];    // ids
+  factChecksUsed: string[]; // ids
   movesPlayed: ProtocolMove[]; // in order
   pendingFollowup?: ProtocolMove;
   ended: boolean;
@@ -87,44 +87,90 @@ export function resolveVerdict(
   // COMPLY: transacted. Loss if scam, win only if REAL variant AND at least one protocol move played first.
   if (verdict === "COMPLY_NOW") {
     if (variant.truth === "REAL" && state.movesPlayed.length > 0) {
-      return { kind: "WIN", badge: boss.badge.label, wasCorrectVerdict: true, usedMoves: state.movesPlayed };
+      return {
+        kind: "WIN",
+        badge: boss.badge.label,
+        wasCorrectVerdict: true,
+        usedMoves: state.movesPlayed,
+      };
     }
-    return { kind: "LOSS_TRANSACTED", wasCorrectVerdict: false, reason: "You transacted on an unverified channel." };
+    return {
+      kind: "LOSS_TRANSACTED",
+      wasCorrectVerdict: false,
+      reason: "You transacted on an unverified channel.",
+    };
   }
 
   // REFUSE_REPORT: blank refuse without protocol. Loss on REAL variant (false alarm).
   if (verdict === "REFUSE_REPORT") {
     if (variant.truth === "REAL") {
-      return { kind: "LOSS_FALSE_ALARM", wasCorrectVerdict: false, reason: "This was a REAL request. Blank refusal cost you. Protocol still wins — HOLD and verify." };
+      return {
+        kind: "LOSS_FALSE_ALARM",
+        wasCorrectVerdict: false,
+        reason:
+          "This was a REAL request. Blank refusal cost you. Protocol still wins — HOLD and verify.",
+      };
     }
     // On SCAM: refuse-and-report is safe but not full win — the doctrine wants HOLD.
     // We treat as PARANOIA loss if the player fact-checked without playing any winning move.
-    const playedWin = state.movesPlayed.some((mv) => variant.moves.find((m) => m.id === mv)?.outcome === "WIN");
+    const playedWin = state.movesPlayed.some(
+      (mv) => variant.moves.find((m) => m.id === mv)?.outcome === "WIN",
+    );
     if (!playedWin && state.factChecksUsed.length >= 2) {
-      return { kind: "LOSS_PARANOIA", wasCorrectVerdict: false, reason: "You tried to fact-check your way out. Every check confirmed the story. That was the trap." };
+      return {
+        kind: "LOSS_PARANOIA",
+        wasCorrectVerdict: false,
+        reason:
+          "You tried to fact-check your way out. Every check confirmed the story. That was the trap.",
+      };
     }
-    return { kind: "WIN", badge: boss.badge.label, wasCorrectVerdict: true, usedMoves: state.movesPlayed };
+    return {
+      kind: "WIN",
+      badge: boss.badge.label,
+      wasCorrectVerdict: true,
+      usedMoves: state.movesPlayed,
+    };
   }
 
   // HOLD_UNVERIFIED: the doctrine answer. Wins if the player also played at least one WIN-outcome move for this variant.
   if (verdict === "HOLD_UNVERIFIED") {
-    const winMoves = state.movesPlayed.filter((mv) => variant.moves.find((m) => m.id === mv)?.outcome === "WIN");
+    const winMoves = state.movesPlayed.filter(
+      (mv) => variant.moves.find((m) => m.id === mv)?.outcome === "WIN",
+    );
     if (winMoves.length > 0) {
-      return { kind: "WIN", badge: boss.badge.label, wasCorrectVerdict: true, usedMoves: state.movesPlayed };
+      return {
+        kind: "WIN",
+        badge: boss.badge.label,
+        wasCorrectVerdict: true,
+        usedMoves: state.movesPlayed,
+      };
     }
     // HOLD alone against a SCAM = safe, count as win.
     if (variant.truth === "SCAM") {
-      return { kind: "WIN", badge: boss.badge.label, wasCorrectVerdict: true, usedMoves: state.movesPlayed };
+      return {
+        kind: "WIN",
+        badge: boss.badge.label,
+        wasCorrectVerdict: true,
+        usedMoves: state.movesPlayed,
+      };
     }
     // HOLD alone against REAL variant = false alarm — you never verified.
-    return { kind: "LOSS_FALSE_ALARM", wasCorrectVerdict: false, reason: "This was a REAL request. HOLD is right — but you never followed through with verification." };
+    return {
+      kind: "LOSS_FALSE_ALARM",
+      wasCorrectVerdict: false,
+      reason:
+        "This was a REAL request. HOLD is right — but you never followed through with verification.",
+    };
   }
 
   return { kind: "LOSS_TRANSACTED", wasCorrectVerdict: false, reason: "Unrecognised verdict." };
 }
 
 /** Which line the boss says NOW based on the current phase. */
-export function currentPressureLine(state: BossState, boss: BossConfig): { phase: string; line: string } {
+export function currentPressureLine(
+  state: BossState,
+  boss: BossConfig,
+): { phase: string; line: string } {
   const phase = boss.phases[Math.min(state.phaseIdx, boss.phases.length - 1)];
   const line = phase.scriptedLines[state.turnCount % phase.scriptedLines.length];
   return { phase: phase.label, line };

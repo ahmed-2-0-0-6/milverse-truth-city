@@ -36,9 +36,7 @@ const TOOLS = [
       "For a claimed public account: search the person on the platform's real verified handle — not the one in the link you got.",
       "For a government claim: go to the .gov domain directly by typing it, not clicking through.",
     ],
-    links: [
-      { label: "Wikipedia (search any outlet)", url: "https://en.wikipedia.org" },
-    ],
+    links: [{ label: "Wikipedia (search any outlet)", url: "https://en.wikipedia.org" }],
   },
   {
     Icon: Layers,
@@ -65,9 +63,7 @@ const TOOLS = [
       "For an image: search on Google Images and sort by date to find the earliest appearance.",
       "For a suspicious URL: paste it into web.archive.org to see when it first existed.",
     ],
-    links: [
-      { label: "Wayback Machine", url: "https://web.archive.org" },
-    ],
+    links: [{ label: "Wayback Machine", url: "https://web.archive.org" }],
   },
 ];
 
@@ -76,14 +72,24 @@ function TakeItOutside() {
     <div className="min-h-screen grain">
       <TopBar />
       <main className="mx-auto max-w-3xl px-4 py-10">
-        <Link to="/manual" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">← FIELD MANUAL</Link>
+        <Link
+          to="/manual"
+          className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
+        >
+          ← FIELD MANUAL
+        </Link>
         <div className="mt-4">
           <div className="font-mono text-xs tracking-[0.3em] text-primary">TAKE IT OUTSIDE</div>
-          <h1 className="mt-2 text-4xl sm:text-5xl font-black tracking-tight" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
-            THE TOOLS LIVE IN YOUR POCKET. <span className="text-primary">MILVERSE TRAINS YOUR HAND.</span>
+          <h1
+            className="mt-2 text-4xl sm:text-5xl font-black tracking-tight"
+            style={{ fontFamily: '"Bebas Neue", sans-serif' }}
+          >
+            THE TOOLS LIVE IN YOUR POCKET.{" "}
+            <span className="text-primary">MILVERSE TRAINS YOUR HAND.</span>
           </h1>
           <p className="mt-3 text-muted-foreground">
-            These are the real verification tools the Toolbelt inside cases is teaching you to use. Learn one this week.
+            These are the real verification tools the Toolbelt inside cases is teaching you to use.
+            Learn one this week.
           </p>
         </div>
 
@@ -121,8 +127,9 @@ function TakeItOutside() {
         </div>
 
         <div className="mt-8 rounded-md border border-primary/30 bg-primary/5 p-4 text-sm">
-          <b>Not a truth-checker.</b> MILVERSE will never let you paste in a message and be told whether it's true.
-          That's the wrong instinct to build. Instead, the site trains YOU to reach for these tools — every case, every time.
+          <b>Not a truth-checker.</b> MILVERSE will never let you paste in a message and be told
+          whether it's true. That's the wrong instinct to build. Instead, the site trains YOU to
+          reach for these tools — every case, every time.
         </div>
       </main>
     </div>

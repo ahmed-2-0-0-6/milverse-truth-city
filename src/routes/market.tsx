@@ -5,7 +5,11 @@ export const Route = createFileRoute("/market")({
   head: () => ({
     meta: [
       { title: "The Market — Blueprint — MILVERSE" },
-      { name: "description", content: "MILVERSE district blueprint: spotting scam ads, fake shops, and too-good-to-be-true deals. Vote on what opens next." },
+      {
+        name: "description",
+        content:
+          "MILVERSE district blueprint: spotting scam ads, fake shops, and too-good-to-be-true deals. Vote on what opens next.",
+      },
     ],
   }),
   component: () => (

@@ -30,7 +30,9 @@ function load(): PaperStore {
     const raw = localStorage.getItem(KEY);
     if (!raw) return { editions: {} };
     return { editions: {}, ...JSON.parse(raw) } as PaperStore;
-  } catch { return { editions: {} }; }
+  } catch {
+    return { editions: {} };
+  }
 }
 function save(s: PaperStore) {
   if (typeof window === "undefined") return;
@@ -80,7 +82,13 @@ export function commitLeadPlay(input: {
   verdict: "LEGIT" | "SCAM" | "MISLEADING";
   truth: "LEGIT" | "SCAM" | "MISLEADING";
   stake: number;
-}): { correct: boolean; delta: number; newTrust: number; newStreak: number; record: PaperEditionRecord } | null {
+}): {
+  correct: boolean;
+  delta: number;
+  newTrust: number;
+  newStreak: number;
+  record: PaperEditionRecord;
+} | null {
   const s = load();
   const r = ensure(s, input.editionNumber);
   if (r.playedLeadAt) return null;
@@ -102,17 +110,20 @@ export function commitLeadPlay(input: {
     newStreak = p.lastDailyDate === yesterday ? newStreak + 1 : 1;
     p.dailyStreak = newStreak;
     p.lastDailyDate = today;
-    p.dailyPlays = [...(p.dailyPlays ?? []), {
-      dateKey: today,
-      caseId: input.caseId,
-      verdict: input.verdict,
-      truth: input.truth,
-      correct,
-      stake: clampedStake,
-      delta,
-      probesUsed: 0,
-      ts: Date.now(),
-    }];
+    p.dailyPlays = [
+      ...(p.dailyPlays ?? []),
+      {
+        dateKey: today,
+        caseId: input.caseId,
+        verdict: input.verdict,
+        truth: input.truth,
+        correct,
+        stake: clampedStake,
+        delta,
+        probesUsed: 0,
+        ts: Date.now(),
+      },
+    ];
   }
 
   p.trust = newTrust;

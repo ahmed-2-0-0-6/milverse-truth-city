@@ -8,15 +8,15 @@ import { track } from "@/lib/telemetry";
 import { Copy, Download, Share2, Check } from "lucide-react";
 
 export interface ReceiptData {
-  dropNumber: number;         // e.g. days since epoch UTC+5 mod something, or just streak-index
+  dropNumber: number; // e.g. days since epoch UTC+5 mod something, or just streak-index
   dateKey: string;
-  probesUsed: number;         // 0..2
+  probesUsed: number; // 0..2
   correct: boolean;
   outcome: "correct" | "missed_scam" | "false_alarm";
   stake: number;
-  delta: number;              // +N or -N
+  delta: number; // +N or -N
   streak: number;
-  sharpness: number;          // "sharper than X% of the city"
+  sharpness: number; // "sharper than X% of the city"
   siteUrl: string;
 }
 
@@ -36,13 +36,17 @@ export function receiptEmojiRow(d: ReceiptData): string {
 
 export function receiptText(d: ReceiptData): string {
   const emoji = receiptEmojiRow(d);
-  const result = d.correct ? `staked ${d.stake} → won ${d.delta}` : `staked ${d.stake} → lost ${Math.abs(d.delta)}`;
+  const result = d.correct
+    ? `staked ${d.stake} → won ${d.delta}`
+    : `staked ${d.stake} → lost ${Math.abs(d.delta)}`;
   return `MILVERSE #${d.dropNumber} ${emoji} · ${result} · ${d.streak} days on watch · sharper than ${d.sharpness}% of the city\n${d.siteUrl}`;
 }
 
 function drawReceipt(canvas: HTMLCanvasElement, d: ReceiptData) {
-  const W = 1080, H = 1080;
-  canvas.width = W; canvas.height = H;
+  const W = 1080,
+    H = 1080;
+  canvas.width = W;
+  canvas.height = H;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
@@ -55,7 +59,10 @@ function drawReceipt(canvas: HTMLCanvasElement, d: ReceiptData) {
 
   // Card
   const pad = 60;
-  const cardX = pad, cardY = pad, cardW = W - pad * 2, cardH = H - pad * 2;
+  const cardX = pad,
+    cardY = pad,
+    cardW = W - pad * 2,
+    cardH = H - pad * 2;
   ctx.fillStyle = "#141414";
   ctx.strokeStyle = "#f5b942";
   ctx.lineWidth = 3;
@@ -149,7 +156,9 @@ export function ReceiptCard({ data }: { data: ReceiptData }) {
       setCopied(true);
       track("share_copy", { payload: { surface: "receipt" } });
       setTimeout(() => setCopied(false), 1400);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   };
 
   const download = () => {
@@ -169,13 +178,24 @@ export function ReceiptCard({ data }: { data: ReceiptData }) {
   const share = async () => {
     const c = canvasRef.current;
     if (!c) return;
-    if (!navigator.share) { copy(); return; }
+    if (!navigator.share) {
+      copy();
+      return;
+    }
     try {
       const blob = await new Promise<Blob | null>((res) => c.toBlob(res, "image/png"));
-      const files = blob ? [new File([blob], `milverse-${data.dateKey}.png`, { type: "image/png" })] : undefined;
-      const canShareFiles = files && (navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean }).canShare?.({ files });
+      const files = blob
+        ? [new File([blob], `milverse-${data.dateKey}.png`, { type: "image/png" })]
+        : undefined;
+      const canShareFiles =
+        files &&
+        (navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean }).canShare?.({
+          files,
+        });
       await navigator.share(canShareFiles ? { text, files } : { text });
-    } catch { /* user cancelled */ }
+    } catch {
+      /* user cancelled */
+    }
   };
 
   return (
@@ -183,20 +203,33 @@ export function ReceiptCard({ data }: { data: ReceiptData }) {
       <div className="rounded-sm border border-primary/40 bg-black/60 overflow-hidden">
         <canvas ref={canvasRef} className="block w-full h-auto" />
       </div>
-      <pre className="whitespace-pre-wrap break-words rounded-sm border border-border bg-card p-3 text-xs text-muted-foreground font-mono">{text}</pre>
+      <pre className="whitespace-pre-wrap break-words rounded-sm border border-border bg-card p-3 text-xs text-muted-foreground font-mono">
+        {text}
+      </pre>
       <div className="flex flex-wrap gap-2">
-        <button onClick={copy} className="inline-flex items-center gap-2 rounded-sm border border-primary/50 bg-primary/10 px-3 py-2 stencil text-[10px] text-primary hover:bg-primary/20">
+        <button
+          onClick={copy}
+          className="inline-flex items-center gap-2 rounded-sm border border-primary/50 bg-primary/10 px-3 py-2 stencil text-[10px] text-primary hover:bg-primary/20"
+        >
           {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
           {copied ? "COPIED" : "COPY LINE"}
         </button>
-        <button onClick={download} className="inline-flex items-center gap-2 rounded-sm border border-border px-3 py-2 stencil text-[10px] text-muted-foreground hover:text-foreground">
+        <button
+          onClick={download}
+          className="inline-flex items-center gap-2 rounded-sm border border-border px-3 py-2 stencil text-[10px] text-muted-foreground hover:text-foreground"
+        >
           <Download className="h-3.5 w-3.5" /> DOWNLOAD PNG
         </button>
-        <button onClick={share} className="inline-flex items-center gap-2 rounded-sm border border-border px-3 py-2 stencil text-[10px] text-muted-foreground hover:text-foreground">
+        <button
+          onClick={share}
+          className="inline-flex items-center gap-2 rounded-sm border border-border px-3 py-2 stencil text-[10px] text-muted-foreground hover:text-foreground"
+        >
           <Share2 className="h-3.5 w-3.5" /> SHARE
         </button>
       </div>
-      <div className="text-[10px] text-muted-foreground/70 stencil">SPOILER-SAFE · CONTAINS NO CASE TITLE, VERDICT, OR ANSWER</div>
+      <div className="text-[10px] text-muted-foreground/70 stencil">
+        SPOILER-SAFE · CONTAINS NO CASE TITLE, VERDICT, OR ANSWER
+      </div>
     </div>
   );
 }

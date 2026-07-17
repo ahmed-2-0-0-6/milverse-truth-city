@@ -23,13 +23,35 @@ export function initFeedState(): FeedState {
 }
 
 const RUDE_WORDS = [
-  "stupid", "idiot", "ignorant", "boomer", "gullible", "always fall",
-  "wtf", "lol no", "seriously?", "dumb", "how are you this",
+  "stupid",
+  "idiot",
+  "ignorant",
+  "boomer",
+  "gullible",
+  "always fall",
+  "wtf",
+  "lol no",
+  "seriously?",
+  "dumb",
+  "how are you this",
 ];
 const RESPECTFUL_WORDS = [
-  "i checked", "i love", "thank you", "i know you", "understand",
-  "❤", "🙏", "thoda", "actually checked", "khala", "chacha", "uncle",
-  "please", "let's", "we can", "together",
+  "i checked",
+  "i love",
+  "thank you",
+  "i know you",
+  "understand",
+  "❤",
+  "🙏",
+  "thoda",
+  "actually checked",
+  "khala",
+  "chacha",
+  "uncle",
+  "please",
+  "let's",
+  "we can",
+  "together",
 ];
 
 function normalize(s: string) {
@@ -123,9 +145,10 @@ export function gradeVerdict(
     return {
       result: "correct",
       points: 100 + state.actionsUsed.length * 5,
-      headline: truth === "UNVERIFIED"
-        ? "You held the honest 'we cannot know' — and kept the relationship."
-        : "You corrected them — and kept the relationship.",
+      headline:
+        truth === "UNVERIFIED"
+          ? "You held the honest 'we cannot know' — and kept the relationship."
+          : "You corrected them — and kept the relationship.",
       detail:
         "This is what real media literacy looks like. Facts don't spread on their own — trusted people carry them. You stayed one of those trusted people.",
     };

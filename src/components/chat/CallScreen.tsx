@@ -14,8 +14,14 @@ interface Props {
 }
 
 export function CallScreen({
-  open, contactName, contactNumber, resultLine,
-  direction = "out", onEnd, onAccept, reducedMotion,
+  open,
+  contactName,
+  contactNumber,
+  resultLine,
+  direction = "out",
+  onEnd,
+  onAccept,
+  reducedMotion,
 }: Props) {
   const [ringing, setRinging] = useState(true);
   const [seconds, setSeconds] = useState(0);
@@ -37,8 +43,15 @@ export function CallScreen({
   }, [open, ringing]);
 
   if (!open) return null;
-  const initials = contactName.split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
-  const mm = Math.floor(seconds / 60).toString().padStart(2, "0");
+  const initials = contactName
+    .split(/\s+/)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+  const mm = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, "0");
   const ss = (seconds % 60).toString().padStart(2, "0");
 
   return (
@@ -58,9 +71,7 @@ export function CallScreen({
         {contactNumber && (
           <div className="mt-1 text-sm font-mono text-white/60 tracking-wider">{contactNumber}</div>
         )}
-        <div className="mt-2 text-xs text-white/50">
-          {ringing ? "…" : `${mm}:${ss}`}
-        </div>
+        <div className="mt-2 text-xs text-white/50">{ringing ? "…" : `${mm}:${ss}`}</div>
       </div>
 
       <div className="relative flex items-center justify-center">
@@ -70,7 +81,9 @@ export function CallScreen({
             <span className="absolute h-56 w-56 rounded-full bg-primary/5 animate-pulse" />
           </>
         )}
-        <div className={`flex h-32 w-32 items-center justify-center rounded-full border border-primary/40 bg-primary/15 text-primary text-2xl font-bold font-mono ${reducedMotion ? "" : ringing ? "" : ""}`}>
+        <div
+          className={`flex h-32 w-32 items-center justify-center rounded-full border border-primary/40 bg-primary/15 text-primary text-2xl font-bold font-mono ${reducedMotion ? "" : ringing ? "" : ""}`}
+        >
           {initials}
         </div>
       </div>
@@ -84,7 +97,10 @@ export function CallScreen({
       <div className="flex items-center gap-6">
         {direction === "in" && onAccept && ringing && (
           <button
-            onClick={() => { setRinging(false); onAccept(); }}
+            onClick={() => {
+              setRinging(false);
+              onAccept();
+            }}
             className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-xl shadow-emerald-500/30 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300/50 transition-colors"
             aria-label="Accept"
           >
@@ -96,7 +112,11 @@ export function CallScreen({
           className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 hover:bg-red-400 text-white shadow-xl shadow-red-500/30 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-300/50 transition-colors"
           aria-label="End call"
         >
-          {ringing && direction === "out" ? <PhoneOff className="h-6 w-6" /> : <Phone className="h-6 w-6 rotate-[135deg]" />}
+          {ringing && direction === "out" ? (
+            <PhoneOff className="h-6 w-6" />
+          ) : (
+            <Phone className="h-6 w-6 rotate-[135deg]" />
+          )}
         </button>
       </div>
     </div>

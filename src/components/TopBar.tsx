@@ -1,7 +1,14 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Volume2, VolumeX, BookOpen, Menu, X } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription, SheetClose } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+  SheetDescription,
+  SheetClose,
+} from "@/components/ui/sheet";
 import {
   loadProfile,
   calibrationLabel,
@@ -78,10 +85,13 @@ export function TopBar() {
   const xp = computeXp(profile, manualUnlocks, profile?.publishedCount ?? 0);
   const noirRank = rankFromXp(xp);
   const toneClass =
-    cal.tone === "good" ? "text-primary border-primary/50"
-    : cal.tone === "warn" ? "text-caution border-caution/50"
-    : cal.tone === "bad" ? "text-destructive border-destructive/50"
-    : "text-muted-foreground border-border";
+    cal.tone === "good"
+      ? "text-primary border-primary/50"
+      : cal.tone === "warn"
+        ? "text-caution border-caution/50"
+        : cal.tone === "bad"
+          ? "text-destructive border-destructive/50"
+          : "text-muted-foreground border-border";
 
   return (
     <header className="sticky top-0 z-50 border-b-2 border-primary/30 bg-background/90 backdrop-blur">
@@ -101,22 +111,24 @@ export function TopBar() {
 
         {/* Desktop primary nav */}
         <nav aria-label="Primary" className="hidden lg:flex items-center justify-center gap-1">
-          {NAV_GROUPS.flatMap((g) => g.items).filter((i) =>
-            ["/", "/first-phone", "/educators", "/family", "/visit"].includes(i.to)
-          ).map((item) => {
-            const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`stencil text-[10px] tracking-widest rounded px-2.5 py-1.5 transition-colors ${
-                  active ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                }`}
-              >
-                {item.label.toUpperCase()}
-              </Link>
-            );
-          })}
+          {NAV_GROUPS.flatMap((g) => g.items)
+            .filter((i) => ["/", "/first-phone", "/educators", "/family", "/visit"].includes(i.to))
+            .map((item) => {
+              const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`stencil text-[10px] tracking-widest rounded px-2.5 py-1.5 transition-colors ${
+                    active
+                      ? "text-primary bg-primary/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  }`}
+                >
+                  {item.label.toUpperCase()}
+                </Link>
+              );
+            })}
           <button
             onClick={() => setNavOpen(true)}
             className="stencil text-[10px] tracking-widest rounded px-2.5 py-1.5 text-muted-foreground hover:text-foreground hover:bg-accent inline-flex items-center gap-1"
@@ -143,7 +155,10 @@ export function TopBar() {
           <VisualQualityToggle />
           <AccessPanel />
           <button
-            onClick={() => { setMuted(!muted); setLocalMuted(!muted); }}
+            onClick={() => {
+              setMuted(!muted);
+              setLocalMuted(!muted);
+            }}
             className="rounded border border-border p-2 text-muted-foreground transition hover:text-foreground hover:bg-accent"
             aria-label={muted ? "Unmute sound" : "Mute sound"}
             title={muted ? "Unmute sound" : "Mute sound"}
@@ -158,7 +173,10 @@ export function TopBar() {
             <span className="opacity-70">{noirRank.current.code}</span>
             <span className="hidden md:inline text-foreground/90">{noirRank.current.name}</span>
             <span className="hidden lg:inline-block h-1 w-8 overflow-hidden rounded-full bg-muted">
-              <span className="block h-full bg-primary" style={{ width: `${Math.round(noirRank.progress * 100)}%` }} />
+              <span
+                className="block h-full bg-primary"
+                style={{ width: `${Math.round(noirRank.progress * 100)}%` }}
+              />
             </span>
             <span className="hidden lg:inline text-muted-foreground">·</span>
             <span className="hidden lg:inline opacity-80">{cal.label.toUpperCase()}</span>
@@ -177,7 +195,10 @@ export function TopBar() {
             <SheetContent side="right" className="w-full sm:max-w-sm overflow-y-auto p-0">
               <div className="flex items-center justify-between border-b border-border px-4 py-3">
                 <SheetTitle className="stencil text-sm text-foreground">MILVERSE</SheetTitle>
-                <SheetClose className="rounded p-1 text-muted-foreground hover:text-foreground hover:bg-accent" aria-label="Close menu">
+                <SheetClose
+                  className="rounded p-1 text-muted-foreground hover:text-foreground hover:bg-accent"
+                  aria-label="Close menu"
+                >
                   <X className="h-4 w-4" />
                 </SheetClose>
               </div>
@@ -190,7 +211,8 @@ export function TopBar() {
                     </div>
                     <ul className="flex flex-col">
                       {group.items.map((item) => {
-                        const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+                        const active =
+                          item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
                         return (
                           <li key={item.to}>
                             <SheetClose asChild>
@@ -204,7 +226,9 @@ export function TopBar() {
                               >
                                 <span className="text-sm font-medium">{item.label}</span>
                                 {item.desc && (
-                                  <span className="text-[11px] text-muted-foreground">{item.desc}</span>
+                                  <span className="text-[11px] text-muted-foreground">
+                                    {item.desc}
+                                  </span>
                                 )}
                               </Link>
                             </SheetClose>
@@ -216,12 +240,18 @@ export function TopBar() {
                 ))}
                 <div className="border-t border-border px-3 pt-3 mt-2 flex flex-col gap-2">
                   <SheetClose asChild>
-                    <Link to="/profile" className="stencil text-[11px] text-muted-foreground hover:text-foreground">
+                    <Link
+                      to="/profile"
+                      className="stencil text-[11px] text-muted-foreground hover:text-foreground"
+                    >
                       PROFILE · {noirRank.current.name} · {xp} XP
                     </Link>
                   </SheetClose>
                   <SheetClose asChild>
-                    <Link to="/pilot" className="stencil text-[11px] text-muted-foreground hover:text-foreground">
+                    <Link
+                      to="/pilot"
+                      className="stencil text-[11px] text-muted-foreground hover:text-foreground"
+                    >
                       PILOT ACCESS
                     </Link>
                   </SheetClose>

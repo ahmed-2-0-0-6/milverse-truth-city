@@ -48,11 +48,19 @@ export function DailyBeacon({ compact = false }: { compact?: boolean }) {
         title="Today's Forward"
       >
         <span className="relative h-2 w-2">
-          <span className={`absolute inset-0 rounded-full ${played ? "bg-muted-foreground" : "bg-primary animate-ping"}`} />
-          <span className={`absolute inset-0 rounded-full ${played ? "bg-muted-foreground" : "bg-primary"}`} />
+          <span
+            className={`absolute inset-0 rounded-full ${played ? "bg-muted-foreground" : "bg-primary animate-ping"}`}
+          />
+          <span
+            className={`absolute inset-0 rounded-full ${played ? "bg-muted-foreground" : "bg-primary"}`}
+          />
         </span>
         <span>{played ? "COME BACK" : "TODAY'S FORWARD"}</span>
-        {played && <span className="text-muted-foreground normal-case tracking-normal">· {hhmmss(remain)}</span>}
+        {played && (
+          <span className="text-muted-foreground normal-case tracking-normal">
+            · {hhmmss(remain)}
+          </span>
+        )}
       </Link>
     );
   }
@@ -63,10 +71,13 @@ export function DailyBeacon({ compact = false }: { compact?: boolean }) {
       className="group relative block overflow-hidden rounded-sm border border-primary/60 bg-black/40 backdrop-blur px-5 py-4 hover:border-primary transition"
       style={{ boxShadow: "0 0 40px oklch(0.82 0.16 85 / 0.25)" }}
     >
-      <div className="absolute inset-0 pointer-events-none opacity-40" style={{
-        backgroundImage: "radial-gradient(rgba(245,185,66,0.2) 1px, transparent 1px)",
-        backgroundSize: "3px 3px",
-      }} />
+      <div
+        className="absolute inset-0 pointer-events-none opacity-40"
+        style={{
+          backgroundImage: "radial-gradient(rgba(245,185,66,0.2) 1px, transparent 1px)",
+          backgroundSize: "3px 3px",
+        }}
+      />
       <div className="relative flex items-center gap-4">
         <div className="relative h-10 w-10 shrink-0">
           {!played && <span className="absolute inset-0 rounded-full bg-primary/40 animate-ping" />}
@@ -76,16 +87,30 @@ export function DailyBeacon({ compact = false }: { compact?: boolean }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="stencil text-[10px] text-primary/80 flex items-center gap-2">
-            {friday && <span className="rounded-sm bg-primary/20 px-1.5 py-0.5 text-primary">DESIGNER FRIDAY</span>}
+            {friday && (
+              <span className="rounded-sm bg-primary/20 px-1.5 py-0.5 text-primary">
+                DESIGNER FRIDAY
+              </span>
+            )}
             AAJ KA FORWARD · {dateKey}
           </div>
-          <div className="mt-1 text-xl sm:text-2xl font-black text-white leading-tight" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
+          <div
+            className="mt-1 text-xl sm:text-2xl font-black text-white leading-tight"
+            style={{ fontFamily: '"Bebas Neue", sans-serif' }}
+          >
             {played ? "THE CITY HAS MOVED ON." : "TODAY'S FORWARD IS OPEN."}
           </div>
           <div className="mt-0.5 text-xs text-white/60">
-            {played
-              ? <>Next drop in <span className="text-primary tabular-nums">{hhmmss(remain)}</span>. Yesterday viewable on the drop page.</>
-              : <>One case. One wager. One receipt. <span className="text-primary">Play now →</span></>}
+            {played ? (
+              <>
+                Next drop in <span className="text-primary tabular-nums">{hhmmss(remain)}</span>.
+                Yesterday viewable on the drop page.
+              </>
+            ) : (
+              <>
+                One case. One wager. One receipt. <span className="text-primary">Play now →</span>
+              </>
+            )}
           </div>
         </div>
         {streak > 0 && (

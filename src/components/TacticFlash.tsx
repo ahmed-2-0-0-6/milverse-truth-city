@@ -23,7 +23,8 @@ export function TacticFlash({ tacticId, onDone, duration = 1600 }: Props) {
     // Always unlock — the player has demonstrably encountered the tactic.
     unlockTactic(tacticId);
 
-    const reduce = typeof window !== "undefined" &&
+    const reduce =
+      typeof window !== "undefined" &&
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     if (mode !== "cinematic" || reduce) {
       onDone?.();
@@ -55,7 +56,10 @@ export function TacticFlash({ tacticId, onDone, duration = 1600 }: Props) {
         </div>
         <div
           className="text-2xl sm:text-3xl font-black tracking-tight text-primary"
-          style={{ fontFamily: '"Bebas Neue", sans-serif', textShadow: "0 0 18px rgba(34,211,238,0.5)" }}
+          style={{
+            fontFamily: '"Bebas Neue", sans-serif',
+            textShadow: "0 0 18px rgba(34,211,238,0.5)",
+          }}
         >
           {entry.name}
         </div>

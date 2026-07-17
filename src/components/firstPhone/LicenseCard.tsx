@@ -4,7 +4,9 @@ import { LESSONS } from "@/lib/firstPhone/lessons";
 import { describeTactic } from "@/lib/firstPhone/tacticMap";
 import { Download, Printer } from "lucide-react";
 
-interface Props { onClose?: () => void }
+interface Props {
+  onClose?: () => void;
+}
 
 /** Random per-print issue mark. NOT persisted anywhere. Regenerates every mount. */
 function generateIssueMark(): string {
@@ -21,19 +23,24 @@ export function LicenseCard({ onClose }: Props) {
   const issueMark = useMemo(() => generateIssueMark(), []);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => { render(); }, [name, issueMark]);
+  useEffect(() => {
+    render();
+  }, [name, issueMark]);
 
   function render() {
     const c = canvasRef.current;
     if (!c) return;
-    const W = 1200, H = 760;
-    c.width = W; c.height = H;
+    const W = 1200,
+      H = 760;
+    c.width = W;
+    c.height = H;
     const ctx = c.getContext("2d")!;
     // Background
     const bg = ctx.createLinearGradient(0, 0, W, H);
     bg.addColorStop(0, "#0b1220");
     bg.addColorStop(1, "#131c2e");
-    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
     // Guilloché
     ctx.strokeStyle = "rgba(34,211,238,0.06)";
     for (let i = 0; i < 60; i++) {
@@ -42,32 +49,42 @@ export function LicenseCard({ onClose }: Props) {
       ctx.stroke();
     }
     // Border
-    ctx.strokeStyle = "rgba(34,211,238,0.5)"; ctx.lineWidth = 3;
+    ctx.strokeStyle = "rgba(34,211,238,0.5)";
+    ctx.lineWidth = 3;
     ctx.strokeRect(24, 24, W - 48, H - 48);
-    ctx.strokeStyle = "rgba(34,211,238,0.9)"; ctx.lineWidth = 2;
+    ctx.strokeStyle = "rgba(34,211,238,0.9)";
+    ctx.lineWidth = 2;
     ctx.strokeRect(40, 40, W - 80, H - 80);
     // Header
-    ctx.fillStyle = "#22d3ee"; ctx.font = "600 20px ui-monospace, Menlo, monospace";
+    ctx.fillStyle = "#22d3ee";
+    ctx.font = "600 20px ui-monospace, Menlo, monospace";
     ctx.fillText("MILVERSE · CITY OF SIGNALS", 72, 96);
-    ctx.fillStyle = "#94a3b8"; ctx.font = "14px ui-monospace, Menlo, monospace";
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "14px ui-monospace, Menlo, monospace";
     ctx.fillText("FIRST PHONE LICENSE — DEPARTMENT OF DIGITAL TRUST", 72, 122);
     // Title
-    ctx.fillStyle = "#ffffff"; ctx.font = "900 82px Impact, 'Bebas Neue', sans-serif";
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 82px Impact, 'Bebas Neue', sans-serif";
     ctx.fillText("LICENSED CITIZEN", 72, 220);
-    ctx.fillStyle = "#22d3ee"; ctx.font = "600 22px ui-monospace, Menlo, monospace";
+    ctx.fillStyle = "#22d3ee";
+    ctx.font = "600 22px ui-monospace, Menlo, monospace";
     ctx.fillText("CLEARED FOR FIRST REAL PHONE", 72, 254);
     // Name
-    ctx.fillStyle = "#94a3b8"; ctx.font = "500 14px ui-monospace, Menlo, monospace";
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "500 14px ui-monospace, Menlo, monospace";
     ctx.fillText("HOLDER", 72, 306);
-    ctx.fillStyle = "#ffffff"; ctx.font = "700 42px 'Bebas Neue', Impact, sans-serif";
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "700 42px 'Bebas Neue', Impact, sans-serif";
     ctx.fillText((name || "———").toUpperCase(), 72, 348);
     // Endorsements
-    ctx.fillStyle = "#94a3b8"; ctx.font = "500 14px ui-monospace, Menlo, monospace";
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "500 14px ui-monospace, Menlo, monospace";
     ctx.fillText("ENDORSEMENTS · SKILLS EARNED", 72, 400);
     // Each endorsement pairs the lesson title with its Field Manual entry so
     // the license reads as a bridge between the junior register and the adult
     // MIL taxonomy.
-    ctx.fillStyle = "#e2e8f0"; ctx.font = "500 13px ui-sans-serif, system-ui, sans-serif";
+    ctx.fillStyle = "#e2e8f0";
+    ctx.font = "500 13px ui-sans-serif, system-ui, sans-serif";
     LESSONS.forEach((l, i) => {
       const col = i < 5 ? 0 : 1;
       const row = i % 5;
@@ -78,20 +95,24 @@ export function LicenseCard({ onClose }: Props) {
     });
     // Footer — issue mark is per-print, not stored anywhere.
     const issued = state.licenseIssuedAt ? new Date(state.licenseIssuedAt) : new Date();
-    ctx.fillStyle = "#94a3b8"; ctx.font = "500 13px ui-monospace, Menlo, monospace";
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "500 13px ui-monospace, Menlo, monospace";
     ctx.fillText(`ISSUE MARK ${issueMark}`, 72, 688);
     ctx.fillText(`ISSUED ${issued.toISOString().slice(0, 10)}`, 72, 710);
     // Small print — the license disclaimer, on-card.
-    ctx.fillStyle = "#64748b"; ctx.font = "italic 11px ui-sans-serif, system-ui, sans-serif";
+    ctx.fillStyle = "#64748b";
+    ctx.font = "italic 11px ui-sans-serif, system-ui, sans-serif";
     ctx.fillText("Certifies completion of a learning pathway. Not a guarantee of online", 72, 732);
     ctx.fillText("safety — the training continues in real life.", 72, 748);
     // Stamp
     ctx.save();
     ctx.translate(W - 200, H - 180);
     ctx.rotate(-0.22);
-    ctx.strokeStyle = "rgba(34,211,238,0.9)"; ctx.lineWidth = 3;
+    ctx.strokeStyle = "rgba(34,211,238,0.9)";
+    ctx.lineWidth = 3;
     ctx.strokeRect(-90, -50, 180, 100);
-    ctx.fillStyle = "#22d3ee"; ctx.font = "700 22px ui-monospace, Menlo, monospace";
+    ctx.fillStyle = "#22d3ee";
+    ctx.font = "700 22px ui-monospace, Menlo, monospace";
     ctx.textAlign = "center";
     ctx.fillText("CITY SEAL", 0, -8);
     ctx.font = "500 12px ui-monospace, Menlo, monospace";
@@ -104,13 +125,19 @@ export function LicenseCard({ onClose }: Props) {
   function save() {
     // persist the city name if changed
     const s = loadFirstPhone();
-    if (name && s.kidCityName !== name) { s.kidCityName = name; saveFirstPhone(s); }
+    if (name && s.kidCityName !== name) {
+      s.kidCityName = name;
+      saveFirstPhone(s);
+    }
     canvasRef.current?.toBlob((blob) => {
       if (!blob) return;
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url; a.download = `first-phone-license-${(name || "citizen").toLowerCase()}.png`;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      a.href = url;
+      a.download = `first-phone-license-${(name || "citizen").toLowerCase()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     }, "image/png");
   }
@@ -119,14 +146,22 @@ export function LicenseCard({ onClose }: Props) {
     <div className="rounded-2xl border-2 border-primary/50 bg-card p-5 print:border-0 print:bg-white">
       <div className="flex items-center justify-between gap-2 print:hidden">
         <div>
-          <div className="font-mono text-[11px] tracking-widest text-primary">FIRST PHONE LICENSE</div>
+          <div className="font-mono text-[11px] tracking-widest text-primary">
+            FIRST PHONE LICENSE
+          </div>
           <h2 className="text-2xl font-semibold mt-1">Congratulations — you're cleared.</h2>
         </div>
-        {onClose && <button onClick={onClose} className="text-sm text-muted-foreground hover:text-foreground">Close</button>}
+        {onClose && (
+          <button onClick={onClose} className="text-sm text-muted-foreground hover:text-foreground">
+            Close
+          </button>
+        )}
       </div>
 
       <div className="mt-4 print:hidden">
-        <label className="block text-xs text-muted-foreground mb-1">Your city name (on the card)</label>
+        <label className="block text-xs text-muted-foreground mb-1">
+          Your city name (on the card)
+        </label>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -137,18 +172,29 @@ export function LicenseCard({ onClose }: Props) {
       </div>
 
       <div className="mt-4 overflow-x-auto">
-        <canvas ref={canvasRef} className="w-full max-w-full rounded-lg border border-border" style={{ aspectRatio: "1200 / 760" }} />
+        <canvas
+          ref={canvasRef}
+          className="w-full max-w-full rounded-lg border border-border"
+          style={{ aspectRatio: "1200 / 760" }}
+        />
       </div>
 
       <p className="mt-3 text-[11px] italic text-muted-foreground print:hidden">
-        Certifies completion of a learning pathway. Not a guarantee of online safety — the training continues in real life.
+        Certifies completion of a learning pathway. Not a guarantee of online safety — the training
+        continues in real life.
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2 print:hidden">
-        <button onClick={save} className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-all">
+        <button
+          onClick={save}
+          className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-all"
+        >
           <Download className="h-4 w-4" /> Save PNG
         </button>
-        <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors">
+        <button
+          onClick={() => window.print()}
+          className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors"
+        >
           <Printer className="h-4 w-4" /> Print (A5)
         </button>
       </div>

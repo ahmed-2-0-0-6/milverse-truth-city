@@ -13,18 +13,18 @@ export type BossOutcomeKind = "WIN" | "LOSS_TRANSACTED" | "LOSS_FALSE_ALARM" | "
 export type BossId = "ghost-of-bali" | "the-twin" | "the-chorus";
 
 export type ProtocolMove =
-  | "callback_known"     // Call the KNOWN number (Contacts)
-  | "second_person"      // Ask a mutual / office / family member
-  | "shared_secret"      // Ask a question only the real person could answer
-  | "hold_unverified"    // Refuse to transact until verified
-  | "outbound_video"     // For The Twin: call THEM back on your line
-  | "provenance_trace"   // For The Chorus: follow source chain
+  | "callback_known" // Call the KNOWN number (Contacts)
+  | "second_person" // Ask a mutual / office / family member
+  | "shared_secret" // Ask a question only the real person could answer
+  | "hold_unverified" // Refuse to transact until verified
+  | "outbound_video" // For The Twin: call THEM back on your line
+  | "provenance_trace" // For The Chorus: follow source chain
   | "delay_past_window"; // For The Chorus: wait past urgency window
 
 export type BossVerdict =
-  | "COMPLY_NOW"         // Transact — loss if scam, win if real+trusted
-  | "REFUSE_REPORT"      // Blank refuse — loss if REAL (False Alarm)
-  | "HOLD_UNVERIFIED";   // Refuse to transact until verified — always safe
+  | "COMPLY_NOW" // Transact — loss if scam, win if real+trusted
+  | "REFUSE_REPORT" // Blank refuse — loss if REAL (False Alarm)
+  | "HOLD_UNVERIFIED"; // Refuse to transact until verified — always safe
 
 export interface PressurePhase {
   id: "friendly" | "urgent" | "guilt" | "threat" | "morning_after";

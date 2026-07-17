@@ -6,8 +6,12 @@ const TEXT = "TRAIN YOUR TRUST";
 export function HeroType() {
   const [n, setN] = useState(0);
   useEffect(() => {
-    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-      setN(TEXT.length); return;
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setN(TEXT.length);
+      return;
     }
     let i = 0;
     const id = window.setInterval(() => {

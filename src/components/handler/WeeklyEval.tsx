@@ -47,7 +47,9 @@ export function WeeklyEval() {
 
   return (
     <section className="mt-6 rounded-2xl border-2 border-caution/50 bg-card p-5 sm:p-6 relative overflow-hidden">
-      <div className="stencil text-[10px] tracking-[0.35em] text-caution">PSYCH EVAL · WEEK IN REVIEW</div>
+      <div className="stencil text-[10px] tracking-[0.35em] text-caution">
+        PSYCH EVAL · WEEK IN REVIEW
+      </div>
       <div className="mt-2 text-sm text-foreground/95">{line.text}</div>
 
       <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
@@ -55,9 +57,11 @@ export function WeeklyEval() {
         <Stat label="LEAN TREND" value={weekly.leanTrend.replace(/-/g, " ").toUpperCase()} />
         <Stat
           label="TACTIC MASTERY"
-          value={weekly.tacticImprovement
-            ? `${labelForTactic(weekly.tacticImprovement.tactic).toUpperCase()} · ${Math.round((weekly.tacticImprovement.before - weekly.tacticImprovement.after) * 100)}%↑`
-            : "—"}
+          value={
+            weekly.tacticImprovement
+              ? `${labelForTactic(weekly.tacticImprovement.tactic).toUpperCase()} · ${Math.round((weekly.tacticImprovement.before - weekly.tacticImprovement.after) * 100)}%↑`
+              : "—"
+          }
         />
       </div>
     </section>

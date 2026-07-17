@@ -6,7 +6,11 @@ export function RouteWipe() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [key, setKey] = useState(0);
   useEffect(() => {
-    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
     setKey((k) => k + 1);
   }, [path]);
   return (

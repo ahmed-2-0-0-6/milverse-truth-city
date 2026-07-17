@@ -8,13 +8,13 @@ import { loadProfile } from "@/lib/mirror/profile";
 import type { DistrictKey } from "@/components/DistrictLiveFX";
 
 interface Props {
-  id: string;                    // unique district key
-  chapter: string;               // "CHAPTER 02"
-  title: string;                 // "THE FEED"
-  art?: string;                  // (unused in banner form, kept for API compat)
-  artVideo?: string;             // (unused in banner form, kept for API compat)
-  district?: DistrictKey;        // (unused in banner form, kept for API compat)
-  lines: [string, string];       // exactly two lines of narration
+  id: string; // unique district key
+  chapter: string; // "CHAPTER 02"
+  title: string; // "THE FEED"
+  art?: string; // (unused in banner form, kept for API compat)
+  artVideo?: string; // (unused in banner form, kept for API compat)
+  district?: DistrictKey; // (unused in banner form, kept for API compat)
+  lines: [string, string]; // exactly two lines of narration
   onDone?: () => void;
 }
 
@@ -49,7 +49,9 @@ export function DistrictIntro({ id, chapter, title, lines, onDone }: Props) {
       >
         <X className="h-3.5 w-3.5" />
       </button>
-      <div className="stencil text-[9px] tracking-[0.35em] text-primary/80">{chapter} · {title}</div>
+      <div className="stencil text-[9px] tracking-[0.35em] text-primary/80">
+        {chapter} · {title}
+      </div>
       <p className="mt-1 text-sm text-foreground/90 leading-snug pr-6">{lines[0]}</p>
       <p className="mt-1 text-sm text-foreground/70 leading-snug pr-6">{lines[1]}</p>
     </div>

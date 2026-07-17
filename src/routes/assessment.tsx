@@ -12,8 +12,12 @@ import { useServerFn } from "@tanstack/react-start";
 import { TopBar } from "@/components/TopBar";
 import { getActiveGroup } from "@/lib/pilot";
 import {
-  getCodename, hashCodename, formForPhase,
-  hasAttempt, recordAttempt, myOwnAttempts,
+  getCodename,
+  hashCodename,
+  formForPhase,
+  hasAttempt,
+  recordAttempt,
+  myOwnAttempts,
 } from "@/lib/assessment/state";
 import { getForm, type AssessmentItem, type Verdict } from "@/lib/assessment/items";
 import type { ItemResponse } from "@/lib/assessment/scoring";
@@ -49,7 +53,10 @@ function AssessmentPage() {
   useEffect(() => {
     (async () => {
       const g = getActiveGroup();
-      if (!g) { setStage("no-group"); return; }
+      if (!g) {
+        setStage("no-group");
+        return;
+      }
       setGroupCode(g);
       const h = await hashCodename(getCodename());
       setHash(h);
@@ -58,14 +65,20 @@ function AssessmentPage() {
       try {
         const res = await fetchPhase({ data: { groupCode: g } as never });
         groupPhase = (res as { phase: "intake" | "exit" }).phase;
-      } catch { /* offline OK — default intake */ }
+      } catch {
+        /* offline OK — default intake */
+      }
 
       // Decide what the player should do right now.
       const doneIntake = hasAttempt(g, h, "intake");
       const doneExit = hasAttempt(g, h, "exit");
 
       if (groupPhase === "intake") {
-        if (doneIntake) { setStage("already-done"); setPhase("intake"); return; }
+        if (doneIntake) {
+          setStage("already-done");
+          setPhase("intake");
+          return;
+        }
         setPhase("intake");
       } else {
         // exit phase
@@ -112,7 +125,10 @@ function AssessmentPage() {
     <div className="min-h-screen grain">
       <TopBar />
       <main className="mx-auto max-w-2xl px-4 py-10">
-        <Link to="/pilot" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">
+        <Link
+          to="/pilot"
+          className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
+        >
           ← PILOT
         </Link>
 
@@ -125,9 +141,13 @@ function AssessmentPage() {
             <div className="stencil text-[10px] text-caution">NO PILOT GROUP</div>
             <h1 className="mt-2 text-2xl font-semibold">Join a group first</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              The Citizen Baseline is a classroom-only measurement. Ask your teacher for the group code.
+              The Citizen Baseline is a classroom-only measurement. Ask your teacher for the group
+              code.
             </p>
-            <Link to="/pilot" className="mt-4 inline-block rounded-md border border-primary bg-primary/10 px-4 py-2 stencil text-[10px] text-primary">
+            <Link
+              to="/pilot"
+              className="mt-4 inline-block rounded-md border border-primary bg-primary/10 px-4 py-2 stencil text-[10px] text-primary"
+            >
               GO TO PILOT
             </Link>
           </div>
@@ -149,7 +169,9 @@ function AssessmentPage() {
                 CITIZEN BASELINE · {phase === "intake" ? "INTAKE" : "EXIT"} · FORM {current.form}
               </div>
               <h1 className="mt-2 text-2xl sm:text-3xl font-semibold">
-                {phase === "intake" ? "3 minutes. Before you train." : "3 minutes. To see what changed."}
+                {phase === "intake"
+                  ? "3 minutes. Before you train."
+                  : "3 minutes. To see what changed."}
               </h1>
               <p className="mt-2 text-sm text-muted-foreground">
                 No feedback. No score during. The city measures before it trains — and after.
@@ -228,7 +250,8 @@ function AssessmentPage() {
               disabled={!verdict}
               className="mt-6 w-full rounded-md border-2 border-primary bg-primary py-3 stencil text-[11px] text-primary-foreground disabled:opacity-40"
             >
-              {idx + 1 >= items.length ? "SUBMIT BASELINE" : "NEXT ITEM"} <ArrowRight className="inline h-3 w-3 ml-1" />
+              {idx + 1 >= items.length ? "SUBMIT BASELINE" : "NEXT ITEM"}{" "}
+              <ArrowRight className="inline h-3 w-3 ml-1" />
             </button>
           </>
         )}
@@ -240,7 +263,10 @@ function AssessmentPage() {
 /* ── After-completion card ─────────────────────────────────── */
 
 function FinishedCard({
-  phase, groupCode, hash, onEnterCity,
+  phase,
+  groupCode,
+  hash,
+  onEnterCity,
 }: {
   phase: "intake" | "exit";
   groupCode: string;
@@ -284,8 +310,18 @@ function FinishedCard({
         <div className="stencil text-[10px] text-primary">YOUR DATA · CODENAME ONLY</div>
         <h1 className="mt-2 text-2xl font-semibold">Before → After</h1>
         <div className="mt-4 grid grid-cols-2 gap-4">
-          <MetricPair label="Accuracy" pre={`${accPre}%`} post={`${accPost}%`} good={accPost >= accPre} />
-          <MetricPair label="Calibration gap" pre={`${gapPre}`} post={`${gapPost}`} good={Math.abs(gapPost) <= Math.abs(gapPre)} />
+          <MetricPair
+            label="Accuracy"
+            pre={`${accPre}%`}
+            post={`${accPost}%`}
+            good={accPost >= accPre}
+          />
+          <MetricPair
+            label="Calibration gap"
+            pre={`${gapPre}`}
+            post={`${gapPost}`}
+            good={Math.abs(gapPost) <= Math.abs(gapPre)}
+          />
         </div>
       </div>
       <blockquote className="rounded-md border-l-2 border-primary bg-card p-4 text-sm italic text-muted-foreground">
@@ -301,23 +337,38 @@ function FinishedCard({
   );
 }
 
-function MetricPair({ label, pre, post, good }: { label: string; pre: string; post: string; good: boolean }) {
+function MetricPair({
+  label,
+  pre,
+  post,
+  good,
+}: {
+  label: string;
+  pre: string;
+  post: string;
+  good: boolean;
+}) {
   return (
     <div className="rounded-md border border-border p-3">
       <div className="stencil text-[10px] text-muted-foreground">{label.toUpperCase()}</div>
       <div className="mt-2 flex items-baseline gap-2">
         <span className="font-mono text-lg text-muted-foreground line-through">{pre}</span>
         <ArrowRight className="h-3 w-3 text-muted-foreground" />
-        <span className={`font-mono text-2xl ${good ? "text-primary" : "text-destructive"}`}>{post}</span>
+        <span className={`font-mono text-2xl ${good ? "text-primary" : "text-destructive"}`}>
+          {post}
+        </span>
       </div>
     </div>
   );
 }
 
 function pickHandlerLine(accDelta: number, gapDelta: number): string {
-  if (accDelta >= 15 && gapDelta <= -5) return "Sharper AND more honest with yourself. That's the whole game.";
-  if (accDelta >= 10) return "You're catching more of them. Keep the doubt tuned — not everything's a scam.";
-  if (gapDelta <= -5) return "Same accuracy, better honesty about your certainty. That matters more than people think.";
+  if (accDelta >= 15 && gapDelta <= -5)
+    return "Sharper AND more honest with yourself. That's the whole game.";
+  if (accDelta >= 10)
+    return "You're catching more of them. Keep the doubt tuned — not everything's a scam.";
+  if (gapDelta <= -5)
+    return "Same accuracy, better honesty about your certainty. That matters more than people think.";
   if (accDelta > 0) return "Small lift. Real people, real practice — the arc is long.";
   if (accDelta === 0) return "Flat this week. That's data too. Come back next module.";
   return "Off week. Rest, then rerun a few Mirror cases. Reps beat theory.";

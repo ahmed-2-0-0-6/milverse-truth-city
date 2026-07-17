@@ -13,7 +13,11 @@ interface Props {
 
 function audioAvailable(): boolean {
   if (typeof window === "undefined") return false;
-  return "speechSynthesis" in window || "AudioContext" in window || "webkitAudioContext" in (window as unknown as Record<string, unknown>);
+  return (
+    "speechSynthesis" in window ||
+    "AudioContext" in window ||
+    "webkitAudioContext" in (window as unknown as Record<string, unknown>)
+  );
 }
 
 export function VoiceNote({ voice, fromPlayer = false, speakerName, speakerVoiceDesc }: Props) {
@@ -73,7 +77,9 @@ export function VoiceNote({ voice, fromPlayer = false, speakerName, speakerVoice
         <button
           onClick={toggle}
           className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition ${
-            fromPlayer ? "bg-primary-foreground/15 hover:bg-primary-foreground/25" : "bg-primary/15 hover:bg-primary/25"
+            fromPlayer
+              ? "bg-primary-foreground/15 hover:bg-primary-foreground/25"
+              : "bg-primary/15 hover:bg-primary/25"
           }`}
           aria-label={playing ? "Pause voice note" : "Play voice note"}
         >
@@ -96,7 +102,9 @@ export function VoiceNote({ voice, fromPlayer = false, speakerName, speakerVoice
             <span className="flex items-center gap-1">
               <Mic className="h-2.5 w-2.5" /> VOICE NOTE
             </span>
-            <span>{Math.round((handleRef.current?.duration ?? 3) * (playing ? (1 - progress) : 1))}s</span>
+            <span>
+              {Math.round((handleRef.current?.duration ?? 3) * (playing ? 1 - progress : 1))}s
+            </span>
           </div>
         </div>
       </div>
@@ -107,10 +115,14 @@ export function VoiceNote({ voice, fromPlayer = false, speakerName, speakerVoice
       >
         <FileText className="h-2.5 w-2.5" />
         {showTranscript ? "HIDE TRANSCRIPT" : "READ TRANSCRIPT"}
-        <ChevronDown className={`h-2.5 w-2.5 transition-transform ${showTranscript ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`h-2.5 w-2.5 transition-transform ${showTranscript ? "rotate-180" : ""}`}
+        />
       </button>
       {showTranscript && (
-        <p className={`mt-1.5 text-xs italic leading-relaxed ${fromPlayer ? "text-primary-foreground/90" : "text-foreground/90"}`}>
+        <p
+          className={`mt-1.5 text-xs italic leading-relaxed ${fromPlayer ? "text-primary-foreground/90" : "text-foreground/90"}`}
+        >
           "{voice.text}"
         </p>
       )}

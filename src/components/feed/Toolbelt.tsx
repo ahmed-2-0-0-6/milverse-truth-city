@@ -95,13 +95,19 @@ function loadFirstUse(): Set<FeedToolKind> {
   try {
     const raw = localStorage.getItem(FIRST_USE_KEY);
     return raw ? new Set(JSON.parse(raw)) : new Set();
-  } catch { return new Set(); }
+  } catch {
+    return new Set();
+  }
 }
 function markFirstUse(kind: FeedToolKind) {
   if (typeof window === "undefined") return;
   const s = loadFirstUse();
   s.add(kind);
-  try { localStorage.setItem(FIRST_USE_KEY, JSON.stringify([...s])); } catch { /* noop */ }
+  try {
+    localStorage.setItem(FIRST_USE_KEY, JSON.stringify([...s]));
+  } catch {
+    /* noop */
+  }
 }
 
 interface Slot {
@@ -120,10 +126,15 @@ function resolveSlot(scenario: FeedScenario, kind: FeedToolKind): Slot {
 export function Toolbelt({ scenario, used, onUse, onGrade }: Props) {
   const format = scenario.format ?? "whatsapp";
   const [firstUse, setFirstUse] = useState<Set<FeedToolKind>>(() => new Set());
-  useEffect(() => { setFirstUse(loadFirstUse()); }, []);
+  useEffect(() => {
+    setFirstUse(loadFirstUse());
+  }, []);
   const [active, setActive] = useState<FeedToolKind | null>(null);
   const [reveals, setReveals] = useState<Record<FeedToolKind, string | null>>({
-    reverse_image: null, check_source: null, cross_check: null, check_date: null,
+    reverse_image: null,
+    check_source: null,
+    cross_check: null,
+    check_date: null,
   });
   const [wastedFlash, setWastedFlash] = useState<FeedToolKind | null>(null);
   const [counts, setCounts] = useState({ strong: 0, wasted: 0 });
@@ -145,7 +156,7 @@ export function Toolbelt({ scenario, used, onUse, onGrade }: Props) {
     return t.hint;
   }
 
-  function useTool(tool: ToolMeta) {
+  function runTool(tool: ToolMeta) {
     const slot = slots[tool.kind];
     const isFit = tool.bestFor.includes(format);
     const alreadyRevealed = reveals[tool.kind] !== null;
@@ -224,12 +235,16 @@ export function Toolbelt({ scenario, used, onUse, onGrade }: Props) {
             } ${wasted ? "animate-[fade-in_.2s_ease-out] border-caution/60" : ""}`}
           >
             <header className="flex items-center gap-2 mb-1.5">
-              <div className={`relative h-6 w-6 grid place-items-center rounded-sm border ${isFit ? "border-primary/50 text-primary" : "border-border text-muted-foreground"}`}>
+              <div
+                className={`relative h-6 w-6 grid place-items-center rounded-sm border ${isFit ? "border-primary/50 text-primary" : "border-border text-muted-foreground"}`}
+              >
                 <tool.Icon className={`h-3.5 w-3.5 ${spinning ? tool.animClass : ""}`} />
               </div>
               <div className="stencil text-[10px] tracking-widest">{tool.label}</div>
               {isFit && <span className="stencil text-[9px] text-primary">· FIT</span>}
-              {!isFit && <span className="stencil text-[9px] text-muted-foreground">· POOR FIT</span>}
+              {!isFit && (
+                <span className="stencil text-[9px] text-muted-foreground">· POOR FIT</span>
+              )}
             </header>
             <p className="text-[11px] text-muted-foreground mb-2">{tool.hint}</p>
 
@@ -244,11 +259,15 @@ export function Toolbelt({ scenario, used, onUse, onGrade }: Props) {
             )}
 
             {revealed ? (
-              <div className={`rounded-md border-l-2 pl-3 py-2 text-xs ${
-                wasted ? "border-caution bg-caution/5 text-caution-foreground/90"
-                : isFit ? "border-primary bg-primary/5"
-                : "border-muted bg-muted/20 text-muted-foreground"
-              }`}>
+              <div
+                className={`rounded-md border-l-2 pl-3 py-2 text-xs ${
+                  wasted
+                    ? "border-caution bg-caution/5 text-caution-foreground/90"
+                    : isFit
+                      ? "border-primary bg-primary/5"
+                      : "border-muted bg-muted/20 text-muted-foreground"
+                }`}
+              >
                 <div className="stencil text-[9px] tracking-widest mb-1 opacity-80">
                   {wasted ? "WASTED TURN · TEACHING LINE" : "EVIDENCE · FROM DOSSIER"}
                 </div>
@@ -256,7 +275,7 @@ export function Toolbelt({ scenario, used, onUse, onGrade }: Props) {
               </div>
             ) : (
               <button
-                onClick={() => useTool(tool)}
+                onClick={() => runTool(tool)}
                 className={`w-full rounded-md border p-2 stencil text-[10px] tracking-widest transition ${
                   isFit
                     ? "border-primary/50 bg-background/60 text-primary hover:bg-primary/10"

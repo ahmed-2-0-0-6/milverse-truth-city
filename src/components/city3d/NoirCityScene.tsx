@@ -43,7 +43,10 @@ function Buildings() {
             <planeGeometry args={[b.w * 0.9, b.h * 0.9]} />
             <shaderMaterial
               transparent
-              uniforms={{ uColor: { value: new THREE.Color(b.lit > 0.55 ? "#f5b942" : "#22d3ee") }, uSeed: { value: b.lit * 100 } }}
+              uniforms={{
+                uColor: { value: new THREE.Color(b.lit > 0.55 ? "#f5b942" : "#22d3ee") },
+                uSeed: { value: b.lit * 100 },
+              }}
               vertexShader={`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`}
               fragmentShader={`
                 varying vec2 vUv; uniform vec3 uColor; uniform float uSeed;
@@ -116,7 +119,9 @@ function CameraRig() {
 function PauseWhenHidden() {
   const { gl, invalidate } = useThree();
   useEffect(() => {
-    const on = () => { if (!document.hidden) invalidate(); };
+    const on = () => {
+      if (!document.hidden) invalidate();
+    };
     document.addEventListener("visibilitychange", on);
     return () => document.removeEventListener("visibilitychange", on);
   }, [gl, invalidate]);
@@ -135,8 +140,10 @@ export default function NoirCityScene() {
     return () => io.disconnect();
   }, []);
 
-  const dpr: [number, number] = typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches
-    ? [1, 1.5] : [1, 2];
+  const dpr: [number, number] =
+    typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches
+      ? [1, 1.5]
+      : [1, 2];
 
   return (
     <div ref={wrapRef} className="absolute inset-0" aria-hidden>

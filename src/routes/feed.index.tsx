@@ -11,7 +11,11 @@ export const Route = createFileRoute("/feed/")({
   head: () => ({
     meta: [
       { title: "The Feed — MILVERSE" },
-      { name: "description", content: "Verify claims, not just people. Fight viral lies without breaking your relationships." },
+      {
+        name: "description",
+        content:
+          "Verify claims, not just people. Fight viral lies without breaking your relationships.",
+      },
     ],
   }),
   component: function FeedIndexGuarded() {
@@ -42,15 +46,22 @@ function FeedIndex() {
             "Your job is to check the claim without breaking the person. Verify the source. Correct with dignity. Both are the work.",
           ]}
         />
-        <Link to="/" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">← CITY</Link>
+        <Link
+          to="/"
+          className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
+        >
+          ← CITY
+        </Link>
 
         <div className="mt-4 max-w-2xl">
-          <div className="font-mono text-xs tracking-[0.3em] text-primary">THE FEED · MASS DECEPTION</div>
+          <div className="font-mono text-xs tracking-[0.3em] text-primary">
+            THE FEED · MASS DECEPTION
+          </div>
           <h1 className="mt-2 text-3xl sm:text-4xl font-semibold">Claims, not con artists.</h1>
           <p className="mt-3 text-muted-foreground">
-            The person sending it is real, and sincere, and probably someone you love.
-            The <span className="text-foreground">claim</span> might be a viral lie.
-            Verify the claim. Correct with dignity. Both are the job.
+            The person sending it is real, and sincere, and probably someone you love. The{" "}
+            <span className="text-foreground">claim</span> might be a viral lie. Verify the claim.
+            Correct with dignity. Both are the job.
           </p>
           <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-caution/30 bg-caution/10 px-3 py-1 text-[11px] font-mono tracking-widest text-caution">
             🇵🇰 SCENARIOS ROOTED IN REAL FORWARDS THAT SPREAD IN PAKISTANI CHATS

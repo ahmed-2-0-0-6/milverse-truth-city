@@ -15,7 +15,8 @@ function serverClient() {
     global: {
       fetch: (input, init) => {
         const h = new Headers(init?.headers);
-        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+          h.delete("Authorization");
         h.set("apikey", key);
         return fetch(input, { ...init, headers: h });
       },
@@ -43,14 +44,16 @@ const metricsSchema = z.object({
 
 export const logAssessmentToCloud = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({
-      groupCode: z.string().regex(CODE_RE),
-      codenameHash: z.string().min(4).max(64),
-      phase: z.enum(["intake", "exit"]),
-      form: z.enum(["A", "B"]),
-      items: z.array(itemSchema).min(1).max(12),
-      metrics: metricsSchema,
-    }).parse(input),
+    z
+      .object({
+        groupCode: z.string().regex(CODE_RE),
+        codenameHash: z.string().min(4).max(64),
+        phase: z.enum(["intake", "exit"]),
+        form: z.enum(["A", "B"]),
+        items: z.array(itemSchema).min(1).max(12),
+        metrics: metricsSchema,
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     const supabase = serverClient();
@@ -80,7 +83,9 @@ export const fetchAssessmentGroup = createServerFn({ method: "GET" })
     const supabase = serverClient();
     const { data: rows, error } = await supabase
       .from("assessment_entries")
-      .select("codename_hash, phase, form, items, accuracy, mean_confidence, calibration_gap, overconfident_errors, missed_scams, false_alarms, unverifiable_recognized, created_at")
+      .select(
+        "codename_hash, phase, form, items, accuracy, mean_confidence, calibration_gap, overconfident_errors, missed_scams, false_alarms, unverifiable_recognized, created_at",
+      )
       .eq("group_code", data.groupCode)
       .order("created_at", { ascending: true })
       .limit(5000);
@@ -105,26 +110,33 @@ export const fetchGroupPhase = createServerFn({ method: "GET" })
       .eq("group_code", data.groupCode)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    return { phase: (row?.phase ?? "intake") as "intake" | "exit", updatedAt: row?.updated_at ?? null };
+    return {
+      phase: (row?.phase ?? "intake") as "intake" | "exit",
+      updatedAt: row?.updated_at ?? null,
+    };
   });
 
 /** Passcode-gated: flip a group to exit phase (or back to intake). */
 export const setGroupPhase = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({
-      passcode: z.string().min(1),
-      groupCode: z.string().regex(CODE_RE),
-      phase: z.enum(["intake", "exit"]),
-    }).parse(input),
+    z
+      .object({
+        passcode: z.string().min(1),
+        groupCode: z.string().regex(CODE_RE),
+        phase: z.enum(["intake", "exit"]),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     const expected = process.env.MILVERSE_REVIEW_PASSCODE;
     if (!expected) throw new Error("Review passcode is not configured on the server.");
     if (data.passcode !== expected) throw new Error("Invalid passcode.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
-      .from("assessment_phase")
-      .upsert({ group_code: data.groupCode, phase: data.phase, updated_at: new Date().toISOString() });
+    const { error } = await supabaseAdmin.from("assessment_phase").upsert({
+      group_code: data.groupCode,
+      phase: data.phase,
+      updated_at: new Date().toISOString(),
+    });
     if (error) throw new Error(error.message);
     return { ok: true, phase: data.phase };
   });

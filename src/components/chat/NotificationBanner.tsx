@@ -16,7 +16,10 @@ interface Props {
 export function NotificationBanner({ banner, onDismiss, reducedMotion }: Props) {
   const [show, setShow] = useState(false);
   useEffect(() => {
-    if (!banner) { setShow(false); return; }
+    if (!banner) {
+      setShow(false);
+      return;
+    }
     setShow(true);
     const t = setTimeout(() => {
       setShow(false);
@@ -35,7 +38,11 @@ export function NotificationBanner({ banner, onDismiss, reducedMotion }: Props) 
       role="status"
       aria-live="polite"
       className={`absolute left-2 right-2 top-2 z-[60] pointer-events-none ${
-        reducedMotion ? "" : show ? "animate-in slide-in-from-top duration-300" : "animate-out slide-out-to-top duration-200"
+        reducedMotion
+          ? ""
+          : show
+            ? "animate-in slide-in-from-top duration-300"
+            : "animate-out slide-out-to-top duration-200"
       }`}
     >
       <button
@@ -46,7 +53,9 @@ export function NotificationBanner({ banner, onDismiss, reducedMotion }: Props) 
       >
         <div className="flex items-center justify-between text-[10px] font-mono tracking-wider text-white/50 mb-0.5">
           <span className="truncate">{banner.sender}</span>
-          <span className="tabular-nums">{hh}:{mm}</span>
+          <span className="tabular-nums">
+            {hh}:{mm}
+          </span>
         </div>
         <div className="text-xs text-white line-clamp-2 leading-snug">{banner.preview}</div>
       </button>

@@ -31,7 +31,7 @@ const MAX_QUEUE = 10;
 const MAX_PAYLOAD_KEYS = 8;
 const TELEMETRY_ENDPOINT = "/api/public/telemetry";
 
-let queue: TelemetryEvent[] = [];
+const queue: TelemetryEvent[] = [];
 let timer: number | null = null;
 let sessionId = "";
 
@@ -53,7 +53,9 @@ function ensureSessionId(): string {
 }
 
 /** Strip anything oversized or non-scalar from a payload. */
-function sanitize(payload?: Record<string, unknown>): Record<string, string | number | boolean | null> {
+function sanitize(
+  payload?: Record<string, unknown>,
+): Record<string, string | number | boolean | null> {
   if (!payload) return {};
   const out: Record<string, string | number | boolean | null> = {};
   let i = 0;
@@ -73,7 +75,10 @@ function sanitize(payload?: Record<string, unknown>): Record<string, string | nu
 function scheduleFlush() {
   if (timer != null) return;
   if (typeof window === "undefined") return;
-  timer = window.setTimeout(() => { timer = null; void flush(); }, FLUSH_MS);
+  timer = window.setTimeout(() => {
+    timer = null;
+    void flush();
+  }, FLUSH_MS);
 }
 
 async function postOnce(batch: TelemetryEvent[]): Promise<boolean> {
@@ -124,20 +129,25 @@ export function track(
   if (typeof window === "undefined") return;
   const ev: TelemetryEvent = {
     event_type,
-    route: input.route?.slice(0, 200) ?? (window.location.pathname + window.location.search).slice(0, 200),
+    route:
+      input.route?.slice(0, 200) ??
+      (window.location.pathname + window.location.search).slice(0, 200),
     case_id: input.case_id?.slice(0, 120),
     session_id: ensureSessionId(),
     payload: sanitize(input.payload),
     ts: new Date().toISOString(),
   };
   queue.push(ev);
-  if (queue.length >= MAX_QUEUE) { void flush(); return; }
+  if (queue.length >= MAX_QUEUE) {
+    void flush();
+    return;
+  }
   scheduleFlush();
 }
 
 /** Bucketing helpers so payloads stay coarse (no fingerprinting). */
 export function bucketStake(stake: number): string {
-  if (stake <= 5)  return "0-5";
+  if (stake <= 5) return "0-5";
   if (stake <= 15) return "6-15";
   if (stake <= 30) return "16-30";
   if (stake <= 60) return "31-60";

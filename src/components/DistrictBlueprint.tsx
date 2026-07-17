@@ -30,16 +30,21 @@ export function DistrictBlueprint({ district, title, subtitle, concept, mechanic
   useEffect(() => {
     if (typeof window !== "undefined" && localStorage.getItem(voteKey)) setVoted(true);
     refresh();
-     
   }, []);
 
   async function refresh() {
     try {
-      const r = await fetchTallies({} as never) as { market: number; arena: number; suggestions: { district: string; suggestion: string }[] };
+      const r = (await fetchTallies({} as never)) as {
+        market: number;
+        arena: number;
+        suggestions: { district: string; suggestion: string }[];
+      };
       setMarket(r.market);
       setArena(r.arena);
       setSuggestions(r.suggestions);
-    } catch { /* offline — silent */ }
+    } catch {
+      /* offline — silent */
+    }
   }
 
   async function vote() {
@@ -47,7 +52,13 @@ export function DistrictBlueprint({ district, title, subtitle, concept, mechanic
     setBusy(true);
     setMsg(null);
     try {
-      await castVote({ data: { district, suggestion: suggestion.trim() || undefined, deviceId: getDeviceId() } as never });
+      await castVote({
+        data: {
+          district,
+          suggestion: suggestion.trim() || undefined,
+          deviceId: getDeviceId(),
+        } as never,
+      });
       localStorage.setItem(voteKey, "1");
       setVoted(true);
       setSuggestion("");
@@ -68,11 +79,19 @@ export function DistrictBlueprint({ district, title, subtitle, concept, mechanic
       <div className="pointer-events-none fixed inset-0 scanlines opacity-30" />
       <TopBar />
       <main className="mx-auto max-w-3xl px-4 py-10">
-        <Link to="/" className="stencil text-[10px] text-muted-foreground hover:text-foreground">← CITY</Link>
+        <Link to="/" className="stencil text-[10px] text-muted-foreground hover:text-foreground">
+          ← CITY
+        </Link>
 
         <div className="mt-4 hud-frame border-2 border-dashed border-primary/40 bg-primary/[0.02] p-6 rounded-sm relative overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 opacity-[0.08]"
-               style={{ backgroundImage: "linear-gradient(oklch(0.82 0.16 85) 1px, transparent 1px), linear-gradient(90deg, oklch(0.82 0.16 85) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.08]"
+            style={{
+              backgroundImage:
+                "linear-gradient(oklch(0.82 0.16 85) 1px, transparent 1px), linear-gradient(90deg, oklch(0.82 0.16 85) 1px, transparent 1px)",
+              backgroundSize: "24px 24px",
+            }}
+          />
           <div className="relative">
             <div className="flex items-center gap-2 stencil text-[10px] text-primary mb-1">
               <Sparkles className="h-3 w-3" /> DISTRICT BLUEPRINT · UNDER DESIGN
@@ -99,13 +118,23 @@ export function DistrictBlueprint({ district, title, subtitle, concept, mechanic
             <Vote className="h-3 w-3" /> COMMUNITY VOTE · WHICH DISTRICT OPENS NEXT?
           </div>
           <p className="text-sm text-muted-foreground mb-4">
-            MILVERSE is designed <b className="text-foreground">with</b> its citizens.
-            Cast one vote per district. Optional one-line suggestion for what you most want in it.
+            MILVERSE is designed <b className="text-foreground">with</b> its citizens. Cast one vote
+            per district. Optional one-line suggestion for what you most want in it.
           </p>
 
           <div className="space-y-3">
-            <TallyBar label="THE MARKET" count={market} pct={marketPct} active={district === "market"} />
-            <TallyBar label="THE ARENA" count={arena} pct={arenaPct} active={district === "arena"} />
+            <TallyBar
+              label="THE MARKET"
+              count={market}
+              pct={marketPct}
+              active={district === "market"}
+            />
+            <TallyBar
+              label="THE ARENA"
+              count={arena}
+              pct={arenaPct}
+              active={district === "arena"}
+            />
           </div>
 
           <div className="mt-5">
@@ -118,7 +147,9 @@ export function DistrictBlueprint({ district, title, subtitle, concept, mechanic
               disabled={voted}
             />
             <div className="mt-1 flex items-center justify-between">
-              <div className="stencil text-[10px] text-muted-foreground">{suggestion.length}/140 · NO REAL NAMES, NUMBERS, OR LINKS</div>
+              <div className="stencil text-[10px] text-muted-foreground">
+                {suggestion.length}/140 · NO REAL NAMES, NUMBERS, OR LINKS
+              </div>
               <button
                 onClick={vote}
                 disabled={busy || voted}
@@ -151,15 +182,32 @@ export function DistrictBlueprint({ district, title, subtitle, concept, mechanic
   );
 }
 
-function TallyBar({ label, count, pct, active }: { label: string; count: number; pct: number; active: boolean }) {
+function TallyBar({
+  label,
+  count,
+  pct,
+  active,
+}: {
+  label: string;
+  count: number;
+  pct: number;
+  active: boolean;
+}) {
   return (
     <div>
       <div className="flex items-center justify-between stencil text-[10px] mb-1">
-        <span className={active ? "text-primary" : "text-muted-foreground"}>{label} {active && "·  YOU'RE HERE"}</span>
-        <span className="text-muted-foreground">{count} VOTES · {pct}%</span>
+        <span className={active ? "text-primary" : "text-muted-foreground"}>
+          {label} {active && "·  YOU'RE HERE"}
+        </span>
+        <span className="text-muted-foreground">
+          {count} VOTES · {pct}%
+        </span>
       </div>
       <div className="h-2 w-full rounded-sm bg-muted overflow-hidden">
-        <div className={`h-full transition-all duration-500 ${active ? "bg-primary" : "bg-primary/40"}`} style={{ width: `${pct}%` }} />
+        <div
+          className={`h-full transition-all duration-500 ${active ? "bg-primary" : "bg-primary/40"}`}
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </div>
   );

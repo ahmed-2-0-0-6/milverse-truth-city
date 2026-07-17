@@ -16,7 +16,14 @@ interface Props {
   district?: DistrictKey;
 }
 
-export function DistrictHeader({ art, title, tag, glow = "34,211,238", className = "", district }: Props) {
+export function DistrictHeader({
+  art,
+  title,
+  tag,
+  glow = "34,211,238",
+  className = "",
+  district,
+}: Props) {
   const { mode } = useVisualMode();
   const cinematic = mode === "cinematic";
 
@@ -38,31 +45,45 @@ export function DistrictHeader({ art, title, tag, glow = "34,211,238", className
       />
 
       {/* Duotone tint + vignette */}
-      <div className="absolute inset-0 mix-blend-multiply" style={{
-        background: `linear-gradient(180deg, rgba(4,8,14,0.35), rgba(0,0,0,0.75))`,
-      }} />
-      <div className="absolute inset-0" style={{
-        background: `radial-gradient(120% 80% at 50% 40%, transparent 55%, rgba(0,0,0,0.85) 100%)`,
-      }} />
+      <div
+        className="absolute inset-0 mix-blend-multiply"
+        style={{
+          background: `linear-gradient(180deg, rgba(4,8,14,0.35), rgba(0,0,0,0.75))`,
+        }}
+      />
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `radial-gradient(120% 80% at 50% 40%, transparent 55%, rgba(0,0,0,0.85) 100%)`,
+        }}
+      />
 
       {/* Fog layer */}
       {cinematic && (
-        <div className="fog-drift absolute inset-0 pointer-events-none opacity-40 mix-blend-screen" aria-hidden style={{
-          backgroundImage:
-            "radial-gradient(60% 40% at 20% 60%, rgba(180,200,220,0.35), transparent 60%)," +
-            "radial-gradient(50% 35% at 80% 40%, rgba(140,170,200,0.3), transparent 65%)",
-          backgroundSize: "200% 200%",
-        }} />
+        <div
+          className="fog-drift absolute inset-0 pointer-events-none opacity-40 mix-blend-screen"
+          aria-hidden
+          style={{
+            backgroundImage:
+              "radial-gradient(60% 40% at 20% 60%, rgba(180,200,220,0.35), transparent 60%)," +
+              "radial-gradient(50% 35% at 80% 40%, rgba(140,170,200,0.3), transparent 65%)",
+            backgroundSize: "200% 200%",
+          }}
+        />
       )}
 
       {/* District-specific live overlay */}
       {district && <DistrictLiveFX district={district} />}
 
       {/* Grain */}
-      <div className="absolute inset-0 opacity-[0.18] mix-blend-overlay pointer-events-none" aria-hidden style={{
-        backgroundImage: "radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px)",
-        backgroundSize: "3px 3px",
-      }} />
+      <div
+        className="absolute inset-0 opacity-[0.18] mix-blend-overlay pointer-events-none"
+        aria-hidden
+        style={{
+          backgroundImage: "radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px)",
+          backgroundSize: "3px 3px",
+        }}
+      />
 
       {/* Copy */}
       <div className="relative h-full flex flex-col justify-end px-4 sm:px-8 pb-6 max-w-6xl mx-auto">

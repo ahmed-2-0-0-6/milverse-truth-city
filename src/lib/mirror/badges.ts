@@ -23,7 +23,8 @@ export const BADGES: BadgeDef[] = [
     name: "Imposter Spotter",
     blurb: "Flagged 3 imposters correctly.",
     emoji: "👁️",
-    earned: (p) => p.history.filter((h) => h.truth === "IMPOSTER" && h.result === "correct").length >= 3,
+    earned: (p) =>
+      p.history.filter((h) => h.truth === "IMPOSTER" && h.result === "correct").length >= 3,
   },
   {
     id: "no-false-alarm",
@@ -44,7 +45,8 @@ export const BADGES: BadgeDef[] = [
     name: "Clean Room",
     blurb: "Solved a Tier 5 case.",
     emoji: "🧪",
-    earned: (p) => p.history.some((h) => h.tier === 5 && (h.result === "correct" || h.result === "lucky_guess")),
+    earned: (p) =>
+      p.history.some((h) => h.tier === 5 && (h.result === "correct" || h.result === "lucky_guess")),
   },
   {
     id: "field-editor",
@@ -59,7 +61,11 @@ const KEY = "milverse.badges";
 
 export function loadEarnedBadges(): string[] {
   if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; }
+  try {
+    return JSON.parse(localStorage.getItem(KEY) || "[]");
+  } catch {
+    return [];
+  }
 }
 
 function saveEarnedBadges(ids: string[]) {

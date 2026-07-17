@@ -10,25 +10,82 @@ import archiveArt from "@/assets/district-archive.jpg";
 import cleanroomArt from "@/assets/district-cleanroom.jpg";
 import mirrorVideo from "@/assets/mirror.mp4.asset.json";
 
-type District = { key: string; label: string; tag: string; art: string; video?: string; href: string; glow: string };
+type District = {
+  key: string;
+  label: string;
+  tag: string;
+  art: string;
+  video?: string;
+  href: string;
+  glow: string;
+};
 const DISTRICTS: District[] = [
-  { key: "mirror", label: "THE MIRROR", tag: "Judge messages aimed at you — real family, or someone wearing them?", art: mirrorArt, video: mirrorVideo.url, href: "/mirror", glow: "34,211,238" },
-  { key: "feed", label: "THE FEED", tag: "Judge real-world posts — true, false, or misleading?", art: feedArt, href: "/feed", glow: "245,185,66" },
-  { key: "studio", label: "THE STUDIO", tag: "Design the attack yourself — teach by authoring.", art: studioArt, href: "/studio", glow: "245,185,66" },
-  { key: "archive", label: "THE ARCHIVE", tag: "Revisit closed cases — build the pattern memory.", art: archiveArt, href: "/archive", glow: "34,211,238" },
-  { key: "cleanroom", label: "CLEAN ROOM", tag: "Calibrate confidence — know when you know.", art: cleanroomArt, href: "/devintel", glow: "34,211,238" },
+  {
+    key: "mirror",
+    label: "THE MIRROR",
+    tag: "Judge messages aimed at you — real family, or someone wearing them?",
+    art: mirrorArt,
+    video: mirrorVideo.url,
+    href: "/mirror",
+    glow: "34,211,238",
+  },
+  {
+    key: "feed",
+    label: "THE FEED",
+    tag: "Judge real-world posts — true, false, or misleading?",
+    art: feedArt,
+    href: "/feed",
+    glow: "245,185,66",
+  },
+  {
+    key: "studio",
+    label: "THE STUDIO",
+    tag: "Design the attack yourself — teach by authoring.",
+    art: studioArt,
+    href: "/studio",
+    glow: "245,185,66",
+  },
+  {
+    key: "archive",
+    label: "THE ARCHIVE",
+    tag: "Revisit closed cases — build the pattern memory.",
+    art: archiveArt,
+    href: "/archive",
+    glow: "34,211,238",
+  },
+  {
+    key: "cleanroom",
+    label: "CLEAN ROOM",
+    tag: "Calibrate confidence — know when you know.",
+    art: cleanroomArt,
+    href: "/devintel",
+    glow: "34,211,238",
+  },
 ];
 
 const BEATS = [
-  { headline: "Every day, someone in your family gets a message.", sub: "It's already happened this week. Maybe today." },
+  {
+    headline: "Every day, someone in your family gets a message.",
+    sub: "It's already happened this week. Maybe today.",
+  },
   { headline: "It looks real. It sounds real.", sub: "Perfect grammar. Familiar face. Small ask." },
-  { headline: "Spotting fakes is dying. Verifying is forever.", sub: "You can't out-see a machine. You can out-verify one." },
-  { headline: "Welcome to MILVERSE.", sub: "Enter as a target. Leave as a designer.", finale: true },
+  {
+    headline: "Spotting fakes is dying. Verifying is forever.",
+    sub: "You can't out-see a machine. You can out-verify one.",
+  },
+  {
+    headline: "Welcome to MILVERSE.",
+    sub: "Enter as a target. Leave as a designer.",
+    finale: true,
+  },
 ];
 
 const MIL_TRIAD = [
   { word: "MEDIA", line: "Every format a lie can wear: posts, forwards, headlines, images." },
-  { word: "INFORMATION", line: "Name the manipulation: misinformation, disinformation, malinformation." },
+  {
+    word: "INFORMATION",
+    line: "Name the manipulation: misinformation, disinformation, malinformation.",
+  },
   { word: "LITERACY", line: "Learn the counter-move, then design your own cases." },
 ];
 
@@ -42,9 +99,10 @@ export function ScrollStory() {
   function submerge(href: string, key: string) {
     if (submerging) return;
     setSubmerging(key);
-    window.setTimeout(() => { (navigate as unknown as (opts: { to: string }) => void)({ to: href }); }, 720);
+    window.setTimeout(() => {
+      (navigate as unknown as (opts: { to: string }) => void)({ to: href });
+    }, 720);
   }
-
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -69,7 +127,12 @@ export function ScrollStory() {
             duration: 0.9,
             ease: "power3.out",
             stagger: 0.12,
-            scrollTrigger: { trigger: el, start: "top 70%", end: "bottom top", toggleActions: "play none none reverse" },
+            scrollTrigger: {
+              trigger: el,
+              start: "top 70%",
+              end: "bottom top",
+              toggleActions: "play none none reverse",
+            },
           });
           gsap.to(el.querySelector(".beat-bg"), {
             yPercent: -20,
@@ -107,36 +170,54 @@ export function ScrollStory() {
             duration: 1.4,
             ease: "power2.out",
             scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" },
-            onUpdate: () => { el.textContent = Math.round(obj.v).toLocaleString(); },
+            onUpdate: () => {
+              el.textContent = Math.round(obj.v).toLocaleString();
+            },
           });
         });
       }, rootRef);
 
-      cleanup = () => { ctx.revert(); ScrollTrigger.getAll().forEach((t) => t.kill()); };
+      cleanup = () => {
+        ctx.revert();
+        ScrollTrigger.getAll().forEach((t) => t.kill());
+      };
     })();
 
-    return () => { cancelled = true; cleanup?.(); };
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
   }, []);
 
   return (
     <div ref={rootRef} className="scrollstory relative">
       {/* Story beats */}
       {BEATS.map((b, i) => (
-        <section key={i} className={`story-beat relative min-h-[85vh] flex items-center justify-center overflow-hidden px-6 ${b.finale ? "finale-beat" : ""}`}>
+        <section
+          key={i}
+          className={`story-beat relative min-h-[85vh] flex items-center justify-center overflow-hidden px-6 ${b.finale ? "finale-beat" : ""}`}
+        >
           <div className="beat-bg absolute inset-0 -z-10" aria-hidden>
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/[0.04] to-transparent" />
-            <div className="absolute inset-0 opacity-30" style={{
-              backgroundImage: "radial-gradient(rgba(255,255,255,0.25) 1px, transparent 1px)",
-              backgroundSize: "3px 3px",
-            }} />
+            <div
+              className="absolute inset-0 opacity-30"
+              style={{
+                backgroundImage: "radial-gradient(rgba(255,255,255,0.25) 1px, transparent 1px)",
+                backgroundSize: "3px 3px",
+              }}
+            />
           </div>
           <div className="relative max-w-4xl text-center">
             <div className="stencil text-[10px] text-cyan-300/70 mb-6">BEAT · 0{i + 1} / 04</div>
-            <h2 className="beat-line text-4xl sm:text-6xl md:text-7xl font-black leading-[0.95] tracking-tight text-white"
-                style={{ fontFamily: '"Bebas Neue", "Space Grotesk", sans-serif' }}>
+            <h2
+              className="beat-line text-4xl sm:text-6xl md:text-7xl font-black leading-[0.95] tracking-tight text-white"
+              style={{ fontFamily: '"Bebas Neue", "Space Grotesk", sans-serif' }}
+            >
               {highlight(b.headline)}
             </h2>
-            <p className="beat-line mt-6 text-base sm:text-lg text-white/60 max-w-xl mx-auto">{b.sub}</p>
+            <p className="beat-line mt-6 text-base sm:text-lg text-white/60 max-w-xl mx-auto">
+              {b.sub}
+            </p>
             {b.finale && (
               <div className="beat-line mt-10 grid grid-cols-3 gap-4 max-w-xl mx-auto">
                 <Stat label="CASES" value={128} />
@@ -155,15 +236,25 @@ export function ScrollStory() {
         </div>
         <div className="relative max-w-5xl text-center">
           <div className="stencil text-[10px] text-cyan-300/70 mb-6">THE THESIS</div>
-          <h2 className="beat-line text-3xl sm:text-5xl font-black leading-tight tracking-tight text-white mb-10"
-              style={{ fontFamily: '"Bebas Neue", "Space Grotesk", sans-serif' }}>
+          <h2
+            className="beat-line text-3xl sm:text-5xl font-black leading-tight tracking-tight text-white mb-10"
+            style={{ fontFamily: '"Bebas Neue", "Space Grotesk", sans-serif' }}
+          >
             THIS IS MEDIA &amp; INFORMATION LITERACY, <span className="text-cyan-300">PLAYED.</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {MIL_TRIAD.map((m) => (
-              <div key={m.word} className="beat-line border border-white/10 bg-white/[0.03] p-6 rounded-sm">
-                <div className="text-5xl sm:text-6xl font-black text-cyan-300 tracking-tight"
-                     style={{ fontFamily: '"Bebas Neue", sans-serif', textShadow: "0 0 24px rgba(34,211,238,0.45)" }}>
+              <div
+                key={m.word}
+                className="beat-line border border-white/10 bg-white/[0.03] p-6 rounded-sm"
+              >
+                <div
+                  className="text-5xl sm:text-6xl font-black text-cyan-300 tracking-tight"
+                  style={{
+                    fontFamily: '"Bebas Neue", sans-serif',
+                    textShadow: "0 0 24px rgba(34,211,238,0.45)",
+                  }}
+                >
                   {m.word}
                 </div>
                 <p className="mt-3 text-sm text-white/70 leading-relaxed">{m.line}</p>
@@ -173,14 +264,15 @@ export function ScrollStory() {
         </div>
       </section>
 
-
-
       {/* Horizontal district gallery */}
       <div ref={horizontalRef} className="relative hidden md:block overflow-hidden">
         <div className="absolute top-8 left-1/2 -translate-x-1/2 stencil text-[10px] text-cyan-300/70 z-10">
           THE DISTRICTS · SCROLL →
         </div>
-        <div ref={trackRef} className="flex gap-6 pl-8 pr-8 h-screen items-center will-change-transform">
+        <div
+          ref={trackRef}
+          className="flex gap-6 pl-8 pr-8 h-screen items-center will-change-transform"
+        >
           {DISTRICTS.map((d) => {
             const isSubmerging = submerging === d.key;
             const dimmed = submerging && !isSubmerging;
@@ -191,42 +283,86 @@ export function ScrollStory() {
                 onClick={() => submerge(d.href, d.key)}
                 aria-label={`Enter ${d.label}`}
                 className={`district-card group relative shrink-0 w-[78vw] max-w-[720px] aspect-[4/5] rounded-sm overflow-hidden border border-white/10 text-left transition-all duration-500 ${isSubmerging ? "submerging" : ""} ${dimmed ? "opacity-20 scale-95" : ""}`}
-                style={{ boxShadow: `0 30px 80px -20px rgba(${d.glow},0.45)`, ["--glow" as string]: d.glow }}
+                style={{
+                  boxShadow: `0 30px 80px -20px rgba(${d.glow},0.45)`,
+                  ["--glow" as string]: d.glow,
+                }}
               >
                 {d.video ? (
                   <video
                     src={d.video}
-                    autoPlay muted loop playsInline
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
                     className="absolute inset-0 h-full w-full object-cover kenburns"
                   />
                 ) : (
-                  <img src={d.art} alt="" loading="lazy" width={1536} height={1024}
-                       className="absolute inset-0 h-full w-full object-cover kenburns" />
+                  <img
+                    src={d.art}
+                    alt=""
+                    loading="lazy"
+                    width={1536}
+                    height={1024}
+                    className="absolute inset-0 h-full w-full object-cover kenburns"
+                  />
                 )}
                 <DistrictLiveFX district={d.key as DistrictKey} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-                <div className="absolute inset-0 opacity-20 mix-blend-overlay dot-drift" style={{
-                  backgroundImage: "radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px)", backgroundSize: "3px 3px",
-                }} />
+                <div
+                  className="absolute inset-0 opacity-20 mix-blend-overlay dot-drift"
+                  style={{
+                    backgroundImage: "radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px)",
+                    backgroundSize: "3px 3px",
+                  }}
+                />
                 {/* animated scanlines */}
-                <div className="absolute inset-0 pointer-events-none scanlines-live opacity-30" aria-hidden />
+                <div
+                  className="absolute inset-0 pointer-events-none scanlines-live opacity-30"
+                  aria-hidden
+                />
                 {/* moving sheen */}
                 <div className="absolute inset-0 pointer-events-none scan-sheen" aria-hidden />
                 {/* neon flicker vignette */}
-                <div className="absolute inset-0 pointer-events-none neon-flicker-edge"
-                     style={{ boxShadow: `inset 0 0 80px rgba(${d.glow},0.35), inset 0 0 180px rgba(${d.glow},0.15)` }}
-                     aria-hidden />
+                <div
+                  className="absolute inset-0 pointer-events-none neon-flicker-edge"
+                  style={{
+                    boxShadow: `inset 0 0 80px rgba(${d.glow},0.35), inset 0 0 180px rgba(${d.glow},0.15)`,
+                  }}
+                  aria-hidden
+                />
                 {/* pulsing color glow */}
-                <div className="absolute inset-0 pointer-events-none mix-blend-screen opacity-40"
-                     style={{ background: `radial-gradient(60% 40% at 50% 60%, rgba(${d.glow},0.35), transparent 70%)`, animation: "district-pulse 4.5s ease-in-out infinite" }}
-                     aria-hidden />
+                <div
+                  className="absolute inset-0 pointer-events-none mix-blend-screen opacity-40"
+                  style={{
+                    background: `radial-gradient(60% 40% at 50% 60%, rgba(${d.glow},0.35), transparent 70%)`,
+                    animation: "district-pulse 4.5s ease-in-out infinite",
+                  }}
+                  aria-hidden
+                />
                 {/* hover chromatic ripple */}
-                <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                     style={{ background: `conic-gradient(from 0deg at 50% 50%, transparent, rgba(${d.glow},0.18), transparent 60%)`, animation: "district-swirl 8s linear infinite" }}
-                     aria-hidden />
+                <div
+                  className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: `conic-gradient(from 0deg at 50% 50%, transparent, rgba(${d.glow},0.18), transparent 60%)`,
+                    animation: "district-swirl 8s linear infinite",
+                  }}
+                  aria-hidden
+                />
                 <div className="absolute bottom-0 left-0 right-0 p-8">
-                  <div className="stencil text-[10px] mb-2 tracking-widest" style={{ color: `rgb(${d.glow})` }}>{d.tag}</div>
-                  <h3 className="text-5xl font-black text-white tracking-tight glitch-flicker" style={{ fontFamily: '"Bebas Neue", sans-serif', textShadow: `0 0 24px rgba(${d.glow},0.55), 0 0 4px rgba(${d.glow},0.9)` }}>
+                  <div
+                    className="stencil text-[10px] mb-2 tracking-widest"
+                    style={{ color: `rgb(${d.glow})` }}
+                  >
+                    {d.tag}
+                  </div>
+                  <h3
+                    className="text-5xl font-black text-white tracking-tight glitch-flicker"
+                    style={{
+                      fontFamily: '"Bebas Neue", sans-serif',
+                      textShadow: `0 0 24px rgba(${d.glow},0.55), 0 0 4px rgba(${d.glow},0.9)`,
+                    }}
+                  >
                     {d.label}
                   </h3>
                   <div className="mt-3 stencil text-[10px] text-white/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -238,8 +374,12 @@ export function ScrollStory() {
                 </div>
                 {/* submerge wave */}
                 {isSubmerging && (
-                  <div className="absolute inset-0 pointer-events-none submerge-flash"
-                       style={{ background: `radial-gradient(circle at 50% 50%, rgba(${d.glow},0.8), rgba(0,0,0,0.95) 70%)` }} />
+                  <div
+                    className="absolute inset-0 pointer-events-none submerge-flash"
+                    style={{
+                      background: `radial-gradient(circle at 50% 50%, rgba(${d.glow},0.8), rgba(0,0,0,0.95) 70%)`,
+                    }}
+                  />
                 )}
               </button>
             );
@@ -262,22 +402,56 @@ export function ScrollStory() {
               style={{ ["--glow" as string]: d.glow }}
             >
               {d.video ? (
-                <video src={d.video} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" />
+                <video
+                  src={d.video}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
               ) : (
-                <img src={d.art} alt="" loading="lazy" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover" />
+                <img
+                  src={d.art}
+                  alt=""
+                  loading="lazy"
+                  width={1536}
+                  height={1024}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
               )}
               <DistrictLiveFX district={d.key as DistrictKey} intensity="soft" />
-              <div className="absolute inset-0 pointer-events-none scanlines-live opacity-25" aria-hidden />
-              <div className="absolute inset-0 pointer-events-none neon-flicker-edge"
-                   style={{ boxShadow: `inset 0 0 60px rgba(${d.glow},0.35)` }} aria-hidden />
+              <div
+                className="absolute inset-0 pointer-events-none scanlines-live opacity-25"
+                aria-hidden
+              />
+              <div
+                className="absolute inset-0 pointer-events-none neon-flicker-edge"
+                style={{ boxShadow: `inset 0 0 60px rgba(${d.glow},0.35)` }}
+                aria-hidden
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-4">
-                <div className="stencil text-[9px]" style={{ color: `rgb(${d.glow})` }}>{d.tag}</div>
-                <h3 className="text-3xl font-black text-white glitch-flicker" style={{ fontFamily: '"Bebas Neue", sans-serif', textShadow: `0 0 18px rgba(${d.glow},0.5)` }}>{d.label}</h3>
+                <div className="stencil text-[9px]" style={{ color: `rgb(${d.glow})` }}>
+                  {d.tag}
+                </div>
+                <h3
+                  className="text-3xl font-black text-white glitch-flicker"
+                  style={{
+                    fontFamily: '"Bebas Neue", sans-serif',
+                    textShadow: `0 0 18px rgba(${d.glow},0.5)`,
+                  }}
+                >
+                  {d.label}
+                </h3>
               </div>
               {isSubmerging && (
-                <div className="absolute inset-0 pointer-events-none submerge-flash"
-                     style={{ background: `radial-gradient(circle at 50% 50%, rgba(${d.glow},0.8), rgba(0,0,0,0.95) 70%)` }} />
+                <div
+                  className="absolute inset-0 pointer-events-none submerge-flash"
+                  style={{
+                    background: `radial-gradient(circle at 50% 50%, rgba(${d.glow},0.8), rgba(0,0,0,0.95) 70%)`,
+                  }}
+                />
               )}
             </button>
           );
@@ -290,7 +464,13 @@ export function ScrollStory() {
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div className="border border-white/10 bg-white/[0.03] p-3">
-      <div className="count-num text-3xl font-black text-cyan-300 tabular-nums" data-target={value} style={{ fontFamily: '"Bebas Neue", sans-serif' }}>0</div>
+      <div
+        className="count-num text-3xl font-black text-cyan-300 tabular-nums"
+        data-target={value}
+        style={{ fontFamily: '"Bebas Neue", sans-serif' }}
+      >
+        0
+      </div>
       <div className="stencil text-[9px] text-white/50 mt-1">{label}</div>
     </div>
   );
@@ -309,7 +489,12 @@ function highlight(text: string) {
   return text.split(/(\s+)/).map((tok, i) => {
     const clean = tok.replace(/[^a-zA-Z]/g, "");
     const cls = map[clean.toLowerCase()] || map[clean];
-    if (cls) return <span key={i} className={cls}>{tok}</span>;
+    if (cls)
+      return (
+        <span key={i} className={cls}>
+          {tok}
+        </span>
+      );
     return <span key={i}>{tok}</span>;
   });
 }

@@ -11,9 +11,15 @@ export const Route = createFileRoute("/manual/")({
   head: () => ({
     meta: [
       { title: "The Field Manual — MILVERSE" },
-      { name: "description", content: "A detective's codex of manipulation tactics. Every entry unlocks through play." },
+      {
+        name: "description",
+        content: "A detective's codex of manipulation tactics. Every entry unlocks through play.",
+      },
       { property: "og:title", content: "The Field Manual — MILVERSE" },
-      { property: "og:description", content: "A living MIL codex — tactics, red flags, and counter-moves." },
+      {
+        property: "og:description",
+        content: "A living MIL codex — tactics, red flags, and counter-moves.",
+      },
     ],
   }),
   component: ManualIndex,
@@ -42,21 +48,37 @@ function ManualIndex() {
     <div className="min-h-screen grain">
       <TopBar />
       <main className="mx-auto max-w-6xl px-4 py-10">
-        <Link to="/" className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground">← CITY</Link>
+        <Link
+          to="/"
+          className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
+        >
+          ← CITY
+        </Link>
         <div className="mt-4">
-          <div className="font-mono text-xs tracking-[0.3em] text-primary">THE FIELD MANUAL · MIL CODEX</div>
-          <h1 className="mt-2 text-4xl sm:text-5xl font-black tracking-tight" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
+          <div className="font-mono text-xs tracking-[0.3em] text-primary">
+            THE FIELD MANUAL · MIL CODEX
+          </div>
+          <h1
+            className="mt-2 text-4xl sm:text-5xl font-black tracking-tight"
+            style={{ fontFamily: '"Bebas Neue", sans-serif' }}
+          >
             NAME THE TACTIC. LEARN THE COUNTER-MOVE.
           </h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Redacted files unlock as you face each tactic in play. This is your growing dossier of how deception works —
-            and how to shut it down. MILVERSE never tells you a specific claim is true. This manual teaches your hand so YOU can.
+            Redacted files unlock as you face each tactic in play. This is your growing dossier of
+            how deception works — and how to shut it down. MILVERSE never tells you a specific claim
+            is true. This manual teaches your hand so YOU can.
           </p>
         </div>
 
         <div className="mt-6 flex flex-wrap items-center gap-4 rounded-md border border-border bg-card p-4">
-          <div className="stencil text-[10px] tracking-widest text-muted-foreground">FILES DECLASSIFIED</div>
-          <div className="text-2xl font-black text-primary tabular-nums" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
+          <div className="stencil text-[10px] tracking-widest text-muted-foreground">
+            FILES DECLASSIFIED
+          </div>
+          <div
+            className="text-2xl font-black text-primary tabular-nums"
+            style={{ fontFamily: '"Bebas Neue", sans-serif' }}
+          >
             {unlockedCount} / {MANUAL_ENTRIES.length}
           </div>
           <div className="flex-1 min-w-[140px] h-1.5 bg-muted rounded-full overflow-hidden">
@@ -77,8 +99,9 @@ function ManualIndex() {
         </div>
 
         <div className="mt-6 rounded-md border border-border bg-background/50 p-4 text-xs text-muted-foreground">
-          <b className="text-foreground">How MILVERSE uses AI:</b> AI role-plays the scammer, imposter, or forwarded voice so you can rehearse
-          safely. AI in MILVERSE never tells you what is true. Truth verdicts come from the case dossier and from the tools you learn here.
+          <b className="text-foreground">How MILVERSE uses AI:</b> AI role-plays the scammer,
+          imposter, or forwarded voice so you can rehearse safely. AI in MILVERSE never tells you
+          what is true. Truth verdicts come from the case dossier and from the tools you learn here.
         </div>
 
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -96,14 +119,19 @@ function ManualIndex() {
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="stencil text-[10px] tracking-widest text-muted-foreground">{e.code}</div>
+                  <div className="stencil text-[10px] tracking-widest text-muted-foreground">
+                    {e.code}
+                  </div>
                   {isUnlocked ? (
                     <FileText className="h-4 w-4 text-primary" />
                   ) : (
                     <Lock className="h-4 w-4 text-muted-foreground" />
                   )}
                 </div>
-                <div className="mt-3 text-2xl font-black tracking-tight" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
+                <div
+                  className="mt-3 text-2xl font-black tracking-tight"
+                  style={{ fontFamily: '"Bebas Neue", sans-serif' }}
+                >
                   {isUnlocked ? e.name : "▓▓▓▓▓▓▓▓▓▓"}
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground italic">
@@ -120,7 +148,8 @@ function ManualIndex() {
             <Skull className="w-3 h-3" /> BOSS DOSSIERS · CLASSIFIED
           </div>
           <p className="text-xs text-muted-foreground mb-4 max-w-2xl">
-            Method pages for the three capstone bosses. Each dossier declassifies when you win the case in Boss Protocol.
+            Method pages for the three capstone bosses. Each dossier declassifies when you win the
+            case in Boss Protocol.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {BOSSES.map((b) => {
@@ -131,25 +160,46 @@ function ManualIndex() {
                   to="/boss/$bossId"
                   params={{ bossId: b.id }}
                   className={`block rounded-xl border p-5 transition ${
-                    dc ? "border-red-500/50 bg-red-950/20 hover:border-red-500" : "border-dashed border-border bg-muted/10 hover:border-red-500/40"
+                    dc
+                      ? "border-red-500/50 bg-red-950/20 hover:border-red-500"
+                      : "border-dashed border-border bg-muted/10 hover:border-red-500/40"
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="stencil text-[10px] tracking-widest text-red-400">{b.threatRating}</div>
-                    {dc ? <FileText className="h-4 w-4 text-red-400" /> : <Lock className="h-4 w-4 text-muted-foreground" />}
+                    <div className="stencil text-[10px] tracking-widest text-red-400">
+                      {b.threatRating}
+                    </div>
+                    {dc ? (
+                      <FileText className="h-4 w-4 text-red-400" />
+                    ) : (
+                      <Lock className="h-4 w-4 text-muted-foreground" />
+                    )}
                   </div>
-                  <div className="mt-3 text-2xl font-black tracking-tight" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
+                  <div
+                    className="mt-3 text-2xl font-black tracking-tight"
+                    style={{ fontFamily: '"Bebas Neue", sans-serif' }}
+                  >
                     {dc ? b.methodPage.codename : "▓▓▓▓▓▓▓"}
                   </div>
                   {dc ? (
                     <div className="mt-2 space-y-2 text-xs text-muted-foreground">
-                      <p><b className="text-foreground">How it works:</b> {b.methodPage.howItWorks}</p>
-                      <p><b className="text-foreground">The trap:</b> {b.methodPage.theTrap}</p>
-                      <p><b className="text-foreground">The counter:</b> {b.methodPage.theCounter}</p>
-                      <p className="italic pt-1 border-t border-red-500/20">{b.methodPage.realWorldPattern}</p>
+                      <p>
+                        <b className="text-foreground">How it works:</b> {b.methodPage.howItWorks}
+                      </p>
+                      <p>
+                        <b className="text-foreground">The trap:</b> {b.methodPage.theTrap}
+                      </p>
+                      <p>
+                        <b className="text-foreground">The counter:</b> {b.methodPage.theCounter}
+                      </p>
+                      <p className="italic pt-1 border-t border-red-500/20">
+                        {b.methodPage.realWorldPattern}
+                      </p>
                     </div>
                   ) : (
-                    <p className="mt-1 text-sm text-muted-foreground italic">Beat this boss to declassify.</p>
+                    <p className="mt-1 text-sm text-muted-foreground italic">
+                      Beat this boss to declassify.
+                    </p>
                   )}
                 </Link>
               );

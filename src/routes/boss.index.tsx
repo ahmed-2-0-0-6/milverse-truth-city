@@ -11,7 +11,11 @@ export const Route = createFileRoute("/boss/")({
   head: () => ({
     meta: [
       { title: "Boss Protocol — MILVERSE" },
-      { name: "description", content: "Capstone cases where fact-checking is the trap. Beat by protocol, not perception." },
+      {
+        name: "description",
+        content:
+          "Capstone cases where fact-checking is the trap. Beat by protocol, not perception.",
+      },
       { property: "og:title", content: "Boss Protocol — MILVERSE" },
       { property: "og:description", content: "Fact-checks will not save you. Protocol will." },
     ],
@@ -39,14 +43,17 @@ function BossLobby() {
           <div className="text-xs tracking-[0.3em] text-red-500 mb-2">SPECIAL CASE FILE</div>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight">BOSS PROTOCOL</h1>
           <p className="text-white/60 mt-2 max-w-2xl">
-            Capstone cases where the scam is built from <em>true facts</em>. Every surface fact-check confirms the cover story.
-            Beatable only by protocol: callback, second-person, shared-secret, or HOLD.
+            Capstone cases where the scam is built from <em>true facts</em>. Every surface
+            fact-check confirms the cover story. Beatable only by protocol: callback, second-person,
+            shared-secret, or HOLD.
           </p>
         </div>
 
         {/* Doctrine card */}
         <div className="border border-red-900/50 bg-gradient-to-br from-red-950/40 to-black rounded-lg p-5 mb-8">
-          <div className="text-[10px] tracking-[0.3em] text-red-400 mb-3">THE DOCTRINE — SHAREABLE</div>
+          <div className="text-[10px] tracking-[0.3em] text-red-400 mb-3">
+            THE DOCTRINE — SHAREABLE
+          </div>
           <ul className="space-y-2">
             {DOCTRINE_RULES.map((r) => (
               <li key={r.n} className="flex gap-3 text-sm">
@@ -59,20 +66,27 @@ function BossLobby() {
 
         <div className="grid gap-4">
           {BOSSES.map((b) => {
-            const wins = prof?.attempts.filter((a) => a.bossId === b.id && a.outcome === "WIN").length ?? 0;
-            const losses = prof?.attempts.filter((a) => a.bossId === b.id && a.outcome !== "WIN").length ?? 0;
+            const wins =
+              prof?.attempts.filter((a) => a.bossId === b.id && a.outcome === "WIN").length ?? 0;
+            const losses =
+              prof?.attempts.filter((a) => a.bossId === b.id && a.outcome !== "WIN").length ?? 0;
             const declassified = prof?.declassified.includes(b.id) ?? false;
             const rematchOk = canRematch(b.id);
-            const districtHref = b.district === "mirror" ? "/mirror" : b.district === "feed" ? "/feed" : "/";
-            const districtLabel = b.district === "mirror" ? "The Mirror" : b.district === "feed" ? "The Feed" : b.district;
+            const districtHref =
+              b.district === "mirror" ? "/mirror" : b.district === "feed" ? "/feed" : "/";
+            const districtLabel =
+              b.district === "mirror"
+                ? "The Mirror"
+                : b.district === "feed"
+                  ? "The Feed"
+                  : b.district;
             const assignmentOpen = !rematchOk && losses > 0;
             return (
-              <div key={b.id} className="border border-white/10 hover:border-red-500/60 bg-black/60 rounded-lg transition">
-                <Link
-                  to="/boss/$bossId"
-                  params={{ bossId: b.id }}
-                  className="group block p-5"
-                >
+              <div
+                key={b.id}
+                className="border border-white/10 hover:border-red-500/60 bg-black/60 rounded-lg transition"
+              >
+                <Link to="/boss/$bossId" params={{ bossId: b.id }} className="group block p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 text-[10px] tracking-[0.3em] text-red-400 mb-1">
@@ -88,19 +102,38 @@ function BossLobby() {
                       </div>
                     </div>
                     <div className="text-right text-xs text-white/50 space-y-1 shrink-0">
-                      {wins > 0 && <div className="flex items-center gap-1 justify-end text-emerald-400"><Award className="w-3 h-3" /> {b.badge.label}</div>}
-                      {losses > 0 && <div>{losses} loss{losses > 1 ? "es" : ""}</div>}
-                      {declassified && <div className="flex items-center gap-1 justify-end text-white/70"><CheckCircle2 className="w-3 h-3" /> DECLASSIFIED</div>}
-                      {!rematchOk && <div className="flex items-center gap-1 justify-end text-amber-500"><Lock className="w-3 h-3" /> REMATCH LOCKED</div>}
+                      {wins > 0 && (
+                        <div className="flex items-center gap-1 justify-end text-emerald-400">
+                          <Award className="w-3 h-3" /> {b.badge.label}
+                        </div>
+                      )}
+                      {losses > 0 && (
+                        <div>
+                          {losses} loss{losses > 1 ? "es" : ""}
+                        </div>
+                      )}
+                      {declassified && (
+                        <div className="flex items-center gap-1 justify-end text-white/70">
+                          <CheckCircle2 className="w-3 h-3" /> DECLASSIFIED
+                        </div>
+                      )}
+                      {!rematchOk && (
+                        <div className="flex items-center gap-1 justify-end text-amber-500">
+                          <Lock className="w-3 h-3" /> REMATCH LOCKED
+                        </div>
+                      )}
                     </div>
                   </div>
                 </Link>
 
                 {assignmentOpen && (
                   <div className="border-t border-amber-500/30 bg-amber-500/[0.05] rounded-b-lg px-5 py-3">
-                    <div className="text-[10px] tracking-[0.3em] text-amber-400 mb-1">ASSIGNMENT · REMATCH GATE</div>
+                    <div className="text-[10px] tracking-[0.3em] text-amber-400 mb-1">
+                      ASSIGNMENT · REMATCH GATE
+                    </div>
                     <div className="text-sm text-white/90">
-                      Win 1 case in <span className="font-semibold">{districtLabel}</span> to unlock the rematch.
+                      Win 1 case in <span className="font-semibold">{districtLabel}</span> to unlock
+                      the rematch.
                     </div>
                     <div className="mt-1 font-mono text-[11px] text-amber-300/90">
                       PROGRESS · 0 / 1 COMPLETE

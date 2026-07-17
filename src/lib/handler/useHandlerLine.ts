@@ -79,7 +79,9 @@ export function useHandlerLine(input: HandlerLineInput): HandlerLineState {
 
     (async () => {
       try {
-        const res = await call({ data: { surface: input.surface, fallback: input.fallback, summary: input.summary } });
+        const res = await call({
+          data: { surface: input.surface, fallback: input.fallback, summary: input.summary },
+        });
         if (done) return;
         done = true;
         clearTimeout(timer);
@@ -94,8 +96,10 @@ export function useHandlerLine(input: HandlerLineInput): HandlerLineState {
       }
     })();
 
-    return () => { clearTimeout(timer); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input.surface, input.fallback, input.cacheKey, JSON.stringify(input.summary), input.enabled]);
 
   return state;
