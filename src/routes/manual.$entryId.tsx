@@ -93,7 +93,9 @@ function EntryPage() {
               FILE · <span className="text-primary">{e.code}</span>
             </span>
             <span>TACTIC · REFERENCE</span>
-            <span>STATUS · <span className="text-primary">DECLASSIFIED</span></span>
+            <span>
+              STATUS · <span className="text-primary">DECLASSIFIED</span>
+            </span>
             <span className="ml-auto">STAMPED · {stamp}</span>
           </header>
 
@@ -139,10 +141,7 @@ function EntryPage() {
               </SectionLabel>
               <ol className="space-y-2">
                 {e.redFlags.map((r, i) => (
-                  <li
-                    key={i}
-                    className="grid grid-cols-[auto_1fr] items-start gap-3 text-sm"
-                  >
+                  <li key={i} className="grid grid-cols-[auto_1fr] items-start gap-3 text-sm">
                     <span className="stencil text-[10px] tracking-widest text-caution tabular-nums pt-0.5">
                       {String(i + 1).padStart(2, "0")}
                     </span>
@@ -160,10 +159,7 @@ function EntryPage() {
             </section>
 
             <div className="mt-8 border-t border-dashed border-border pt-4 flex flex-wrap items-center gap-3 stencil text-[10px] tracking-widest">
-              <Link
-                to="/manual"
-                className="text-muted-foreground hover:text-foreground"
-              >
+              <Link to="/manual" className="text-muted-foreground hover:text-foreground">
                 ← ALL FILES
               </Link>
               <span className="text-muted-foreground/60">·</span>
@@ -191,9 +187,7 @@ function SectionLabel({
 }) {
   const color = tone === "warn" ? "text-caution" : "text-muted-foreground";
   return (
-    <div
-      className={`stencil text-[10px] tracking-widest mb-2 flex items-center gap-1.5 ${color}`}
-    >
+    <div className={`stencil text-[10px] tracking-widest mb-2 flex items-center gap-1.5 ${color}`}>
       {children}
     </div>
   );
