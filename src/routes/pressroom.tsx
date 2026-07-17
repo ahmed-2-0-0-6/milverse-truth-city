@@ -155,14 +155,41 @@ function PressroomPage() {
     <div className="min-h-screen grain">
       <TopBar />
       <main className="mx-auto max-w-6xl px-4 py-6">
-        <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-black" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
-            PRESSROOM
-          </h1>
-          <div className="stencil text-[10px] text-muted-foreground">
-            HAND-COMPOSED. NOTHING AUTO-ROTATES.
+        <header className="border-b border-border pb-4">
+          <div className="stencil text-[10px] tracking-[0.3em] text-primary">
+            THE DAILY MIRAGE · PRESSROOM · TEAM ONLY
           </div>
-        </div>
+          <div className="mt-1 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
+            <h1
+              className="text-4xl font-black leading-none tracking-tight"
+              style={{ fontFamily: '"Bebas Neue", sans-serif' }}
+            >
+              PRESSROOM
+            </h1>
+            <dl className="hidden sm:flex items-end gap-5 stencil text-[10px] text-muted-foreground">
+              <div className="text-right">
+                <dt className="tracking-[0.25em]">EDITIONS</dt>
+                <dd className="mt-0.5 text-lg text-foreground tabular-nums">{rows.length}</dd>
+              </div>
+              <div className="text-right">
+                <dt className="tracking-[0.25em]">DRAFTS</dt>
+                <dd className="mt-0.5 text-lg text-foreground tabular-nums">
+                  {rows.filter((r) => r.status !== "published" && r.status !== "locked").length}
+                </dd>
+              </div>
+              <div className="text-right">
+                <dt className="tracking-[0.25em]">LATEST</dt>
+                <dd className="mt-0.5 text-lg text-foreground tabular-nums">
+                  #{String(rows[0]?.edition_number ?? 0).padStart(3, "0")}
+                </dd>
+              </div>
+            </dl>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Hand-composed. Nothing auto-rotates. Every edition ships when a human hits publish.
+          </p>
+        </header>
+
 
         <div className="mt-4 grid md:grid-cols-[240px_minmax(0,1fr)] gap-6">
           {/* editions list */}
