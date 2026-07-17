@@ -1138,6 +1138,30 @@
   cursor: not-allowed;
 }
 
+/* Paper verdict tokens — one source of truth for pass/fail stamp colors.
+   Every reveal stamp (Front page, Forgery, Social, Puzzle, Read-Cover-to-Cover)
+   pulls from these two variables so the paper never drifts to seven different
+   greens and reds. */
+.paper {
+  --paper-pass: oklch(0.4 0.15 140);
+  --paper-pass-ink: oklch(0.35 0.15 140);
+  --paper-fail: oklch(0.5 0.2 25);
+  --paper-fail-ink: oklch(0.4 0.2 25);
+}
+.paper-stamp-pass {
+  color: var(--paper-pass-ink);
+  border-color: var(--paper-pass);
+}
+.paper-stamp-fail {
+  color: var(--paper-fail-ink);
+  border-color: var(--paper-fail);
+}
+.paper-ink-pass {
+  color: var(--paper-pass-ink);
+}
+
+
+
 @keyframes paper-unfold {
   0% {
     opacity: 0;

@@ -182,7 +182,7 @@ function PlayFlow({
                   <span className="inline-flex items-center gap-1">
                     <Search className="h-3 w-3" /> {p.label}
                   </span>
-                  {used && <span className="ml-2 text-[oklch(0.35_0.15_140)]">✓ used</span>}
+                  {used && <span className="ml-2 paper-ink-pass">✓ used</span>}
                 </button>
               );
             })}
@@ -282,7 +282,7 @@ function RevealBlock({
   return (
     <div className="mt-2">
       <div
-        className={`paper-stamp inline-block border-4 px-4 py-2 paper-mono text-sm tracking-[0.3em] ${correct ? "text-[oklch(0.35_0.15_140)] border-[oklch(0.4_0.15_140)]" : "text-[oklch(0.4_0.2_25)] border-[oklch(0.5_0.2_25)]"}`}
+        className={`paper-stamp inline-block border-4 px-4 py-2 paper-mono text-sm tracking-[0.3em] ${correct ? "paper-stamp-pass" : "paper-stamp-fail"}`}
       >
         {correct ? "CORRECT — TRUTH: " + truth : "MISFIRE — TRUTH: " + truth}
       </div>
@@ -332,7 +332,7 @@ function PostPlay({
   return (
     <div className="mt-3">
       <div
-        className={`paper-stamp inline-block border-4 px-4 py-2 paper-mono text-sm tracking-[0.3em] ${record.correct ? "text-[oklch(0.35_0.15_140)] border-[oklch(0.4_0.15_140)]" : "text-[oklch(0.4_0.2_25)] border-[oklch(0.5_0.2_25)]"}`}
+        className={`paper-stamp inline-block border-4 px-4 py-2 paper-mono text-sm tracking-[0.3em] ${record.correct ? "paper-stamp-pass" : "paper-stamp-fail"}`}
       >
         {record.correct ? "YOU FILED — TRUTH: " + truth : "YOU MISSED — TRUTH: " + truth}
       </div>

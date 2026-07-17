@@ -131,7 +131,7 @@ export function PaperPuzzle({
         ) : (
           <div>
             <div
-              className={`paper-stamp inline-block border-4 px-3 py-1 paper-mono text-xs tracking-[0.3em] ${correct ? "text-[oklch(0.35_0.15_140)] border-[oklch(0.4_0.15_140)]" : "text-[oklch(0.4_0.2_25)] border-[oklch(0.5_0.2_25)]"}`}
+              className={`paper-stamp inline-block border-4 px-3 py-1 paper-mono text-xs tracking-[0.3em] ${correct ? "paper-stamp-pass" : "paper-stamp-fail"}`}
             >
               {correct ? "CLEAN CUT" : "CLOSE — HONEST VERSION BELOW"}
             </div>
