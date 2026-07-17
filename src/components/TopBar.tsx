@@ -1,6 +1,7 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Volume2, VolumeX, BookOpen } from "lucide-react";
+import { Volume2, VolumeX, BookOpen, Menu, X } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription, SheetClose } from "@/components/ui/sheet";
 import {
   loadProfile,
   calibrationLabel,
