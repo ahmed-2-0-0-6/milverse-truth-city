@@ -330,7 +330,7 @@ function PilotPage() {
                   <div className="mt-3">
                     <ErrorState
                       title="Pilot service unreachable"
-                      message={cloudErr}
+                      description={cloudErr}
                       onRetry={() => { setCloudErr(null); void refreshCloud(); }}
                     />
                   </div>
