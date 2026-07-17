@@ -42,13 +42,13 @@ export function NotificationBanner({ banner, onDismiss, reducedMotion }: Props) 
         type="button"
         onClick={() => onDismiss(banner.id)}
         aria-label={`Notification from ${banner.sender}: ${banner.preview}. Tap to dismiss.`}
-        className="pointer-events-auto w-full text-left rounded-xl border border-white/10 bg-neutral-900/95 backdrop-blur shadow-2xl px-3 py-2.5 cursor-pointer hover:bg-neutral-800/95 transition-colors"
+        className="pointer-events-auto w-full text-left rounded-xl border border-white/10 bg-neutral-900/95 backdrop-blur shadow-2xl shadow-black/40 px-3 py-2.5 cursor-pointer hover:bg-neutral-800/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors"
       >
         <div className="flex items-center justify-between text-[10px] font-mono tracking-wider text-white/50 mb-0.5">
-          <span>{banner.sender}</span>
-          <span>{hh}:{mm}</span>
+          <span className="truncate">{banner.sender}</span>
+          <span className="tabular-nums">{hh}:{mm}</span>
         </div>
-        <div className="text-xs text-white line-clamp-2">{banner.preview}</div>
+        <div className="text-xs text-white line-clamp-2 leading-snug">{banner.preview}</div>
       </button>
     </div>
   );

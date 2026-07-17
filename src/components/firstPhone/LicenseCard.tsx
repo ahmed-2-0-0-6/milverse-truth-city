@@ -145,10 +145,10 @@ export function LicenseCard({ onClose }: Props) {
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2 print:hidden">
-        <button onClick={save} className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+        <button onClick={save} className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-all">
           <Download className="h-4 w-4" /> Save PNG
         </button>
-        <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm">
+        <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors">
           <Printer className="h-4 w-4" /> Print (A5)
         </button>
       </div>

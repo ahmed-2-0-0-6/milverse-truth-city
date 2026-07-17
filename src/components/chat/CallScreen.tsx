@@ -85,7 +85,7 @@ export function CallScreen({
         {direction === "in" && onAccept && ringing && (
           <button
             onClick={() => { setRinging(false); onAccept(); }}
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg"
+            className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-xl shadow-emerald-500/30 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300/50 transition-colors"
             aria-label="Accept"
           >
             <PhoneIncoming className="h-6 w-6" />
@@ -93,7 +93,7 @@ export function CallScreen({
         )}
         <button
           onClick={onEnd}
-          className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 hover:bg-red-400 text-white shadow-lg"
+          className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 hover:bg-red-400 text-white shadow-xl shadow-red-500/30 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-300/50 transition-colors"
           aria-label="End call"
         >
           {ringing && direction === "out" ? <PhoneOff className="h-6 w-6" /> : <Phone className="h-6 w-6 rotate-[135deg]" />}
