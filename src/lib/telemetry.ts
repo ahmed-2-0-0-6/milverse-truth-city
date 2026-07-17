@@ -31,7 +31,7 @@ const MAX_QUEUE = 10;
 const MAX_PAYLOAD_KEYS = 8;
 const TELEMETRY_ENDPOINT = "/api/public/telemetry";
 
-let queue: TelemetryEvent[] = [];
+const queue: TelemetryEvent[] = [];
 let timer: number | null = null;
 let sessionId = "";
 

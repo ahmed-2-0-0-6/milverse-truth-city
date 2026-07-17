@@ -77,7 +77,7 @@ function FlagFinder({
 
   // Split by flags to render circle-clickable spans
   const parts: Array<{ text: string; flag: string | null }> = [];
-  let idx = 0;
+  const idx = 0;
   const remaining: string[] = [combined];
   // simple sequential split
   const acc: Array<{ text: string; flag: string | null }> = [];
