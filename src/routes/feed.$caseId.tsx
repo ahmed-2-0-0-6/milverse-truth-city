@@ -636,6 +636,9 @@ function Debrief({
         <p className="mt-2 text-sm">{outcome.detail}</p>
       </div>
 
+      <CalibrationQuadrant profile={profileSnap} compact caption="CALIBRATION · AFTER THIS CASE" />
+
+
       <section className="rounded-xl border border-border bg-card p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="font-mono text-xs tracking-widest text-muted-foreground">
