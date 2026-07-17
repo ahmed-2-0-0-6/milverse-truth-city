@@ -3,6 +3,8 @@
 // Verdicts: TRUE / FALSE / MISLEADING / UNVERIFIED.
 
 import type { InspiredByCase } from "@/lib/mirror/inspired";
+import type { CastAfterword } from "@/lib/cast";
+
 
 export type FeedTier = 1 | 2 | 3;
 export type FeedVerdict = "TRUE" | "FALSE" | "MISLEADING" | "UNVERIFIED";
@@ -69,7 +71,10 @@ export interface FeedScenario {
   truthNote: string;
   respectfulScript: string;
   inspiredBy?: InspiredByCase;
+  /** Optional in-character aside from the recurring cast — colour only. */
+  castAfterword?: CastAfterword;
 }
+
 
 export const FEED_SCENARIOS: FeedScenario[] = [
   /* ── T1 FALSE — the bank rumor ─────────────────────────────── */
@@ -147,7 +152,12 @@ export const FEED_SCENARIOS: FeedScenario[] = [
         "News-ticker screenshots are the most-doctored evidence there is.",
       ],
     },
+    castAfterword: {
+      who: "nani",
+      line: "Nani ne aik nazar dekha aur bola: 'Yeh wohi purana rumour hai. Har election se pehle ghoomta hai. ATM par mat jao, chai banao.'",
+    },
   },
+
 
   /* ── T2 MISLEADING — the flood photo ───────────────────────── */
   {
@@ -423,7 +433,12 @@ export const FEED_SCENARIOS: FeedScenario[] = [
         "A '24-hour deadline' on a life-changing benefit is the trap.",
       ],
     },
+    castAfterword: {
+      who: "cousin-zohaib",
+      line: "Zohaib ne screenshot dekh ke hansa: 'Bhai domain mein hyphen dekha? .gov.pk kabhi hyphen nahin leta. Yeh scam 2020 se same template pe chal raha hai — sirf sena aur ministry ka naam badalta rehta hai.'",
+    },
   },
+
 
   /* ── T2 FALSE — kidnap-van rumor ───────────────────────────── */
   {
@@ -498,7 +513,12 @@ export const FEED_SCENARIOS: FeedScenario[] = [
         "'Share to every parent' is the signature of a hoax, not a warning.",
       ],
     },
+    castAfterword: {
+      who: "nani",
+      line: "Nani ne voice note suna, phir mujhe sunaya: 'Yehi awaaz thi jab tumhari ammi choti thi. Naya sirf yeh WhatsApp hai. Iss aunty ko phone karo aur bolo bhejna band karein — kisi aur ke baap ko na maar dein log iss ke chakkar mein.'",
+    },
   },
+
 
   /* ── T2 MISLEADING — the miracle doctor clip ──────────────── */
   {

@@ -17,6 +17,8 @@ import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
 import { Send, Search, Heart, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
+import { CAST } from "@/lib/cast";
+
 import { FormatFrame } from "@/components/feed/FormatFrame";
 import { Toolbelt } from "@/components/feed/Toolbelt";
 import { TacticStamp } from "@/components/TacticStamp";
@@ -666,6 +668,20 @@ function Debrief({
         </div>
         <p className="text-sm italic">"{scenario.respectfulScript}"</p>
       </div>
+
+      {scenario.castAfterword && (
+        <div className="rounded-xl border border-border/60 bg-muted/30 p-6">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">
+            AT HOME, LATER — {CAST[scenario.castAfterword.who].name.toUpperCase()}
+          </div>
+          <p className="text-sm leading-relaxed">{scenario.castAfterword.line}</p>
+          <p className="mt-2 text-xs text-muted-foreground italic">
+            {CAST[scenario.castAfterword.who].relation}
+          </p>
+        </div>
+      )}
+
+
 
       <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between text-sm">
         <span className="text-muted-foreground">Actions used</span>
