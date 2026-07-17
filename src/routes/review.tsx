@@ -209,7 +209,12 @@ function AssessmentTab({ passcode }: { passcode: string }) {
       setRows(res.entries ?? []);
       setPhase(res.phase?.phase ?? "intake");
       setLoadedCode(upper);
-    } catch (e) { setErr((e as Error).message); }
+      toast.success(`Loaded group ${upper}`, { description: `${res.entries?.length ?? 0} responses.` });
+    } catch (e) {
+      const msg = (e as Error).message;
+      setErr(msg);
+      toast.error("Couldn't load group", { description: msg });
+    }
     setBusy(false);
   }
 
@@ -219,7 +224,12 @@ function AssessmentTab({ passcode }: { passcode: string }) {
     try {
       await flipFn({ data: { passcode, groupCode: loadedCode, phase: next } as never });
       setPhase(next);
-    } catch (e) { setErr((e as Error).message); }
+      toast.success(`Group phase → ${next.toUpperCase()}`);
+    } catch (e) {
+      const msg = (e as Error).message;
+      setErr(msg);
+      toast.error("Couldn't change phase", { description: msg });
+    }
     setBusy(false);
   }
 
