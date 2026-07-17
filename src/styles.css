@@ -566,6 +566,99 @@ html[data-force-reduce-motion="on"] .marquee-track {
   animation: neon-flicker 6s ease-in-out infinite;
 }
 
+/* ── Dossier case cards — a folder on the night desk ──────────────
+   Tab = manila folder lip. Body = dark evidence folder with faint
+   fibre texture. Hover = torch sweep. Locked = sealed with tape.
+   All CSS — no images. */
+.dossier {
+  display: block;
+}
+.dossier-tab {
+  background: color-mix(in oklab, var(--color-caution) 22%, var(--color-card));
+  color: color-mix(in oklab, var(--color-caution) 75%, var(--color-foreground));
+  border: 1px solid color-mix(in oklab, var(--color-caution) 35%, transparent);
+  border-bottom: none;
+  transform: translateY(1px);
+  transition: background 200ms ease;
+}
+.dossier-tab-icon > svg {
+  height: 0.85rem;
+  width: 0.85rem;
+}
+.dossier-tab-citizen {
+  background: color-mix(in oklab, var(--color-primary) 20%, var(--color-card));
+  color: var(--color-primary);
+  border-color: color-mix(in oklab, var(--color-primary) 40%, transparent);
+}
+.dossier-live:hover .dossier-tab {
+  background: color-mix(in oklab, var(--color-caution) 32%, var(--color-card));
+}
+.dossier-body {
+  background:
+    radial-gradient(80% 50% at 20% 0%, oklch(0.94 0.01 240 / 0.03), transparent 60%),
+    var(--color-card);
+}
+.dossier-live .dossier-body {
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+.dossier-live:hover .dossier-body {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px oklch(0.82 0.14 195 / 0.12);
+}
+.dossier-texture {
+  background-image:
+    radial-gradient(oklch(0.94 0.01 240 / 0.05) 1px, transparent 1px),
+    radial-gradient(40% 30% at 82% 85%, oklch(0.55 0.06 80 / 0.07), transparent 70%);
+  background-size:
+    3px 3px,
+    100% 100%;
+  opacity: 0.7;
+}
+.dossier-sweep {
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    oklch(0.82 0.14 195 / 0.06) 48%,
+    oklch(0.94 0.01 240 / 0.1) 50%,
+    oklch(0.82 0.14 195 / 0.06) 52%,
+    transparent 60%
+  );
+  background-size: 300% 100%;
+  background-position: 120% 0;
+  opacity: 0;
+  transition:
+    background-position 600ms ease,
+    opacity 200ms ease;
+}
+.dossier-live:hover .dossier-sweep {
+  opacity: 1;
+  background-position: -20% 0;
+}
+.dossier-locked .dossier-body {
+  filter: saturate(0.6);
+}
+.dossier-locked .dossier-body > .relative {
+  opacity: 0.45;
+}
+.dossier-seal {
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent 0 18px,
+    oklch(0.64 0.21 22 / 0.05) 18px 36px
+  );
+}
+.dossier-seal-tape {
+  transform: rotate(-6deg);
+  padding: 0.45rem 1.4rem;
+  color: color-mix(in oklab, var(--color-destructive) 80%, var(--color-foreground));
+  background: color-mix(in oklab, var(--color-destructive) 12%, var(--color-card));
+  border-block: 2px dashed color-mix(in oklab, var(--color-destructive) 45%, transparent);
+  white-space: nowrap;
+}
+
 /* Case-card evidence texture (folder paper + redaction + stain) */
 .evidence-thumb {
   position: relative;

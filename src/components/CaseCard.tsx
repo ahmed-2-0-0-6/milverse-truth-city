@@ -1,21 +1,31 @@
 // LAYER-1 — CaseCard. One card anatomy for The Mirror + The Feed case lists.
 // Boss Protocol deliberately opts out — it has its own red-noir language.
 //
-// Anatomy (top → bottom):
-//   1. Header row  · left: icon chip · right: meta stack (badges/tier dots)
-//   2. Title       · single-source hierarchy: 18px semibold
-//   3. Teaser      · muted, 2-line clamp
-//   4. Tag row     · pill badges (solved, survivor, format, byline)
-//   5. Footer      · "OPEN CASE →" — visible on hover for unlocked, hidden for locked
+// Design: each case is a physical dossier on the night desk — manila folder
+// tab, punched file number, evidence-bag texture, rubber stamps. Locked cases
+// are sealed with tape. All art is CSS/SVG — no images, prints clean.
 //
-// Rules: no shadows beyond the shared hover glow. No per-card border colour drift
-// except the citizen accent (primary/30 → primary/60). Same rounded-xl, same p-6,
-// same hover -translate-y-0.5. Locked cards mute to opacity-60.
+// Anatomy (top → bottom):
+//   1. Folder tab   · angled manila tab with icon + generated file no.
+//   2. Title        · single-source hierarchy: 18px semibold
+//   3. Teaser       · muted, 2-line clamp
+//   4. Tag row      · pill badges (solved, survivor, format, byline)
+//   5. Footer       · "OPEN CASE →" — visible on hover for unlocked
+//
+// Rules: no per-card border colour drift except the citizen accent. Same
+// rounded geometry, same hover lift. Locked cards seal, not fade.
 
 import { Link } from "@tanstack/react-router";
 import { type ReactNode } from "react";
 
 type Tone = "default" | "citizen";
+
+/** Deterministic in-world file number from the case title (stable per case). */
+function fileNo(seed: string): string {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  return `${String(h % 90 + 10)}-${String(h % 900 + 100)}`;
+}
 
 interface CardShellProps {
   icon: ReactNode;
@@ -38,27 +48,65 @@ function CardShell({
   tone = "default",
   locked = false,
 }: CardShellProps) {
-  const base = "group relative overflow-hidden rounded-xl border p-6 transition-all";
-  const skin = locked
-    ? "border-border/60 bg-card/40 opacity-60"
-    : tone === "citizen"
-      ? "border-primary/30 bg-card hover:border-primary/60 hover:-translate-y-0.5 hover:shadow-[0_0_32px_oklch(0.82_0.15_210/0.15)]"
-      : "border-border bg-card hover:border-primary/50 hover:-translate-y-0.5 hover:shadow-[0_0_32px_oklch(0.82_0.15_210/0.15)]";
-
+  const no = fileNo(title);
   return (
-    <div className={`${base} ${skin}`}>
-      <div className="flex items-start justify-between gap-3 min-w-0">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
-          {icon}
+    <div className={`dossier group relative ${locked ? "dossier-locked" : "dossier-live"}`}>
+      {/* Folder tab row — sits above the folder body */}
+      <div className="flex items-end">
+        <div
+          className={`dossier-tab relative z-[1] inline-flex items-center gap-2 rounded-t-md px-3 py-1.5 ${
+            tone === "citizen" ? "dossier-tab-citizen" : ""
+          }`}
+        >
+          <span className="dossier-tab-icon">{icon}</span>
+          <span className="font-mono text-[9px] tracking-[0.25em]">
+            {locked ? "SEALED" : `FILE ${no}`}
+          </span>
         </div>
-        {metaTopRight && (
-          <div className="flex flex-col items-end gap-1 min-w-0">{metaTopRight}</div>
+        {/* punched holes on the tab shoulder */}
+        <div className="mb-1.5 ml-3 flex gap-1.5 opacity-40" aria-hidden="true">
+          <span className="h-1.5 w-1.5 rounded-full border border-current" />
+          <span className="h-1.5 w-1.5 rounded-full border border-current" />
+        </div>
+      </div>
+
+      {/* Folder body */}
+      <div
+        className={`dossier-body relative overflow-hidden rounded-b-xl rounded-tr-xl border p-6 transition-all ${
+          locked
+            ? "border-border/60"
+            : tone === "citizen"
+              ? "border-primary/30 group-hover:border-primary/60"
+              : "border-border group-hover:border-primary/50"
+        }`}
+      >
+        {/* evidence texture + torch sweep on hover (CSS only) */}
+        <div className="dossier-texture absolute inset-0 pointer-events-none" aria-hidden="true" />
+        {!locked && (
+          <div className="dossier-sweep absolute inset-0 pointer-events-none" aria-hidden="true" />
+        )}
+
+        <div className="relative">
+          {metaTopRight && (
+            <div className="flex flex-col items-end gap-1 min-w-0 float-right ml-3">
+              {metaTopRight}
+            </div>
+          )}
+          <h3 className="text-lg font-semibold leading-snug">{title}</h3>
+          <p className="mt-1.5 text-sm text-muted-foreground line-clamp-2 clear-none">{teaser}</p>
+          {badges && <div className="mt-4 flex flex-wrap items-center gap-2">{badges}</div>}
+          {footer}
+        </div>
+
+        {/* Sealed tape across locked folders */}
+        {locked && (
+          <div className="dossier-seal absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="dossier-seal-tape font-mono text-[10px] tracking-[0.4em]">
+              SEALED · CLEAR THE TIER BELOW
+            </div>
+          </div>
         )}
       </div>
-      <h3 className="mt-5 text-lg font-semibold leading-snug">{title}</h3>
-      <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{teaser}</p>
-      {badges && <div className="mt-4 flex flex-wrap items-center gap-2">{badges}</div>}
-      {footer}
     </div>
   );
 }
@@ -66,7 +114,10 @@ function CardShell({
 /** Small 5-slot tier meter — filled slots = tier. Used by Mirror cards. */
 export function TierMeter({ tier, max = 5 }: { tier: number; max?: number }) {
   return (
-    <div className="flex items-center gap-1 font-mono text-[10px] tracking-widest">
+    <div
+      className="flex items-center gap-1 font-mono text-[10px] tracking-widest"
+      aria-label={`Tier ${tier} of ${max}`}
+    >
       {Array.from({ length: max }).map((_, i) => (
         <span key={i} className={`h-1.5 w-4 rounded-sm ${i < tier ? "bg-primary" : "bg-muted"}`} />
       ))}
@@ -122,7 +173,7 @@ export function CaseCard<TParams extends Record<string, string>>({
   // Typed at call site with TanStack Link's overloads.
   return (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    <Link to={to as any} params={params as any}>
+    <Link to={to as any} params={params as any} className="block">
       {shell}
     </Link>
   );
