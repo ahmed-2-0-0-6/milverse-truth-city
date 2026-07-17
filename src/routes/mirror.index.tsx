@@ -22,6 +22,7 @@ import { loadProfile, unlockedMaxTier, tierWins, type TrustProfile } from "@/lib
 import { fetchCitizenCase } from "@/lib/citizen.functions";
 import { RecommendedStrip } from "@/components/RecommendedStrip";
 import { DistrictIntro } from "@/components/DistrictIntro";
+import { DistrictHero } from "@/components/DistrictHero";
 import { CaseCard, TierMeter } from "@/components/CaseCard";
 import mirrorArt from "@/assets/district-mirror.jpg";
 import mirrorVideo from "@/assets/mirror.mp4.asset.json";
@@ -111,7 +112,21 @@ function CaseFiles() {
   return (
     <div className="min-h-screen grain">
       <TopBar />
-      <main className="mx-auto max-w-6xl px-4 py-10">
+      <DistrictHero
+        art={mirrorArt}
+        district="mirror"
+        kicker="CHAPTER 01 · THE MIRROR · TEXT CHANNEL"
+        title="Case Files"
+        thesis={
+          <>
+            Live, unscripted conversations. Your job isn't to guess from vibes — it's to{" "}
+            <span className="text-white font-semibold">verify</span>. Two clean wins in a tier and
+            the next one opens.
+          </>
+        }
+        rooted="SCENARIOS ROOTED IN REAL REPORTED SCAM PATTERNS FROM PAKISTAN"
+      />
+      <main className="mx-auto max-w-6xl px-4 py-8">
         <Link
           to="/"
           className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
@@ -130,23 +145,9 @@ function CaseFiles() {
             "Your turn to answer better. Verify the person, not the vibe.",
           ]}
         />
-        <div className="mt-4 mb-4 max-w-2xl">
-          <div className="font-mono text-xs tracking-[0.3em] text-primary">
-            THE MIRROR · TEXT CHANNEL
-          </div>
-          <h1 className="mt-2 text-3xl sm:text-4xl font-semibold">Case Files</h1>
-          <p className="mt-3 text-muted-foreground">
-            Live, unscripted conversations. Your job isn't to guess from vibes — it's to{" "}
-            <span className="text-foreground">verify</span>. Two clean wins in a tier and the next
-            one opens.
-          </p>
-          <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-caution/30 bg-caution/10 px-3 py-1 text-[11px] font-mono tracking-widest text-caution">
-            🇵🇰 SCENARIOS ROOTED IN REAL REPORTED SCAM PATTERNS FROM PAKISTAN
-          </div>
-        </div>
 
         {/* Share code entry */}
-        <div className="mb-8 flex flex-wrap items-center gap-2">
+        <div className="mt-6 mb-8 flex flex-wrap items-center gap-2">
           <input
             value={code}
             onChange={(e) => {

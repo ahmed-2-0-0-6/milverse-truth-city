@@ -3,6 +3,7 @@ import { TopBar } from "@/components/TopBar";
 import { FEED_SCENARIOS } from "@/lib/feed/scenarios";
 import { FormatBadge } from "@/components/feed/FormatFrame";
 import { DistrictIntro } from "@/components/DistrictIntro";
+import { DistrictHero } from "@/components/DistrictHero";
 import { CaseCard } from "@/components/CaseCard";
 import feedArt from "@/assets/district-feed.jpg";
 import { Newspaper, Share2 } from "lucide-react";
@@ -35,7 +36,21 @@ function FeedIndex() {
   return (
     <div className="min-h-screen grain">
       <TopBar />
-      <main className="mx-auto max-w-5xl px-4 py-10">
+      <DistrictHero
+        art={feedArt}
+        district="feed"
+        kicker="CHAPTER 02 · THE FEED · MASS DECEPTION"
+        title="Claims, not con artists."
+        thesis={
+          <>
+            The person sending it is real, and sincere, and probably someone you love. The{" "}
+            <span className="text-white font-semibold">claim</span> might be a viral lie. Verify the
+            claim. Correct with dignity. Both are the job.
+          </>
+        }
+        rooted="SCENARIOS ROOTED IN REAL FORWARDS THAT SPREAD IN PAKISTANI CHATS"
+      />
+      <main className="mx-auto max-w-5xl px-4 py-8">
         <DistrictIntro
           id="feed"
           chapter="CHAPTER 02"
@@ -53,21 +68,6 @@ function FeedIndex() {
         >
           ← CITY
         </Link>
-
-        <div className="mt-4 max-w-2xl">
-          <div className="font-mono text-xs tracking-[0.3em] text-primary">
-            THE FEED · MASS DECEPTION
-          </div>
-          <h1 className="mt-2 text-3xl sm:text-4xl font-semibold">Claims, not con artists.</h1>
-          <p className="mt-3 text-muted-foreground">
-            The person sending it is real, and sincere, and probably someone you love. The{" "}
-            <span className="text-foreground">claim</span> might be a viral lie. Verify the claim.
-            Correct with dignity. Both are the job.
-          </p>
-          <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-caution/30 bg-caution/10 px-3 py-1 text-[11px] font-mono tracking-widest text-caution">
-            🇵🇰 SCENARIOS ROOTED IN REAL FORWARDS THAT SPREAD IN PAKISTANI CHATS
-          </div>
-        </div>
 
         {[1, 2, 3].map((tier) => {
           const cases = FEED_SCENARIOS.filter((s) => s.tier === tier);
