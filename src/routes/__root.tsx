@@ -172,6 +172,7 @@ function RootComponent() {
             <Outlet />
           </main>
           <BadgeToast />
+          <Toaster />
           <AtmosphereLayer />
           <GlowCursor />
           <RouteWipe />
