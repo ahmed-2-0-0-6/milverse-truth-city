@@ -513,7 +513,12 @@ export const FEED_SCENARIOS: FeedScenario[] = [
         "'Share to every parent' is the signature of a hoax, not a warning.",
       ],
     },
+    castAfterword: {
+      who: "nani",
+      line: "Nani ne voice note suna, phir mujhe sunaya: 'Yehi awaaz thi jab tumhari ammi choti thi. Naya sirf yeh WhatsApp hai. Iss aunty ko phone karo aur bolo bhejna band karein — kisi aur ke baap ko na maar dein log iss ke chakkar mein.'",
+    },
   },
+
 
   /* ── T2 MISLEADING — the miracle doctor clip ──────────────── */
   {
