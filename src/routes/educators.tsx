@@ -1,18 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { TopBar } from "@/components/TopBar";
-import { GraduationCap, Shield, BookOpen, Printer } from "lucide-react";
+import { GraduationCap, Shield, BookOpen, Printer, Play, Search, Award } from "lucide-react";
 
 export const Route = createFileRoute("/educators")({
   head: () => ({
     meta: [
       { title: "For Educators — MILVERSE" },
-      { name: "description", content: "MILVERSE is a Media & Information Literacy training simulator for classrooms." },
+      { name: "description", content: "MILVERSE is a Media & Information Literacy training simulator for classrooms. No signup, works on shared devices, aligns with UNESCO MIL." },
       { property: "og:title", content: "For Educators — MILVERSE" },
       { property: "og:description", content: "Media & Information Literacy training simulator: rehearse manipulation safely, name the tactic, master real verification tools." },
+      { property: "og:url", content: "https://milverse-truth-city.lovable.app/educators" },
+      { property: "og:type", content: "article" },
     ],
+    links: [{ rel: "canonical", href: "https://milverse-truth-city.lovable.app/educators" }],
   }),
   component: EducatorsPage,
 });
+
+const HOW_IT_WORKS = [
+  { icon: Play, label: "REHEARSE", body: "Students meet the scam in-world — a WhatsApp forward, a viral post, a doctored screenshot. No lecture, just the artifact." },
+  { icon: Search, label: "VERIFY", body: "They probe the dossier and run four real tools: reverse image, source check, cross-check, date/metadata." },
+  { icon: Award, label: "CALIBRATE", body: "Verdict plus confidence gets scored against ground truth. The score they chase is calibration, not certainty." },
+];
 
 const COMPETENCIES = [
   {
@@ -66,6 +75,33 @@ function EducatorsPage() {
           MILVERSE is a <b>Media &amp; Information Literacy training simulator</b>: students rehearse manipulation attempts safely,
           learn to name the tactic, and master real verification tools.
         </p>
+
+        <section className="mt-8" aria-labelledby="how-it-works">
+          <div id="how-it-works" className="stencil text-[10px] tracking-widest text-primary mb-3">HOW IT WORKS · 3 BEATS</div>
+          <ol className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {HOW_IT_WORKS.map((step, i) => (
+              <li key={step.label} className="relative rounded-xl border border-border bg-card p-4">
+                <div className="absolute -top-2 -left-2 grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground stencil text-[10px]">
+                  {i + 1}
+                </div>
+                <step.icon className="h-5 w-5 text-primary" />
+                <div className="mt-2 stencil text-sm tracking-widest text-foreground">{step.label}</div>
+                <p className="mt-2 text-sm text-muted-foreground leading-snug">{step.body}</p>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <Link to="/visit" className="inline-flex items-center rounded-md bg-primary px-4 py-2 stencil text-[11px] tracking-[0.25em] text-primary-foreground hover:bg-primary/90">
+              TAKE THE VISIT →
+            </Link>
+            <Link to="/drop" className="inline-flex items-center rounded-md border border-border px-4 py-2 stencil text-[11px] tracking-[0.25em] text-foreground hover:bg-accent">
+              PLAY TODAY'S DROP
+            </Link>
+            <Link to="/kit" className="stencil text-[11px] tracking-widest text-muted-foreground hover:text-foreground">
+              PRINTABLE FIELD KIT →
+            </Link>
+          </div>
+        </section>
 
         <section className="mt-8">
           <div className="stencil text-[10px] tracking-widest text-primary mb-3">FEATURES → MIL COMPETENCIES</div>
