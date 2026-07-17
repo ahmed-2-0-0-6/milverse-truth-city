@@ -3,6 +3,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { TopBar } from "@/components/TopBar";
 import { Lock, CheckCircle2, XCircle, BarChart3, FileText, Download, RefreshCw, ArrowRightLeft } from "lucide-react";
 import { listPendingSubmissions, rejectSubmission, approveSubmissionAndPublish } from "@/lib/story.functions";
@@ -57,7 +58,12 @@ function ReviewPage() {
       const res = await listFn({ data: { passcode } as never });
       setRows((res as { rows: StoryRow[] }).rows);
       setAuthed(true);
-    } catch (e) { setErr((e as Error).message); }
+      toast.success("Signed in to review console");
+    } catch (e) {
+      const msg = (e as Error).message;
+      setErr(msg);
+      toast.error("Authentication failed", { description: msg });
+    }
     setBusy(false);
   }
 
@@ -65,7 +71,12 @@ function ReviewPage() {
     try {
       const res = await listFn({ data: { passcode } as never });
       setRows((res as { rows: StoryRow[] }).rows);
-    } catch (e) { setErr((e as Error).message); }
+      toast("Queue refreshed");
+    } catch (e) {
+      const msg = (e as Error).message;
+      setErr(msg);
+      toast.error("Refresh failed", { description: msg });
+    }
   }
 
   if (!authed) {
@@ -198,7 +209,12 @@ function AssessmentTab({ passcode }: { passcode: string }) {
       setRows(res.entries ?? []);
       setPhase(res.phase?.phase ?? "intake");
       setLoadedCode(upper);
-    } catch (e) { setErr((e as Error).message); }
+      toast.success(`Loaded group ${upper}`, { description: `${res.entries?.length ?? 0} responses.` });
+    } catch (e) {
+      const msg = (e as Error).message;
+      setErr(msg);
+      toast.error("Couldn't load group", { description: msg });
+    }
     setBusy(false);
   }
 
@@ -208,7 +224,12 @@ function AssessmentTab({ passcode }: { passcode: string }) {
     try {
       await flipFn({ data: { passcode, groupCode: loadedCode, phase: next } as never });
       setPhase(next);
-    } catch (e) { setErr((e as Error).message); }
+      toast.success(`Group phase → ${next.toUpperCase()}`);
+    } catch (e) {
+      const msg = (e as Error).message;
+      setErr(msg);
+      toast.error("Couldn't change phase", { description: msg });
+    }
     setBusy(false);
   }
 
@@ -237,6 +258,7 @@ function AssessmentTab({ passcode }: { passcode: string }) {
 
   function exportCsv() {
     if (!loadedCode) return;
+    if (!rows.length) { toast.error("No responses to export yet"); return; }
     const header = [
       "group_code","codename_hash","phase","form","ts_iso",
       "accuracy","mean_confidence","calibration_gap","overconfident_errors",
@@ -270,6 +292,7 @@ function AssessmentTab({ passcode }: { passcode: string }) {
     const a = document.createElement("a");
     a.href = url; a.download = `assessment-${loadedCode}-${new Date().toISOString().slice(0,10)}.csv`; a.click();
     URL.revokeObjectURL(url);
+    toast.success(`Exported ${rows.length} rows`);
   }
 
   return (
@@ -494,8 +517,8 @@ function SubmissionCard({
         prevention: [row.story.whatTippedYouOff.slice(0, 200), "Verify out-of-band using a number you already trust.", "Slow down — real institutions do not require instant decisions."],
       },
     };
-    try { await onApprove(scenario as unknown as Record<string, unknown>); }
-    catch (e) { alert((e as Error).message); }
+    try { await onApprove(scenario as unknown as Record<string, unknown>); toast.success("Submission approved and published"); }
+    catch (e) { const msg = (e as Error).message; toast.error("Approve failed", { description: msg }); }
     setBusy(false);
   }
 
