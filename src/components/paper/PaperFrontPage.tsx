@@ -182,7 +182,7 @@ function PlayFlow({
                   <span className="inline-flex items-center gap-1">
                     <Search className="h-3 w-3" /> {p.label}
                   </span>
-                  {used && <span className="ml-2 text-[oklch(0.35_0.15_140)]">✓ used</span>}
+                  {used && <span className="ml-2 paper-ink-pass">✓ used</span>}
                 </button>
               );
             })}
