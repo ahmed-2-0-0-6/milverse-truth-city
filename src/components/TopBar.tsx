@@ -119,9 +119,10 @@ export function TopBar() {
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`stencil text-[10px] tracking-widest rounded px-2.5 py-1.5 transition-colors ${
+                  aria-current={active ? "page" : undefined}
+                  className={`relative stencil text-[10px] tracking-widest rounded px-2.5 py-1.5 transition-colors ${
                     active
-                      ? "text-primary bg-primary/10"
+                      ? "text-primary bg-primary/10 after:absolute after:left-2 after:right-2 after:-bottom-[9px] after:h-[2px] after:bg-primary after:shadow-[0_0_8px_oklch(0.82_0.16_85/0.7)]"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent"
                   }`}
                 >
@@ -129,6 +130,7 @@ export function TopBar() {
                 </Link>
               );
             })}
+
           <button
             onClick={() => setNavOpen(true)}
             className="stencil text-[10px] tracking-widest rounded px-2.5 py-1.5 text-muted-foreground hover:text-foreground hover:bg-accent inline-flex items-center gap-1"
@@ -218,10 +220,11 @@ export function TopBar() {
                             <SheetClose asChild>
                               <Link
                                 to={item.to}
-                                className={`flex flex-col rounded px-3 py-2 transition-colors ${
+                                aria-current={active ? "page" : undefined}
+                                className={`flex flex-col rounded px-3 py-2 border-l-2 transition-colors ${
                                   active
-                                    ? "bg-primary/10 text-primary"
-                                    : "text-foreground hover:bg-accent"
+                                    ? "bg-primary/10 text-primary border-primary"
+                                    : "text-foreground hover:bg-accent border-transparent"
                                 }`}
                               >
                                 <span className="text-sm font-medium">{item.label}</span>
@@ -233,6 +236,7 @@ export function TopBar() {
                               </Link>
                             </SheetClose>
                           </li>
+
                         );
                       })}
                     </ul>
