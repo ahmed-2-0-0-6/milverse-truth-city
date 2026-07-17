@@ -13,7 +13,7 @@ import { PaperPuzzle } from "@/components/paper/PaperPuzzle";
 import { PaperLedger } from "@/components/paper/PaperLedger";
 import { PaperEditorial } from "@/components/paper/PaperEditorial";
 import { PaperRealWorld } from "@/components/paper/PaperRealWorld";
-import { getLatestEdition, listArchive } from "@/lib/paper.functions";
+import { getLatestEdition, listArchive, getEdition } from "@/lib/paper.functions";
 import type { Edition, EditionContent } from "@/lib/paper/types";
 import { dropDateKey } from "@/lib/daily/rotation";
 import { readEditionRecord } from "@/lib/paper/profile";
@@ -41,10 +41,13 @@ export const Route = createFileRoute("/paper")({
 function PaperPage() {
   const nav = useNavigate();
   const [edition, setEdition] = useState<Edition | null>(null);
+  const [viewing, setViewing] = useState<Edition | null>(null); // an older edition off the shelf
+  const [pulling, setPulling] = useState(false);
   const [showArchive, setShowArchive] = useState(false);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const fetchEdition = useServerFn(getLatestEdition);
+  const fetchByNumber = useServerFn(getEdition);
 
   useEffect(() => {
     let alive = true;
@@ -97,8 +100,9 @@ function PaperPage() {
   }
 
   const today = dropDateKey();
-  const isToday = edition.edition_date === today;
-  const dateLabel = new Date(edition.edition_date + "T00:00:00Z").toLocaleDateString("en-GB", {
+  const shown = viewing ?? edition; // older edition off the shelf, or today's
+  const isToday = shown.edition_date === today && !viewing;
+  const dateLabel = new Date(shown.edition_date + "T00:00:00Z").toLocaleDateString("en-GB", {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -127,14 +131,23 @@ function PaperPage() {
               className="paper-mono text-xs inline-flex items-center gap-1 border border-current/50 px-2 py-1 rounded-sm hover:bg-black/5"
               style={{ borderColor: "var(--paper-rule)" }}
             >
-              <Printer className="h-3 w-3" /> PRINT TODAY'S EDITION
+              <Printer className="h-3 w-3" /> {viewing ? "PRINT THIS EDITION" : "PRINT TODAY'S EDITION"}
             </button>
-            <button
-              onClick={() => setShowArchive((v) => !v)}
-              className="paper-mono text-xs underline decoration-dotted"
-            >
-              {showArchive ? "TODAY" : "YESTERDAY'S PAPERS"}
-            </button>
+            {viewing ? (
+              <button
+                onClick={() => setViewing(null)}
+                className="paper-mono text-xs underline decoration-dotted"
+              >
+                BACK TO TODAY
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowArchive((v) => !v)}
+                className="paper-mono text-xs underline decoration-dotted"
+              >
+                {showArchive ? "TODAY" : "YESTERDAY'S PAPERS"}
+              </button>
+            )}
           </div>
         </div>
 
@@ -144,33 +157,45 @@ function PaperPage() {
           style={{ borderColor: "var(--paper-ink)" }}
         >
           <div className="paper-mono text-[10px] tracking-[0.3em] pt-3">
-            {isToday
-              ? "TODAY'S EDITION"
-              : `LATEST EDITION — ${dateLabel.toUpperCase()}. THE PRESSES ARE WARMING FOR THE NEXT RUN.`}
+            {viewing
+              ? `FROM THE SHELF — ${dateLabel.toUpperCase()} · NO STREAK CREDIT`
+              : isToday
+                ? "TODAY'S EDITION"
+                : `LATEST EDITION — ${dateLabel.toUpperCase()}. THE PRESSES ARE WARMING FOR THE NEXT RUN.`}
           </div>
           <h1 className="paper-blackletter text-5xl sm:text-7xl md:text-8xl leading-none py-2 sm:py-3">
             The Daily Mirage
           </h1>
           <div className="paper-mono text-[10px] tracking-[0.25em] flex flex-wrap justify-center items-center gap-x-6 gap-y-1 pb-3 text-[color:var(--paper-muted)]">
-            <span>VOL I · No. {String(edition.edition_number).padStart(3, "0")}</span>
+            <span>VOL I · No. {String(shown.edition_number).padStart(3, "0")}</span>
             <span>{dateLabel.toUpperCase()}</span>
             <span>PRICE: YOUR ATTENTION</span>
           </div>
           <div className="italic text-sm sm:text-base paper-serif pb-3 -mt-1 text-[color:var(--paper-muted)]">
-            “{edition.motto}”
+            “{shown.motto}”
           </div>
         </header>
 
         {showArchive ? (
           <YesterdaysPapers
             currentNumber={edition.edition_number}
+            pulling={pulling}
             onOpen={(n) => {
-              setShowArchive(false);
-              void n;
+              setPulling(true);
+              fetchByNumber({ data: { number: n } })
+                .then((row) => {
+                  const e = row as unknown as Edition | null;
+                  if (e) {
+                    setViewing(e);
+                    setShowArchive(false);
+                    window.scrollTo({ top: 0 });
+                  }
+                })
+                .finally(() => setPulling(false));
             }}
           />
         ) : (
-          <EditionBody edition={edition} />
+          <EditionBody key={shown.edition_number} edition={shown} />
         )}
 
         <footer
@@ -278,9 +303,11 @@ function Divider({ label }: { label: string }) {
 
 function YesterdaysPapers({
   currentNumber,
+  pulling,
   onOpen,
 }: {
   currentNumber: number;
+  pulling: boolean;
   onOpen: (n: number) => void;
 }) {
   const fetchArchive = useServerFn(listArchive);
@@ -328,9 +355,10 @@ function YesterdaysPapers({
               </p>
               <button
                 onClick={() => onOpen(r.edition_number)}
-                className="paper-mono text-[10px] tracking-[0.2em] mt-3 underline decoration-dotted"
+                disabled={pulling}
+                className="paper-mono text-[10px] tracking-[0.2em] mt-3 underline decoration-dotted disabled:opacity-50"
               >
-                READ (READ-ONLY)
+                {pulling ? "PULLING FROM THE SHELF…" : "PULL FROM THE SHELF"}
               </button>
             </li>
           ))}
