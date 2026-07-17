@@ -152,26 +152,19 @@ function FlagFinder({
           )}
         </div>
         <div className="mt-4 flex items-center gap-3">
-          <div className="paper-mono text-[10px]">
-            {hits}/{item.flags.length} circled
+          <div className="paper-mono text-[10px] tracking-[0.2em] text-[color:var(--paper-muted)]">
+            {hits}/{item.flags.length} CIRCLED
           </div>
           <div className="flex-1" />
           {!revealed ? (
-            <button
-              onClick={submit}
-              className="border-4 double px-3 py-2 paper-mono text-xs tracking-widest"
-              style={{ borderColor: "var(--paper-ink)" }}
-            >
+            <button onClick={submit} className="paper-btn-primary">
               REVEAL
             </button>
           ) : (
-            <button
-              onClick={onClose}
-              className="border-4 double px-3 py-2 paper-mono text-xs tracking-widest"
-              style={{ borderColor: "var(--paper-ink)" }}
-            >
+            <button onClick={onClose} className="paper-btn-primary">
               CLOSE
             </button>
+
           )}
         </div>
         {revealed && (
