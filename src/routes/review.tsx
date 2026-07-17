@@ -517,8 +517,8 @@ function SubmissionCard({
         prevention: [row.story.whatTippedYouOff.slice(0, 200), "Verify out-of-band using a number you already trust.", "Slow down — real institutions do not require instant decisions."],
       },
     };
-    try { await onApprove(scenario as unknown as Record<string, unknown>); }
-    catch (e) { alert((e as Error).message); }
+    try { await onApprove(scenario as unknown as Record<string, unknown>); toast.success("Submission approved and published"); }
+    catch (e) { const msg = (e as Error).message; toast.error("Approve failed", { description: msg }); }
     setBusy(false);
   }
 
