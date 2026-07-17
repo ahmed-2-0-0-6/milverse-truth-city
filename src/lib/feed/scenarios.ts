@@ -152,7 +152,12 @@ export const FEED_SCENARIOS: FeedScenario[] = [
         "News-ticker screenshots are the most-doctored evidence there is.",
       ],
     },
+    castAfterword: {
+      who: "nani",
+      line: "Nani ne aik nazar dekha aur bola: 'Yeh wohi purana rumour hai. Har election se pehle ghoomta hai. ATM par mat jao, chai banao.'",
+    },
   },
+
 
   /* ── T2 MISLEADING — the flood photo ───────────────────────── */
   {
