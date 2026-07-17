@@ -22,6 +22,7 @@ import { CAST } from "@/lib/cast";
 import { FormatFrame } from "@/components/feed/FormatFrame";
 import { Toolbelt } from "@/components/feed/Toolbelt";
 import { TacticStamp } from "@/components/TacticStamp";
+import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
 import { TacticFlash } from "@/components/TacticFlash";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 import { RookieIntro } from "@/components/handler/RookieIntro";
@@ -589,6 +590,12 @@ function Debrief({
   finalReply: string;
 }) {
   const navigate = useNavigate();
+  const [profileSnap, setProfileSnap] = useState(() => loadProfile());
+  useEffect(() => {
+    const on = () => setProfileSnap(loadProfile());
+    window.addEventListener("milverse:profile", on);
+    return () => window.removeEventListener("milverse:profile", on);
+  }, []);
   const Icon =
     outcome.result === "correct"
       ? CheckCircle2
@@ -628,6 +635,9 @@ function Debrief({
         <div className="mt-1 text-xl font-semibold">{outcome.headline}</div>
         <p className="mt-2 text-sm">{outcome.detail}</p>
       </div>
+
+      <CalibrationQuadrant profile={profileSnap} compact caption="CALIBRATION · AFTER THIS CASE" />
+
 
       <section className="rounded-xl border border-border bg-card p-6">
         <div className="flex items-center justify-between mb-4">
