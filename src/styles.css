@@ -345,6 +345,14 @@
 .marquee-track:hover {
   animation-play-state: paused;
 }
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none !important;
+  }
+}
+html[data-force-reduce-motion="on"] .marquee-track {
+  animation: none !important;
+}
 
 @keyframes neon-in {
   0% {

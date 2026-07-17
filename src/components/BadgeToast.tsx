@@ -1,18 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { BadgeDef } from "@/lib/mirror/badges";
 
 export function BadgeToast() {
   const [badge, setBadge] = useState<BadgeDef | null>(null);
+  const timerRef = useRef<number | null>(null);
   useEffect(() => {
     const on = (e: Event) => {
       const detail = (e as CustomEvent<BadgeDef>).detail;
       if (!detail) return;
       setBadge(detail);
-      const t = setTimeout(() => setBadge(null), 5000);
-      return () => clearTimeout(t);
+      // Reset the hide timer on every badge — a second badge shouldn't be
+      // cut short by the first badge's 5s countdown.
+      if (timerRef.current != null) window.clearTimeout(timerRef.current);
+      timerRef.current = window.setTimeout(() => setBadge(null), 5000);
     };
     window.addEventListener("milverse:badge", on);
-    return () => window.removeEventListener("milverse:badge", on);
+    return () => {
+      window.removeEventListener("milverse:badge", on);
+      if (timerRef.current != null) window.clearTimeout(timerRef.current);
+    };
   }, []);
   if (!badge) return null;
   return (

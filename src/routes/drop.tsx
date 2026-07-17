@@ -135,7 +135,12 @@ function DropPage() {
             <Flame className="h-3.5 w-3.5" /> {status.streak}D ON WATCH
           </div>
           <div className="flex-1" />
-          <div className="stencil text-[10px] text-muted-foreground">
+          <div
+            className="stencil text-[10px] text-muted-foreground"
+            role="timer"
+            aria-live="off"
+            aria-label="Time until the next drop"
+          >
             NEXT DROP {hh}:{mm}:{ss}
           </div>
         </div>

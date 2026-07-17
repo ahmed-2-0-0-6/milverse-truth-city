@@ -11,7 +11,10 @@ export function Marquee() {
     "STUDIO · 6 CASES SUBMITTED",
   ];
   return (
-    <div className="relative overflow-hidden border-y border-primary/30 bg-black/40 backdrop-blur-sm">
+    <div
+      className="relative overflow-hidden border-y border-primary/30 bg-black/40 backdrop-blur-sm"
+      aria-hidden="true"
+    >
       <div className="marquee-track flex whitespace-nowrap py-2">
         {[...items, ...items, ...items].map((t, i) => (
           <span
