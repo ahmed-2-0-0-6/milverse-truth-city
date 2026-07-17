@@ -177,7 +177,12 @@ export function installTelemetry() {
   ensureSessionId();
 
   const sessionStart = performance.now();
+  // Both pagehide and beforeunload are registered for browser coverage, but
+  // most browsers fire both — guard so session_end is queued exactly once.
+  let leftAlready = false;
   const onLeave = () => {
+    if (leftAlready) return;
+    leftAlready = true;
     const dur = performance.now() - sessionStart;
     queue.push({
       event_type: "session_end",
