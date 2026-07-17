@@ -84,7 +84,12 @@ function FamilyPage() {
       await registerFn({ data: { code: c } });
       localStorage.setItem(CODE_KEY, c);
       setParentCode(c);
-    } catch (e) { setErr((e as Error).message); }
+      toast.success("Family code created", { description: `Share ${c} with your kid.` });
+    } catch (e) {
+      const msg = (e as Error).message;
+      setErr(msg);
+      toast.error("Couldn't create code", { description: msg });
+    }
     setBusy(false);
   }
 
@@ -97,19 +102,32 @@ function FamilyPage() {
       localStorage.setItem(CODE_KEY, c);
       setParentCode(c);
       setEntries([]);
-    } catch (e) { setErr((e as Error).message); }
+      toast.success("New family code issued", { description: `Old code retired. New code: ${c}.` });
+    } catch (e) {
+      const msg = (e as Error).message;
+      setErr(msg);
+      toast.error("Couldn't regenerate code", { description: msg });
+    }
     setBusy(false);
   }
 
   async function joinAsKid() {
     const code = kidJoinCode.trim().toUpperCase();
-    if (!/^[A-Z0-9]{4,6}$/.test(code)) return;
+    if (!/^[A-Z0-9]{4,6}$/.test(code)) {
+      toast.error("Enter a 4-6 character code");
+      return;
+    }
     setErr(null);
     try {
       await joinCheckFn({ data: { code } });
       joinFamily(code);
       setKidJoinCode("");
-    } catch (e) { setErr((e as Error).message); }
+      toast.success(`Linked to family ${code}`);
+    } catch (e) {
+      const msg = (e as Error).message;
+      setErr(msg);
+      toast.error("Couldn't join family", { description: msg });
+    }
   }
 
   // Aggregate: only junior lesson entries count. Case IDs are like junior:L3:xxx.
