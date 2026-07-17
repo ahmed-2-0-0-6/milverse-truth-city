@@ -188,6 +188,10 @@ function PilotPage() {
   }, [effectiveCloud]);
 
   function exportCsv() {
+    if (!cloud.length) {
+      toast.error("No cloud entries to export yet");
+      return;
+    }
     const rows = [
       ["ts_iso", "device_id", "wing", "case_id", "tier", "result", "points"].join(","),
       ...cloud.map((c) => [
@@ -207,6 +211,7 @@ function PilotPage() {
     a.download = `pilot-${active}-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+    toast.success(`Exported ${cloud.length} entries`);
   }
 
   return (
