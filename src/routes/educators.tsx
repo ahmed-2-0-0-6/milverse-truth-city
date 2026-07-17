@@ -76,6 +76,33 @@ function EducatorsPage() {
           learn to name the tactic, and master real verification tools.
         </p>
 
+        <section className="mt-8" aria-labelledby="how-it-works">
+          <div id="how-it-works" className="stencil text-[10px] tracking-widest text-primary mb-3">HOW IT WORKS · 3 BEATS</div>
+          <ol className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {HOW_IT_WORKS.map((step, i) => (
+              <li key={step.label} className="relative rounded-xl border border-border bg-card p-4">
+                <div className="absolute -top-2 -left-2 grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground stencil text-[10px]">
+                  {i + 1}
+                </div>
+                <step.icon className="h-5 w-5 text-primary" />
+                <div className="mt-2 stencil text-sm tracking-widest text-foreground">{step.label}</div>
+                <p className="mt-2 text-sm text-muted-foreground leading-snug">{step.body}</p>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <Link to="/visit" className="inline-flex items-center rounded-md bg-primary px-4 py-2 stencil text-[11px] tracking-[0.25em] text-primary-foreground hover:bg-primary/90">
+              TAKE THE VISIT →
+            </Link>
+            <Link to="/drop" className="inline-flex items-center rounded-md border border-border px-4 py-2 stencil text-[11px] tracking-[0.25em] text-foreground hover:bg-accent">
+              PLAY TODAY'S DROP
+            </Link>
+            <Link to="/kit" className="stencil text-[11px] tracking-widest text-muted-foreground hover:text-foreground">
+              PRINTABLE FIELD KIT →
+            </Link>
+          </div>
+        </section>
+
         <section className="mt-8">
           <div className="stencil text-[10px] tracking-widest text-primary mb-3">FEATURES → MIL COMPETENCIES</div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
