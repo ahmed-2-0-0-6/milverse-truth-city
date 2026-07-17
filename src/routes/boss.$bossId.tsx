@@ -38,6 +38,17 @@ import { BankConfirmSheet } from "@/components/chat/BankConfirmSheet";
 import { NotificationBanner, type NotificationPayload } from "@/components/chat/NotificationBanner";
 import { detectAmount, type SavedContact } from "@/lib/chat/contacts";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
+import { TacticStamp } from "@/components/TacticStamp";
+import type { TacticId } from "@/lib/manual/entries";
+
+// Boss → canonical Field Manual tactic. Chosen by reading each boss's
+// method page: the Ghost swaps channels ("new number, it's me"), the Twin
+// is the Forgery Engine's flagship, the Chorus is many outlets one origin.
+const BOSS_TACTIC: Record<string, TacticId> = {
+  "ghost-of-bali": "impersonation",
+  "the-twin": "forgery-engine",
+  "the-chorus": "imposter-outlet",
+};
 
 export const Route = createFileRoute("/boss/$bossId")({
   component: function BossPlayGuarded() {
@@ -561,6 +572,12 @@ function BossPlay() {
                 caption="CALIBRATION · TO DATE"
               />
             </div>
+
+            {BOSS_TACTIC[boss.id] && (
+              <div className="mt-6">
+                <TacticStamp tacticId={BOSS_TACTIC[boss.id]} />
+              </div>
+            )}
 
             <div className="border-t border-white/10 pt-4 mt-6">
 
