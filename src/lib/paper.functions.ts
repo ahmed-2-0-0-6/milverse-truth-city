@@ -7,12 +7,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { EditionContent } from "@/lib/paper/types";
+import { assertReviewPasscode } from "@/lib/passcode.server";
 
-function checkPass(passcode: string) {
-  const expected = process.env.MILVERSE_REVIEW_PASSCODE;
-  if (!expected) throw new Error("Passcode not configured on the server.");
-  if (passcode !== expected) throw new Error("Invalid passcode.");
-}
+const checkPass = assertReviewPasscode;
 
 function pubClient() {
   const url = process.env.SUPABASE_URL!;
@@ -124,7 +121,7 @@ export const logPaperInteraction = createServerFn({ method: "POST" })
 export const pressroomList = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => z.object({ passcode: z.string().min(1) }).parse(i))
   .handler(async ({ data }) => {
-    checkPass(data.passcode);
+    await checkPass(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("editions" as never)
@@ -139,7 +136,7 @@ export const pressroomGet = createServerFn({ method: "POST" })
     z.object({ passcode: z.string().min(1), number: z.number().int() }).parse(i),
   )
   .handler(async ({ data }) => {
-    checkPass(data.passcode);
+    await checkPass(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
       .from("editions" as never)
@@ -162,7 +159,7 @@ export const pressroomSave = createServerFn({ method: "POST" })
       .parse(i),
   )
   .handler(async ({ data }) => {
-    checkPass(data.passcode);
+    await checkPass(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // If exists → update (only if not locked). Else insert as draft.
     const { data: existing } = await supabaseAdmin
@@ -199,7 +196,7 @@ export const pressroomPublish = createServerFn({ method: "POST" })
     z.object({ passcode: z.string().min(1), number: z.number().int().positive() }).parse(i),
   )
   .handler(async ({ data }) => {
-    checkPass(data.passcode);
+    await checkPass(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("editions" as never)

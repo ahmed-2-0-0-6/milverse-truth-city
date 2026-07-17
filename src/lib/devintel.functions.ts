@@ -8,13 +8,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
+import { assertReviewPasscode } from "@/lib/passcode.server";
 
 // ── Passcode gate (matches /review) ─────────────────────────────
-function checkPasscode(passcode: string) {
-  const expected = process.env.MILVERSE_REVIEW_PASSCODE;
-  if (!expected) throw new Error("Review passcode is not configured on the server.");
-  if (passcode !== expected) throw new Error("Invalid passcode.");
-}
+const checkPasscode = assertReviewPasscode;
 
 const WHITELIST = new Set([
   "route_visit",
@@ -22,12 +19,14 @@ const WHITELIST = new Set([
   "js_error",
   "case_start",
   "case_complete",
+  "case_verdict_locked",
   "drop_play",
   "drop_break",
   "tool_pick",
   "manual_open",
   "share_copy",
   "lite_fallback",
+  "paper_section_done",
 ]);
 
 const EventSchema = z.object({
@@ -93,7 +92,7 @@ export const logTelemetryBatch = createServerFn({ method: "POST" })
 export const fetchIntelligence = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({ passcode: z.string().min(1) }).parse(data))
   .handler(async ({ data }) => {
-    checkPasscode(data.passcode);
+    await checkPasscode(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const sinceISO = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
@@ -440,7 +439,7 @@ const RUN_ANALYSIS_MIN_INTERVAL_MS = 60 * 1000; // no accidental double-clicks
 export const runAnalysisBrief = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({ passcode: z.string().min(1) }).parse(data))
   .handler(async ({ data }) => {
-    checkPasscode(data.passcode);
+    await checkPasscode(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // Rate-limit: refuse if a brief was generated in the last minute.
@@ -560,7 +559,7 @@ function safeParseBrief(text: string): Brief | null {
 export const listBriefs = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({ passcode: z.string().min(1) }).parse(data))
   .handler(async ({ data }) => {
-    checkPasscode(data.passcode);
+    await checkPasscode(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("devintel_briefs")

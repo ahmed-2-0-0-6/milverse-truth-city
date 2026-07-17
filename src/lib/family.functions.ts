@@ -28,9 +28,12 @@ function serverClient() {
 
 async function touchRateLimit(supabase: ReturnType<typeof serverClient>, code: string) {
   // Never throws for infrastructure hiccups — a missing RPC returns null and we
-  // fail open (progress reads still work).
+  // fail open (progress reads still work). Warn so it's visible in Worker logs.
   const { data, error } = await supabase.rpc("family_code_touch", { _code: code, _limit: 60 });
-  if (error) return true;
+  if (error) {
+    console.warn("[family] rate-limit RPC failed, failing open:", error.message);
+    return true;
+  }
   return data !== false;
 }
 

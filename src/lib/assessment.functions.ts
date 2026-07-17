@@ -125,9 +125,8 @@ export const setGroupPhase = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    const expected = process.env.MILVERSE_REVIEW_PASSCODE;
-    if (!expected) throw new Error("Review passcode is not configured on the server.");
-    if (data.passcode !== expected) throw new Error("Invalid passcode.");
+    const { assertReviewPasscode } = await import("@/lib/passcode.server");
+    await assertReviewPasscode(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("assessment_phase").upsert({
       group_code: data.groupCode,

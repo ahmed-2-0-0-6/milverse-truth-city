@@ -6,6 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
+import { assertReviewPasscode } from "@/lib/passcode.server";
 
 const PHONE_RE = /\+?\d[\d\s\-()]{6,}/;
 const EMAIL_RE = /[\w.+-]+@[\w-]+\.[\w.-]+/;
@@ -77,16 +78,12 @@ export const submitStory = createServerFn({ method: "POST" })
 
 // ── Moderation (passcode-gated) ────────────────────────────────
 
-function checkPasscode(passcode: string) {
-  const expected = process.env.MILVERSE_REVIEW_PASSCODE;
-  if (!expected) throw new Error("Review passcode is not configured on the server.");
-  if (passcode !== expected) throw new Error("Invalid passcode.");
-}
+const checkPasscode = assertReviewPasscode;
 
 export const listPendingSubmissions = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => z.object({ passcode: z.string().min(1) }).parse(input))
   .handler(async ({ data }) => {
-    checkPasscode(data.passcode);
+    await checkPasscode(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("story_submissions")
@@ -109,7 +106,7 @@ export const rejectSubmission = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    checkPasscode(data.passcode);
+    await checkPasscode(data.passcode);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("story_submissions")
@@ -131,7 +128,7 @@ export const approveSubmissionAndPublish = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    checkPasscode(data.passcode);
+    await checkPasscode(data.passcode);
     const blob = JSON.stringify(data.scenario);
     const pii = scanPii(blob);
     if (pii) throw new Error(`Published scenario still contains a ${pii}. Edit before publishing.`);
