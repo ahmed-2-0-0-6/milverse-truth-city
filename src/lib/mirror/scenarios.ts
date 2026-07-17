@@ -616,15 +616,16 @@ export const SCENARIOS: Scenario[] = [
     persona: {
       voice: "formal, respectful, polished bank-desk cadence — no exclamation marks",
       fillers: [
-        "For your safety sahib.",
-        "Standard procedure, please bear with me.",
-        "I understand your concern.",
-        "We handle 200 such cases a day, sahib.",
+        "This is for your account safety sahib.",
+        "Standard procedure sahib, kindly bear with me.",
+        "Sahib I fully understand your concern.",
+        "We handle nearly 200 such cases every day sahib.",
       ],
       urgencyLines: [
-        "The unauthorised debit will post in 4 minutes.",
-        "I need to close this ticket within the SLA sahib.",
+        "The unauthorised debit will post in under 4 minutes sahib.",
+        "Sahib I have to close this ticket within our SLA window.",
       ],
+
       pushLines: [
         "Please install the security app I've just sent — it's a 30-second verification.",
         "Then read out the 6-digit SMS code and last 4 digits of your PIN. That's all.",
