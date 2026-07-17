@@ -21,9 +21,15 @@ interface Props {
  */
 export function HandoverMoment({ cityName, onDone }: Props) {
   const [reduced, setReduced] = useState(false);
-  useEffect(() => setReduced(shouldReduceMotion()), []);
-  const [phase, setPhase] = useState<0 | 1 | 2 | 3 | 4>(reduced ? 3 : 0);
-  const [picked, setPicked] = useState<number>(loadFirstPhone().wallpaper ?? 0);
+  const [phase, setPhase] = useState<0 | 1 | 2 | 3 | 4>(0);
+  const [picked, setPicked] = useState<number>(0);
+
+  useEffect(() => {
+    const r = shouldReduceMotion();
+    setReduced(r);
+    setPicked(loadFirstPhone().wallpaper ?? 0);
+    if (r) setPhase(3);
+  }, []);
 
   useEffect(() => {
     if (reduced) return;
