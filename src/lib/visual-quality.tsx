@@ -49,7 +49,9 @@ export function VisualQualityProvider({ children }: { children: ReactNode }) {
     try {
       const s = localStorage.getItem(KEY);
       if (s === "cinematic" || s === "lite") stored = s;
-    } catch { /* localStorage unavailable */ }
+    } catch {
+      /* localStorage unavailable */
+    }
     setModeState(stored ?? "cinematic");
   }, []);
 
@@ -58,7 +60,9 @@ export function VisualQualityProvider({ children }: { children: ReactNode }) {
     setModeState(m);
     try {
       localStorage.setItem(KEY, m);
-    } catch { /* localStorage unavailable */ }
+    } catch {
+      /* localStorage unavailable */
+    }
     if (typeof window !== "undefined") window.dispatchEvent(new Event("milverse:visual"));
   };
 
