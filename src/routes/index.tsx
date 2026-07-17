@@ -123,7 +123,7 @@ function CityMap() {
           A city that trains your trust — play today's forward.
         </p>
         <p className="mt-2 max-w-xl text-center text-white/50 text-xs sm:text-sm">
-          Learn to spot the fakes by verifying, not guessing.
+          Fakes beat eyes. They don't beat verification.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
