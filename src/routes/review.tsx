@@ -58,7 +58,12 @@ function ReviewPage() {
       const res = await listFn({ data: { passcode } as never });
       setRows((res as { rows: StoryRow[] }).rows);
       setAuthed(true);
-    } catch (e) { setErr((e as Error).message); }
+      toast.success("Signed in to review console");
+    } catch (e) {
+      const msg = (e as Error).message;
+      setErr(msg);
+      toast.error("Authentication failed", { description: msg });
+    }
     setBusy(false);
   }
 
@@ -66,7 +71,12 @@ function ReviewPage() {
     try {
       const res = await listFn({ data: { passcode } as never });
       setRows((res as { rows: StoryRow[] }).rows);
-    } catch (e) { setErr((e as Error).message); }
+      toast("Queue refreshed");
+    } catch (e) {
+      const msg = (e as Error).message;
+      setErr(msg);
+      toast.error("Refresh failed", { description: msg });
+    }
   }
 
   if (!authed) {
