@@ -1167,6 +1167,8 @@ function Debrief({ scenario }: { scenario: Scenario }) {
 
       <TacticStamp tacticId={tacticForMirror(scenario.id)} />
 
+      <CalibrationQuadrant profile={profileSnap} compact caption="CALIBRATION · AFTER THIS CASE" />
+
       {/* 4-axis star scoring */}
       <section className="rounded-xl border border-border bg-card p-6">
         <div className="flex items-center justify-between mb-4">
