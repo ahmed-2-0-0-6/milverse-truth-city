@@ -14,10 +14,45 @@ import { AccessPanel } from "@/components/AccessPanel";
 import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp } from "@/lib/ranks";
 
+const NAV_GROUPS: { label: string; items: { label: string; to: string; desc?: string }[] }[] = [
+  {
+    label: "PLAY",
+    items: [
+      { label: "The City", to: "/", desc: "Enter MILVERSE" },
+      { label: "Daily Drop", to: "/drop", desc: "Today's case" },
+      { label: "The Feed", to: "/feed", desc: "Verify or scroll" },
+      { label: "The Mirror", to: "/mirror", desc: "Read the room" },
+      { label: "The Paper", to: "/paper", desc: "Read like a pro" },
+      { label: "Boss Fights", to: "/boss", desc: "Take down operators" },
+    ],
+  },
+  {
+    label: "LEARN",
+    items: [
+      { label: "First Phone", to: "/first-phone", desc: "For juniors" },
+      { label: "Field Manual", to: "/manual", desc: "Tactics reference" },
+      { label: "City Charter", to: "/charter", desc: "Our promises" },
+      { label: "Quick Tour", to: "/quick-tour", desc: "30-second orientation" },
+    ],
+  },
+  {
+    label: "COMMUNITY",
+    items: [
+      { label: "For Educators", to: "/educators", desc: "Classroom kit" },
+      { label: "For Family", to: "/family", desc: "Household dashboard" },
+      { label: "Visit", to: "/visit", desc: "3-minute guided tour" },
+      { label: "City Hall", to: "/city-hall", desc: "Vote & propose" },
+      { label: "Archive", to: "/archive", desc: "Real cases" },
+    ],
+  },
+];
+
 export function TopBar() {
   const [profile, setProfile] = useState<TrustProfile | null>(null);
   const [muted, setLocalMuted] = useState(false);
   const [manualUnlocks, setManualUnlocks] = useState(0);
+  const [navOpen, setNavOpen] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
     setProfile(loadProfile());
