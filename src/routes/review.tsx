@@ -258,6 +258,7 @@ function AssessmentTab({ passcode }: { passcode: string }) {
 
   function exportCsv() {
     if (!loadedCode) return;
+    if (!rows.length) { toast.error("No responses to export yet"); return; }
     const header = [
       "group_code","codename_hash","phase","form","ts_iso",
       "accuracy","mean_confidence","calibration_gap","overconfident_errors",
@@ -291,6 +292,7 @@ function AssessmentTab({ passcode }: { passcode: string }) {
     const a = document.createElement("a");
     a.href = url; a.download = `assessment-${loadedCode}-${new Date().toISOString().slice(0,10)}.csv`; a.click();
     URL.revokeObjectURL(url);
+    toast.success(`Exported ${rows.length} rows`);
   }
 
   return (
