@@ -2152,6 +2152,333 @@ const OUTRAGE_CASES: FeedScenario[] = [
 FEED_SCENARIOS.push(...NEW_CASES);
 FEED_SCENARIOS.push(...OUTRAGE_CASES);
 
+/* ── Calibration balance set ────────────────────────────────────
+   TRUE / UNVERIFIED / MISLEADING cases. The wing was FALSE-heavy enough
+   that reflex-dismissal almost paid. These exist so it never does:
+   two-way loss is the whole game. */
+const BALANCE_CASES: FeedScenario[] = [
+  /* ── T1 TRUE — the scholarship deadline ────────────────────── */
+  {
+    id: "scholarship-real",
+    title: "The scholarship deadline",
+    teaser: "A classmate forwards a scholarship with a deadline. Smells like bait. Isn't.",
+    tier: 1,
+    verdict: "TRUE",
+    format: "whatsapp",
+    tacticId: "mis-dis-mal",
+    sender: {
+      name: "Hassan",
+      relationship: "Classmate",
+      voice: "helpful, slightly disorganized, forwards everything he finds useful",
+    },
+    senderMotive:
+      "He found it on the education board's page and thought of you. If you dismiss him coldly, he'll stop sending you real opportunities too.",
+    opener:
+      "yaar deadline is Friday — merit scholarship for our year. form is on the board site. don't miss it like last time 😤",
+    forward: {
+      meta: "Forwarded · link to board portal",
+      headline: "Provincial merit scholarship — applications close Friday",
+      imageEmoji: "🎓",
+      imageAlt: "Screenshot of a scholarship notice with an education board header",
+      bodyLines: [
+        "Open to current-year students above 80% marks.",
+        "Application through the board portal only.",
+        "No fee. Closes Friday 5pm.",
+      ],
+    },
+    actions: [
+      {
+        id: "check-board-site",
+        label: "Open the board portal directly",
+        tool: "check_source",
+        result:
+          "Typed the board's address yourself: the scholarship notice is on their official announcements page, same dates, same criteria. The form is hosted on the portal itself.",
+        decisive: true,
+      },
+      {
+        id: "check-fee-ask",
+        label: "Check if any step asks for money",
+        tool: "check_source",
+        result:
+          "No fee anywhere. No 'processing charge', no bank details requested. Application is a form plus your roll number.",
+        decisive: true,
+      },
+      {
+        id: "check-date",
+        label: "Check when the notice was posted",
+        tool: "check_date",
+        result: "Posted this Monday. Current cycle, not a resurfaced old notice.",
+      },
+    ],
+    truthNote:
+      "TRUE. The urgency was real because deadlines are real. A deadline plus a link is not automatically a scam — a scam needs a hook: a fee, a credential ask, a lookalike domain. This one had none. Dismiss everything and you don't stay safe; you just miss the scholarship.",
+    respectfulScript:
+      "Checked it properly — it's on the board's own portal, no fee, real deadline. Thanks yaar, applying tonight. Send me these whenever you see them.",
+  },
+
+  /* ── T2 UNVERIFIED — the missing person forward ────────────── */
+  {
+    id: "missing-person-forward",
+    title: "The missing person forward",
+    teaser: "A photo of a lost child, a phone number, and 'share fast'. No way to confirm any of it.",
+    tier: 2,
+    verdict: "UNVERIFIED",
+    format: "image",
+    tacticId: "urgency-fear",
+    sender: {
+      name: "Khala Shabana",
+      relationship: "Family WhatsApp",
+      voice: "soft-hearted, shares anything that might help someone",
+    },
+    senderMotive:
+      "She believes a share costs nothing and might reunite a family. Her heart is exactly right. The question is whether the forward is.",
+    opener:
+      "Beta please share this everywhere. Bacha ghum ho gaya hai, poor family is searching. One share can save a life 🙏",
+    forward: {
+      meta: "Forwarded many times · photo + phone number",
+      headline: "MISSING: 7-year-old, last seen near the market — call this number",
+      imageEmoji: "📷",
+      imageAlt: "A photo of a child with a caption and a mobile number",
+      bodyLines: [
+        "Photo of a child, no name of city or date.",
+        "One mobile number to call.",
+        "'Share until he is found.'",
+      ],
+    },
+    actions: [
+      {
+        id: "reverse-child-photo",
+        label: "Reverse-search the photo",
+        tool: "reverse_image",
+        result:
+          "The photo appears in forwards from at least three different cities over two years — sometimes with different names and different numbers. Original source not findable.",
+        decisive: true,
+      },
+      {
+        id: "check-police-listing",
+        label: "Check official missing-person listings",
+        tool: "cross_check",
+        result:
+          "No matching report on the police or child-protection helpline listings. That doesn't prove there's no missing child — reports lag, and not every family files one immediately.",
+      },
+      {
+        id: "check-number-history",
+        label: "Search the phone number",
+        tool: "cross_check",
+        result:
+          "The number appears in older unrelated forwards too. Could be recycled by a scammer harvesting calls — or could be a relative's number reused badly. Cannot tell from here.",
+      },
+    ],
+    truthNote:
+      "UNVERIFIED — and this one hurts, because the cost of being wrong feels unbearable in both directions. You cannot confirm the child, the city, the date, or the number. Forwarding unverifiable personal data with a phone number attached feeds harvest scams that exploit exactly this kindness. The honest move: don't amplify it — report it to the official helpline and let the people with a database check. Kindness plus a pause beats kindness at forward-speed.",
+    respectfulScript:
+      "Khala aap ka dil bilkul sahi jagah hai ❤️ Main ne photo check ki — yeh kai shehron mein alag naamon ke saath ghoom rahi hai, is liye number pe call ya forward risky hai. Main ne official helpline ko report kar diya hai — woh verify kar sakte hain. Agar asli hai, unke paas system hai dhoondhne ka.",
+    inspiredBy: {
+      patternName: "Recycled Missing-Child Forward",
+      country: "South Asia · ongoing",
+      year: "2015–ongoing",
+      whatHappened:
+        "The same child's photo circulates for years across cities with changing names and phone numbers. Some began as real cases long since resolved; the numbers are often recycled by call-harvesting scammers. Well-meaning shares keep the loop alive indefinitely.",
+      prevention: [
+        "Reverse-search the photo before sharing any missing-person forward.",
+        "Report to the official helpline instead of amplifying a number you can't verify.",
+        "A resolved case that keeps circulating wastes the exact attention real cases need.",
+      ],
+    },
+  },
+
+  /* ── T2 TRUE — the recall that sounds fake ─────────────────── */
+  {
+    id: "recall-real",
+    title: "The recall that sounds fake",
+    teaser: "'They're recalling THAT? No way.' The regulator says way.",
+    tier: 2,
+    verdict: "TRUE",
+    format: "news",
+    tacticId: "mis-dis-mal",
+    sender: {
+      name: "Cousin Zohaib",
+      relationship: "Cousin",
+      voice: "cocky but correct, city Roman-Urdu, knows the internet",
+    },
+    senderMotive:
+      "He already thinks it's real and wants you to check the batch at home. He'll enjoy being right.",
+    opener:
+      "oye check your kitchen — that snack batch is actually recalled, contamination issue. sab keh rahe fake news hai but I don't think so. dekh le",
+    forward: {
+      meta: "News article · regulator statement quoted",
+      headline: "Food authority orders recall of popular snack batch over contamination",
+      imageEmoji: "⚠️",
+      imageAlt: "News article with a regulator's recall notice",
+      bodyLines: [
+        "Specific batch numbers listed.",
+        "Regulator quoted with a named spokesperson.",
+        "Retailers instructed to pull stock this week.",
+      ],
+    },
+    actions: [
+      {
+        id: "check-regulator-site",
+        label: "Check the food authority's own site",
+        tool: "check_source",
+        result:
+          "The recall notice is on the authority's official page — same batch numbers, dated this week, signed by the named spokesperson.",
+        decisive: true,
+      },
+      {
+        id: "cross-check-outlets",
+        label: "Cross-check other newsrooms",
+        tool: "cross_check",
+        result:
+          "Three established outlets carry it independently, each quoting the regulator directly. Retail chains have posted pull-notices.",
+        decisive: true,
+      },
+      {
+        id: "check-batch-format",
+        label: "Compare the batch numbers to a pack at home",
+        tool: "check_source",
+        result:
+          "Batch number format matches real packaging. The listed batches are a specific production window, not 'all products' — a hoax usually says ALL.",
+      },
+    ],
+    truthNote:
+      "TRUE. Recalls sound like hoaxes because both use the same alarm bell. The difference is precision: a real recall names exact batches, a named spokesperson, and a notice on the regulator's own site. A hoax says 'ALL products, share fast'. Precision is what fear-bait can't fake cheaply.",
+    respectfulScript:
+      "Zohaib was right for once 😌 — it's on the authority's own site, exact batch numbers and everything. Checked our packs, ours isn't in the recalled window. Telling Ammi to check hers too.",
+  },
+
+  /* ── T3 UNVERIFIED — the neighborhood voice note ───────────── */
+  {
+    id: "voice-note-incident",
+    title: "The neighborhood voice note",
+    teaser: "A breathless voice note about an incident 'two streets over'. Nobody else has heard a thing.",
+    tier: 3,
+    verdict: "UNVERIFIED",
+    format: "whatsapp",
+    tacticId: "urgency-fear",
+    sender: {
+      name: "Uncle Tariq",
+      relationship: "Neighborhood WhatsApp group",
+      voice: "worried patriarch, forwards fast, means well",
+    },
+    senderMotive:
+      "He got the voice note from another group and forwarded within a minute. Protecting the street is his whole identity.",
+    opener:
+      "Sab log suno — abhi voice note aya hai, do galiyan door kuch hua hai. Bachon ko andar rakho. Forward kar raha hoon, khud sun lo.",
+    forward: {
+      meta: "Voice note · 0:41 · forwarded many times",
+      headline: "Voice note: 'something happened near the park, police everywhere'",
+      imageEmoji: "🎙️",
+      imageAlt: "A forwarded voice note waveform",
+      bodyLines: [
+        "Unknown voice, breathless, no names.",
+        "'Police everywhere' near the park.",
+        "'Keep kids inside, tell everyone.'",
+      ],
+    },
+    actions: [
+      {
+        id: "check-local-coverage",
+        label: "Check local news and city police feed",
+        tool: "cross_check",
+        result:
+          "Nothing on local news or the police information feed. But a minor street incident wouldn't necessarily be reported this fast — silence isn't proof either way.",
+      },
+      {
+        id: "ask-source-chain",
+        label: "Ask Uncle Tariq where the note came from",
+        tool: "check_source",
+        result:
+          "He got it from another group, who got it from another group. Nobody in the chain heard it firsthand. The original sender is unfindable.",
+        decisive: true,
+      },
+      {
+        id: "check-note-history",
+        label: "Ask if anyone recognizes the voice",
+        tool: "cross_check",
+        result:
+          "Nobody knows the speaker. One neighbor says a similar note circulated in a different area last month; nobody can find that one now to compare.",
+      },
+    ],
+    truthNote:
+      "UNVERIFIED. Something MAY have happened — you can't disprove a vague claim, and 'no news coverage yet' is weak evidence about an event minutes old. But an anonymous voice with no firsthand source is not information; it's mood. The honest verdict is UNVERIFIED, and the honest action is to check on people you know directly instead of amplifying an unknown voice. Absence of evidence isn't evidence of absence — it's a reason to hold, not to broadcast.",
+    respectfulScript:
+      "Uncle, koi firsthand source nahi mila — na news, na police feed, aur chain mein kisi ne khud nahi suna. Ho sakta hai kuch hua ho, is liye main ne park side walon ko seedha message kar diya hai poochhne ke liye. Jab tak confirm nahi hota, aage forward na karein — agar kuch hai to direct contact zyada kaam ka hai.",
+  },
+
+  /* ── T3 MISLEADING — the real number, wrong story ──────────── */
+  {
+    id: "real-stat-wrong-story",
+    title: "The real number, wrong story",
+    teaser: "A genuine statistic from a genuine report — captioned to say the opposite of what the report says.",
+    tier: 3,
+    verdict: "MISLEADING",
+    format: "instagram",
+    tacticId: "out-of-context",
+    sender: {
+      name: "Areeba",
+      relationship: "Friend from tuition",
+      voice: "sharp, cares about issues, reposts fast when angry",
+    },
+    senderMotive:
+      "The caption made her angry on behalf of people she cares about. The number is real, so it felt safe to repost.",
+    opener: "this is actually from the official report?? how is nobody talking about this",
+    forward: {
+      meta: "Repost · infographic with a source citation",
+      headline: "'70% increase' — infographic citing a real annual report",
+      imageEmoji: "📊",
+      imageAlt: "An infographic quoting a statistic with an official-looking citation",
+      bodyLines: [
+        "The percentage is real and the report exists.",
+        "Caption: 'the situation is exploding and they're hiding it.'",
+        "Repost counter climbing fast.",
+      ],
+    },
+    actions: [
+      {
+        id: "open-actual-report",
+        label: "Open the cited report",
+        tool: "check_source",
+        result:
+          "The number is on page 12 — a 70% increase in CASES REPORTED. The same page credits a new reporting hotline for the rise and says measured incidence is flat. The report's own headline: 'reporting up, incidence stable'.",
+        decisive: true,
+      },
+      {
+        id: "check-infographic-source",
+        label: "Check who made the infographic",
+        tool: "cross_check",
+        result:
+          "Not the report's authors. An anonymous page that produces outrage infographics weekly, always citing real documents, always cropping the context sentence.",
+        decisive: true,
+      },
+      {
+        id: "check-date",
+        label: "Check the report's date",
+        tool: "check_date",
+        result: "Report is current-year. The number isn't stale — it's real. The story around it is the forgery.",
+      },
+    ],
+    truthNote:
+      "MISLEADING — the hardest verdict, because the number survives every fact-check. More people reporting a problem is what a system working looks like; the infographic sold it as the problem exploding. A real statistic with an inverted story is more dangerous than a fake one, because checking 'is the number real?' answers yes. The question that catches it: 'is the number saying what the caption says it says?'",
+    respectfulScript:
+      "The number's real — I opened the actual report. Page 12: reports went up 70% because they launched a hotline, and actual incidence is flat. The infographic flipped the meaning. Worth being angry about real things — this one's actually a good-news stat wearing a scary caption.",
+    inspiredBy: {
+      patternName: "Context-Stripped Statistic",
+      country: "Global",
+      year: "ongoing",
+      whatHappened:
+        "Outrage pages quote genuine figures from genuine reports — crime counts, health numbers, budget lines — with the qualifying sentence cropped out. Because the number verifies, the post survives casual fact-checks and spreads through people who did check.",
+      prevention: [
+        "Verify the CLAIM, not just the number — open the cited page and read the sentence around it.",
+        "'Reported cases' and 'actual incidence' are different numbers wearing the same digits.",
+        "Check who built the graphic. Report authors rarely make outrage infographics about their own data.",
+      ],
+    },
+  },
+];
+
+FEED_SCENARIOS.push(...BALANCE_CASES);
+
 /* ── Format + tactic defaults for existing cases ────────────────
    Additive-only: keeps original data intact, just fills the new fields.
 */
