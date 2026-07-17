@@ -132,8 +132,8 @@ function BossLobby() {
                       ASSIGNMENT · REMATCH GATE
                     </div>
                     <div className="text-sm text-white/90">
-                      Win 1 case in <span className="font-semibold">{districtLabel}</span> to unlock
-                      the rematch.
+                      One clean win in <span className="font-semibold">{districtLabel}</span> and
+                      the rematch opens.
                     </div>
                     <div className="mt-1 font-mono text-[11px] text-amber-300/90">
                       PROGRESS · 0 / 1 COMPLETE

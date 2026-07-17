@@ -754,7 +754,7 @@ function Leaderboards() {
         </div>
         {devious.length === 0 ? (
           <div className="mt-3 text-xs text-muted-foreground italic">
-            No community daily cases yet — Designer Friday builds this list.
+            Board's empty till Friday. Designer Friday fills this list.
           </div>
         ) : (
           <ol className="mt-3 space-y-1 text-sm">

@@ -74,8 +74,8 @@ const BEATS = [
     sub: "You can't out-see a machine. You can out-verify one.",
   },
   {
-    headline: "Welcome to MILVERSE.",
-    sub: "Enter as a target. Leave as a designer.",
+    headline: "This is MILVERSE.",
+    sub: "Walk in as a target. Walk out as a designer.",
     finale: true,
   },
 ];

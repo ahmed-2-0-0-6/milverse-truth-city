@@ -589,7 +589,7 @@ function Beat2Boss({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
         <div className="mx-auto max-w-lg space-y-3">
           <div className="rounded-lg border-2 border-primary/60 bg-primary/10 p-5">
             <div className="stencil text-[10px] tracking-[0.3em] text-primary">
-              DOCTRINE UNLOCKED
+              DOCTRINE DECLASSIFIED
             </div>
             <ul className="mt-3 space-y-2 text-sm text-white">
               {DOCTRINE_RULES.map((d) => (
@@ -846,7 +846,7 @@ function Beat5Departure() {
         <ExitDoor
           to="/"
           label="PLAY THE FULL CITY"
-          hint="everything you just saw, unlocked"
+          hint="all of it, live"
           primary
         />
         <ExitDoor to="/educators" label="FOR EDUCATORS" hint="curriculum + pilot notes" />

@@ -200,7 +200,7 @@ function CityHall() {
           <div className="stencil text-[10px] text-primary mb-4">// CASE LOG · LAST 10</div>
           {p.history.length === 0 ? (
             <div className="text-sm text-muted-foreground">
-              No cases logged yet.{" "}
+              Nothing logged yet.{" "}
               <Link to="/mirror" className="text-primary underline-offset-4 hover:underline">
                 Open The Mirror →
               </Link>
