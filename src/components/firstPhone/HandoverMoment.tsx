@@ -20,7 +20,8 @@ interface Props {
  * wallpaper. LITE / reduced-motion = static composed frame.
  */
 export function HandoverMoment({ cityName, onDone }: Props) {
-  const reduced = useReducedMotion();
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => setReduced(shouldReduceMotion()), []);
   const [phase, setPhase] = useState<0 | 1 | 2 | 3 | 4>(reduced ? 3 : 0);
   const [picked, setPicked] = useState<number>(loadFirstPhone().wallpaper ?? 0);
 
