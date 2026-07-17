@@ -19,6 +19,8 @@ function freshState(): FirstPhoneState {
     lessonsCompleted: [],
     licenseIssuedAt: null,
     licenseNumber: null,
+    wallpaper: 0,
+    handoverSeen: false,
   };
 }
 
