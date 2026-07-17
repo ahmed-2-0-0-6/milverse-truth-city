@@ -17,6 +17,7 @@ import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
 import { Send, Search, Heart, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
+import { NextCaseCard } from "@/components/NextCaseCard";
 import { CAST } from "@/lib/cast";
 
 import { FormatFrame } from "@/components/feed/FormatFrame";
@@ -702,10 +703,12 @@ function Debrief({
 
       <RealCaseFile caseId={scenario.id} inline={scenario.inspiredBy} />
 
+      <NextCaseCard wing="feed" currentId={scenario.id} />
+
       <div className="flex gap-2">
         <button
           onClick={() => navigate({ to: "/feed" })}
-          className="flex-1 rounded-md bg-primary py-3 font-mono text-xs tracking-widest text-primary-foreground"
+          className="flex-1 rounded-md border border-border py-3 font-mono text-xs tracking-widest hover:border-primary/50"
         >
           BACK TO THE FEED
         </button>

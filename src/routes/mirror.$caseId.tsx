@@ -24,6 +24,7 @@ import { track } from "@/lib/telemetry";
 import { tick, tensionCue } from "@/lib/mirror/audio";
 import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
+import { NextCaseCard } from "@/components/NextCaseCard";
 import { RookieIntro } from "@/components/handler/RookieIntro";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 import { TacticStamp } from "@/components/TacticStamp";
@@ -1323,6 +1324,8 @@ function Debrief({ scenario }: { scenario: Scenario }) {
 
       <RealCaseFile caseId={scenario.id} inline={scenario.inspiredBy} />
 
+      <NextCaseCard wing="mirror" currentId={scenario.id} />
+
       <div className="flex gap-3">
         <Link
           to="/mirror"
@@ -1332,7 +1335,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
         </Link>
         <button
           onClick={() => navigate({ to: "/city-hall" })}
-          className="flex-1 rounded-md bg-primary py-3 font-mono text-xs tracking-widest text-primary-foreground"
+          className="flex-1 rounded-md border border-border py-3 font-mono text-xs tracking-widest hover:border-primary/50"
         >
           VIEW CALIBRATION
         </button>
