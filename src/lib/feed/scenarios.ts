@@ -3,6 +3,8 @@
 // Verdicts: TRUE / FALSE / MISLEADING / UNVERIFIED.
 
 import type { InspiredByCase } from "@/lib/mirror/inspired";
+import type { CastAfterword } from "@/lib/cast";
+
 
 export type FeedTier = 1 | 2 | 3;
 export type FeedVerdict = "TRUE" | "FALSE" | "MISLEADING" | "UNVERIFIED";
