@@ -7,6 +7,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useVisualMode } from "@/lib/visual-quality";
+import { isMuted } from "@/lib/mirror/audio";
 
 export type CalibrationOutcome = "correct" | "missed_scam" | "false_alarm";
 
@@ -52,6 +53,7 @@ const GRADES: Record<
 };
 
 function playThud(freq = 90, decay = 0.45) {
+  if (isMuted()) return;
   try {
     const AC = (window.AudioContext ||
       (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext) as
@@ -76,6 +78,7 @@ function playThud(freq = 90, decay = 0.45) {
 }
 
 function playSting(freq: number) {
+  if (isMuted()) return;
   try {
     const AC = (window.AudioContext ||
       (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext) as
