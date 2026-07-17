@@ -433,7 +433,12 @@ export const FEED_SCENARIOS: FeedScenario[] = [
         "A '24-hour deadline' on a life-changing benefit is the trap.",
       ],
     },
+    castAfterword: {
+      who: "cousin-zohaib",
+      line: "Zohaib ne screenshot dekh ke hansa: 'Bhai domain mein hyphen dekha? .gov.pk kabhi hyphen nahin leta. Yeh scam 2020 se same template pe chal raha hai — sirf sena aur ministry ka naam badalta rehta hai.'",
+    },
   },
+
 
   /* ── T2 FALSE — kidnap-van rumor ───────────────────────────── */
   {
