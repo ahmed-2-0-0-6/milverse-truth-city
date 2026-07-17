@@ -10,6 +10,10 @@ export interface FirstPhoneState {
   lessonsCompleted: number[]; // e.g. [1,2,3]
   licenseIssuedAt: number | null;
   licenseNumber: string | null;
+  /** ADDITIVE: index into WALLPAPERS (0-3). Chosen at handover. */
+  wallpaper: number;
+  /** ADDITIVE: once-per-child handover beat played? */
+  handoverSeen: boolean;
 }
 
 function fresh(): FirstPhoneState {
@@ -20,7 +24,21 @@ function fresh(): FirstPhoneState {
     lessonsCompleted: [],
     licenseIssuedAt: null,
     licenseNumber: null,
+    wallpaper: 0,
+    handoverSeen: false,
   };
+}
+
+export function setWallpaper(i: number) {
+  const s = loadFirstPhone();
+  s.wallpaper = i;
+  saveFirstPhone(s);
+}
+
+export function markHandoverSeen() {
+  const s = loadFirstPhone();
+  s.handoverSeen = true;
+  saveFirstPhone(s);
 }
 
 export function loadFirstPhone(): FirstPhoneState {

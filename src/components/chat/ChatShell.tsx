@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, CSSProperties } from "react";
 import { StatusBar } from "./StatusBar";
 
 interface Props {
@@ -7,8 +7,15 @@ interface Props {
   composer?: ReactNode;
   /** Rendered floating above content (notifications, sheets, call screens). */
   overlay?: ReactNode;
-  /** If true, no desktop device frame — full-bleed (mobile). Auto by breakpoint. */
   className?: string;
+  /**
+   * ADDITIVE: visual sub-theme. "detective" (default) = noir black.
+   * "junior" = the kid's First Phone — softer, brighter, less grain.
+   * Both reuse the same StatusBar and layout tokens.
+   */
+  variant?: "detective" | "junior";
+  /** Optional style (used by junior surface to paint the wallpaper behind). */
+  style?: CSSProperties;
 }
 
 /**
@@ -16,10 +23,27 @@ interface Props {
  * noir backdrop. On mobile, becomes full-bleed — the player's real phone IS the
  * case phone.
  */
-export function ChatShell({ header, children, composer, overlay, className }: Props) {
+export function ChatShell({
+  header,
+  children,
+  composer,
+  overlay,
+  className,
+  variant = "detective",
+  style,
+}: Props) {
+  const isJunior = variant === "junior";
+  const outer = isJunior ? "chat-shell-backdrop chat-shell-backdrop--junior" : "chat-shell-backdrop";
+  const frame = isJunior
+    ? "bg-neutral-900 text-white sm:rounded-[40px] sm:ring-1 sm:ring-white/10"
+    : "bg-black text-white sm:rounded-[36px] sm:ring-1 sm:ring-white/5";
+  const inner = isJunior ? "bg-neutral-900/80" : "bg-neutral-950";
+  const composerBg = isJunior ? "bg-neutral-900/95" : "bg-neutral-950/95";
   return (
-    <div className={`chat-shell-backdrop min-h-[100dvh] w-full ${className ?? ""}`}>
-      <div className="mx-auto flex min-h-[100dvh] w-full max-w-[420px] flex-col bg-black text-white sm:my-6 sm:min-h-0 sm:h-[min(880px,calc(100dvh-3rem))] sm:rounded-[36px] sm:border sm:border-white/10 sm:shadow-2xl sm:overflow-hidden sm:ring-1 sm:ring-white/5 relative">
+    <div className={`${outer} min-h-[100dvh] w-full ${className ?? ""}`} style={style}>
+      <div
+        className={`mx-auto flex min-h-[100dvh] w-full max-w-[420px] flex-col sm:my-6 sm:min-h-0 sm:h-[min(880px,calc(100dvh-3rem))] sm:border sm:border-white/10 sm:shadow-2xl sm:overflow-hidden relative ${frame}`}
+      >
         <StatusBar />
         {header}
         <div
@@ -27,13 +51,14 @@ export function ChatShell({ header, children, composer, overlay, className }: Pr
           aria-live="polite"
           aria-relevant="additions text"
           aria-label="Chat conversation"
-          className="relative flex-1 min-h-0 flex flex-col overflow-hidden bg-neutral-950"
+          className={`relative flex-1 min-h-0 flex flex-col overflow-hidden ${inner}`}
         >
           {children}
         </div>
-        {composer && <div className="border-t border-white/10 bg-neutral-950/95">{composer}</div>}
+        {composer && <div className={`border-t border-white/10 ${composerBg}`}>{composer}</div>}
         {overlay}
       </div>
     </div>
   );
 }
+

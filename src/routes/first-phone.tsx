@@ -4,6 +4,7 @@ import { TopBar } from "@/components/TopBar";
 import { useJuniorMode } from "@/hooks/useJuniorMode";
 import { ParentPitch } from "@/components/firstPhone/ParentPitch";
 import { LessonPath } from "@/components/firstPhone/LessonPath";
+import { HandoverMoment } from "@/components/firstPhone/HandoverMoment";
 import { setActive } from "@/lib/firstPhone/profile";
 
 export const Route = createFileRoute("/first-phone")({
@@ -29,6 +30,10 @@ export const Route = createFileRoute("/first-phone")({
 function FirstPhonePage() {
   const state = useJuniorMode();
   const [, force] = useState(0);
+
+  // Handover moment: once per kid, at first activation.
+  // We render it as soon as they're active but haven't seen it yet.
+  const needsHandover = state.ready && state.active && !state.handoverSeen;
 
   return (
     <div className="min-h-screen grain">
@@ -71,6 +76,14 @@ function FirstPhonePage() {
           </div>
         )}
       </main>
+
+      {needsHandover && (
+        <HandoverMoment
+          cityName={state.kidCityName || "cadet"}
+          onDone={() => force((n) => n + 1)}
+        />
+      )}
     </div>
   );
 }
+
