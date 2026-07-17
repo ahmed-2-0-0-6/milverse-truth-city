@@ -942,6 +942,12 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
 function Debrief({ scenario }: { scenario: Scenario }) {
   const navigate = useNavigate();
   const sim = useMemo(() => loadSim(), []);
+  const [profileSnap, setProfileSnap] = useState(() => loadProfile());
+  useEffect(() => {
+    const on = () => setProfileSnap(loadProfile());
+    window.addEventListener("milverse:profile", on);
+    return () => window.removeEventListener("milverse:profile", on);
+  }, []);
   const verdictRaw = useMemo(() => {
     try {
       const raw = sessionStorage.getItem(VERDICT_KEY);
