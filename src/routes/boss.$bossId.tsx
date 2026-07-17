@@ -28,6 +28,8 @@ import {
 import { attemptCount, recordBossAttempt, canRematch } from "@/lib/boss/profile";
 import { DOCTRINE_RULES } from "@/lib/boss/doctrine";
 import { logPilotEntry } from "@/lib/pilot";
+import { loadProfile } from "@/lib/mirror/profile";
+import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ContactsSheet } from "@/components/chat/ContactsSheet";
