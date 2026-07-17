@@ -109,7 +109,8 @@ function FlagFinder({
   function toggle(f: string) {
     if (revealed) return;
     const n = new Set(circled);
-    n.has(f) ? n.delete(f) : n.add(f);
+    if (n.has(f)) n.delete(f);
+    else n.add(f);
     setCircled(n);
   }
   function submit() {

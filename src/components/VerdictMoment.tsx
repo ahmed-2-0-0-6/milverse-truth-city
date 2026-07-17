@@ -53,7 +53,8 @@ const GRADES: Record<
 
 function playThud(freq = 90, decay = 0.45) {
   try {
-    const AC = (window.AudioContext || (window as any).webkitAudioContext) as
+    const AC = (window.AudioContext ||
+      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext) as
       | typeof AudioContext
       | undefined;
     if (!AC) return;
@@ -76,7 +77,8 @@ function playThud(freq = 90, decay = 0.45) {
 
 function playSting(freq: number) {
   try {
-    const AC = (window.AudioContext || (window as any).webkitAudioContext) as
+    const AC = (window.AudioContext ||
+      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext) as
       | typeof AudioContext
       | undefined;
     if (!AC) return;

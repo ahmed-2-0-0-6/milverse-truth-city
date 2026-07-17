@@ -156,7 +156,7 @@ export function Toolbelt({ scenario, used, onUse, onGrade }: Props) {
     return t.hint;
   }
 
-  function useTool(tool: ToolMeta) {
+  function runTool(tool: ToolMeta) {
     const slot = slots[tool.kind];
     const isFit = tool.bestFor.includes(format);
     const alreadyRevealed = reveals[tool.kind] !== null;
@@ -275,7 +275,7 @@ export function Toolbelt({ scenario, used, onUse, onGrade }: Props) {
               </div>
             ) : (
               <button
-                onClick={() => useTool(tool)}
+                onClick={() => runTool(tool)}
                 className={`w-full rounded-md border p-2 stencil text-[10px] tracking-widest transition ${
                   isFit
                     ? "border-primary/50 bg-background/60 text-primary hover:bg-primary/10"
