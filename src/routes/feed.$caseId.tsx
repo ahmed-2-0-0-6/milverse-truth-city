@@ -20,6 +20,9 @@ import { XpDeltaLine } from "@/components/rank/XpDeltaLine";
 import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
 import { appendFeedWall } from "@/lib/feed/wall";
+import { dignityBandFor } from "@/lib/mirror/meterBands";
+import { MeterNote } from "@/components/chat/MeterNote";
+
 import { Send, Search, Heart, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
 import { NextCaseCard } from "@/components/NextCaseCard";
