@@ -124,7 +124,7 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone, 
     return () => {
       [t1, t2, tSkip, t3, t4].forEach(clearTimeout);
     };
-  }, [mode, outcome]);
+  }, [mode, outcome, quiet]);
 
   if (mode !== "cinematic") return null;
 
