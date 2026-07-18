@@ -900,9 +900,27 @@ function WorldSvg({
           />
         );
       })}
+
+      {/* CITY IS AWAKE — ambient decorative life (skip entirely if not ambient) */}
+      {ambient && (
+        <>
+          {/* hidden path the metro rides — reuses mirror line geometry */}
+          <path id="ambient-metro-path" d={mirrorPath} fill="none" stroke="none" />
+          <AmbientLife
+            hour={hour}
+            minuteOfDay={minuteOfDay}
+            metroPathId="ambient-metro-path"
+            animateMetro={!prefersReduced}
+          />
+        </>
+      )}
+
+      {/* CITY IS AWAKE — truthful signal beacons (always render if present) */}
+      <SignalBeacons ambient={ambient} onBeacon={onBeacon} />
     </svg>
   );
 }
+
 
 /* ── flickering city silhouettes (window lights) ─────────────── */
 function CitySilhouettes({ prefersReduced }: { prefersReduced: boolean }) {
