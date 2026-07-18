@@ -290,7 +290,7 @@ function Studio() {
       incrementPublishedCount();
       if (res.lane === "community") {
         toast.success("Submitted to the Community Library", {
-          description: `Queued for human review · share code ${code}${res.aiChecked ? " · AI safety check passed" : " · manual review pending"}`,
+          description: `Queued for human review · share code ${code}${res.aiChecked ? " · AI safety check passed" : " · manual review pending"}${advisories > 0 ? ` · ${advisories} desk note${advisories === 1 ? "" : "s"} traveled with it.` : ""}`,
         });
       } else {
         toast.success("Published as a private case", {
