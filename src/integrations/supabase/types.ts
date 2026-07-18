@@ -495,6 +495,13 @@ export type Database = {
           wing: string
         }[]
       }
+      get_pinned_lines: {
+        Args: { _case_id: string }
+        Returns: {
+          line_hash: string
+          pins: number
+        }[]
+      }
       get_sharpest_watch: {
         Args: never
         Returns: {

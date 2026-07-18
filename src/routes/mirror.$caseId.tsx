@@ -78,6 +78,28 @@ import {
   isColdEligible,
   saveColdRead,
 } from "@/lib/mirror/coldreads";
+import { fetchPinnedLines, type PinnedLine } from "@/lib/mirror/pinned.functions";
+
+/**
+ * THE MOST SUSPECTED LINE — hash architecture.
+ * Message bodies never leave the device. We hash the NORMALIZED text
+ * (lowercase, collapsed whitespace) with SHA-256 and keep only the
+ * first 12 hex chars. Player-typed text is NEVER hashed or sent — the
+ * pin UI is gated to `role === "contact"` in Chat.onPin (search for
+ * `onPin` in this file). Contact lines are engine-composed authored
+ * strings, so hashes are stable across devices.
+ */
+function normalizeLine(text: string): string {
+  return text.trim().toLowerCase().replace(/\s+/g, " ");
+}
+async function hashLine12(text: string): Promise<string> {
+  const buf = new TextEncoder().encode(normalizeLine(text));
+  const digest = await crypto.subtle.digest("SHA-256", buf);
+  const bytes = new Uint8Array(digest);
+  let hex = "";
+  for (let i = 0; i < 6; i++) hex += bytes[i].toString(16).padStart(2, "0");
+  return hex;
+}
 
 /**
  * COLD READ MODE — the drill law.
@@ -1968,6 +1990,104 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     }
   }, [result, scenario.id, scenario.tier, scenario.truth, scenario.tactic, verdictRaw, pendingBefore]);
 
+  // ─── THE MOST SUSPECTED LINE ───────────────────────────────────
+  // On debrief mount: (a) send one pin_flag per final pinned CONTACT
+  // line — max 5, hashes only, never text; (b) fetch the city's top
+  // three hashes and locate one that appears in this player's own
+  // transcript. Anything that fails silently: the block just doesn't
+  // render. Cold reads and /visit render different components and so
+  // never reach this effect.
+  const pinnedSentRef = useRef(false);
+  const [cityLine, setCityLine] = useState<
+    | { text: string; pins: number; playerPinned: boolean; wasTell: boolean }
+    | { fallback: true }
+    | null
+  >(null);
+  const callFetchPinned = useServerFn(fetchPinnedLines);
+  useEffect(() => {
+    if (pinnedSentRef.current || !sim || !result) return;
+    pinnedSentRef.current = true;
+    let cancelled = false;
+
+    (async () => {
+      const finalPinIdxs: number[] =
+        (sim.state as EngineState & { pins?: number[] })?.pins ?? [];
+      // Contact messages only. onPin in the chat UI is gated to
+      // role === "contact"; player messages are unpinnable by
+      // construction, so nothing player-typed ever hashes here.
+      const pinnedContact = finalPinIdxs
+        .map((idx) => ({ idx, msg: sim.messages[idx] }))
+        .filter(
+          (p) => p.msg && p.msg.role === "contact" && typeof p.msg.text === "string" && p.msg.text.trim().length > 0,
+        )
+        .slice(0, 5);
+
+      const playerHashes = new Set<string>();
+      for (const p of pinnedContact) {
+        try {
+          const h = await hashLine12(p.msg.text as string);
+          playerHashes.add(h);
+          try {
+            track("pin_flag", {
+              case_id: scenario.id,
+              payload: { line: h },
+            });
+          } catch {
+            /* noop */
+          }
+        } catch {
+          /* noop */
+        }
+      }
+
+      // Hash every contact line in the transcript so we can match the
+      // city's top hash even when the player didn't pin it.
+      const contactHashes: { text: string; hash: string; wasTell: boolean }[] = [];
+      for (const m of sim.messages) {
+        if (m.role !== "contact") continue;
+        if (typeof m.text !== "string" || m.text.trim().length === 0) continue;
+        try {
+          const h = await hashLine12(m.text);
+          contactHashes.push({ text: m.text, hash: h, wasTell: !!m.isTell });
+        } catch {
+          /* noop */
+        }
+      }
+
+      let rows: PinnedLine[] = [];
+      try {
+        rows = await callFetchPinned({ data: { caseId: scenario.id } });
+      } catch {
+        rows = [];
+      }
+      if (cancelled) return;
+      if (!rows.length) {
+        setCityLine(null);
+        return;
+      }
+
+      const match = rows
+        .map((r) => ({ row: r, hit: contactHashes.find((c) => c.hash === r.lineHash) }))
+        .find((x) => !!x.hit);
+
+      if (match && match.hit) {
+        setCityLine({
+          text: match.hit.text,
+          pins: match.row.pins,
+          playerPinned: playerHashes.has(match.hit.hash),
+          wasTell: match.hit.wasTell,
+        });
+      } else {
+        setCityLine({ fallback: true });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sim, result, scenario.id, callFetchPinned]);
+
+
   if (!result || !verdictRaw) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-10 text-muted-foreground">
@@ -2185,6 +2305,45 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           </ul>
         </section>
       )}
+
+      {/* THE MOST SUSPECTED LINE — the crowd's record on this case. */}
+      {cityLine && "fallback" in cityLine ? (
+        <section className="rounded-xl border border-border bg-card p-6">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
+            THE CITY'S RECORD ON THIS LINE
+          </div>
+          <p className="text-sm text-muted-foreground">
+            The city has a record on this case — but its most-suspected line didn't come up in your run. Conversations fork; suspicion maps differently every time.
+          </p>
+        </section>
+      ) : cityLine ? (
+        <section className="rounded-xl border border-border bg-card p-6">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
+            THE CITY'S RECORD ON THIS LINE
+          </div>
+          <blockquote
+            role="blockquote"
+            className="rounded-md border-l-2 border-caution bg-caution/5 pl-3 py-2 text-sm italic"
+          >
+            "{cityLine.text}"
+            <figcaption className="mt-1.5 not-italic font-mono text-[10px] tracking-widest text-muted-foreground">
+              {cityLine.pins.toLocaleString()} citizens pinned this exact line.
+            </figcaption>
+          </blockquote>
+          <p className="mt-3 text-xs text-muted-foreground">
+            {result.truthLabel === "FAKE"
+              ? cityLine.wasTell
+                ? "The crowd found the crack in the same place. That's not coincidence — that's the tell doing its job."
+                : "The city's suspicion pooled here — but the real slip was elsewhere. Crowds find smoke; verification finds fire."
+              : `A real person's ordinary sentence, and ${cityLine.pins.toLocaleString()} citizens flagged it. That's what a false alarm looks like from above — suspicion is cheap, and it pools on the innocent.`}
+          </p>
+          {cityLine.playerPinned && (
+            <p className="mt-2 font-mono text-[10px] tracking-widest text-caution">
+              YOUR PIN IS IN THAT COUNT.
+            </p>
+          )}
+        </section>
+      ) : null}
 
       {/* The Tape — annotated playback of the whole exchange. */}
       {sim?.messages?.length ? (
