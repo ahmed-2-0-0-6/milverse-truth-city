@@ -754,8 +754,8 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               )}
 
 
-              <div className="mt-2 flex gap-1" role="tablist" aria-label="Chat and notes">
-                {(["chat", "notes"] as const).map((t, i, arr) => (
+              <div className="mt-2 flex gap-1" role="tablist" aria-label={coldMode ? "Chat" : "Chat and notes"}>
+                {((coldMode ? (["chat"] as const) : (["chat", "notes"] as const)) as readonly ("chat" | "notes")[]).map((t, i, arr) => (
                   <button
                     key={t}
                     id={`mirror-tab-${t}`}
@@ -780,6 +780,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                     {t === "chat" ? "CHAT" : `NOTES · ${pins.length}/5`}
                   </button>
                 ))}
+
 
                 <div className="flex-1" />
                 {/* Desktop-only: VERIFY / CALL IT live in the meter row.
