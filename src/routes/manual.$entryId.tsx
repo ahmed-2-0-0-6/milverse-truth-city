@@ -161,6 +161,12 @@ function EntryPage() {
               <p className="text-sm">{e.counterMove}</p>
             </section>
 
+            <SectionRule />
+
+            <SeenInTheWild entryId={e.id} />
+
+
+
             <div className="mt-8 border-t border-dashed border-border pt-4 flex flex-wrap items-center gap-3 stencil text-[10px] tracking-widest">
               <Link to="/manual" className="text-muted-foreground hover:text-foreground">
                 ← ALL FILES
