@@ -767,6 +767,17 @@ function Debrief({
 
       <RealCaseFile caseId={scenario.id} inline={scenario.inspiredBy} />
 
+      <CitySolved
+        caseId={scenario.id}
+        playerResult={
+          outcome.result === "correct"
+            ? "correct"
+            : outcome.result === "missed_fake" || outcome.result === "missed_scam"
+              ? "missed_scam"
+              : "false_alarm"
+        }
+      />
+
       <NextCaseCard wing="feed" currentId={scenario.id} />
 
       <div className="flex gap-2">
