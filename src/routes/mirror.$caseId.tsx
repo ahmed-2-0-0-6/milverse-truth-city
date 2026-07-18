@@ -1308,6 +1308,8 @@ function Debrief({ scenario }: { scenario: Scenario }) {
         )}
       </div>
 
+      <RetestReveal resolution={retestResolution} />
+
       <TacticStamp tacticId={tacticForMirror(scenario.id)} />
 
       {(result.resultKind === "missed_scam" || result.resultKind === "false_alarm") && (
