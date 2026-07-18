@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/sheet";
 import { useAccess, type TextSize } from "@/lib/access";
 import { isMuted, setMuted } from "@/lib/mirror/audio";
+import { storageHealth } from "@/lib/storage";
+
 
 const SIZE_LABEL: Record<TextSize, string> = {
   default: "Default",
