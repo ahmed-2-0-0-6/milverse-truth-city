@@ -20,6 +20,7 @@ function freshState(): FirstPhoneState {
     licenseNumber: null,
     wallpaper: 0,
     handoverSeen: false,
+    tourSeen: false,
   };
 }
 
