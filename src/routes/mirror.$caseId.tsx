@@ -733,6 +733,23 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
             {tab === "chat" && (
               <QuickBrief refs={refs} openRef={openRef} onToggle={(r) => setOpenRef((cur) => (cur === r ? null : r))} />
             )}
+            {/* Mobile-only thumb-reach cluster for the two most consequential controls. */}
+            <div className="mb-2 flex justify-end gap-2 sm:hidden">
+              <button
+                onClick={() => setShowVob(true)}
+                disabled={ended || messages.length < 2}
+                className="touch-manipulation inline-flex min-h-[44px] items-center rounded-full border border-primary/50 bg-primary/10 px-4 text-[11px] font-mono tracking-widest text-primary active:bg-primary/20 disabled:opacity-40"
+              >
+                <ShieldCheck className="inline h-3.5 w-3.5 mr-1" /> VERIFY
+              </button>
+              <button
+                onClick={onEnd}
+                disabled={messages.length < 2}
+                className="touch-manipulation inline-flex min-h-[44px] items-center rounded-full border border-destructive/50 bg-destructive/10 px-4 text-[11px] font-mono tracking-widest text-destructive active:bg-destructive/20 disabled:opacity-40"
+              >
+                <Phone className="inline h-3.5 w-3.5 mr-1" /> CALL IT
+              </button>
+            </div>
             <div className="flex gap-2">
               <input
                 id="mirror-composer"
@@ -742,21 +759,21 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 placeholder={ended ? "Chat ended — make your call." : skin.placeholder}
                 disabled={ended || typing}
                 aria-label="Type your reply"
-                className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-sm text-white outline-none focus:border-primary disabled:opacity-50"
+                className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-base sm:text-sm text-white outline-none focus:border-primary disabled:opacity-50 min-h-[44px] sm:min-h-0"
               />
 
               <button
                 onClick={send}
                 disabled={ended || typing || !input.trim()}
                 aria-label="Send message"
-                className="rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40"
+                className="touch-manipulation rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
               >
                 <Send className="h-4 w-4" aria-hidden="true" />
               </button>
 
             </div>
             <div className="mt-1.5 flex items-center justify-between font-mono text-[9px] tracking-widest text-white/40">
-              <span>ASK FOR A "VOICE NOTE" · TAP PIN TO FLAG</span>
+              <span>HOLD A MESSAGE TO FLAG IT · OR TAP ITS PIN</span>
               <span>{messages.filter((m) => m.role === "player").length} SENT</span>
             </div>
           </div>
