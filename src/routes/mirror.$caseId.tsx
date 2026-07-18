@@ -1096,7 +1096,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
 
       <button
         onClick={submit}
-        disabled={!verdict}
+        disabled={!verdict || !confidence}
         className="mt-6 w-full rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground disabled:opacity-40"
       >
         SUBMIT VERDICT
