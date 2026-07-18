@@ -123,6 +123,14 @@ export function CitizenFile({ open, onOpenChange, profile, xp, manualUnlocks }: 
             <span>THE CASE WALL</span>
             <span aria-hidden>→</span>
           </Link>
+          <Link
+            to="/paper/supplement"
+            onClick={() => onOpenChange(false)}
+            className="mt-2 flex items-center justify-between rounded-md border border-border bg-background/40 px-3 py-2 stencil text-[10px] tracking-widest text-foreground transition-colors hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <span>SUNDAY SUPPLEMENT</span>
+            <span aria-hidden>→</span>
+          </Link>
           {activeGroup && (
             <Link
               to="/board"
