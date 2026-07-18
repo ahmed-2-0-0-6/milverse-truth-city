@@ -438,6 +438,17 @@ export type Database = {
           total: number
         }[]
       }
+      get_city_board: {
+        Args: { _code: string }
+        Returns: {
+          correct_count: number
+          false_alarms: number
+          handle: string
+          missed: number
+          plays: number
+          points: number
+        }[]
+      }
       get_daily_split: {
         Args: { _case_id: string; _drop_date: string }
         Returns: {
