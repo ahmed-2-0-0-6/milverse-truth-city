@@ -3,6 +3,8 @@
 // playback. Message bodies never leave the device. No telemetry.
 
 import type { Message, VoicePayload } from "./engine";
+import { readStore, recoverStore, writeStore } from "@/lib/storage";
+
 
 /** Fields the tape renders. Everything else is stripped on save. */
 export interface TapeMessage {
@@ -26,8 +28,11 @@ export interface StoredTape {
   messages: TapeMessage[];
 }
 
+// Owner: mirror/tapes (StoredTape FIFO, cap 10). Reclaim() may drop the
+// oldest half when disk is full. Bump the suffix on breaking shape change.
 const KEY = "milverse.tapes.v1";
 const CAP = 10;
+
 
 function strip(m: Message): TapeMessage {
   const out: TapeMessage = { role: m.role, text: m.text ?? "", ts: m.ts };
@@ -46,16 +51,18 @@ function strip(m: Message): TapeMessage {
   return out;
 }
 
+function isTapeListShape(v: unknown): v is StoredTape[] {
+  return Array.isArray(v);
+}
+
 export function readTapes(): StoredTape[] {
   if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as StoredTape[]) : [];
-  } catch {
-    return [];
+  const read = readStore<StoredTape[]>(KEY, isTapeListShape);
+  if (read === "corrupt") {
+    const rec = recoverStore<StoredTape[]>(KEY, isTapeListShape);
+    return rec ?? [];
   }
+  return read ?? [];
 }
 
 export function saveTape(entry: {
@@ -77,12 +84,9 @@ export function saveTape(entry: {
   list.push(tape);
   // FIFO cap.
   while (list.length > CAP) list.shift();
-  try {
-    localStorage.setItem(KEY, JSON.stringify(list));
-  } catch {
-    /* quota — silently drop */
-  }
+  writeStore(KEY, list);
 }
+
 
 export function clearTapes(): void {
   if (typeof window === "undefined") return;

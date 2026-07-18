@@ -2,6 +2,7 @@
 // Rule: at most ONE AI generation per surface per profile per UTC+5 day.
 
 import { dropDateKey } from "@/lib/daily/rotation";
+import { readStore, writeStore } from "@/lib/storage";
 
 export type HandlerSurface =
   | "reading"
@@ -12,6 +13,9 @@ export type HandlerSurface =
   | "send-off"
   | "loss-debrief";
 
+// Owner: handler/cache (per-surface AI cache). SAFE-LIST member — reclaim()
+// may delete this whole key. Bump the suffix on breaking shape change;
+// readStore validators are the compatibility gate.
 const KEY = "milverse.handler.cache.v1";
 
 interface CacheEntry {
@@ -28,19 +32,22 @@ type CacheShape = Partial<Record<HandlerSurface, CacheEntry>>;
 // Drop always roll over together.
 export { dropDateKey };
 
-function load(): CacheShape {
-  if (typeof window === "undefined") return {};
-  try {
-    return JSON.parse(localStorage.getItem(KEY) ?? "{}") as CacheShape;
-  } catch {
-    return {};
-  }
+function isCacheShape(v: unknown): v is CacheShape {
+  return !!v && typeof v === "object" && !Array.isArray(v);
 }
 
-function save(c: CacheShape) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(KEY, JSON.stringify(c));
+function load(): CacheShape {
+  if (typeof window === "undefined") return {};
+  const read = readStore<CacheShape>(KEY, isCacheShape);
+  if (read === "corrupt" || read === null) return {};
+  return read;
 }
+
+function save(c: CacheShape): boolean {
+  if (typeof window === "undefined") return false;
+  return writeStore(KEY, c);
+}
+
 
 export function readCache(surface: HandlerSurface, hash: string): CacheEntry | null {
   const c = load();

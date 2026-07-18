@@ -4,10 +4,14 @@
 import type { ItemResponse, Metrics, CohortAttempt } from "./scoring";
 import { scoreAttempt } from "./scoring";
 import type { FormId } from "./items";
+import { readStore, recoverStore, writeStore } from "@/lib/storage";
 
+// Owner: assessment/state (pilot attempts + codename). Bump the suffix on
+// breaking shape change; readStore validators are the compatibility gate.
 const LOCAL_KEY = "milverse.assessment.local.v1";
 // Distinct namespace so the codename hash is stable across dev sessions.
 const CODENAME_KEY = "milverse.pilot.codename";
+
 
 export interface StoredAttempt {
   groupCode: string;
@@ -62,20 +66,25 @@ export function formForPhase(hash: string, phase: "intake" | "exit"): FormId {
 
 /* ── local mirror ──────────────────────────────────────────── */
 
+function isAttemptListShape(v: unknown): v is StoredAttempt[] {
+  return Array.isArray(v);
+}
+
 export function loadLocal(): StoredAttempt[] {
   if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(LOCAL_KEY);
-    return raw ? (JSON.parse(raw) as StoredAttempt[]) : [];
-  } catch {
-    return [];
+  const read = readStore<StoredAttempt[]>(LOCAL_KEY, isAttemptListShape);
+  if (read === "corrupt") {
+    const rec = recoverStore<StoredAttempt[]>(LOCAL_KEY, isAttemptListShape);
+    return rec ?? [];
   }
+  return read ?? [];
 }
 
 function saveLocal(list: StoredAttempt[]) {
-  localStorage.setItem(LOCAL_KEY, JSON.stringify(list));
+  writeStore(LOCAL_KEY, list);
   window.dispatchEvent(new Event("milverse:assessment"));
 }
+
 
 /** Idempotent: one intake and one exit per (group, codenameHash) locally. */
 export function hasAttempt(groupCode: string, hash: string, phase: "intake" | "exit"): boolean {

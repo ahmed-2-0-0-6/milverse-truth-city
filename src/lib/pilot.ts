@@ -3,6 +3,9 @@
 // is active and the network is available, we also insert into pilot_entries
 // so a real classroom on multiple devices aggregates on the dashboard.
 
+import { readStore, recoverStore, writeStore } from "@/lib/storage";
+
+
 export interface PilotEntry {
   wing: "mirror" | "feed" | "daily";
   caseId: string;
@@ -43,14 +46,18 @@ function key(code: string) {
   return `milverse.pilot.log.${code.toUpperCase()}`;
 }
 
+function isEntryListShape(v: unknown): v is PilotEntry[] {
+  return Array.isArray(v);
+}
+
 export function loadPilotLog(code: string): PilotEntry[] {
   if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(key(code));
-    return raw ? (JSON.parse(raw) as PilotEntry[]) : [];
-  } catch {
-    return [];
+  const read = readStore<PilotEntry[]>(key(code), isEntryListShape);
+  if (read === "corrupt") {
+    const rec = recoverStore<PilotEntry[]>(key(code), isEntryListShape);
+    return rec ?? [];
   }
+  return read ?? [];
 }
 
 /** Fire-and-forget: always write to localStorage. If a group is active, also
@@ -61,11 +68,12 @@ export function logPilotEntry(entry: PilotEntry) {
   if (!code) return;
   const list = loadPilotLog(code);
   list.push(entry);
-  localStorage.setItem(key(code), JSON.stringify(list));
+  writeStore(key(code), list);
   window.dispatchEvent(new Event("milverse:pilot"));
   enqueueOutbox({ groupCode: code, deviceId: getDeviceId(), entry });
   void flushOutbox();
 }
+
 
 /* ── OUTBOX ────────────────────────────────────────────────────────────────
    DELIBERATE DECISION: NO service worker / PWA caching backs this outbox.
@@ -86,21 +94,22 @@ const OUTBOX_KEY = "milverse.pilot.outbox.v1";
 const OUTBOX_CAP = 200;
 const MAX_HEAD_FAILS = 5;
 
+function isOutboxShape(v: unknown): v is OutboxItem[] {
+  return Array.isArray(v);
+}
+
 function loadOutbox(): OutboxItem[] {
-  try {
-    const raw = localStorage.getItem(OUTBOX_KEY);
-    return raw ? (JSON.parse(raw) as OutboxItem[]) : [];
-  } catch {
-    return [];
+  const read = readStore<OutboxItem[]>(OUTBOX_KEY, isOutboxShape);
+  if (read === "corrupt") {
+    const rec = recoverStore<OutboxItem[]>(OUTBOX_KEY, isOutboxShape);
+    return rec ?? [];
   }
+  return read ?? [];
 }
 function saveOutbox(items: OutboxItem[]) {
-  try {
-    localStorage.setItem(OUTBOX_KEY, JSON.stringify(items));
-  } catch {
-    /* quota — nothing we can do */
-  }
+  writeStore(OUTBOX_KEY, items);
 }
+
 
 function enqueueOutbox(item: OutboxItem) {
   const list = loadOutbox();

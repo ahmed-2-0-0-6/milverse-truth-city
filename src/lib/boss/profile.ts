@@ -1,7 +1,10 @@
 // MILVERSE — Boss Protocol local profile: attempts, wins, badges, rematch state.
 
 import type { BossId, ProtocolMove } from "./types";
+import { readStore, recoverStore, writeStore } from "@/lib/storage";
 
+// Owner: boss/profile (BossProfile). Bump the suffix on breaking shape
+// change; readStore validators are the compatibility gate.
 const KEY = "milverse.boss.v1";
 
 export interface BossAttempt {
@@ -21,21 +24,35 @@ export interface BossProfile {
 
 const empty: BossProfile = { attempts: [], badges: [], declassified: [], assignments: [] };
 
-export function loadBossProfile(): BossProfile {
-  if (typeof window === "undefined") return empty;
-  try {
-    const raw = localStorage.getItem(KEY);
-    return raw ? { ...empty, ...(JSON.parse(raw) as BossProfile) } : empty;
-  } catch {
-    return empty;
-  }
+function isBossProfileShape(v: unknown): v is Partial<BossProfile> {
+  if (!v || typeof v !== "object") return false;
+  const o = v as Record<string, unknown>;
+  if (o.attempts !== undefined && !Array.isArray(o.attempts)) return false;
+  if (o.badges !== undefined && !Array.isArray(o.badges)) return false;
+  if (o.declassified !== undefined && !Array.isArray(o.declassified)) return false;
+  if (o.assignments !== undefined && !Array.isArray(o.assignments)) return false;
+  return true;
 }
 
-export function saveBossProfile(p: BossProfile) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(KEY, JSON.stringify(p));
-  window.dispatchEvent(new Event("milverse:boss"));
+export function loadBossProfile(): BossProfile {
+  if (typeof window === "undefined") return empty;
+  const read = readStore<Partial<BossProfile>>(KEY, isBossProfileShape);
+  if (read === "corrupt") {
+    const rec = recoverStore<Partial<BossProfile>>(KEY, isBossProfileShape);
+    if (rec) return { ...empty, ...rec };
+    return empty;
+  }
+  if (read === null) return empty;
+  return { ...empty, ...read };
 }
+
+export function saveBossProfile(p: BossProfile): boolean {
+  if (typeof window === "undefined") return false;
+  const ok = writeStore(KEY, p);
+  window.dispatchEvent(new Event("milverse:boss"));
+  return ok;
+}
+
 
 export function recordBossAttempt(attempt: BossAttempt, badge?: string, declassify?: BossId) {
   const p = loadBossProfile();

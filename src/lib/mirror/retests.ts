@@ -6,10 +6,14 @@ import { SCENARIOS, getScenario } from "@/lib/mirror/scenarios";
 import type { TrustProfile } from "@/lib/mirror/profile";
 import { unlockedMaxTier } from "@/lib/mirror/profile";
 import type { TacticId } from "@/lib/manual/entries";
+import { readStore, recoverStore, writeStore } from "@/lib/storage";
 
+// Owner: mirror/retests (Retest queue). Bump the suffix on breaking shape
+// change; readStore validators are the compatibility gate.
 const KEY = "milverse.retests.v1";
 const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
 const QUEUE_CAP = 3;
+
 
 export type RetestStatus = "pending" | "closed";
 
@@ -25,27 +29,26 @@ export interface Retest {
   status: RetestStatus;
 }
 
+function isRetestListShape(v: unknown): v is Retest[] {
+  return Array.isArray(v);
+}
+
 export function loadRetests(): Retest[] {
   if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as Retest[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+  const read = readStore<Retest[]>(KEY, isRetestListShape);
+  if (read === "corrupt") {
+    const rec = recoverStore<Retest[]>(KEY, isRetestListShape);
+    return rec ?? [];
   }
+  return read ?? [];
 }
 
 export function saveRetests(list: Retest[]) {
   if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(KEY, JSON.stringify(list));
-  } catch {
-    /* localStorage unavailable */
-  }
+  writeStore(KEY, list);
   window.dispatchEvent(new Event("milverse:retests"));
 }
+
 
 /** Latest history entry (by ts) per caseId. */
 function latestByCase(profile: TrustProfile): Map<string, TrustProfile["history"][number]> {

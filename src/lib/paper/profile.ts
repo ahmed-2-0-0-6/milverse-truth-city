@@ -6,7 +6,10 @@
 
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
 import { dropDateKey } from "@/lib/daily/rotation";
+import { readStore, recoverStore, writeStore } from "@/lib/storage";
 
+// Owner: paper/profile (PaperStore, per-edition records). Bump the suffix
+// on breaking shape change; readStore validators are the compatibility gate.
 const KEY = "milverse.paper.v1";
 
 export type PaperSection = "lead" | "forgery" | "social" | "classified" | "puzzle";
@@ -24,21 +27,33 @@ interface PaperStore {
   editions: Record<number, PaperEditionRecord>;
 }
 
+function isPaperShape(v: unknown): v is Partial<PaperStore> {
+  if (!v || typeof v !== "object") return false;
+  const o = v as Record<string, unknown>;
+  if (o.editions !== undefined && (typeof o.editions !== "object" || o.editions === null)) {
+    return false;
+  }
+  return true;
+}
+
 function load(): PaperStore {
   if (typeof window === "undefined") return { editions: {} };
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return { editions: {} };
-    return { editions: {}, ...JSON.parse(raw) } as PaperStore;
-  } catch {
+  const read = readStore<Partial<PaperStore>>(KEY, isPaperShape);
+  if (read === "corrupt") {
+    const rec = recoverStore<Partial<PaperStore>>(KEY, isPaperShape);
+    if (rec) return { editions: {}, ...rec };
     return { editions: {} };
   }
+  if (read === null) return { editions: {} };
+  return { editions: {}, ...read };
 }
-function save(s: PaperStore) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(KEY, JSON.stringify(s));
+function save(s: PaperStore): boolean {
+  if (typeof window === "undefined") return false;
+  const ok = writeStore(KEY, s);
   window.dispatchEvent(new Event("milverse:profile"));
+  return ok;
 }
+
 
 function ensure(s: PaperStore, editionNumber: number): PaperEditionRecord {
   if (!s.editions[editionNumber]) {
