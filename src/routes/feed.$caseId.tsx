@@ -737,6 +737,7 @@ function Debrief({
   verdict,
   conclusion,
   finalReply,
+  loadBearing,
 }: {
   scenario: FeedScenario;
   outcome: FeedOutcome;
@@ -744,7 +745,9 @@ function Debrief({
   verdict: FeedVerdict | null;
   conclusion: string;
   finalReply: string;
+  loadBearing: string[];
 }) {
+
   const navigate = useNavigate();
   const [profileSnap, setProfileSnap] = useState(() => loadProfile());
   useEffect(() => {
