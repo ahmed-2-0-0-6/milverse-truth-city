@@ -91,6 +91,19 @@ export function resolveNextAction(_now: Date = new Date()): NextAction {
     };
   }
 
+  // 2.5. Active shift — resume next slot before per-case retests.
+  const active = getActiveShift();
+  if (active && active.slot < active.caseRefs.length && active.lives > 0) {
+    const ref = active.caseRefs[active.slot];
+    const slotNum = active.slot + 1;
+    return {
+      label: `SHIFT · SLOT ${slotNum}/${active.caseRefs.length}`,
+      sublabel: `resume the docket — ${active.lives} live${active.lives === 1 ? "" : "s"}`,
+      to: ref.kind === "mirror" ? "/mirror/$caseId" : "/feed/$caseId",
+      params: { caseId: ref.id },
+    };
+  }
+
   // 3. Due retest.
   const due = dueRetests(profile);
   if (due.length > 0) {
