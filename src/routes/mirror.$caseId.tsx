@@ -83,6 +83,21 @@ function CasePlay() {
   const { scenario } = Route.useLoaderData();
   const [phase, setPhase] = useState<Phase>("dossier");
 
+  // Focus follows the phase (skip the initial mount — the dossier's default
+  // top-of-page focus order is correct on first paint).
+  const isInitialPhase = useRef(true);
+  useEffect(() => {
+    if (isInitialPhase.current) {
+      isInitialPhase.current = false;
+      return;
+    }
+    const raf = requestAnimationFrame(() => {
+      const el = document.querySelector<HTMLElement>('[data-phase-anchor="mirror"]');
+      el?.focus();
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [phase]);
+
   // In the "sim" phase, ChatShell owns the whole viewport (phone frame).
   // Every other phase keeps the normal MILVERSE app chrome.
   if (phase === "sim") {
@@ -104,6 +119,7 @@ function CasePlay() {
     </div>
   );
 }
+
 
 function VerdictReveal({ scenario, onDone }: { scenario: Scenario; onDone: () => void }) {
   const raw = useMemo(() => {
