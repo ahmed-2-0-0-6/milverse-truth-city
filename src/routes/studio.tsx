@@ -253,6 +253,10 @@ function Studio() {
   const [error, setError] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
   const publishFn = useServerFn(publishCitizenCase);
+  const deskNotes = useMemo(() => deskReview(draft), [draft]);
+  const desk = deskScore(deskNotes);
+  const advisories = deskNotes.filter((n) => n.status === "advise").length;
+
 
   async function publish(lane: "private" | "community") {
     const err = validate(draft);
