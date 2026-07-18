@@ -3,7 +3,12 @@ import { useEffect, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import { CityWorld } from "@/components/CityWorld";
 import { CityList } from "@/components/CityList";
-import { ChevronDown, Sparkles } from "lucide-react";
+import { ChevronDown, ArrowRight, Flame } from "lucide-react";
+import { resolveNextAction, type NextAction } from "@/lib/city/nextAction";
+import { loadProfile } from "@/lib/mirror/profile";
+import { readDailyStatus } from "@/lib/daily/profile";
+import { loadUnlocked } from "@/lib/manual/state";
+import { computeXp, rankFromXp, RANKS } from "@/lib/ranks";
 import { CityHero3D } from "@/components/city3d/CityHero3D";
 import { BootScreen } from "@/components/BootScreen";
 import { HeroType } from "@/components/HeroType";
@@ -171,30 +176,16 @@ function CityMap() {
                 {kicker}
               </div>
               <HeroType />
-              <p className="mt-4 max-w-xl text-center text-white/70 text-sm sm:text-base">
-                A city that trains your trust — play today's forward.
-
-              </p>
-              <p className="mt-2 max-w-xl text-center text-white/50 text-xs sm:text-sm">
-                Fakes beat eyes. They don't beat verification.
+              <p className="mt-4 max-w-xl text-center text-white/80 text-sm sm:text-base">
+                Scammers are about to text you. Catch them. Level up.
               </p>
 
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                <Link
-                  to="/drop"
-                  className="cta-glow inline-flex items-center gap-2 rounded-sm bg-primary px-6 py-3 text-primary-foreground stencil text-xs"
-                >
-                  <Sparkles className="h-3.5 w-3.5" /> PLAY TODAY'S DROP →
-                </Link>
-                <a
-                  href="#enter"
-                  className="inline-flex items-center gap-2 rounded-sm border border-white/25 px-6 py-3 text-white/80 stencil text-xs hover:border-cyan-300 hover:text-cyan-200 transition"
-                >
-                  ENTER THE CITY ↓
-                </a>
+              <div className="mt-8 w-full max-w-[360px]">
+                <PlayButton />
+                <StatStrip />
               </div>
 
-              <div className="mt-8 w-full max-w-xl">
+              <div className="mt-6 w-full max-w-xl">
                 <DailyBeacon />
               </div>
             </>
@@ -213,12 +204,12 @@ function CityMap() {
 
       <Marquee />
 
-      {/* ── ENTER THE CITY (interactive map / list) ── */}
+      {/* ── EXPLORE THE CITY (interactive map / list) ── */}
       <section id="enter" className="relative pt-16 pb-6 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px flex-1 max-w-[60px] bg-cyan-400/60" />
-            <div className="stencil text-[10px] text-cyan-300">// ENTER THE CITY</div>
+            <div className="stencil text-[10px] text-cyan-300">// EXPLORE THE CITY ↓</div>
             <div className="h-px flex-1 bg-cyan-400/20" />
           </div>
           <div className="flex flex-wrap items-end justify-between gap-3">
@@ -280,6 +271,90 @@ function CityMap() {
   );
 }
 
+// ── PLAY BUTTON — one big verb-first CTA that always knows the next move.
+function PlayButton() {
+  const [action, setAction] = useState<NextAction | null>(null);
+  useEffect(() => {
+    const push = () => setAction(resolveNextAction(new Date()));
+    push();
+    const events = [
+      "milverse:profile",
+      "milverse:manual",
+      "milverse:retests",
+      "milverse:boss",
+      "storage",
+    ];
+    events.forEach((e) => window.addEventListener(e, push));
+    return () => events.forEach((e) => window.removeEventListener(e, push));
+  }, []);
+
+  if (!action) {
+    // SSR / pre-hydration: safe deterministic fallback (matches branch 1).
+    return (
+      <Link
+        to="/mirror"
+        className="cta-glow flex w-full max-w-[360px] min-h-[56px] flex-col items-center justify-center gap-1 rounded-sm bg-primary px-6 py-3 text-primary-foreground stencil"
+      >
+        <span className="text-sm tracking-widest">START →</span>
+      </Link>
+    );
+  }
+
+  const params = action.params ?? {};
+  const accessible = `${action.label}. ${action.sublabel}.`;
+  return (
+    <Link
+      to={action.to as string}
+      params={params as never}
+      aria-label={accessible}
+      className="cta-glow flex w-full min-h-[56px] max-w-[360px] flex-col items-center justify-center gap-1 rounded-sm bg-primary px-6 py-3 text-primary-foreground stencil"
+    >
+      <span className="inline-flex items-center gap-2 text-sm tracking-widest">
+        {action.label} <ArrowRight className="h-3.5 w-3.5" />
+      </span>
+      <span className="text-[10px] tracking-wider text-primary-foreground/80 normal-case truncate max-w-full">
+        {action.sublabel}
+      </span>
+    </Link>
+  );
+}
+
+// ── STAT STRIP — LVL · STREAK · CASES. Zeros are a challenge, not an absence.
+function StatStrip() {
+  const [stats, setStats] = useState<{ lvl: number; streak: number; cases: number } | null>(null);
+  useEffect(() => {
+    const push = () => {
+      const p = loadProfile();
+      const xp = computeXp(p, loadUnlocked().size, p.publishedCount ?? 0);
+      const idx = RANKS.findIndex((r) => r.id === rankFromXp(xp).current.id);
+      const daily = readDailyStatus();
+      setStats({ lvl: idx + 1, streak: daily.streak, cases: p.casesPlayed });
+    };
+    push();
+    ["milverse:profile", "milverse:manual", "storage"].forEach((e) =>
+      window.addEventListener(e, push),
+    );
+    return () =>
+      ["milverse:profile", "milverse:manual", "storage"].forEach((e) =>
+        window.removeEventListener(e, push),
+      );
+  }, []);
+
+  const s = stats ?? { lvl: 1, streak: 0, cases: 0 };
+  return (
+    <div className="mt-3 flex items-center justify-center gap-3 stencil text-[10px] text-white/70">
+      <span className="tabular-nums">LVL {s.lvl}</span>
+      <span aria-hidden className="text-white/25">·</span>
+      <span className="inline-flex items-center gap-1 tabular-nums">
+        <Flame className="h-3 w-3" /> STREAK {s.streak}
+      </span>
+      <span aria-hidden className="text-white/25">·</span>
+      <span className="tabular-nums">CASES {s.cases}</span>
+    </div>
+  );
+}
+
 // The old three-slide Intro was replaced by <FirstCall />
 // (src/components/onboarding/FirstCall.tsx) — verb-first onboarding.
+
 

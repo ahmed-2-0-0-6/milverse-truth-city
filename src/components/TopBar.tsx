@@ -12,6 +12,7 @@ import {
   SheetDescription,
   SheetClose,
 } from "@/components/ui/sheet";
+import { GameBar, isGameSurface } from "@/components/GameBar";
 import {
   loadProfile,
   calibrationLabel,
@@ -168,6 +169,11 @@ export function TopBar() {
             <BookOpen className="h-3.5 w-3.5" />
             <span className="hidden lg:inline">MANUAL</span>
           </Link>
+          {isGameSurface(pathname) && (
+            <div className="hidden md:flex">
+              <GameBar />
+            </div>
+          )}
           {showRankChip && <RankChip />}
           {showInbox && <InboxTray />}
           <VisualQualityToggle />
@@ -280,6 +286,11 @@ export function TopBar() {
           </Sheet>
         </div>
       </div>
+      {isGameSurface(pathname) && (
+        <div className="md:hidden border-t border-primary/20 bg-background/85 overflow-x-auto">
+          <GameBar compact />
+        </div>
+      )}
       <SoundIntroChip />
     </header>
   );
