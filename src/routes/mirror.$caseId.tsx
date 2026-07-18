@@ -301,17 +301,21 @@ function VerdictReveal({ scenario, onDone }: { scenario: Scenario; onDone: () =>
     : scenario.truth === "IMPOSTER"
       ? "missed_scam"
       : "false_alarm";
+  // TAKEDOWN — imposter caught cleanly gets the ceremony stamp.
+  const stampLabel =
+    correct && scenario.truth === "IMPOSTER" ? "TAKEDOWN" : (raw?.verdict ?? "UNVERIFIED");
   return (
     <VerdictMoment
       caseTitle={scenario.title || `Case ${scenario.id}`}
       caseId={scenario.id}
-      stampLabel={raw?.verdict ?? "UNVERIFIED"}
+      stampLabel={stampLabel}
       outcome={outcome}
       onDone={onDone}
       register={scenario.isSurvivorStory ? "quiet" : "standard"}
     />
   );
 }
+
 
 /* ─────────────────────────── DOSSIER ─────────────────────────── */
 
