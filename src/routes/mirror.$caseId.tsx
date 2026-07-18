@@ -53,6 +53,7 @@ import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 import { aftermathFor } from "@/lib/mirror/aftermath";
 import { saveTape } from "@/lib/mirror/tapes";
 import { TapeReview } from "@/components/mirror/TapeReview";
+import { factRefsFor, findRef, GUT_REF, type FactRef } from "@/lib/mirror/factRefs";
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
