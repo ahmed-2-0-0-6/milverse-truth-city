@@ -438,19 +438,23 @@ function Sim({
           <div className="p-3">
             <div className="flex gap-2">
               <input
+                id="feed-composer"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
                 placeholder="Reply to them…"
+                aria-label="Type your reply"
                 className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-sm text-white outline-none focus:border-primary"
               />
               <button
                 onClick={send}
                 disabled={!input.trim()}
+                aria-label="Send message"
                 className="rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40"
               >
-                <Send className="h-4 w-4" />
+                <Send className="h-4 w-4" aria-hidden="true" />
               </button>
+
             </div>
             <div className="mt-1.5 font-mono text-[9px] tracking-widest text-white/40">
               OPEN TOOLBELT · PICK THE RIGHT TOOL FOR THIS FORMAT
