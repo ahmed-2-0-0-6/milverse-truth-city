@@ -166,6 +166,8 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
         </section>
       </div>
 
+      <SendOff />
+
       <button
         onClick={onStart}
         className="mt-6 w-full rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground transition-transform hover:scale-[1.01]"
