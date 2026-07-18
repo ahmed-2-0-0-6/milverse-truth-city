@@ -14,6 +14,7 @@ import { useVisualMode } from "@/lib/visual-quality";
 import { InboxManager } from "@/components/inbox/InboxManager";
 import { IncomingToast } from "@/components/inbox/IncomingToast";
 import { IncomingCall } from "@/components/inbox/IncomingCall";
+import { FirstCall } from "@/components/onboarding/FirstCall";
 
 export const Route = createFileRoute("/")({
   head: () => ({
