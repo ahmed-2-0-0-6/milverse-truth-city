@@ -263,10 +263,7 @@ function StandoffInterstitial({ scenario, onStart }: { scenario: Scenario; onSta
 function StandoffHandoff() {
   const navigate = useNavigate();
   useEffect(() => {
-    // The verdict + sim are already in sessionStorage. /standoff reads them.
-    // Clearing PENDING happens on the /standoff side after the reveal renders.
-    void clearPendingStandoff;
-    navigate({ to: "/standoff", search: { stage: "reveal" } as never, replace: true });
+    navigate({ to: "/standoff", replace: true });
   }, [navigate]);
   return (
     <main className="mx-auto max-w-2xl px-4 py-16 text-center">
@@ -276,6 +273,7 @@ function StandoffHandoff() {
     </main>
   );
 }
+
 
 
 
