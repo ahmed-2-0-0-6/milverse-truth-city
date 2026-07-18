@@ -19,6 +19,7 @@ export function InboxTray() {
   const [open, setOpen] = useState(false);
   const [tick, setTick] = useState(0);
   const [allItems, setAllItems] = useState<InboxItem[]>([]);
+  const [voicemail, setVoicemail] = useState<InboxItem | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
