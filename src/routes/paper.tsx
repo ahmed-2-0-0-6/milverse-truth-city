@@ -152,6 +152,8 @@ function PaperPage() {
           </div>
         </div>
 
+        <SupplementBanner />
+
         {/* Masthead */}
         <header
           className="text-center border-y-4 double border-current"
