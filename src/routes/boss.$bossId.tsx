@@ -448,7 +448,7 @@ function BossPlay() {
                       key={m.id}
                       disabled={played}
                       onClick={() => doMove(m.id)}
-                      className="text-[11px] px-2.5 py-1 rounded-full border border-emerald-500/40 bg-emerald-950/30 text-emerald-200 hover:bg-emerald-950/60 disabled:opacity-30"
+                      className="touch-manipulation text-[11px] px-3 py-1 rounded-full border border-emerald-500/40 bg-emerald-950/30 text-emerald-200 hover:bg-emerald-950/60 disabled:opacity-30 min-h-[44px] sm:min-h-0 sm:px-2.5"
                       title={m.blurb}
                     >
                       ▶ {m.label}
