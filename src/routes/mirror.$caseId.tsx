@@ -388,6 +388,8 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
       probeQuality: grade,
     };
     setMessages((prev) => [...prev, playerMsg]);
+    setSendTick((t) => t + 1);
+
     setInput("");
     setTyping(true);
     if (grade === "strong" && !tacticFlashed.current) {
