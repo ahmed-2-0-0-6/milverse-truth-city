@@ -917,3 +917,95 @@ function FeedStarAxis({ label, value }: { label: string; value: number }) {
     </div>
   );
 }
+
+/* ─────────── THE BOARD, GRADED ─────────── */
+function BoardGraded({
+  scenario,
+  state,
+  loadBearing,
+}: {
+  scenario: FeedScenario;
+  state: FeedState;
+  loadBearing: string[];
+}) {
+  const used = state.actionsUsed
+    .map((id) => scenario.actions.find((a) => a.id === id))
+    .filter((a): a is NonNullable<typeof a> => Boolean(a));
+  const marked = loadBearing
+    .map((id) => scenario.actions.find((a) => a.id === id))
+    .filter((a): a is NonNullable<typeof a> => Boolean(a));
+  const anyDecisiveUsed = used.some((a) => a.decisive);
+  const markedDecisive = marked.some((a) => a.decisive);
+  const stillInBelt = scenario.actions.filter(
+    (a) => a.decisive && !state.actionsUsed.includes(a.id),
+  );
+
+  let summary = "";
+  if (used.length === 0) {
+    summary = "No evidence, no board, no grade. The toolkit exists because 'it sounds off' is not a method.";
+  } else if (marked.length === 0) {
+    summary = "You checked, then voted from your gut anyway. Marking evidence is how you catch yourself bluffing.";
+  } else if (markedDecisive) {
+    summary = "Your verdict stood on the right evidence. That's the whole method.";
+  } else if (anyDecisiveUsed) {
+    summary = "You had the crack in the case on your board and leaned on something softer. Re-read what you skipped.";
+  } else {
+    summary = "Nothing you ran could settle this one. The tool that could is still in the belt.";
+  }
+
+  const unverifiedNote =
+    scenario.verdict === "UNVERIFIED" && marked.length > 0
+      ? "Some cases have no decisive evidence. Recognizing that IS the verdict."
+      : null;
+
+  return (
+    <section className="rounded-xl border border-border bg-card p-6 space-y-4">
+      <div className="font-mono text-xs tracking-widest text-muted-foreground">
+        THE BOARD, GRADED
+      </div>
+      {marked.length > 0 && (
+        <ul className="space-y-1.5">
+          {marked.map((a) => (
+            <li key={a.id} className="text-xs">
+              <span className="font-mono text-[10px] tracking-widest text-primary">{a.label}</span>
+              <span className="text-muted-foreground"> — </span>
+              {a.decisive ? (
+                <span className="text-primary">
+                  ◈ decisive — this was the crack in the case
+                </span>
+              ) : (
+                <span className="text-muted-foreground">
+                  supporting — real, but it didn't settle anything
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="text-sm text-foreground/90">{summary}</p>
+      {unverifiedNote && (
+        <p className="text-xs italic text-muted-foreground">{unverifiedNote}</p>
+      )}
+      {stillInBelt.length > 0 && (
+        <div className="rounded-md border border-caution/40 bg-caution/5 p-4 space-y-2">
+          <div className="font-mono text-[10px] tracking-widest text-caution">
+            STILL IN THE BELT
+          </div>
+          <ul className="space-y-2">
+            {stillInBelt.map((a) => (
+              <li key={a.id}>
+                <div className="font-mono text-[10px] tracking-widest text-caution">
+                  {a.label}
+                </div>
+                <p className="mt-1 text-xs italic border-l-2 border-caution/40 pl-2.5 text-foreground/90">
+                  "{a.result}"
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+  );
+}
+
