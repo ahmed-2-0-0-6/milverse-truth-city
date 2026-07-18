@@ -1,4 +1,5 @@
 // MILVERSE — /paper — THE DAILY MIRAGE.
+import "@/styles/paper-fonts.css";
 // Human-published newspaper. The site always shows the latest published edition.
 
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";

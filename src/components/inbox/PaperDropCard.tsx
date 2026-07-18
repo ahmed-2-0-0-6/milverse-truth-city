@@ -1,4 +1,5 @@
 // MILVERSE — The Morning Edition delivery card.
+import "@/styles/paper-fonts.css";
 // A folded-newspaper card that thuds into the hub once a day.
 // Read-only consumer of the edition already fetched by /paper.
 

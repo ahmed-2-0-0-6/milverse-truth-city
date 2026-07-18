@@ -1,4 +1,5 @@
 // Civic primitive — the Countersign ceremony. Local, ceremonial signature
+import "@/styles/paper-fonts.css";
 // tied to the player's current rank title (not a name). Signed state is
 // persisted to localStorage; the signature RECOMPUTES from current rank
 // on every render — the document lives with the player.

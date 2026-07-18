@@ -1,4 +1,5 @@
 // THE DAILY MIRAGE — Forgery Column ("Real or Engine-Made?")
+import "@/styles/paper-fonts.css";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import type { EditionForgery } from "@/lib/paper/types";

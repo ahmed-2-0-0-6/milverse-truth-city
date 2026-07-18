@@ -1,4 +1,5 @@
 // THE DAILY MIRAGE — Front Page.
+import "@/styles/paper-fonts.css";
 // Renders the lead as a real news article, then a "YOUR CALL, CITIZEN" plate:
 // verdict → wager slider → stamp slam → city split → tactic debrief.
 
