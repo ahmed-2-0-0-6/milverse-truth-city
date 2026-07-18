@@ -214,6 +214,19 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
   const tacticFlashed = useRef<boolean>(false);
   const [tacticFlash, setTacticFlash] = useState<null | ReturnType<typeof tacticForMirror>>(null);
   const [contactsOpen, setContactsOpen] = useState(false);
+  const claimedClock = useMemo(() => clockFor(scenario.id), [scenario.id]);
+  const clockExpiredRef = useRef(false);
+  function handleClockExpire() {
+    if (clockExpiredRef.current || !claimedClock) return;
+    clockExpiredRef.current = true;
+    // UI-level appended row. role="system" is already excluded from the
+    // player SENT counter and from contact-based read-receipt logic — do
+    // NOT route through the engine or mutate EngineState.
+    setMessages((prev) => [
+      ...prev,
+      { role: "system", kind: "system", text: claimedClock.expiredLine, ts: Date.now() },
+    ]);
+  }
 
   useEffect(() => {
     const opener: Message = {
