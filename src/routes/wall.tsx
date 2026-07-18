@@ -219,6 +219,10 @@ function WallPage() {
   const [districts, setDistricts] = useState<Set<District>>(new Set());
   const [outcomes, setOutcomes] = useState<Set<Outcome>>(new Set());
   const [announce, setAnnounce] = useState("");
+  const [tapes, setTapes] = useState<StoredTape[]>([]);
+  const [openTape, setOpenTape] = useState<StoredTape | null>(null);
+  const [burnArmed, setBurnArmed] = useState(false);
+  const burnTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const rebuild = () => {
