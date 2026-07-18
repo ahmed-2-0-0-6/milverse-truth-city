@@ -439,6 +439,16 @@ function Sim({
         }
         composer={
           <div className="p-3">
+            {/* Mobile-only thumb-reach cluster for DELIVER VERDICT. */}
+            <div className="mb-2 flex justify-end sm:hidden">
+              <button
+                onClick={onDeliverVerdict}
+                disabled={messages.length < 2}
+                className="touch-manipulation inline-flex min-h-[44px] items-center rounded-full border border-primary/50 bg-primary/10 px-4 text-[11px] font-mono tracking-widest text-primary active:bg-primary/20 disabled:opacity-40"
+              >
+                DELIVER VERDICT →
+              </button>
+            </div>
             <div className="flex gap-2">
               <input
                 id="feed-composer"
@@ -447,13 +457,13 @@ function Sim({
                 onKeyDown={(e) => e.key === "Enter" && send()}
                 placeholder="Reply to them…"
                 aria-label="Type your reply"
-                className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-sm text-white outline-none focus:border-primary"
+                className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-base sm:text-sm text-white outline-none focus:border-primary min-h-[44px] sm:min-h-0"
               />
               <button
                 onClick={send}
                 disabled={!input.trim()}
                 aria-label="Send message"
-                className="rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40"
+                className="touch-manipulation rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
               >
                 <Send className="h-4 w-4" aria-hidden="true" />
               </button>
