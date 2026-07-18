@@ -1,9 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { TopBar } from "@/components/TopBar";
-import { saveCitizenCase } from "@/lib/mirror/scenarios";
+import { saveCitizenCase, loadCitizenCases } from "@/lib/mirror/scenarios";
 import type { Scenario, EvidenceChip } from "@/lib/mirror/scenarios";
 import { publishCitizenCase } from "@/lib/citizen.functions";
 import { getDeviceId } from "@/lib/pilot";
@@ -12,8 +12,13 @@ import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp } from "@/lib/ranks";
 import { DistrictHero } from "@/components/DistrictHero";
 import studioArt from "@/assets/district-studio.jpg";
-import { Clapperboard, ChevronLeft, ChevronRight, Sparkles, ArrowLeft } from "lucide-react";
+import { Clapperboard, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Share2, Zap } from "lucide-react";
 import { deskReview, deskScore } from "@/lib/studio/editorsDesk";
+import { screenPersonaName, fairnessGate } from "@/lib/mask/safety";
+import { RACK, cloneRack } from "@/lib/mask/rack";
+import { decodeToken } from "@/lib/mask/tokens";
+import { loadMaskStamps, saveMaskStamp, stampsByCode, armMask } from "@/lib/mask/plays";
+
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
