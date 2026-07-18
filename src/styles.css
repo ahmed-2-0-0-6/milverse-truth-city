@@ -2319,3 +2319,27 @@ html[data-force-reduce-motion="on"] .clock-tense {
   animation: none !important;
   opacity: 1 !important;
 }
+
+/* ---------- CITY IS AWAKE (signal beacons) ---------- */
+@keyframes beaconPulse {
+  0%   { transform: scale(0.6); opacity: 0.35; }
+  70%  { transform: scale(1.6); opacity: 0;    }
+  100% { transform: scale(1.6); opacity: 0;    }
+}
+.beacon-pulse {
+  animation: beaconPulse 2.4s ease-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.beacon-node:focus-visible .beacon-focus,
+.beacon-node:focus .beacon-focus {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .beacon-pulse { animation: none !important; opacity: 0 !important; }
+}
+html[data-high-legibility="on"] .beacon-pulse,
+html[data-force-reduce-motion="on"] .beacon-pulse {
+  animation: none !important;
+  opacity: 0 !important;
+}
