@@ -111,6 +111,15 @@ async function hashLine12(text: string): Promise<string> {
  * back to normal mode — acceptable, and simplest.
  */
 const ColdReadContext = createContext<boolean>(false);
+/**
+ * THE STANDOFF — same fence as cold reads, different flag. When true, the
+ * mirror route runs in cold-mode chrome (drill clock, no assists, no meter)
+ * AND the debrief slot renders <StandoffHandoff/> instead of <Debrief/>,
+ * so the write-heavy debrief effect (savedRef) never mounts. Reported
+ * mechanism: reuse of the coldMode presentation fence + one extra branch
+ * in the phase-router below. Zero engine diffs.
+ */
+const StandoffContext = createContext<boolean>(false);
 const COLD_START_KEY = "milverse.coldread.startTs";
 
 
