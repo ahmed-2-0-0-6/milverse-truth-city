@@ -105,11 +105,11 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone, 
     }
     const t1 = window.setTimeout(() => {
       setStage("stamp");
-      stampSlam();
+      if (!quiet) stampSlam();
     }, 380);
     const t2 = window.setTimeout(() => {
       setStage("reveal");
-      stampSting(STING_KIND[outcome]);
+      if (!quiet) stampSting(STING_KIND[outcome]);
     }, 680); // slam + 300ms per Sound of the City spec
     const tSkip = window.setTimeout(() => setCanSkip(true), 1500);
     const t3 = window.setTimeout(() => {
