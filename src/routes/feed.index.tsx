@@ -15,6 +15,8 @@ import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 import { InboxManager } from "@/components/inbox/InboxManager";
 import { IncomingToast } from "@/components/inbox/IncomingToast";
 import { IncomingCall } from "@/components/inbox/IncomingCall";
+import { SeasonAdvisory, SeasonGlyph, useSeason } from "@/components/season/SeasonAdvisory";
+
 
 export const Route = createFileRoute("/feed/")({
   head: () => ({
