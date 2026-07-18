@@ -900,9 +900,17 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
           )}
         </div>
       </ChatShell>
+      </div>
+      {showVob && useRitual && (
+        <VobRitual
+          onClose={() => setShowVob(false)}
+          onPick={(m) => useVob(m)}
+        />
+      )}
     </>
   );
 }
+
 
 function MessageRow({
   m,
