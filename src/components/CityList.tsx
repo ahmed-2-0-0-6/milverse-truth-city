@@ -26,6 +26,8 @@ import {
 } from "@/lib/city/world-data";
 import { loadProfile, type TrustProfile } from "@/lib/mirror/profile";
 import { getMirrorRecommendations } from "@/lib/recommendations";
+import { SIGNAGE, signFor } from "@/lib/city/signage";
+
 
 export function CityList({ onSwitchToMap }: { onSwitchToMap: () => void }) {
   const [profile, setProfile] = useState<TrustProfile | null>(null);
