@@ -69,6 +69,18 @@ function FeedPlay() {
   const [conclusion, setConclusion] = useState("");
   const [loadBearing, setLoadBearing] = useState<string[]>([]);
 
+  // Focus follows phase changes (skip initial mount).
+  const initialPhaseRef = useRef(true);
+  useEffect(() => {
+    if (initialPhaseRef.current) {
+      initialPhaseRef.current = false;
+      return;
+    }
+    const raf = requestAnimationFrame(() => {
+      document.querySelector<HTMLElement>('[data-phase-anchor="feed"]')?.focus();
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [phase]);
 
   useEffect(() => {
     track("case_start", {
@@ -76,6 +88,7 @@ function FeedPlay() {
       payload: { district: "feed", tactic: scenario.tacticId ?? "unknown" },
     });
   }, [scenario.id, scenario.tacticId]);
+
 
   useEffect(() => {
     if (outcome) {
@@ -244,7 +257,7 @@ function Brief({ scenario, onStart }: { scenario: FeedScenario; onStart: () => v
         <div className="flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-caution">
           <ShieldAlert className="h-4 w-4" /> INCOMING FORWARD · TIER {scenario.tier}
         </div>
-        <h1 className="mt-4 text-2xl font-semibold">{scenario.title}</h1>
+        <h1 data-phase-anchor="feed" tabIndex={-1} className="mt-4 text-2xl font-semibold outline-none">{scenario.title}</h1>
         <section className="mt-6">
           <div className="font-mono text-[11px] tracking-widest text-muted-foreground">
             WHO SENT IT
@@ -364,6 +377,8 @@ function Sim({
     <>
       <TacticFlash tacticId={tacticFlash ?? null} onDone={() => setTacticFlash(null)} />
       <ChatShell
+        logRegion={false}
+
         header={
           <>
             <ChatHeader
@@ -425,19 +440,23 @@ function Sim({
           <div className="p-3">
             <div className="flex gap-2">
               <input
+                id="feed-composer"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
                 placeholder="Reply to them…"
+                aria-label="Type your reply"
                 className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-sm text-white outline-none focus:border-primary"
               />
               <button
                 onClick={send}
                 disabled={!input.trim()}
+                aria-label="Send message"
                 className="rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40"
               >
-                <Send className="h-4 w-4" />
+                <Send className="h-4 w-4" aria-hidden="true" />
               </button>
+
             </div>
             <div className="mt-1.5 font-mono text-[9px] tracking-widest text-white/40">
               OPEN TOOLBELT · PICK THE RIGHT TOOL FOR THIS FORMAT
@@ -445,8 +464,22 @@ function Sim({
           </div>
         }
       >
+        <a
+          href="#feed-composer"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-primary focus:px-3 focus:py-1 focus:text-xs focus:text-primary-foreground"
+        >
+          Skip to reply
+        </a>
         {tab === "chat" ? (
-          <div ref={scroller} className="flex-1 overflow-y-auto p-3 space-y-3">
+          <div
+            ref={scroller}
+            role="log"
+            aria-live="polite"
+            aria-relevant="additions text"
+            aria-label="Conversation messages"
+            className="flex-1 overflow-y-auto p-3 space-y-3"
+          >
+
             <FormatFrame
               format={scenario.format ?? "whatsapp"}
               senderName={scenario.sender.name}
@@ -527,8 +560,10 @@ function FeedRow({ m, read }: { m: FeedMessage; read?: boolean }) {
               : "bg-neutral-800 border border-white/10 text-white rounded-bl-sm"
           }`}
         >
+          <span className="sr-only">{isPlayer ? "You" : "Sender"}: </span>
           {m.text}
         </div>
+
         <div className="px-1 font-mono text-[9px] tabular-nums text-white/35" aria-hidden>
           {stamp}
           {isPlayer && (
@@ -608,7 +643,7 @@ function VerdictScreen({
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
       <div className="font-mono text-xs tracking-[0.3em] text-caution">INVESTIGATION BOARD</div>
-      <h1 className="mt-2 text-2xl font-semibold">Assemble the case. Deliver the verdict.</h1>
+      <h1 data-phase-anchor="feed" tabIndex={-1} className="mt-2 text-2xl font-semibold outline-none">Assemble the case. Deliver the verdict.</h1>
 
       <span className="sr-only" aria-live="polite" role="status">
         {srMsg}
@@ -688,10 +723,25 @@ function VerdictScreen({
       </p>
 
 
-      <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2">
-        {(["TRUE", "MISLEADING", "FALSE", "UNVERIFIED"] as FeedVerdict[]).map((v) => (
+      <div
+        className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2"
+        role="radiogroup"
+        aria-label="Your verdict"
+      >
+        {(["TRUE", "MISLEADING", "FALSE", "UNVERIFIED"] as FeedVerdict[]).map((v, i, arr) => (
           <button
             key={v}
+            role="radio"
+            type="button"
+            aria-checked={verdict === v}
+            tabIndex={verdict === v || (!verdict && i === 0) ? 0 : -1}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+                e.preventDefault();
+                const dir = e.key === "ArrowRight" ? 1 : -1;
+                setVerdict(arr[(i + dir + arr.length) % arr.length]);
+              }
+            }}
             onClick={() => setVerdict(v)}
             className={`rounded-md border-2 p-4 font-mono text-xs tracking-widest transition ${
               verdict === v
@@ -709,6 +759,7 @@ function VerdictScreen({
           </button>
         ))}
       </div>
+
       <p className="mt-2 text-xs text-muted-foreground">
         UNVERIFIED = the claim can neither be confirmed nor disproved. Refusing to forward fear you
         can't check is the correct move.
@@ -819,7 +870,7 @@ function Debrief({
           {outcome.result.replace("_", " ").toUpperCase()} · {outcome.points > 0 ? "+" : ""}
           {outcome.points}
         </div>
-        <div className="mt-1 text-xl font-semibold">{outcome.headline}</div>
+        <h1 data-phase-anchor="feed" tabIndex={-1} className="mt-1 text-xl font-semibold outline-none">{outcome.headline}</h1>
         <p className="mt-2 text-sm">{outcome.detail}</p>
         <div className="mt-3">
           <XpDeltaLine />

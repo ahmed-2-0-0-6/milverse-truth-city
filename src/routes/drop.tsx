@@ -548,10 +548,11 @@ function PlayFlow({
             <div className="stencil text-[10px] tracking-widest text-primary mb-2">
               YOUR VERDICT
             </div>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2" role="group" aria-label="Your verdict">
               {(["LEGIT", "SCAM", "MISLEADING"] as const).map((v) => (
                 <button
                   key={v}
+                  type="button"
                   onClick={() => lockVerdict(v)}
                   className="rounded-sm border border-border bg-background hover:border-primary hover:bg-primary/10 px-3 py-3 stencil text-xs text-foreground transition"
                 >
@@ -559,6 +560,7 @@ function PlayFlow({
                 </button>
               ))}
             </div>
+
             <div className="mt-2 text-[10px] text-muted-foreground">
               Probes used: {probesUsed.length} / 2 · You always judge — the site never declares
               truth for you.

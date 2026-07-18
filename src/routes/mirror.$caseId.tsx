@@ -83,6 +83,21 @@ function CasePlay() {
   const { scenario } = Route.useLoaderData();
   const [phase, setPhase] = useState<Phase>("dossier");
 
+  // Focus follows the phase (skip the initial mount — the dossier's default
+  // top-of-page focus order is correct on first paint).
+  const isInitialPhase = useRef(true);
+  useEffect(() => {
+    if (isInitialPhase.current) {
+      isInitialPhase.current = false;
+      return;
+    }
+    const raf = requestAnimationFrame(() => {
+      const el = document.querySelector<HTMLElement>('[data-phase-anchor="mirror"]');
+      el?.focus();
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [phase]);
+
   // In the "sim" phase, ChatShell owns the whole viewport (phone frame).
   // Every other phase keeps the normal MILVERSE app chrome.
   if (phase === "sim") {
@@ -104,6 +119,7 @@ function CasePlay() {
     </div>
   );
 }
+
 
 function VerdictReveal({ scenario, onDone }: { scenario: Scenario; onDone: () => void }) {
   const raw = useMemo(() => {
@@ -149,7 +165,7 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
         <div className="flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-caution">
           <FileText className="h-4 w-4" /> CASE DOSSIER · TIER {scenario.tier}
         </div>
-        <h1 className="mt-4 text-2xl font-semibold">{scenario.title}</h1>
+        <h1 data-phase-anchor="mirror" tabIndex={-1} className="mt-4 text-2xl font-semibold outline-none">{scenario.title}</h1>
 
         {/* THE CLAIM — bordered claim card. */}
         <section className="mt-6">
@@ -581,6 +597,8 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
     <>
       <TacticFlash tacticId={tacticFlash} onDone={() => setTacticFlash(null)} />
       <ChatShell
+        logRegion={false}
+
         header={
           <>
             <ChatHeader
@@ -639,11 +657,25 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 showOnMount={showBandOnMount}
               />
 
-              <div className="mt-2 flex gap-1">
-                {(["chat", "notes"] as const).map((t) => (
+              <div className="mt-2 flex gap-1" role="tablist" aria-label="Chat and notes">
+                {(["chat", "notes"] as const).map((t, i, arr) => (
                   <button
                     key={t}
+                    id={`mirror-tab-${t}`}
+                    role="tab"
+                    type="button"
+                    aria-selected={tab === t}
+                    aria-controls={`mirror-panel-${t}`}
+                    tabIndex={tab === t ? 0 : -1}
                     onClick={() => setTab(t)}
+                    onKeyDown={(e) => {
+                      if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+                        e.preventDefault();
+                        const dir = e.key === "ArrowRight" ? 1 : -1;
+                        const next = arr[(i + dir + arr.length) % arr.length];
+                        setTab(next);
+                      }
+                    }}
                     className={`rounded px-3 py-1 font-mono text-[10px] tracking-widest transition ${
                       tab === t ? "bg-primary/15 text-primary" : "text-white/50 hover:text-white"
                     }`}
@@ -651,6 +683,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                     {t === "chat" ? "CHAT" : `NOTES · ${pins.length}/5`}
                   </button>
                 ))}
+
                 <div className="flex-1" />
                 <button
                   onClick={() => setShowVob(true)}
@@ -700,20 +733,25 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
             )}
             <div className="flex gap-2">
               <input
+                id="mirror-composer"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
                 placeholder={ended ? "Chat ended — make your call." : skin.placeholder}
                 disabled={ended || typing}
+                aria-label="Type your reply"
                 className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-sm text-white outline-none focus:border-primary disabled:opacity-50"
               />
+
               <button
                 onClick={send}
                 disabled={ended || typing || !input.trim()}
+                aria-label="Send message"
                 className="rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40"
               >
-                <Send className="h-4 w-4" />
+                <Send className="h-4 w-4" aria-hidden="true" />
               </button>
+
             </div>
             <div className="mt-1.5 flex items-center justify-between font-mono text-[9px] tracking-widest text-white/40">
               <span>ASK FOR A "VOICE NOTE" · TAP PIN TO FLAG</span>
@@ -723,12 +761,22 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
         }
       >
         <div className="flex-1 min-h-0 flex flex-col">
+          <a
+            href="#mirror-composer"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-primary focus:px-3 focus:py-1 focus:text-xs focus:text-primary-foreground"
+          >
+            Skip to reply
+          </a>
           {tab === "chat" ? (
             <div
               ref={scroller}
+              id="mirror-panel-chat"
+              role="tabpanel"
+              aria-labelledby="mirror-tab-chat"
               className={`flex-1 overflow-y-auto p-3 space-y-2.5 ${skin.bodyClass}`}
               style={skin.bodyStyle}
             >
+              <div role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation messages" className="contents">
               {skin.systemNote && (
                 <div className="flex justify-center">
                   <div className="max-w-[85%] rounded-md bg-black/40 border border-white/10 px-3 py-1.5 text-center text-[10px] leading-relaxed text-amber-200/80">
@@ -736,6 +784,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                   </div>
                 </div>
               )}
+
               {messages.map((m, i) => {
                 const hasReply = messages.some((later, j) => j > i && later.role === "contact");
                 const grade = m.role === "player" ? (m.probeQuality as CraftGrade | undefined) : undefined;
@@ -785,9 +834,11 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                   VERIFICATION COMPLETE — MAKE YOUR CALL
                 </div>
               )}
+              </div>
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto">
+            <div id="mirror-panel-notes" role="tabpanel" aria-labelledby="mirror-tab-notes" className="flex-1 overflow-y-auto">
+
               <NotesTab
                 scenario={scenario}
                 messages={messages}
@@ -856,13 +907,15 @@ function MessageRow({
       {!isPlayer && onPin && (
         <button
           onClick={onPin}
+          aria-pressed={pinned}
+          aria-label={pinned ? "Unpin evidence" : "Pin as suspicious"}
           className={`self-end mb-1 rounded p-1 transition ${
             pinned ? "bg-caution/20 text-caution" : "text-muted-foreground hover:text-caution"
           }`}
-          aria-label="Pin as suspicious"
         >
-          <Pin className={`h-3.5 w-3.5 ${pinned ? "fill-current" : ""}`} />
+          <Pin aria-hidden="true" className={`h-3.5 w-3.5 ${pinned ? "fill-current" : ""}`} />
         </button>
+
       )}
 
       {m.kind === "voice" && m.voice ? (
@@ -894,8 +947,10 @@ function MessageRow({
                   : skin.inBubble
             }`}
           >
+            <span className="sr-only">{isPlayer ? "You" : speakerName}: </span>
             {m.text}
           </div>
+
           <MessageMeta ts={m.ts} isPlayer={isPlayer} read={!!read} skin={skin} />
           {showMark && (
             <CraftMark
@@ -1264,7 +1319,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
       <div className="font-mono text-xs tracking-[0.3em] text-caution">INVESTIGATION BOARD</div>
-      <h1 className="mt-2 text-2xl font-semibold">Pin the evidence. Make the call.</h1>
+      <h1 data-phase-anchor="mirror" tabIndex={-1} className="mt-2 text-2xl font-semibold outline-none">Pin the evidence. Make the call.</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         Everything you flagged during the chat is here. Now assemble the picture.
       </p>
@@ -1353,9 +1408,23 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
         </div>
       </section>
 
-      <div className="mt-6 grid grid-cols-2 gap-3">
+      <div
+        className="mt-6 grid grid-cols-2 gap-3"
+        role="radiogroup"
+        aria-label="Your verdict"
+      >
         <button
+          role="radio"
+          type="button"
+          aria-checked={verdict === "REAL"}
+          tabIndex={verdict === "REAL" || (!verdict) ? 0 : -1}
           onClick={() => setVerdict("REAL")}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+              e.preventDefault();
+              setVerdict("FAKE");
+            }
+          }}
           className={`rounded-xl border-2 p-6 text-center font-mono tracking-widest transition ${
             verdict === "REAL"
               ? "border-primary bg-primary/10 text-primary"
@@ -1366,7 +1435,17 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
           <div className="mt-1 text-[10px] text-muted-foreground">This is who they claim</div>
         </button>
         <button
+          role="radio"
+          type="button"
+          aria-checked={verdict === "FAKE"}
+          tabIndex={verdict === "FAKE" ? 0 : -1}
           onClick={() => setVerdict("FAKE")}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+              e.preventDefault();
+              setVerdict("REAL");
+            }
+          }}
           className={`rounded-xl border-2 p-6 text-center font-mono tracking-widest transition ${
             verdict === "FAKE"
               ? "border-destructive bg-destructive/10 text-destructive"
@@ -1377,6 +1456,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
           <div className="mt-1 text-[10px] text-muted-foreground">This is an imposter</div>
         </button>
       </div>
+
 
       {/* HOW SURE? — conviction pick, radio group. Locks are gated on this. */}
       {verdict && (
@@ -1433,10 +1513,12 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
         <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
           EVIDENCE — TAG WHAT YOU OBSERVED
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Evidence tags">
           {scenario.evidenceChips.map((c: EvidenceChip) => (
             <button
               key={c.id}
+              type="button"
+              aria-pressed={picked.includes(c.id)}
               onClick={() => toggle(c.id)}
               className={`rounded-full border px-3 py-1.5 text-xs transition ${
                 picked.includes(c.id)
@@ -1448,6 +1530,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
             </button>
           ))}
         </div>
+
       </div>
 
       {/* Investigator's conclusion */}
@@ -1721,7 +1804,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
         <div className="font-mono text-xs tracking-[0.3em] opacity-80">
           DEBRIEF · TIER {scenario.tier}
         </div>
-        <h1 className="mt-2 text-2xl font-semibold">{truthHeadline}</h1>
+        <h1 data-phase-anchor="mirror" tabIndex={-1} className="mt-2 text-2xl font-semibold outline-none">{truthHeadline}</h1>
         <div className="mt-3">
           <XpDeltaLine />
         </div>
