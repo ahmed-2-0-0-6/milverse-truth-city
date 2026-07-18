@@ -69,6 +69,18 @@ function FeedPlay() {
   const [conclusion, setConclusion] = useState("");
   const [loadBearing, setLoadBearing] = useState<string[]>([]);
 
+  // Focus follows phase changes (skip initial mount).
+  const initialPhaseRef = useRef(true);
+  useEffect(() => {
+    if (initialPhaseRef.current) {
+      initialPhaseRef.current = false;
+      return;
+    }
+    const raf = requestAnimationFrame(() => {
+      document.querySelector<HTMLElement>('[data-phase-anchor="feed"]')?.focus();
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [phase]);
 
   useEffect(() => {
     track("case_start", {
@@ -76,6 +88,7 @@ function FeedPlay() {
       payload: { district: "feed", tactic: scenario.tacticId ?? "unknown" },
     });
   }, [scenario.id, scenario.tacticId]);
+
 
   useEffect(() => {
     if (outcome) {
