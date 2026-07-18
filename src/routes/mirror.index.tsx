@@ -269,6 +269,7 @@ function CaseFiles() {
 
         {/* Seasonal advisory strip — off-season this renders nothing. */}
         <SeasonAdvisory season={season} />
+        <NightShiftAdvisory />
 
         <div className="mt-6 mb-3 font-mono text-[10px] tracking-widest text-muted-foreground">
           {shelfLine}
