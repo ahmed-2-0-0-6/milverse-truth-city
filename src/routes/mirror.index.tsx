@@ -115,6 +115,61 @@ function CaseFiles() {
   const maxTier = profile ? unlockedMaxTier(profile) : 2;
   const tiers: TierId[] = [1, 2, 3, 4, 5];
 
+  // Latest outcome per caseId (loss-stays-loud rule handled by taking the LATEST entry).
+  const latestOutcome = new Map<string, CaseCardOutcome>();
+  if (profile) {
+    const sorted = [...profile.history].sort((a, b) => a.ts - b.ts);
+    for (const h of sorted) {
+      const oc: CaseCardOutcome | null =
+        h.result === "correct" || h.result === "lucky_guess"
+          ? "closed"
+          : h.result === "missed_scam"
+            ? "transacted"
+            : h.result === "false_alarm"
+              ? "false_alarm"
+              : null;
+      if (oc) latestOutcome.set(h.caseId, oc);
+    }
+  }
+
+  const solvedCount = [...latestOutcome.values()].filter((o) => o === "closed").length;
+  const lossCount = [...latestOutcome.values()].filter((o) => o !== "closed").length;
+  const totalCases = SCENARIOS.length;
+  const shelfLine =
+    latestOutcome.size === 0
+      ? "SHELF: UNTOUCHED. EVERY FILE IS WAITING."
+      : `SHELF: ${solvedCount}/${totalCases} FILES CLOSED · ${lossCount} STILL OPEN ON YOUR RECORD`;
+
+  // Unread arrivals from today's inbox (client-only read).
+  const [unread, setUnread] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    const read = () => {
+      const p = loadInbox();
+      const opened = new Set(p.opened);
+      setUnread(new Set(p.arrived.filter((id) => !opened.has(id))));
+    };
+    read();
+    window.addEventListener("milverse:inbox", read);
+    return () => window.removeEventListener("milverse:inbox", read);
+  }, []);
+
+  const chipFor = (caseId: string): ArtifactChip => {
+    const p = platformForCase(caseId);
+    if (p === "sms") return { label: "SMS", tone: "sms" };
+    if (p === "instagram") return { label: "DM", tone: "dm" };
+    return { label: "CHAT", tone: "wa" };
+  };
+
+  const railNodes = tiers.map((t) => ({
+    tier: t,
+    label: `T${t}`,
+    unlocked: t <= maxTier,
+    wins: profile ? tierWins(profile, t) : 0,
+    required: 2,
+    targetId: `tier-${t}`,
+  }));
+  const frontierTier = maxTier;
+
   return (
     <div className="min-h-screen grain">
       <InboxManager />
