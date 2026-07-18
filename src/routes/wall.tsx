@@ -14,6 +14,8 @@ import { getFeedScenario } from "@/lib/feed/scenarios";
 import { getBoss } from "@/lib/boss/scenarios";
 import { caseForDate } from "@/lib/daily/rotation";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
+import { readTapes, clearTapes, type StoredTape } from "@/lib/mirror/tapes";
+import { TapeReview } from "@/components/mirror/TapeReview";
 
 export const Route = createFileRoute("/wall")({
   head: () => ({
