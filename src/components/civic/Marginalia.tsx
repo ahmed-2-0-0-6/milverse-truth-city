@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
-  note: string;
+  note: ReactNode;
   side?: "left" | "right";
   className?: string;
 }
