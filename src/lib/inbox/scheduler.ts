@@ -8,9 +8,10 @@ import { todaysDailyCase, dropDateKey } from "@/lib/daily/rotation";
 import { platformForCase, type ChatPlatform } from "@/lib/chat/skins";
 import { fakeNumberForCase } from "@/lib/chat/fakeNumber";
 import { loadInbox } from "@/lib/inbox/profile";
+import type { Edition } from "@/lib/paper/types";
 
-export type InboxPlatform = ChatPlatform | "drop";
-export type InboxItemType = "message" | "call";
+export type InboxPlatform = ChatPlatform | "drop" | "paper";
+export type InboxItemType = "message" | "call" | "paper";
 
 export interface InboxItem {
   id: string;
