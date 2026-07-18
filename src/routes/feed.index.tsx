@@ -155,6 +155,10 @@ function FeedIndex() {
             "Your job is to check the claim without breaking the person. Verify the source. Correct with dignity. Both are the work.",
           ]}
         />
+        <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
+          Is that viral forward true? Prove it.
+        </p>
+
         <Link
           to="/"
           className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
