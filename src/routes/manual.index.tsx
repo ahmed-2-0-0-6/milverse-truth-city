@@ -1,13 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TopBar } from "@/components/TopBar";
-import { MANUAL_ENTRIES } from "@/lib/manual/entries";
+import { MANUAL_ENTRIES, type TacticId } from "@/lib/manual/entries";
 import { loadUnlocked } from "@/lib/manual/state";
 import { BOSSES } from "@/lib/boss/scenarios";
 import { loadBossProfile } from "@/lib/boss/profile";
 import { RedactedTitle } from "@/components/RedactedTitle";
 import { EngravedReveal } from "@/components/civic/EngravedReveal";
 import { FileText, Lock, ExternalLink, Skull } from "lucide-react";
+import { loadProfile } from "@/lib/mirror/profile";
+import { encountersFor } from "@/lib/manual/encounters";
+
 
 export const Route = createFileRoute("/manual/")({
   head: () => ({
@@ -30,20 +33,36 @@ export const Route = createFileRoute("/manual/")({
 function ManualIndex() {
   const [unlocked, setUnlocked] = useState<Set<string>>(new Set());
   const [bossDeclassified, setBossDeclassified] = useState<string[]>([]);
+  const [profileTick, setProfileTick] = useState(0);
   useEffect(() => {
     setUnlocked(loadUnlocked());
     setBossDeclassified(loadBossProfile().declassified);
     const on = () => setUnlocked(loadUnlocked());
     const onBoss = () => setBossDeclassified(loadBossProfile().declassified);
+    const onProfile = () => setProfileTick((n) => n + 1);
     window.addEventListener("milverse:manual", on);
     window.addEventListener("milverse:boss", onBoss);
+    window.addEventListener("milverse:profile", onProfile);
     return () => {
       window.removeEventListener("milverse:manual", on);
       window.removeEventListener("milverse:boss", onBoss);
+      window.removeEventListener("milverse:profile", onProfile);
     };
   }, []);
 
+  const record = useMemo(() => {
+    const p = typeof window === "undefined" ? null : loadProfile();
+    const out = new Map<TacticId, { met: number; losses: number }>();
+    for (const e of MANUAL_ENTRIES) {
+      const r = encountersFor(e.id, p);
+      if (r.met > 0) out.set(e.id, { met: r.met, losses: r.losses });
+    }
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profileTick]);
+
   const unlockedCount = MANUAL_ENTRIES.filter((e) => unlocked.has(e.id)).length;
+
   const pct = Math.round((unlockedCount / MANUAL_ENTRIES.length) * 100);
 
   return (
@@ -161,21 +180,34 @@ function ManualIndex() {
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {MANUAL_ENTRIES.map((e) => {
             const isUnlocked = unlocked.has(e.id);
+            const rec = record.get(e.id);
+            const chipTone =
+              rec && rec.losses > 0 ? "text-caution" : "text-muted-foreground";
             const inner = (
               <>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <div className="stencil text-[10px] tracking-widest text-muted-foreground">
                     FILE · {e.code}
                   </div>
-                  {isUnlocked ? (
-                    <span className="inline-flex items-center gap-1 stencil text-[9px] tracking-widest text-primary">
-                      <FileText className="h-3 w-3" /> DECLASSIFIED
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 stencil text-[9px] tracking-widest text-muted-foreground">
-                      <Lock className="h-3 w-3" /> REDACTED
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {rec && (
+                      <span
+                        className={`font-mono text-[9px] tracking-widest ${chipTone}`}
+                        aria-label={`Met ${rec.met}, lost ${rec.losses}`}
+                      >
+                        MET {rec.met} · LOST {rec.losses}
+                      </span>
+                    )}
+                    {isUnlocked ? (
+                      <span className="inline-flex items-center gap-1 stencil text-[9px] tracking-widest text-primary">
+                        <FileText className="h-3 w-3" /> DECLASSIFIED
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 stencil text-[9px] tracking-widest text-muted-foreground">
+                        <Lock className="h-3 w-3" /> REDACTED
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div
                   className="mt-3 text-2xl font-black tracking-tight leading-tight"
@@ -188,6 +220,7 @@ function ManualIndex() {
                 </p>
               </>
             );
+
             const skin = isUnlocked
               ? "border-primary/40 bg-card hover:border-primary hover:-translate-y-0.5"
               : "border-dashed border-border bg-muted/20 cursor-not-allowed";
