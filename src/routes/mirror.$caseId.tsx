@@ -39,6 +39,7 @@ import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
 import { CitySolved } from "@/components/CitySolved";
 import { TacticFlash } from "@/components/TacticFlash";
 import { tacticForMirror } from "@/lib/mirror/tactics";
+import { labelForTactic } from "@/lib/handler/profile";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { skinForCase, receiptFor, type ChatSkin } from "@/lib/chat/skins";
