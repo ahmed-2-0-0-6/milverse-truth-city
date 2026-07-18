@@ -741,9 +741,10 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               onClose={() => setContactsOpen(false)}
               mirrorNoHelp={true}
             />
-            {showVob && (
+            {showVob && !useRitual && (
               <VobModal onClose={() => setShowVob(false)} onPick={useVob} tier={scenario.tier} />
             )}
+
           </>
         }
         composer={
