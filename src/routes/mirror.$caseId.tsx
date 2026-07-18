@@ -1284,6 +1284,14 @@ function Debrief({ scenario }: { scenario: Scenario }) {
 
       <TacticStamp tacticId={tacticForMirror(scenario.id)} />
 
+      {(result.resultKind === "missed_scam" || result.resultKind === "false_alarm") && (
+        <LossBeat
+          result={result.resultKind}
+          tacticLabel={labelForTactic(tacticForMirror(scenario.id))}
+          seedKey={`mirror:${scenario.id}`}
+        />
+      )}
+
       <CalibrationQuadrant profile={profileSnap} compact caption="CALIBRATION · AFTER THIS CASE" />
 
       {/* 4-axis star scoring */}
