@@ -327,6 +327,8 @@ function Sim({
     if (!t) return;
     const next = { ...state, actionsUsed: [...state.actionsUsed] };
     setMessages((prev) => [...prev, { role: "player", text: t, ts: Date.now() }]);
+    setSendTick((n) => n + 1);
+
     setInput("");
     const react = senderReact(scenario, next, t);
     setState(next);
