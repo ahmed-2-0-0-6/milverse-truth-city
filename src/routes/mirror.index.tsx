@@ -266,10 +266,13 @@ function CaseFiles() {
         {/* The Double — perspective-flip drill. Locked under 3 solved cases. */}
         <DoubleBeacon casesPlayed={profile?.casesPlayed ?? 0} />
 
+        {/* Seasonal advisory strip — off-season this renders nothing. */}
+        <SeasonAdvisory season={season} />
 
         <div className="mt-6 mb-3 font-mono text-[10px] tracking-widest text-muted-foreground">
           {shelfLine}
         </div>
+
 
         <div className="flex gap-6">
           <TierRail nodes={railNodes} frontierTier={frontierTier} />
