@@ -23,13 +23,16 @@ import { fetchCitizenCase } from "@/lib/citizen.functions";
 import { RecommendedStrip } from "@/components/RecommendedStrip";
 import { DistrictIntro } from "@/components/DistrictIntro";
 import { DistrictHero } from "@/components/DistrictHero";
-import { CaseCard, TierMeter } from "@/components/CaseCard";
+import { CaseCard, TierMeter, type CaseCardOutcome, type ArtifactChip } from "@/components/CaseCard";
+import { TierRail } from "@/components/hub/TierRail";
+import { platformForCase } from "@/lib/chat/skins";
 import mirrorArt from "@/assets/district-mirror.jpg";
 import mirrorVideo from "@/assets/mirror.mp4.asset.json";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 import { InboxManager } from "@/components/inbox/InboxManager";
 import { IncomingToast } from "@/components/inbox/IncomingToast";
 import { IncomingCall } from "@/components/inbox/IncomingCall";
+import { loadInbox } from "@/lib/inbox/profile";
 
 export const Route = createFileRoute("/mirror/")({
   head: () => ({
