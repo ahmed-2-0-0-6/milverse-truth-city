@@ -132,6 +132,19 @@ export function AccessPanel() {
             through controls; <kbd className="rounded border border-border px-1">Esc</kbd> closes
             overlays; arrow keys adjust sliders.
           </p>
+
+          <div className="rounded border border-border p-3 text-xs text-muted-foreground">
+            <div className="stencil text-[10px] mb-1">Cold storage integrity</div>
+            {quarantined.length === 0 ? (
+              <div>All records intact. No quarantine on disk.</div>
+            ) : (
+              <div>
+                {quarantined.length} record{quarantined.length === 1 ? "" : "s"} quarantined for
+                recovery: <span className="font-mono">{quarantined.join(", ")}</span>
+              </div>
+            )}
+          </div>
+
         </div>
       </SheetContent>
     </Sheet>
