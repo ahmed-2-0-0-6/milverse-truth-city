@@ -1511,6 +1511,67 @@ function Debrief({ scenario }: { scenario: Scenario }) {
   );
 }
 
+function RetestReveal({ resolution }: { resolution: RetestResolution }) {
+  if (resolution.kind === "none") return null;
+  const r = resolution.retest;
+  const tacticLabel = labelForTactic(r.tactic);
+  const shortDate = new Date(r.sourceTs).toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
+
+  if (resolution.kind === "closed_win") {
+    return (
+      <section className="rounded-sm border border-primary/40 bg-primary/5 p-5">
+        <div className="font-mono text-[10px] tracking-widest text-primary">FOLLOW-UP CLOSED</div>
+        <p className="mt-2 text-sm text-foreground/90">
+          On {shortDate} the {tacticLabel} beat you — {r.sourceCaseTitle}. Today it didn't. The file
+          closes for good.
+        </p>
+      </section>
+    );
+  }
+
+  if (resolution.kind === "reschedule") {
+    return (
+      <section className="rounded-sm border border-caution/40 bg-caution/5 p-5">
+        <div className="font-mono text-[10px] tracking-widest text-caution">
+          FOLLOW-UP REMAINS OPEN
+        </div>
+        <p className="mt-2 text-sm text-foreground/90">
+          The {tacticLabel} took you twice now. The city will knock once more.
+        </p>
+      </section>
+    );
+  }
+
+  // closed_final — Manual handoff.
+  const hasEntry = MANUAL_ENTRIES.some((e) => e.id === r.tactic);
+  return (
+    <section className="rounded-sm border border-destructive/40 bg-destructive/5 p-5">
+      <div className="font-mono text-[10px] tracking-widest text-destructive">
+        FOLLOW-UP REMAINS OPEN
+      </div>
+      <p className="mt-2 text-sm text-foreground/90">
+        Twice is a pattern. The file goes to the Manual — read the{" "}
+        {hasEntry ? (
+          <Link
+            to="/manual/$entryId"
+            params={{ entryId: r.tactic }}
+            className="text-caution underline underline-offset-2 hover:text-foreground"
+          >
+            {tacticLabel}
+          </Link>
+        ) : (
+          <span className="text-caution">{tacticLabel}</span>
+        )}{" "}
+        page before it finds you again.
+      </p>
+    </section>
+  );
+}
+
 function StarAxis({ label, value }: { label: string; value: number }) {
   const filled = value >= 1 ? "★" : value >= 0.5 ? "⯪" : "☆";
   const tone =
