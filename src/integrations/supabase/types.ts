@@ -413,6 +413,23 @@ export type Database = {
         Args: { _code: string; _limit?: number }
         Returns: boolean
       }
+      get_assessment_group_entries: {
+        Args: { _code: string }
+        Returns: {
+          accuracy: number
+          calibration_gap: number
+          codename_hash: string
+          created_at: string
+          false_alarms: number
+          form: string
+          items: Json
+          mean_confidence: number
+          missed_scams: number
+          overconfident_errors: number
+          phase: string
+          unverifiable_recognized: number
+        }[]
+      }
       get_daily_split: {
         Args: { _case_id: string; _drop_date: string }
         Returns: {
@@ -433,6 +450,18 @@ export type Database = {
         Returns: {
           correct_count: number
           total: number
+        }[]
+      }
+      get_pilot_group_entries: {
+        Args: { _code: string }
+        Returns: {
+          case_id: string
+          created_at: string
+          device_id: string
+          points: number
+          result: string
+          tier: number
+          wing: string
         }[]
       }
       get_sharpest_watch: {
