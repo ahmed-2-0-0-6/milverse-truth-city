@@ -655,6 +655,11 @@ function VerdictScreen({
         common type.
       </p>
 
+      <p className="mt-4 font-mono text-[10px] tracking-widest text-muted-foreground">
+        Verdicts rest on evidence. Mark what's holding yours up.
+      </p>
+
+
       <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2">
         {(["TRUE", "MISLEADING", "FALSE", "UNVERIFIED"] as FeedVerdict[]).map((v) => (
           <button
