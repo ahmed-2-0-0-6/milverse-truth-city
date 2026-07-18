@@ -60,6 +60,8 @@ function ProfilePage() {
   const correct = profile?.correctVerdicts ?? 0;
   const missed = profile?.missedScams ?? 0;
   const falseAlarms = profile?.falseAlarms ?? 0;
+  const timeStolen = useMemo(() => lifetimeStolenSeconds(profile?.history), [profile]);
+
 
   function downloadCard() {
     renderProfileCardPng({
