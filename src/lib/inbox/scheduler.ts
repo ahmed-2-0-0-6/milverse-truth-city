@@ -6,26 +6,48 @@ import { FEED_SCENARIOS } from "@/lib/feed/scenarios";
 import { loadProfile } from "@/lib/mirror/profile";
 import { todaysDailyCase, dropDateKey } from "@/lib/daily/rotation";
 import { platformForCase, type ChatPlatform } from "@/lib/chat/skins";
+import { fakeNumberForCase } from "@/lib/chat/fakeNumber";
+import { loadInbox } from "@/lib/inbox/profile";
 
 export type InboxPlatform = ChatPlatform | "drop";
+export type InboxItemType = "message" | "call";
 
 export interface InboxItem {
   id: string;
+  type: InboxItemType;
   caseId: string;
   route: string;
   platform: InboxPlatform;
   senderName: string;
   preview: string;
   arriveAfterSec: number;
+  /** Present on "call" items — fake caller number, matches chat header. */
+  number?: string;
+  /** Present on "call" items — first sentence of the opener, ≤90 chars. */
+  voicemailText?: string;
+  /** Present on "call" items — passed through to VoiceNote for TTS voice. */
+  speakerVoiceDesc?: string;
 }
 
 /** Stagger, in seconds, from page-load until each arrival fires. */
 export const ARRIVAL_STAGGER = [4, 25, 70, 140];
+/** The Missed Call fires exactly once per day, on this constant delay. */
+export const CALL_ARRIVE_SEC = 100;
+
 const MAX_ITEMS = 4;
 
 function ellipsize(s: string, n = 60): string {
   const t = (s || "").trim().replace(/\s+/g, " ");
   return t.length <= n ? t : t.slice(0, n - 1).trimEnd() + "…";
+}
+
+function firstSentence(s: string, cap = 90): string {
+  const t = (s || "").trim().replace(/\s+/g, " ");
+  if (!t) return "";
+  const m = t.match(/^[^.!?]+[.!?]?/);
+  const one = (m ? m[0] : t).trim();
+  if (one.length <= cap) return one;
+  return one.slice(0, cap - 1).trimEnd() + "…";
 }
 
 function hash(s: string): number {
@@ -52,6 +74,7 @@ export function todaysArrivals(now: Date = new Date()): InboxItem[] {
     if (playedMirror.has(sc.id)) continue;
     pool.push({
       id: `mirror:${sc.id}`,
+      type: "message",
       caseId: sc.id,
       route: `/mirror/${sc.id}`,
       platform: platformForCase(sc.id),
@@ -64,6 +87,7 @@ export function todaysArrivals(now: Date = new Date()): InboxItem[] {
     if (playedFeed.has(sc.id)) continue;
     pool.push({
       id: `feed:${sc.id}`,
+      type: "message",
       caseId: sc.id,
       route: `/feed/${sc.id}`,
       platform: platformForCase(sc.id),
@@ -80,6 +104,7 @@ export function todaysArrivals(now: Date = new Date()): InboxItem[] {
     if (!playedToday) {
       drop = {
         id: `drop:${dateKey}`,
+        type: "message",
         caseId: scenario.id,
         route: `/drop`,
         platform: "drop",
@@ -107,8 +132,44 @@ export function todaysArrivals(now: Date = new Date()): InboxItem[] {
     }
   }
 
-  return picked.slice(0, MAX_ITEMS).map((it, i) => ({
+  const messages = picked.slice(0, MAX_ITEMS).map((it, i) => ({
     ...it,
     arriveAfterSec: ARRIVAL_STAGGER[i] ?? ARRIVAL_STAGGER[ARRIVAL_STAGGER.length - 1],
   }));
+
+  // ── The Missed Call ─────────────────────────────────────────
+  // At most one call per day: the first unplayed Mirror scenario (in
+  // canonical order) whose voice payload is defined. Deterministic.
+  const callScenario = SCENARIOS.find(
+    (sc) => !playedMirror.has(sc.id) && !!sc.voice?.text,
+  );
+  if (callScenario) {
+    const call: InboxItem = {
+      id: `call:${callScenario.id}`,
+      type: "call",
+      caseId: callScenario.id,
+      route: `/mirror/${callScenario.id}`,
+      platform: platformForCase(callScenario.id),
+      senderName: callScenario.claimedIdentity || "Unknown caller",
+      number: fakeNumberForCase(callScenario.id),
+      preview: "Voicemail · tap to play",
+      voicemailText: firstSentence(callScenario.opener || callScenario.teaser || "", 90),
+      speakerVoiceDesc: callScenario.persona?.voice,
+      arriveAfterSec: CALL_ARRIVE_SEC,
+    };
+    messages.push(call);
+  }
+
+  return messages;
+}
+
+/** Convenience: today's call item, or null. */
+export function todaysCall(now: Date = new Date()): InboxItem | null {
+  return todaysArrivals(now).find((x) => x.type === "call") ?? null;
+}
+
+/** Has The Missed Call already fired (for any case) today? */
+export function callAlreadyFiredToday(): boolean {
+  if (typeof window === "undefined") return false;
+  return loadInbox().firedCalls.length > 0;
 }
