@@ -10,6 +10,14 @@ import {
 } from "@/lib/mirror/profile";
 import { BADGES, loadEarnedBadges } from "@/lib/mirror/badges";
 import { RecommendedStrip } from "@/components/RecommendedStrip";
+import { fetchCityCensus, type CityCensus } from "@/lib/daily.functions";
+
+type CensusState =
+  | { kind: "loading" }
+  | { kind: "loaded"; row: CityCensus }
+  | { kind: "sealed" }
+  | { kind: "offline" };
+
 
 export const Route = createFileRoute("/city-hall")({
   head: () => ({
