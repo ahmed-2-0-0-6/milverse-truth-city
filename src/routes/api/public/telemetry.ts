@@ -18,6 +18,7 @@ const WHITELIST = new Set([
   "share_copy",
   "lite_fallback",
   "paper_section_done",
+  "pin_flag",
 ]);
 
 const EventSchema = z.object({
