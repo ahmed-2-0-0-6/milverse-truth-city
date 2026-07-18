@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+
 import { useServerFn } from "@tanstack/react-start";
 import { TopBar } from "@/components/TopBar";
 import { VoiceNote } from "@/components/VoiceNote";
@@ -69,6 +70,26 @@ import {
   type Grade as CraftGrade,
 } from "@/lib/mirror/craftMarks";
 import { CraftMark } from "@/components/mirror/CraftMark";
+import { DrillClock, DRILL_SECONDS } from "@/components/mirror/DrillClock";
+import {
+  bestClearedSeconds,
+  consumeColdArm,
+  formatDrillTime,
+  isColdEligible,
+  saveColdRead,
+} from "@/lib/mirror/coldreads";
+
+/**
+ * COLD READ MODE — the drill law.
+ * Threaded via context so every phase reads the same flag. Cold mode is
+ * presentation-only: the engine is untouched, the scoring path is skipped
+ * entirely in Debrief, and nothing writes to profile / history / points.
+ * On reload mid-drill the arm key is already consumed, so the case falls
+ * back to normal mode — acceptable, and simplest.
+ */
+const ColdReadContext = createContext<boolean>(false);
+const COLD_START_KEY = "milverse.coldread.startTs";
+
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
