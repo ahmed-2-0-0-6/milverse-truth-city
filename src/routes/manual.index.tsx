@@ -48,43 +48,86 @@ function ManualIndex() {
   return (
     <div className="min-h-screen grain">
       <TopBar />
-      <main className="mx-auto max-w-6xl px-4 py-10">
-        <Link
-          to="/"
-          className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
-        >
-          ← CITY
-        </Link>
-        <div className="mt-4">
-          <div className="font-mono text-xs tracking-[0.3em] text-primary">
-            THE FIELD MANUAL · MIL CODEX
-          </div>
-          <h1
-            className="mt-2 text-4xl sm:text-5xl font-black tracking-tight"
-            style={{ fontFamily: '"Bebas Neue", sans-serif' }}
-          >
-            NAME THE TACTIC. LEARN THE COUNTER-MOVE.
-          </h1>
-          <p className="mt-3 max-w-2xl text-muted-foreground">
-            Files stay redacted until you meet the tactic in play. Then they open. This is your
-            dossier of how deception works — and how to shut it down. MILVERSE never rules on a
-            specific claim. This manual sharpens the hand that does.
-          </p>
-        </div>
 
-        <div className="mt-6 flex flex-wrap items-center gap-4 rounded-md border border-border bg-card p-4">
-          <div className="stencil text-[10px] tracking-widest text-muted-foreground">
-            FILES DECLASSIFIED
-          </div>
-          <div
-            className="text-2xl font-black text-primary tabular-nums"
-            style={{ fontFamily: '"Bebas Neue", sans-serif' }}
+      {/* ── Redacted-dossier banner — bars lift as files declassify ── */}
+      <header className="relative overflow-hidden border-b border-white/10">
+        <div
+          className="absolute inset-0"
+          aria-hidden
+          style={{
+            background:
+              "radial-gradient(75% 120% at 15% -20%, oklch(0.82 0.14 195 / 0.12), transparent 60%)," +
+              "linear-gradient(180deg, oklch(0.14 0.03 255) 0%, var(--color-background) 100%)",
+          }}
+        />
+        {/* redaction bars — faint typed lines with black strike-throughs */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.5]"
+          aria-hidden
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(0deg, transparent 0 26px, oklch(0.94 0.01 240 / 0.05) 26px 34px, oklch(0.1 0.01 255 / 0.85) 34px 40px, transparent 40px 64px)",
+            maskImage: "linear-gradient(90deg, transparent 35%, black 75%)",
+          }}
+        />
+        <div className="scan-sweep absolute inset-0 pointer-events-none" aria-hidden />
+
+        <div className="relative mx-auto max-w-6xl px-4 pt-10 pb-9">
+          <Link
+            to="/"
+            className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
           >
-            {unlockedCount} / {MANUAL_ENTRIES.length}
+            ← CITY
+          </Link>
+          <div className="mt-4 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <div className="font-mono text-xs tracking-[0.3em] text-primary">
+                THE FIELD MANUAL · MIL CODEX
+              </div>
+              <h1
+                className="mt-2 text-5xl sm:text-7xl font-black tracking-tight leading-[0.88]"
+                style={{
+                  fontFamily: '"Bebas Neue", "Space Grotesk", sans-serif',
+                  textShadow: "0 0 26px oklch(0.82 0.14 195 / 0.35)",
+                }}
+              >
+                NAME THE TACTIC.
+                <br />
+                LEARN THE COUNTER-MOVE.
+              </h1>
+              <p className="mt-4 max-w-2xl text-white/75 leading-relaxed">
+                Files stay redacted until you meet the tactic in play. Then they open. This is your
+                dossier of how deception works — and how to shut it down. MILVERSE never rules on a
+                specific claim. This manual sharpens the hand that does.
+              </p>
+            </div>
+            <div className="shrink-0 rounded-sm border border-primary/40 bg-black/50 px-4 py-3 backdrop-blur-sm">
+              <div className="stencil text-[10px] tracking-widest text-muted-foreground">
+                FILES DECLASSIFIED
+              </div>
+              <div
+                className="mt-1 text-4xl font-black text-primary tabular-nums leading-none"
+                style={{ fontFamily: '"Bebas Neue", sans-serif' }}
+              >
+                {unlockedCount} / {MANUAL_ENTRIES.length}
+              </div>
+              <div
+                className="mt-2 h-1.5 w-40 bg-muted rounded-full overflow-hidden"
+                role="progressbar"
+                aria-valuenow={unlockedCount}
+                aria-valuemin={0}
+                aria-valuemax={MANUAL_ENTRIES.length}
+                aria-label="Files declassified"
+              >
+                <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+              </div>
+            </div>
           </div>
-          <div className="flex-1 min-w-[140px] h-1.5 bg-muted rounded-full overflow-hidden">
-            <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
-          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-6xl px-4 py-8">
+        <div className="flex flex-wrap items-center gap-3">
           <Link
             to="/manual/take-it-outside"
             className="inline-flex items-center gap-2 rounded-md border border-primary/50 bg-primary/10 px-3 py-1.5 stencil text-[10px] tracking-widest text-primary hover:bg-primary/20"
