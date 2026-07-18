@@ -655,11 +655,25 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 showOnMount={showBandOnMount}
               />
 
-              <div className="mt-2 flex gap-1">
-                {(["chat", "notes"] as const).map((t) => (
+              <div className="mt-2 flex gap-1" role="tablist" aria-label="Chat and notes">
+                {(["chat", "notes"] as const).map((t, i, arr) => (
                   <button
                     key={t}
+                    id={`mirror-tab-${t}`}
+                    role="tab"
+                    type="button"
+                    aria-selected={tab === t}
+                    aria-controls={`mirror-panel-${t}`}
+                    tabIndex={tab === t ? 0 : -1}
                     onClick={() => setTab(t)}
+                    onKeyDown={(e) => {
+                      if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+                        e.preventDefault();
+                        const dir = e.key === "ArrowRight" ? 1 : -1;
+                        const next = arr[(i + dir + arr.length) % arr.length];
+                        setTab(next);
+                      }
+                    }}
                     className={`rounded px-3 py-1 font-mono text-[10px] tracking-widest transition ${
                       tab === t ? "bg-primary/15 text-primary" : "text-white/50 hover:text-white"
                     }`}
@@ -667,6 +681,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                     {t === "chat" ? "CHAT" : `NOTES · ${pins.length}/5`}
                   </button>
                 ))}
+
                 <div className="flex-1" />
                 <button
                   onClick={() => setShowVob(true)}
