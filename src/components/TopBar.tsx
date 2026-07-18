@@ -31,19 +31,20 @@ const NAV_GROUPS: { label: string; items: { label: string; to: string; desc?: st
     label: "PLAY",
     items: [
       { label: "The City", to: "/", desc: "Enter MILVERSE" },
-      { label: "Daily Drop", to: "/drop", desc: "Today's case" },
-      { label: "The Feed", to: "/feed", desc: "Verify or scroll" },
-      { label: "The Mirror", to: "/mirror", desc: "Read the room" },
-      { label: "The Paper", to: "/paper", desc: "Read like a pro" },
-      { label: "Boss Fights", to: "/boss", desc: "Take down operators" },
+      { label: "Daily Drop", to: "/drop", desc: "One quick case a day. Keep the streak alive" },
+      { label: "The Feed", to: "/feed", desc: "Is that viral forward true? Prove it" },
+      { label: "The Mirror", to: "/mirror", desc: "Catch the scammer sliding into your DMs" },
+      { label: "The Shift", to: "/shift", desc: "Five cases, three lives, one score" },
+      { label: "The Paper", to: "/paper", desc: "The city's newspaper. Play the front page" },
+      { label: "Boss Fights", to: "/boss", desc: "Boss fights. Con artists your fact-checks can't touch" },
     ],
   },
   {
     label: "LEARN",
     items: [
-      { label: "First Phone", to: "/first-phone", desc: "For juniors" },
-      { label: "Field Manual", to: "/manual", desc: "Tactics reference" },
-      { label: "City Charter", to: "/charter", desc: "Our promises" },
+      { label: "First Phone", to: "/first-phone", desc: "The ten lessons before a kid's first phone" },
+      { label: "Field Manual", to: "/manual", desc: "Every scam trick, named and dissected" },
+      { label: "City Charter", to: "/charter", desc: "The rules this city is built on" },
       { label: "Quick Tour", to: "/quick-tour", desc: "30-second orientation" },
     ],
   },
@@ -53,11 +54,14 @@ const NAV_GROUPS: { label: string; items: { label: string; to: string; desc?: st
       { label: "For Educators", to: "/educators", desc: "Classroom kit" },
       { label: "For Family", to: "/family", desc: "Household dashboard" },
       { label: "Visit", to: "/visit", desc: "3-minute guided tour" },
-      { label: "City Hall", to: "/city-hall", desc: "Vote & propose" },
-      { label: "Archive", to: "/archive", desc: "Real cases" },
+      { label: "City Hall", to: "/city-hall", desc: "Your stats, your rank, the city's census" },
+      { label: "Archive", to: "/archive", desc: "The city's records and old cases" },
+      { label: "Arena", to: "/arena", desc: "Head-to-head. You vs another citizen" },
+      { label: "Studio", to: "/studio", desc: "Design your own scam case. Test your friends" },
     ],
   },
 ];
+
 
 export function TopBar() {
   const [profile, setProfile] = useState<TrustProfile | null>(null);
