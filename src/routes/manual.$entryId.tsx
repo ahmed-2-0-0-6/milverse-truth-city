@@ -274,3 +274,121 @@ function RedactedEntry({ entry: e }: { entry: ManualEntry }) {
     </div>
   );
 }
+
+// ─────────────────────────────────────────────────────────────────
+// SEEN IN THE WILD — the player's own record with this tactic.
+// Pure render-time derivation over profile.history + dailyPlays.
+// ─────────────────────────────────────────────────────────────────
+
+function outcomeToneClass(o: Encounter["outcome"]): string {
+  switch (o) {
+    case "CORRECT":
+      return "text-primary";
+    case "MISSED SCAM":
+      return "text-red-400";
+    case "FALSE ALARM":
+      return "text-caution";
+    case "LUCKY GUESS":
+      return "text-muted-foreground";
+  }
+}
+
+function SeenInTheWild({ entryId }: { entryId: string }) {
+  const [profileTick, setProfileTick] = useState(0);
+  useEffect(() => {
+    const on = () => setProfileTick((n) => n + 1);
+    window.addEventListener("milverse:profile", on);
+    return () => window.removeEventListener("milverse:profile", on);
+  }, []);
+
+  const record = useMemo(() => {
+    const p = typeof window === "undefined" ? null : loadProfile();
+    return encountersFor(entryId as never, p);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entryId, profileTick]);
+
+  const { encounters, met, losses } = record;
+  const rows = encounters.slice(0, 5);
+  const extra = Math.max(0, encounters.length - rows.length);
+
+  const headline =
+    met === 0
+      ? "No contact on record. When this one finds you, this page is the prep."
+      : losses === 0
+        ? `Met ${met} time${met === 1 ? "" : "(s)"}. Clean sheet. This page is why you keep it that way.`
+        : `Met ${met} time${met === 1 ? "" : "(s)"}. It took you ${losses} of them. Your file on this tactic is still open.`;
+
+  const mostRecentIsLoss =
+    encounters.length > 0 &&
+    (encounters[0].outcome === "MISSED SCAM" || encounters[0].outcome === "FALSE ALARM");
+  const showReadTwice = losses > 0 && mostRecentIsLoss;
+
+  return (
+    <section aria-labelledby="seen-in-wild-label">
+      <div
+        id="seen-in-wild-label"
+        className="stencil text-[10px] tracking-widest mb-2 flex items-center gap-1.5 text-muted-foreground"
+      >
+        SEEN IN THE WILD
+      </div>
+      <p className="font-mono text-xs text-foreground/85 leading-relaxed">{headline}</p>
+
+      {rows.length > 0 && (
+        <ol className="mt-3 space-y-1.5" aria-label="Your encounters with this tactic">
+          {rows.map((r, i) => {
+            const accessibleName = `${r.title}, ${r.outcome}, ${r.dateLabel}`;
+            const inner = (
+              <>
+                <span className="font-mono tabular-nums text-[10px] text-muted-foreground w-14 shrink-0">
+                  {r.dateLabel}
+                </span>
+                <span className="font-mono text-[9px] tracking-widest text-muted-foreground/80 w-12 shrink-0">
+                  {r.source === "mirror" ? "MIRROR" : r.source === "daily" ? "DAILY" : "FEED"}
+                </span>
+                <span className="flex-1 text-sm truncate">{r.title}</span>
+                <span
+                  className={`font-mono text-[10px] tracking-widest ${outcomeToneClass(r.outcome)}`}
+                >
+                  {r.outcome}
+                </span>
+              </>
+            );
+            const rowCls =
+              "flex items-center gap-3 rounded-md border border-border/60 bg-background/40 px-3 py-2";
+            return (
+              <li key={`${r.source}:${r.caseId}:${i}`}>
+                {r.to ? (
+                  <Link
+                    to={r.to.route}
+                    params={r.to.params}
+                    className={`${rowCls} hover:border-primary/50 hover:bg-primary/[0.04] transition`}
+                    aria-label={accessibleName}
+                  >
+                    {inner}
+                  </Link>
+                ) : (
+                  <div className={rowCls} aria-label={accessibleName}>
+                    {inner}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      )}
+
+      {extra > 0 && (
+        <p className="mt-2 font-mono text-[10px] tracking-widest text-muted-foreground">
+          +{extra} EARLIER CONTACTS ON FILE.
+        </p>
+      )}
+
+      {showReadTwice && (
+        <p className="mt-3 font-mono text-xs italic text-foreground/80">
+          The counter-move above exists because of exactly this. Read it twice.
+        </p>
+      )}
+    </section>
+  );
+}
+
