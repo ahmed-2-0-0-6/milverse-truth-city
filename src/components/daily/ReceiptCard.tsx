@@ -230,7 +230,7 @@ export function ReceiptCard({ data }: { data: ReceiptData }) {
   return (
     <div className="space-y-3">
       <div className="rounded-sm border border-primary/40 bg-black/60 overflow-hidden">
-        <canvas ref={canvasRef} className="block w-full h-auto" />
+        <canvas ref={canvasRef} className="block w-full h-auto" role="img" aria-label={text} />
       </div>
       <pre className="whitespace-pre-wrap break-words rounded-sm border border-border bg-card p-3 text-xs text-muted-foreground font-mono">
         {text}
