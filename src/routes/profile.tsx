@@ -13,6 +13,8 @@ import { computeXp, rankFromXp, RANKS } from "@/lib/ranks";
 import { HandlersReading } from "@/components/handler/HandlersReading";
 import { WeeklyEval } from "@/components/handler/WeeklyEval";
 import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
+import { TheRoad } from "@/components/road/TheRoad";
+
 import { Download, Share2 } from "lucide-react";
 
 export const Route = createFileRoute("/profile")({
