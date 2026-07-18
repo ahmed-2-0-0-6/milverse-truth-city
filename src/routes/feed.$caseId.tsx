@@ -219,7 +219,9 @@ function FeedPlay() {
           verdict={verdict}
           conclusion={conclusion}
           finalReply={finalReply}
+          loadBearing={loadBearing}
         />
+
       )}
     </div>
   );
