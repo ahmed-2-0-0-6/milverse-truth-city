@@ -480,9 +480,22 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
     flyTo(px * WORLD_W, py * WORLD_H, camRef.current.z, 500);
   };
 
+  /* ── beacon activation: reuse the house zoom-then-nav flourish ── */
+  const onBeacon = useCallback(
+    (sig: CitySignal) => {
+      const anchor = BEACON_ANCHORS[sig.district];
+      flyTo(anchor.x, anchor.y, ZOOM_LEVELS[2], 600);
+      if (sig.to && sig.to !== "/") {
+        setTimeout(() => nav({ to: sig.to }), 700);
+      }
+    },
+    [flyTo, nav],
+  );
+
   /* ── render ───────────────────────────────────────────────── */
   const tx = vp.w / 2 - cam.x * cam.z;
   const ty = vp.h / 2 - cam.y * cam.z;
+
 
   return (
     <div className="relative w-full h-[70vh] min-h-[520px] rounded-sm overflow-hidden border border-border/60 bg-[#050914]">
