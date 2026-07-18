@@ -2,7 +2,7 @@
 // Human-published newspaper. The site always shows the latest published edition.
 
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { TopBar } from "@/components/TopBar";
 import { PaperFrontPage } from "@/components/paper/PaperFrontPage";
