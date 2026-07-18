@@ -306,6 +306,17 @@ function Sim({
   const [tacticFlash, setTacticFlash] = useState<typeof scenario.tacticId | null>(null);
   const tacticFlashed = useRef(false);
   const scroller = useRef<HTMLDivElement>(null);
+  const [sendTick, setSendTick] = useState(0);
+  const showBandOnMount = useRef(
+    typeof window !== "undefined" && !localStorage.getItem("milverse.feed.bandSeen"),
+  ).current;
+  useEffect(() => {
+    if (showBandOnMount && typeof window !== "undefined") {
+      localStorage.setItem("milverse.feed.bandSeen", "1");
+    }
+  }, [showBandOnMount]);
+  const currentBand = dignityBandFor(state.dignity);
+
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
