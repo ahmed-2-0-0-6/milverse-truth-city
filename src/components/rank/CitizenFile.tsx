@@ -44,6 +44,8 @@ export function CitizenFile({ open, onOpenChange, profile, xp, manualUnlocks }: 
   const missed = profile?.missedScams ?? 0;
   const falseAlarms = profile?.falseAlarms ?? 0;
   const streak = profile?.dailyStreak ?? 0;
+  const timeStolen = lifetimeStolenSeconds(profile?.history);
+
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
