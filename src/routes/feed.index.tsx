@@ -160,10 +160,12 @@ function FeedIndex() {
         >
           ← CITY
         </Link>
+        <SeasonAdvisory season={season} />
 
         <div className="mt-6 mb-3 font-mono text-[10px] tracking-widest text-muted-foreground">
           {shelfLine}
         </div>
+
 
         <div className="flex gap-6">
           <TierRail nodes={railNodes} frontierTier={highestUnlocked} />
