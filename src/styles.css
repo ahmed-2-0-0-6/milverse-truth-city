@@ -2572,3 +2572,21 @@ html[data-force-reduce-motion="on"] .fc-notif {
   transform: none !important;
   opacity: 1 !important;
 }
+
+/* ---------- "THE QUIET FILE" · stamp-quiet kill lists ----------
+   The reduced-motion / LITE branches of VerdictMoment return before
+   render, so the fade never mounts under those modes. These rules
+   are a defensive belt-and-braces skip: if the class ever renders
+   under prefers-reduced-motion, forced reduce-motion, or high
+   legibility, it shows the final frame (opacity 1) with no motion. */
+@media (prefers-reduced-motion: reduce) {
+  .stamp-quiet {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
+html[data-high-legibility="on"] .stamp-quiet,
+html[data-force-reduce-motion="on"] .stamp-quiet {
+  animation: none !important;
+  opacity: 1 !important;
+}
