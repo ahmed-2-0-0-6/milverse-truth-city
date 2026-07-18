@@ -722,6 +722,10 @@ function WorldSvg({
   onStation,
   onLandmark,
   prefersReduced,
+  ambient,
+  hour,
+  minuteOfDay,
+  onBeacon,
 }: {
   mirror: Station[];
   feed: Station[];
@@ -734,6 +738,10 @@ function WorldSvg({
   onStation: (s: Station) => void;
   onLandmark: (l: WorldLandmark) => void;
   prefersReduced: boolean;
+  ambient: boolean;
+  hour: number;
+  minuteOfDay: number;
+  onBeacon: (s: CitySignal) => void;
 }) {
   return (
     <svg
