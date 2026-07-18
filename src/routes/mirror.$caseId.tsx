@@ -1461,6 +1461,28 @@ function Debrief({ scenario }: { scenario: Scenario }) {
         </section>
       )}
 
+      {/* The Tape — annotated playback of the whole exchange. */}
+      {sim?.messages?.length ? (
+        <div>
+          <button
+            type="button"
+            onClick={() => setTapeOpen(true)}
+            className="w-full rounded-md border border-caution/50 bg-caution/5 py-3 font-mono text-xs tracking-widest text-caution hover:bg-caution/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-caution"
+          >
+            PLAY THE TAPE →
+          </button>
+        </div>
+      ) : null}
+
+      {tapeOpen && sim?.messages?.length ? (
+        <TapeReview
+          scenario={scenario}
+          messages={sim.messages}
+          result={result.resultKind}
+          onClose={() => setTapeOpen(false)}
+        />
+      ) : null}
+
       {/* Voice note breakdown */}
       {result.voiceArtifact !== undefined && sim?.messages.some((m) => m.kind === "voice") && (
         <section className="rounded-xl border border-border bg-card p-6">
