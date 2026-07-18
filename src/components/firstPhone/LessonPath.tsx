@@ -186,6 +186,7 @@ export function LessonPath() {
             state={state}
             onOpenLesson={(n) => setOpenLesson(n)}
             onOpenLicense={() => setShowLicense(true)}
+            onOpenSpotIt={() => setOpenSpotIt(true)}
           />
           {state.active &&
             state.handoverSeen &&
