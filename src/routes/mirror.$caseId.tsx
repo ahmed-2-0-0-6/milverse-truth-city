@@ -109,6 +109,24 @@ function CasePlay() {
   const { scenario } = Route.useLoaderData();
   const [phase, setPhase] = useState<Phase>("dossier");
 
+  // COLD READ arm — lazy-init so the first paint already knows which mode we're in.
+  // Consuming the arm here clears it; reload => normal case (spec).
+  const [coldMode] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    const armed = consumeColdArm();
+    if (!armed || armed !== scenario.id) return false;
+    try {
+      const p = loadProfile();
+      if (!isColdEligible(p, scenario.id)) return false;
+      sessionStorage.setItem(COLD_START_KEY, String(Date.now()));
+      sessionStorage.removeItem(SIM_KEY);
+      sessionStorage.removeItem(VERDICT_KEY);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+
   // Focus follows the phase (skip the initial mount — the dossier's default
   // top-of-page focus order is correct on first paint).
   const isInitialPhase = useRef(true);
@@ -125,26 +143,42 @@ function CasePlay() {
   }, [phase]);
 
   // In the "sim" phase, ChatShell owns the whole viewport (phone frame).
-  // Every other phase keeps the normal MILVERSE app chrome.
   if (phase === "sim") {
-    return <Simulation scenario={scenario} onEnd={() => setPhase("verdict")} />;
+    return (
+      <ColdReadContext.Provider value={coldMode}>
+        <Simulation scenario={scenario} onEnd={() => setPhase("verdict")} />
+      </ColdReadContext.Provider>
+    );
   }
 
   return (
-    <div className="min-h-screen grain">
-      <TopBar />
-      <div className="mx-auto max-w-3xl px-4 pt-4">
-        <RookieIntro />
+    <ColdReadContext.Provider value={coldMode}>
+      <div className="min-h-screen grain">
+        <TopBar />
+        {!coldMode && (
+          <div className="mx-auto max-w-3xl px-4 pt-4">
+            <RookieIntro />
+          </div>
+        )}
+        {phase === "dossier" && (
+          coldMode
+            ? <ColdInterstitial scenario={scenario} onStart={() => setPhase("sim")} />
+            : <Dossier scenario={scenario} onStart={() => setPhase("sim")} />
+        )}
+        {phase === "verdict" && <Verdict scenario={scenario} onDone={() => setPhase("reveal")} />}
+        {phase === "reveal" && (
+          <VerdictReveal scenario={scenario} onDone={() => setPhase("debrief")} />
+        )}
+        {phase === "debrief" && (
+          coldMode
+            ? <ColdDebrief scenario={scenario} />
+            : <Debrief scenario={scenario} />
+        )}
       </div>
-      {phase === "dossier" && <Dossier scenario={scenario} onStart={() => setPhase("sim")} />}
-      {phase === "verdict" && <Verdict scenario={scenario} onDone={() => setPhase("reveal")} />}
-      {phase === "reveal" && (
-        <VerdictReveal scenario={scenario} onDone={() => setPhase("debrief")} />
-      )}
-      {phase === "debrief" && <Debrief scenario={scenario} />}
-    </div>
+    </ColdReadContext.Provider>
   );
 }
+
 
 
 function VerdictReveal({ scenario, onDone }: { scenario: Scenario; onDone: () => void }) {
