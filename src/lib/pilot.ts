@@ -54,7 +54,7 @@ export function loadPilotLog(code: string): PilotEntry[] {
 }
 
 /** Fire-and-forget: always write to localStorage. If a group is active, also
- *  try to sync to the cloud so multi-device classrooms aggregate. Silent on failure. */
+ *  enqueue an outbox entry and kick a flush so multi-device classrooms aggregate. */
 export function logPilotEntry(entry: PilotEntry) {
   if (typeof window === "undefined") return;
   const code = getActiveGroup();
@@ -63,28 +63,135 @@ export function logPilotEntry(entry: PilotEntry) {
   list.push(entry);
   localStorage.setItem(key(code), JSON.stringify(list));
   window.dispatchEvent(new Event("milverse:pilot"));
-
-  // Fire-and-forget cloud sync — offline callers get local-only behavior.
-  void (async () => {
-    try {
-      const { logPilotEntryToCloud } = await import("@/lib/pilot.functions");
-      await logPilotEntryToCloud({
-        data: {
-          groupCode: code,
-          deviceId: getDeviceId(),
-          wing: entry.wing,
-          caseId: entry.caseId,
-          tier: entry.tier,
-          result: entry.result,
-          points: entry.points,
-          probeStats: entry.probeStats,
-        },
-      });
-    } catch {
-      // silent — local log is source of truth if cloud is down
-    }
-  })();
+  enqueueOutbox({ groupCode: code, deviceId: getDeviceId(), entry });
+  void flushOutbox();
 }
+
+/* ── OUTBOX ────────────────────────────────────────────────────────────────
+   DELIBERATE DECISION: NO service worker / PWA caching backs this outbox.
+   Lovable's two-way sync ships commits continuously; a cached shell during
+   pilot week is a worse failure than a slow load. Resilience is
+   localStorage-first + this outbox. Do not "helpfully" add a service worker.
+   ──────────────────────────────────────────────────────────────────────── */
+
+interface OutboxItem {
+  groupCode: string;
+  deviceId: string;
+  entry: PilotEntry;
+  /** consecutive head-of-queue send failures — see flushOutbox */
+  headFails?: number;
+}
+
+const OUTBOX_KEY = "milverse.pilot.outbox.v1";
+const OUTBOX_CAP = 200;
+const MAX_HEAD_FAILS = 5;
+
+function loadOutbox(): OutboxItem[] {
+  try {
+    const raw = localStorage.getItem(OUTBOX_KEY);
+    return raw ? (JSON.parse(raw) as OutboxItem[]) : [];
+  } catch {
+    return [];
+  }
+}
+function saveOutbox(items: OutboxItem[]) {
+  try {
+    localStorage.setItem(OUTBOX_KEY, JSON.stringify(items));
+  } catch {
+    /* quota — nothing we can do */
+  }
+}
+
+function enqueueOutbox(item: OutboxItem) {
+  const list = loadOutbox();
+  list.push(item);
+  if (list.length > OUTBOX_CAP) {
+    const dropped = list.length - OUTBOX_CAP;
+    list.splice(0, dropped);
+    // eslint-disable-next-line no-console
+    console.warn(`[pilot outbox] cap ${OUTBOX_CAP} exceeded — dropped ${dropped} oldest entries`);
+  }
+  saveOutbox(list);
+}
+
+let flushing = false;
+export async function flushOutbox(): Promise<void> {
+  if (typeof window === "undefined" || flushing) return;
+  if (!navigator.onLine) return;
+  flushing = true;
+  try {
+    // Reload each iteration in case enqueueOutbox appended concurrently.
+    let list = loadOutbox();
+    while (list.length > 0) {
+      const head = list[0];
+      try {
+        const { logPilotEntryToCloud } = await import("@/lib/pilot.functions");
+        await logPilotEntryToCloud({
+          data: {
+            groupCode: head.groupCode,
+            deviceId: head.deviceId,
+            wing: head.entry.wing,
+            caseId: head.entry.caseId,
+            tier: head.entry.tier,
+            result: head.entry.result,
+            points: head.entry.points,
+            probeStats: head.entry.probeStats,
+          },
+        });
+        // Success — drop head.
+        list = loadOutbox();
+        list.shift();
+        saveOutbox(list);
+      } catch (err) {
+        // Bump head-fail counter. If the same head has failed MAX_HEAD_FAILS
+        // times in a row (poisoned entry, e.g. schema drift the server
+        // permanently rejects), drop it and continue so it can't wedge the
+        // queue. Otherwise stop — order matters; retry later.
+        list = loadOutbox();
+        const cur = list[0];
+        if (!cur) break;
+        const fails = (cur.headFails ?? 0) + 1;
+        if (fails >= MAX_HEAD_FAILS) {
+          // eslint-disable-next-line no-console
+          console.warn("[pilot outbox] dropping poisoned head entry after 5 failures", err);
+          list.shift();
+          saveOutbox(list);
+          // continue loop — try the next head once
+          continue;
+        }
+        cur.headFails = fails;
+        saveOutbox(list);
+        break;
+      }
+    }
+  } finally {
+    flushing = false;
+  }
+}
+
+/** Wire up flush triggers: online event + module init (best-effort).
+ *  Also piggy-backs the assessment sync on the same online event when
+ *  available — assessment/state.ts keeps its own retry pattern otherwise. */
+let wired = false;
+export function initPilotOutbox() {
+  if (typeof window === "undefined" || wired) return;
+  wired = true;
+  window.addEventListener("online", () => {
+    void flushOutbox();
+    // Assessment module owns its own synced-flag retry. Piggy-back its
+    // flush on the same online event since it's trivially available.
+    void import("@/lib/assessment/state")
+      .then((m) => m.syncPending?.())
+      .catch(() => {});
+  });
+  void flushOutbox();
+}
+
+if (typeof window !== "undefined") {
+  // Module init flush — covers app start when this file is first imported.
+  initPilotOutbox();
+}
+
 
 /** Random 5-char group code, avoiding ambiguous chars. */
 export function generateGroupCode(): string {
