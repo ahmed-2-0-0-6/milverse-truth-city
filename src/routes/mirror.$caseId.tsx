@@ -114,6 +114,7 @@ function VerdictReveal({ scenario, onDone }: { scenario: Scenario; onDone: () =>
       stampLabel={raw?.verdict ?? "UNVERIFIED"}
       outcome={outcome}
       onDone={onDone}
+      register={scenario.isSurvivorStory ? "quiet" : "standard"}
     />
   );
 }
