@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WallRouteImport } from './routes/wall'
 import { Route as VisitRouteImport } from './routes/visit'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as ReviewRouteImport } from './routes/review'
@@ -42,6 +43,11 @@ import { Route as BossBossIdRouteImport } from './routes/boss.$bossId'
 import { Route as ArchiveSubmitRouteImport } from './routes/archive.submit'
 import { Route as ApiPublicTelemetryRouteImport } from './routes/api/public/telemetry'
 
+const WallRoute = WallRouteImport.update({
+  id: '/wall',
+  path: '/wall',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VisitRoute = VisitRouteImport.update({
   id: '/visit',
   path: '/visit',
@@ -225,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
   '/visit': typeof VisitRoute
+  '/wall': typeof WallRoute
   '/archive/submit': typeof ArchiveSubmitRoute
   '/boss/$bossId': typeof BossBossIdRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
@@ -259,6 +266,7 @@ export interface FileRoutesByTo {
   '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
   '/visit': typeof VisitRoute
+  '/wall': typeof WallRoute
   '/archive/submit': typeof ArchiveSubmitRoute
   '/boss/$bossId': typeof BossBossIdRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
@@ -294,6 +302,7 @@ export interface FileRoutesById {
   '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
   '/visit': typeof VisitRoute
+  '/wall': typeof WallRoute
   '/archive/submit': typeof ArchiveSubmitRoute
   '/boss/$bossId': typeof BossBossIdRoute
   '/feed/$caseId': typeof FeedCaseIdRoute
@@ -330,6 +339,7 @@ export interface FileRouteTypes {
     | '/review'
     | '/studio'
     | '/visit'
+    | '/wall'
     | '/archive/submit'
     | '/boss/$bossId'
     | '/feed/$caseId'
@@ -364,6 +374,7 @@ export interface FileRouteTypes {
     | '/review'
     | '/studio'
     | '/visit'
+    | '/wall'
     | '/archive/submit'
     | '/boss/$bossId'
     | '/feed/$caseId'
@@ -398,6 +409,7 @@ export interface FileRouteTypes {
     | '/review'
     | '/studio'
     | '/visit'
+    | '/wall'
     | '/archive/submit'
     | '/boss/$bossId'
     | '/feed/$caseId'
@@ -433,6 +445,7 @@ export interface RootRouteChildren {
   ReviewRoute: typeof ReviewRoute
   StudioRoute: typeof StudioRoute
   VisitRoute: typeof VisitRoute
+  WallRoute: typeof WallRoute
   BossBossIdRoute: typeof BossBossIdRoute
   FeedCaseIdRoute: typeof FeedCaseIdRoute
   ManualEntryIdRoute: typeof ManualEntryIdRoute
@@ -447,6 +460,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wall': {
+      id: '/wall'
+      path: '/wall'
+      fullPath: '/wall'
+      preLoaderRoute: typeof WallRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/visit': {
       id: '/visit'
       path: '/visit'
@@ -707,6 +727,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReviewRoute: ReviewRoute,
   StudioRoute: StudioRoute,
   VisitRoute: VisitRoute,
+  WallRoute: WallRoute,
   BossBossIdRoute: BossBossIdRoute,
   FeedCaseIdRoute: FeedCaseIdRoute,
   ManualEntryIdRoute: ManualEntryIdRoute,

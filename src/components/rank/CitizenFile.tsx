@@ -7,6 +7,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import { Link } from "@tanstack/react-router";
 import { operatorCallsign, type TrustProfile } from "@/lib/mirror/profile";
 import { rankFromXp } from "@/lib/ranks";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
@@ -103,6 +104,14 @@ export function CitizenFile({ open, onOpenChange, profile, xp, manualUnlocks }: 
           <p className="mt-3 text-[11px] text-muted-foreground italic">
             Both columns lose. Gullibility and paranoia are the same bill.
           </p>
+          <Link
+            to="/wall"
+            onClick={() => onOpenChange(false)}
+            className="mt-3 flex items-center justify-between rounded-md border border-border bg-background/40 px-3 py-2 stencil text-[10px] tracking-widest text-foreground transition-colors hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <span>THE CASE WALL</span>
+            <span aria-hidden>→</span>
+          </Link>
         </section>
 
         {/* Next */}

@@ -212,6 +212,17 @@ function ProfilePage() {
                 </div>
                 <div className="mt-1 text-lg font-semibold">{publishedCount}</div>
               </Link>
+              <Link
+                to="/wall"
+                className="rounded-md border border-border bg-background/50 p-3 transition-colors hover:border-primary/50 sm:col-span-2"
+              >
+                <div className="stencil text-[10px] tracking-widest text-muted-foreground">
+                  THE CASE WALL
+                </div>
+                <div className="mt-1 text-sm text-foreground">
+                  Every call you made. The city keeps receipts.
+                </div>
+              </Link>
             </div>
 
             <div className="mt-6 flex flex-wrap gap-2">

@@ -2235,3 +2235,24 @@ html[data-high-legibility="on"] .rank-underline,
 html[data-force-reduce-motion="on"] .rank-underline {
   transition: none !important;
 }
+
+/* ---------- THE CASE WALL (card flip crossfade) ---------- */
+@keyframes card-face-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.card-flip .card-face {
+  animation: card-face-in 200ms ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-flip .card-face { animation: none !important; }
+  .wall-card-wrap { transform: none !important; }
+}
+html[data-high-legibility="on"] .card-flip .card-face,
+html[data-force-reduce-motion="on"] .card-flip .card-face {
+  animation: none !important;
+}
+html[data-high-legibility="on"] .wall-card-wrap,
+html[data-force-reduce-motion="on"] .wall-card-wrap {
+  transform: none !important;
+}
