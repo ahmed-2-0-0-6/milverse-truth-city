@@ -449,6 +449,18 @@ export type Database = {
           points: number
         }[]
       }
+      get_city_census: {
+        Args: never
+        Returns: {
+          designer_cases: number
+          drops_correct_pct: number
+          drops_last7: number
+          drops_total: number
+          hardest_case_id: string
+          hardest_fooled_pct: number
+          watchers: number
+        }[]
+      }
       get_daily_split: {
         Args: { _case_id: string; _drop_date: string }
         Returns: {

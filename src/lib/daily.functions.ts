@@ -90,3 +90,21 @@ export const fetchMostDeviousDesigner = createServerFn({ method: "GET" }).handle
   if (error) throw new Error(error.message);
   return { rows: (data ?? []) as Array<{ case_id: string; plays: number; fooled_pct: number }> };
 });
+
+export type CityCensus = {
+  drops_total: number;
+  drops_correct_pct: number;
+  drops_last7: number;
+  watchers: number;
+  designer_cases: number;
+  hardest_case_id: string | null;
+  hardest_fooled_pct: number | null;
+};
+
+export const fetchCityCensus = createServerFn({ method: "GET" }).handler(async () => {
+  const supabase = serverClient();
+  const { data, error } = await supabase.rpc("get_city_census");
+  if (error) throw new Error(error.message);
+  const row = (data as CityCensus[] | null)?.[0] ?? null;
+  return { row };
+});
