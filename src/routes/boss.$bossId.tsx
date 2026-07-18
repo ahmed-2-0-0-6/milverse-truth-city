@@ -93,7 +93,8 @@ function BossPlay() {
   const boss = getBoss(bossId);
   const reducedMotion = useReducedMotion();
 
-  const [stage, setStage] = useState<"intro" | "play" | "cinema" | "debrief">("intro");
+  const [stage, setStage] = useState<"intro" | "cold-open" | "play" | "cinema" | "debrief">("intro");
+  const { mode: visualMode } = useVisualMode();
   const [state, setState] = useState<BossState | null>(null);
   const [log, setLog] = useState<LogItem[]>([]);
   const [outcome, setOutcome] = useState<BossOutcome | null>(null);
