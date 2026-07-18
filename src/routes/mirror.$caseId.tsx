@@ -47,6 +47,8 @@ import { ContactsSheet } from "@/components/chat/ContactsSheet";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 import { clockFor } from "@/lib/mirror/clocks";
 import { ClockChip } from "@/components/mirror/ClockChip";
+import { pendingRetestForCase, scheduleRetest, resolveRetest, type RetestResolution } from "@/lib/mirror/retests";
+import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
@@ -1161,6 +1163,10 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     };
   }, [scenario, sim, verdictRaw]);
 
+  // Capture BEFORE resolve so we can render the reveal in past tense.
+  const pendingBefore = useMemo(() => pendingRetestForCase(scenario.id), [scenario.id]);
+  const [retestResolution, setRetestResolution] = useState<RetestResolution>({ kind: "none" });
+
   const savedRef = useRef(false);
   useEffect(() => {
     if (!result || !verdictRaw || savedRef.current) return;
@@ -1179,6 +1185,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     }
     if (result.resultKind === "missed_scam") p.missedScams += 1;
     if (result.resultKind === "false_alarm") p.falseAlarms += 1;
+    const nowTs = Date.now();
     p.history.push({
       caseId: scenario.id,
       tier: scenario.tier,
@@ -1187,7 +1194,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       result: result.resultKind,
       points: result.points,
       usedVob: result.usedVob,
-      ts: Date.now(),
+      ts: nowTs,
     });
     saveProfile(p);
     const xpAfter = computeXp(p, loadUnlocked().size, p.publishedCount ?? 0);
@@ -1199,7 +1206,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       result: result.resultKind,
       points: result.points,
       probeStats: { strong: result.strong, weak: result.weak, wasted: result.wasted },
-      ts: Date.now(),
+      ts: nowTs,
     });
     // Anonymous telemetry — includes tactic tag for aggregate learning analytics.
     // Wrapped so a failed track never touches the case-completion path.
@@ -1219,7 +1226,25 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     }
     window.dispatchEvent(new Event("milverse:profile"));
     checkAndAwardBadges(p);
-  }, [result, scenario.id, scenario.tier, scenario.truth, scenario.tactic, verdictRaw]);
+
+    // "The City Checks Back" — spaced retests.
+    // 1) Resolve any pending retest that this caseId satisfies.
+    const resolution = resolveRetest(scenario.id, result.resultKind, nowTs);
+    // Only reveal if the retest was actually DUE at play-time (spec: silent
+    // close when player organically solves it before it surfaces).
+    if (
+      resolution.kind !== "none" &&
+      pendingBefore &&
+      pendingBefore.dueTs <= nowTs
+    ) {
+      setRetestResolution(resolution);
+    }
+    // 2) A fresh loss schedules its own retest (uses post-save profile so
+    //    unlockedMaxTier + latest-history are current).
+    if (result.resultKind === "missed_scam" || result.resultKind === "false_alarm") {
+      scheduleRetest(scenario.id, loadProfile(), nowTs);
+    }
+  }, [result, scenario.id, scenario.tier, scenario.truth, scenario.tactic, verdictRaw, pendingBefore]);
 
   if (!result || !verdictRaw) {
     return (
@@ -1282,6 +1307,8 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           </p>
         )}
       </div>
+
+      <RetestReveal resolution={retestResolution} />
 
       <TacticStamp tacticId={tacticForMirror(scenario.id)} />
 
@@ -1481,6 +1508,67 @@ function Debrief({ scenario }: { scenario: Scenario }) {
         </button>
       </div>
     </main>
+  );
+}
+
+function RetestReveal({ resolution }: { resolution: RetestResolution }) {
+  if (resolution.kind === "none") return null;
+  const r = resolution.retest;
+  const tacticLabel = labelForTactic(r.tactic);
+  const shortDate = new Date(r.sourceTs).toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
+
+  if (resolution.kind === "closed_win") {
+    return (
+      <section className="rounded-sm border border-primary/40 bg-primary/5 p-5">
+        <div className="font-mono text-[10px] tracking-widest text-primary">FOLLOW-UP CLOSED</div>
+        <p className="mt-2 text-sm text-foreground/90">
+          On {shortDate} the {tacticLabel} beat you — {r.sourceCaseTitle}. Today it didn't. The file
+          closes for good.
+        </p>
+      </section>
+    );
+  }
+
+  if (resolution.kind === "reschedule") {
+    return (
+      <section className="rounded-sm border border-caution/40 bg-caution/5 p-5">
+        <div className="font-mono text-[10px] tracking-widest text-caution">
+          FOLLOW-UP REMAINS OPEN
+        </div>
+        <p className="mt-2 text-sm text-foreground/90">
+          The {tacticLabel} took you twice now. The city will knock once more.
+        </p>
+      </section>
+    );
+  }
+
+  // closed_final — Manual handoff.
+  const hasEntry = MANUAL_ENTRIES.some((e) => e.id === r.tactic);
+  return (
+    <section className="rounded-sm border border-destructive/40 bg-destructive/5 p-5">
+      <div className="font-mono text-[10px] tracking-widest text-destructive">
+        FOLLOW-UP REMAINS OPEN
+      </div>
+      <p className="mt-2 text-sm text-foreground/90">
+        Twice is a pattern. The file goes to the Manual — read the{" "}
+        {hasEntry ? (
+          <Link
+            to="/manual/$entryId"
+            params={{ entryId: r.tactic }}
+            className="text-caution underline underline-offset-2 hover:text-foreground"
+          >
+            {tacticLabel}
+          </Link>
+        ) : (
+          <span className="text-caution">{tacticLabel}</span>
+        )}{" "}
+        page before it finds you again.
+      </p>
+    </section>
   );
 }
 

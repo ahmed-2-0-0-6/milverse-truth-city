@@ -2180,6 +2180,24 @@ html[data-force-reduce-motion="on"] .paper-thud {
   animation: none !important;
 }
 
+/* ---------- THE CITY CHECKS BACK (reopened file pulse) ---------- */
+@keyframes reopen-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+.reopen-pulse {
+  animation: reopen-pulse 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reopen-pulse { animation: none !important; opacity: 1 !important; }
+}
+html[data-high-legibility="on"] .reopen-pulse,
+html[data-force-reduce-motion="on"] .reopen-pulse {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+
 
 /* ---------- FIRST PHONE (junior surface) ---------- */
 /* Softer backdrop behind the junior phone frame. */
