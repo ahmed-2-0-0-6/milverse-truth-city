@@ -834,9 +834,11 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                   VERIFICATION COMPLETE — MAKE YOUR CALL
                 </div>
               )}
+              </div>
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto">
+            <div id="mirror-panel-notes" role="tabpanel" aria-labelledby="mirror-tab-notes" className="flex-1 overflow-y-auto">
+
               <NotesTab
                 scenario={scenario}
                 messages={messages}
