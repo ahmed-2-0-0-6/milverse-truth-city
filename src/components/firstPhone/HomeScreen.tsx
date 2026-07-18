@@ -135,6 +135,28 @@ export function HomeScreen({ state, onOpenLesson, onOpenLicense, onOpenSpotIt }:
             );
           })}
 
+          <li className="col-span-4 mt-2 border-t border-white/10 pt-3">
+            <button
+              onClick={onOpenSpotIt}
+              aria-label={
+                spotItReady
+                  ? "SPOT IT — practice tricks you've already learned"
+                  : "SPOT IT — locked. Finish Lesson 1 to open."
+              }
+              className={`group inline-flex flex-col items-center gap-1.5 text-white focus-visible:outline-none ${
+                spotItReady ? "" : "opacity-50"
+              }`}
+            >
+              <span className="relative flex h-14 w-14 items-center justify-center rounded-[18px] shadow-lg bg-gradient-to-br from-teal-400 to-teal-600 group-hover:scale-105 group-active:scale-95 transition-all focus-visible:ring-2 focus-visible:ring-white">
+                <Target className="h-7 w-7 text-white" strokeWidth={2} aria-hidden="true" />
+              </span>
+              <span className="text-[10px] text-center leading-tight opacity-95 drop-shadow-sm tracking-wide">
+                SPOT IT
+              </span>
+            </button>
+          </li>
+
+
           {licensed && (
             <li className="col-span-4 mt-4">
               <button
