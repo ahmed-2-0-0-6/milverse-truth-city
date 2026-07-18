@@ -2276,3 +2276,17 @@ html[data-force-reduce-motion="on"] .bar-fill {
   animation: none !important;
   transform: none !important;
 }
+
+/* ── FIRST BOOT · tour-move ──────────────────────────────
+   Spotlight cutout + card position transition (250ms).
+   Suppressed under reduce-motion and high-legibility (LITE). */
+.tour-move {
+  transition: top 250ms ease, left 250ms ease, width 250ms ease, height 250ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-move { transition: none !important; }
+}
+html[data-high-legibility="on"] .tour-move,
+html[data-force-reduce-motion="on"] .tour-move {
+  transition: none !important;
+}
