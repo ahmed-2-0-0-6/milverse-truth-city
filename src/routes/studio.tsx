@@ -71,8 +71,11 @@ const URL_RE = /(https?:\/\/|www\.)[\w./?=&%-]+/i;
 function validate(d: Draft): string | null {
   if (!d.personaName.trim()) return "Persona name is required.";
   if (d.personaName.trim().length < 2) return "Persona name is too short.";
+  const nameErr = screenPersonaName(d.personaName, d.relationship);
+  if (nameErr) return nameErr;
   if (!d.relationship.trim()) return "Describe the relationship to the target.";
   if (!d.opener.trim()) return "Opening message is required.";
+
   if (d.opener.trim().length < 20)
     return "Opening message should be at least 20 characters — set the scene.";
   const filled = d.facts.filter((f) => f.text.trim().length >= 6);
