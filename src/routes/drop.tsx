@@ -9,6 +9,7 @@ import { FormatFrame } from "@/components/feed/FormatFrame";
 import { VerdictMoment } from "@/components/VerdictMoment";
 import { TacticFlash } from "@/components/TacticFlash";
 import { ReceiptCard, type ReceiptData } from "@/components/daily/ReceiptCard";
+import { CitySolved } from "@/components/CitySolved";
 import { StreakBeat } from "@/components/daily/StreakBeat";
 import { HandlerDropLine } from "@/components/handler/HandlerDropLine";
 import {
@@ -361,6 +362,18 @@ function PostPlayState({
         <ReceiptCard data={receipt} />
         <div className="mt-3">
           <XpDeltaLine />
+        </div>
+        <div className="mt-4">
+          <CitySolved
+            caseId={today.scenario.id}
+            playerResult={
+              entry.correct
+                ? "correct"
+                : entry.truth === "SCAM"
+                  ? "missed_scam"
+                  : "false_alarm"
+            }
+          />
         </div>
       </div>
 

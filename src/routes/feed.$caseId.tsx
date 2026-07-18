@@ -29,6 +29,7 @@ import { FormatFrame } from "@/components/feed/FormatFrame";
 import { Toolbelt } from "@/components/feed/Toolbelt";
 import { TacticStamp } from "@/components/TacticStamp";
 import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
+import { CitySolved } from "@/components/CitySolved";
 import { TacticFlash } from "@/components/TacticFlash";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 import { RookieIntro } from "@/components/handler/RookieIntro";
@@ -765,6 +766,17 @@ function Debrief({
       </div>
 
       <RealCaseFile caseId={scenario.id} inline={scenario.inspiredBy} />
+
+      <CitySolved
+        caseId={scenario.id}
+        playerResult={
+          outcome.result === "correct"
+            ? "correct"
+            : outcome.result === "missed_fake"
+              ? "missed_scam"
+              : "false_alarm"
+        }
+      />
 
       <NextCaseCard wing="feed" currentId={scenario.id} />
 

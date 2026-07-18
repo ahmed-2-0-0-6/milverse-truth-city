@@ -34,6 +34,7 @@ import { RookieIntro } from "@/components/handler/RookieIntro";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 import { TacticStamp } from "@/components/TacticStamp";
 import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
+import { CitySolved } from "@/components/CitySolved";
 import { TacticFlash } from "@/components/TacticFlash";
 import { tacticForMirror } from "@/lib/mirror/tactics";
 import { ChatShell } from "@/components/chat/ChatShell";
@@ -1416,6 +1417,8 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       </section>
 
       <RealCaseFile caseId={scenario.id} inline={scenario.inspiredBy} />
+
+      <CitySolved caseId={scenario.id} playerResult={result.resultKind === "correct" ? "correct" : result.resultKind === "missed_scam" ? "missed_scam" : result.resultKind === "false_alarm" ? "false_alarm" : "correct"} />
 
       <NextCaseCard wing="mirror" currentId={scenario.id} />
 

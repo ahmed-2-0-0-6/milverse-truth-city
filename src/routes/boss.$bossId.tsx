@@ -30,6 +30,7 @@ import { DOCTRINE_RULES } from "@/lib/boss/doctrine";
 import { logPilotEntry } from "@/lib/pilot";
 import { loadProfile } from "@/lib/mirror/profile";
 import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
+import { CitySolved } from "@/components/CitySolved";
 import { VerdictMoment } from "@/components/VerdictMoment";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChatHeader } from "@/components/chat/ChatHeader";
@@ -622,6 +623,19 @@ function BossPlay() {
                 <TacticStamp tacticId={BOSS_TACTIC[boss.id]} />
               </div>
             )}
+
+            <div className="mt-6">
+              <CitySolved
+                caseId={`boss-${boss.id}`}
+                playerResult={
+                  outcome.kind === "WIN"
+                    ? "correct"
+                    : outcome.kind === "LOSS_TRANSACTED"
+                      ? "missed_scam"
+                      : "false_alarm"
+                }
+              />
+            </div>
 
             <div className="border-t border-white/10 pt-4 mt-6">
               <div className="text-[10px] tracking-[0.4em] text-white/50 mb-2">THE DOCTRINE</div>

@@ -430,6 +430,14 @@ export type Database = {
           unverifiable_recognized: number
         }[]
       }
+      get_case_city_stats: {
+        Args: { _case_id: string }
+        Returns: {
+          false_alarms: number
+          fooled: number
+          total: number
+        }[]
+      }
       get_daily_split: {
         Args: { _case_id: string; _drop_date: string }
         Returns: {
