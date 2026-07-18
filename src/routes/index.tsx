@@ -116,7 +116,7 @@ function CityMap() {
       <IncomingCall />
       {!booted && <BootScreen onDone={() => setBooted(true)} />}
       <TopBar />
-      {intro && booted && (
+      {intro && booted && !showBait && (
         <FirstCall
           onDone={() => {
             try {
@@ -128,6 +128,7 @@ function CityMap() {
           }}
         />
       )}
+
 
       {/* ── HERO ── full-viewport cinematic */}
       <section
