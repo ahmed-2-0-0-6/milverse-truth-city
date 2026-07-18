@@ -547,7 +547,11 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
           />
 
         </div>
+        {/* Seasonal map wash — a whisper of tint, pointer-events-none. */}
+        <SeasonMapWash />
       </div>
+
+
 
       {/* ── UI overlays ─────────────────────────────────────── */}
       {/* top bar: MAP/LIST + recenter */}
