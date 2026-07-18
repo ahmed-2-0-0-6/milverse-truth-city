@@ -28,6 +28,7 @@ function fresh(): FirstPhoneState {
     licenseNumber: null,
     wallpaper: 0,
     handoverSeen: false,
+    tourSeen: false,
   };
 }
 
@@ -40,6 +41,12 @@ export function setWallpaper(i: number) {
 export function markHandoverSeen() {
   const s = loadFirstPhone();
   s.handoverSeen = true;
+  saveFirstPhone(s);
+}
+
+export function markTourSeen() {
+  const s = loadFirstPhone();
+  s.tourSeen = true;
   saveFirstPhone(s);
 }
 
