@@ -261,6 +261,10 @@ function CaseFiles() {
             {codeBusy ? "LOOKING UP…" : "OPEN CASE"}
           </button>
           {codeErr && <span className="text-xs text-destructive">{codeErr}</span>}
+          <div className="basis-full font-mono text-[10px] tracking-widest text-muted-foreground">
+            Got a code from a friend? It goes here.
+          </div>
+
         </div>
 
         <ReopenedStrip />
