@@ -174,3 +174,31 @@ export function callAlreadyFiredToday(): boolean {
   if (typeof window === "undefined") return false;
   return loadInbox().firedCalls.length > 0;
 }
+
+/** Fixed delay for the Morning Edition thud. */
+export const PAPER_ARRIVE_SEC = 10;
+
+/**
+ * The Morning Edition delivery. Returns a "paper" InboxItem when an edition
+ * exists and the player hasn't opened it yet (paperRead !== edition.id).
+ * Read-only: consumes the edition already fetched by /paper's loader.
+ */
+export function morningEdition(_now: Date, edition: Edition | null): InboxItem | null {
+  if (!edition) return null;
+  const inbox = loadInbox();
+  if (inbox.paperRead === edition.id) return null;
+  return {
+    id: `paper:${edition.id}`,
+    type: "paper",
+    caseId: edition.content.lead.caseId,
+    route: `/paper`,
+    platform: "paper",
+    senderName: edition.content.lead.headline,
+    preview: edition.content.lead.subhead || "The morning edition arrived.",
+    arriveAfterSec: PAPER_ARRIVE_SEC,
+    editionId: edition.id,
+    editionNumber: edition.edition_number,
+    editionDate: edition.edition_date,
+    headline: edition.content.lead.headline,
+  };
+}
