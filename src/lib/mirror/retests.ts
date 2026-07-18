@@ -29,27 +29,26 @@ export interface Retest {
   status: RetestStatus;
 }
 
+function isRetestListShape(v: unknown): v is Retest[] {
+  return Array.isArray(v);
+}
+
 export function loadRetests(): Retest[] {
   if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as Retest[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+  const read = readStore<Retest[]>(KEY, isRetestListShape);
+  if (read === "corrupt") {
+    const rec = recoverStore<Retest[]>(KEY, isRetestListShape);
+    return rec ?? [];
   }
+  return read ?? [];
 }
 
 export function saveRetests(list: Retest[]) {
   if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(KEY, JSON.stringify(list));
-  } catch {
-    /* localStorage unavailable */
-  }
+  writeStore(KEY, list);
   window.dispatchEvent(new Event("milverse:retests"));
 }
+
 
 /** Latest history entry (by ts) per caseId. */
 function latestByCase(profile: TrustProfile): Map<string, TrustProfile["history"][number]> {
