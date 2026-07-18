@@ -265,13 +265,14 @@ function Sim({
 }) {
   const [tab, setTab] = useState<"chat" | "toolkit">("chat");
   const [input, setInput] = useState("");
+  const [typing, setTyping] = useState(false);
   const [tacticFlash, setTacticFlash] = useState<typeof scenario.tacticId | null>(null);
   const tacticFlashed = useRef(false);
   const scroller = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
-  }, [messages]);
+  }, [messages, typing]);
 
   function send() {
     const t = input.trim();
@@ -281,9 +282,11 @@ function Sim({
     setInput("");
     const react = senderReact(scenario, next, t);
     setState(next);
+    setTyping(true);
     setTimeout(() => {
+      setTyping(false);
       setMessages((prev) => [...prev, { role: "sender", text: react.text, ts: Date.now() }]);
-    }, 500);
+    }, 900);
   }
 
   function doAction(id: string) {
@@ -389,8 +392,32 @@ function Sim({
               aiGenerated={scenario.aiGenerated}
             />
             {messages.map((m, i) => (
-              <FeedRow key={i} m={m} />
+              <FeedRow
+                key={i}
+                m={m}
+                read={
+                  m.role === "player" &&
+                  (typing || messages.some((later, j) => j > i && later.role === "sender"))
+                }
+              />
             ))}
+            {typing && (
+              <div className="msg-in flex justify-start" aria-label="Typing">
+                <div className="rounded-2xl rounded-bl-sm bg-neutral-800 border border-white/10 px-3 py-2">
+                  <span className="inline-flex gap-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-white/60 animate-bounce" />
+                    <span
+                      className="h-1.5 w-1.5 rounded-full bg-white/60 animate-bounce"
+                      style={{ animationDelay: "0.15s" }}
+                    />
+                    <span
+                      className="h-1.5 w-1.5 rounded-full bg-white/60 animate-bounce"
+                      style={{ animationDelay: "0.3s" }}
+                    />
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto p-3">
@@ -412,7 +439,7 @@ function Sim({
   );
 }
 
-function FeedRow({ m }: { m: FeedMessage }) {
+function FeedRow({ m, read }: { m: FeedMessage; read?: boolean }) {
   if (m.role === "system") {
     return (
       <div className="rounded-md border border-primary/40 bg-primary/10 p-3 text-xs">
@@ -424,16 +451,27 @@ function FeedRow({ m }: { m: FeedMessage }) {
     );
   }
   const isPlayer = m.role === "player";
+  const stamp = new Date(m.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   return (
     <div className={`msg-in flex ${isPlayer ? "justify-end" : "justify-start"}`}>
-      <div
-        className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
-          isPlayer
-            ? "bg-primary text-primary-foreground rounded-br-sm"
-            : "bg-neutral-800 border border-white/10 text-white rounded-bl-sm"
-        }`}
-      >
-        {m.text}
+      <div className={`flex flex-col gap-0.5 ${isPlayer ? "items-end" : "items-start"}`} style={{ maxWidth: "80%" }}>
+        <div
+          className={`rounded-2xl px-3 py-2 text-sm ${
+            isPlayer
+              ? "bg-primary text-primary-foreground rounded-br-sm"
+              : "bg-neutral-800 border border-white/10 text-white rounded-bl-sm"
+          }`}
+        >
+          {m.text}
+        </div>
+        <div className="px-1 font-mono text-[9px] tabular-nums text-white/35" aria-hidden>
+          {stamp}
+          {isPlayer && (
+            <span className={`ml-1 ${read ? "text-primary/80" : "text-white/35"}`}>
+              {read ? "✓✓" : "✓"}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
