@@ -7,7 +7,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useVisualMode } from "@/lib/visual-quality";
-import { isMuted } from "@/lib/mirror/audio";
+import { stampSlam, stampSting } from "@/lib/mirror/audio";
 
 export type CalibrationOutcome = "correct" | "missed_scam" | "false_alarm";
 
