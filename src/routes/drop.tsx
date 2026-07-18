@@ -11,6 +11,7 @@ import { TacticFlash } from "@/components/TacticFlash";
 import { ReceiptCard, type ReceiptData } from "@/components/daily/ReceiptCard";
 import { CitySolved } from "@/components/CitySolved";
 import { StreakBeat } from "@/components/daily/StreakBeat";
+import { Spool } from "@/components/daily/Spool";
 import { HandlerDropLine } from "@/components/handler/HandlerDropLine";
 import {
   todaysDailyCase,
