@@ -53,6 +53,7 @@ import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 import { aftermathFor } from "@/lib/mirror/aftermath";
 import { saveTape } from "@/lib/mirror/tapes";
 import { TapeReview } from "@/components/mirror/TapeReview";
+import { factRefsFor, findRef, GUT_REF, type FactRef } from "@/lib/mirror/factRefs";
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
@@ -140,36 +141,57 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
         </div>
         <h1 className="mt-4 text-2xl font-semibold">{scenario.title}</h1>
 
+        {/* THE CLAIM — bordered claim card. */}
         <section className="mt-6">
           <div className="font-mono text-[11px] tracking-widest text-muted-foreground">
             WHO IS CONTACTING YOU
           </div>
-          <p className="mt-1 text-sm">{scenario.dossier.contactClaim}</p>
+          <div className="relative mt-2 rounded-md border border-border bg-background/50 p-4">
+            <span className="absolute right-2 top-1.5 font-mono text-[9px] tracking-[0.3em] text-caution">
+              THE CLAIM
+            </span>
+            <p className="text-sm leading-relaxed">{scenario.dossier.contactClaim}</p>
+          </div>
         </section>
 
+        {/* KNOWN — numbered reference cards (K1..). */}
         <section className="mt-6">
           <div className="font-mono text-[11px] tracking-widest text-muted-foreground">
-            WHAT YOU KNOW FOR CERTAIN
+            WHAT YOU KNOW FOR CERTAIN — ONLY YOU AND THE REAL ONE
           </div>
-          <ul className="mt-2 space-y-1.5 text-sm">
+          <ul className="mt-2 space-y-1.5">
             {scenario.dossier.knownFacts.map((f, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="font-mono text-primary shrink-0">·</span>
-                <span>{f}</span>
+              <li
+                key={i}
+                className="flex gap-3 rounded-md border border-primary/30 bg-primary/5 p-2.5"
+              >
+                <span className="shrink-0 rounded-sm border border-primary/40 bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] tracking-widest text-primary">
+                  K{i + 1}
+                </span>
+                <span className="text-sm leading-relaxed">{f}</span>
               </li>
             ))}
           </ul>
         </section>
 
+        {/* PUBLIC — numbered reference cards (P1..). */}
         <section className="mt-6">
           <div className="font-mono text-[11px] tracking-widest text-muted-foreground">
-            PUBLICLY FINDABLE · CAREFUL, IMPOSTERS CAN KNOW THESE
+            PUBLICLY FINDABLE — AMMUNITION FOR IMPOSTERS
           </div>
-          <ul className="mt-2 space-y-1.5 text-sm">
+          <div className="mt-1 font-mono text-[10px] tracking-widest text-muted-foreground/80">
+            If they only ever prove these, they've proven nothing.
+          </div>
+          <ul className="mt-2 space-y-1.5">
             {scenario.dossier.publicFacts.map((f, i) => (
-              <li key={i} className="flex gap-2 text-muted-foreground">
-                <span className="font-mono shrink-0">·</span>
-                <span>{f}</span>
+              <li
+                key={i}
+                className="flex gap-3 rounded-md border border-border bg-muted/20 p-2.5"
+              >
+                <span className="shrink-0 rounded-sm border border-border bg-background/60 px-1.5 py-0.5 font-mono text-[10px] tracking-widest text-muted-foreground">
+                  P{i + 1}
+                </span>
+                <span className="text-sm leading-relaxed text-muted-foreground">{f}</span>
               </li>
             ))}
           </ul>
@@ -185,11 +207,12 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
         I'VE MEMORIZED IT — START
       </button>
       <p className="mt-3 text-center text-xs text-muted-foreground">
-        The dossier stays available in the NOTES tab during the chat.
+        The brief rides along in NOTES. Pin what smells wrong and tag which fact it breaks.
       </p>
     </main>
   );
 }
+
 
 /* ────────────────────────── SIMULATION ───────────────────────── */
 
@@ -203,15 +226,20 @@ interface StoredSim {
   ended: boolean;
   endReason?: "contact_left" | "vob_used";
   vobArtifact?: string | null;
+  /** Message index → fact ref ("K2", "P1", "GUT"). Presentation-only. */
+  pinTags?: Record<number, string>;
 }
 
 function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void }) {
   const skin = skinForCase(scenario.id);
+  const refs = useMemo(() => factRefsFor(scenario), [scenario]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [state, setState] = useState<EngineState>(() => initState(scenario));
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const [pins, setPins] = useState<number[]>([]);
+  const [pinTags, setPinTags] = useState<Record<number, string>>({});
+  const [openRef, setOpenRef] = useState<string | null>(null);
   const [tab, setTab] = useState<"chat" | "notes">("chat");
   const [ended, setEnded] = useState(false);
   const [endReason, setEndReason] = useState<"contact_left" | "vob_used" | null>(null);
@@ -258,9 +286,34 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
       state: { ...state, pins },
       ended,
       endReason: endReason ?? undefined,
+      pinTags,
     };
     sessionStorage.setItem(SIM_KEY, JSON.stringify(stored));
-  }, [messages, state, pins, ended, endReason, scenario.id]);
+  }, [messages, state, pins, pinTags, ended, endReason, scenario.id]);
+
+  // Rehydrate pinTags if the player reloaded mid-case.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(SIM_KEY);
+      if (!raw) return;
+      const prior = JSON.parse(raw) as StoredSim;
+      if (prior.caseId === scenario.id && prior.pinTags) setPinTags(prior.pinTags);
+    } catch {
+      /* noop */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scenario.id]);
+
+  // Escape closes the quick-brief strip.
+  useEffect(() => {
+    if (!openRef) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenRef(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [openRef]);
+
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
@@ -427,10 +480,22 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
 
   function togglePin(idx: number) {
     setPins((prev) => {
-      if (prev.includes(idx)) return prev.filter((i) => i !== idx);
+      if (prev.includes(idx)) {
+        setPinTags((tags) => {
+          if (!(idx in tags)) return tags;
+          const next = { ...tags };
+          delete next[idx];
+          return next;
+        });
+        return prev.filter((i) => i !== idx);
+      }
       if (prev.length >= 5) return prev;
       return [...prev, idx];
     });
+  }
+
+  function setPinTag(idx: number, ref: string) {
+    setPinTags((prev) => ({ ...prev, [idx]: ref }));
   }
 
   function useVob(method: VobMethod) {
@@ -555,6 +620,9 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 </Link>
               </div>
             )}
+            {tab === "chat" && (
+              <QuickBrief refs={refs} openRef={openRef} onToggle={(r) => setOpenRef((cur) => (cur === r ? null : r))} />
+            )}
             <div className="flex gap-2">
               <input
                 value={input}
@@ -619,7 +687,15 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto">
-              <NotesTab scenario={scenario} messages={messages} pins={pins} onUnpin={togglePin} />
+              <NotesTab
+                scenario={scenario}
+                messages={messages}
+                pins={pins}
+                pinTags={pinTags}
+                refs={refs}
+                onUnpin={togglePin}
+                onTag={setPinTag}
+              />
             </div>
           )}
         </div>
@@ -807,12 +883,18 @@ function NotesTab({
   scenario,
   messages,
   pins,
+  pinTags,
+  refs,
   onUnpin,
+  onTag,
 }: {
   scenario: Scenario;
   messages: Message[];
   pins: number[];
+  pinTags: Record<number, string>;
+  refs: FactRef[];
   onUnpin: (i: number) => void;
+  onTag: (i: number, ref: string) => void;
 }) {
   return (
     <div className="h-full overflow-y-auto p-4 space-y-6">
@@ -827,7 +909,7 @@ function NotesTab({
         <ul className="mt-1 space-y-1 text-xs">
           {scenario.dossier.knownFacts.map((f, i) => (
             <li key={i} className="flex gap-2">
-              <span className="text-primary shrink-0">·</span>
+              <span className="shrink-0 font-mono text-primary">K{i + 1}</span>
               <span>{f}</span>
             </li>
           ))}
@@ -838,7 +920,7 @@ function NotesTab({
         <ul className="mt-1 space-y-1 text-xs text-muted-foreground">
           {scenario.dossier.publicFacts.map((f, i) => (
             <li key={i} className="flex gap-2">
-              <span className="shrink-0">·</span>
+              <span className="shrink-0 font-mono">P{i + 1}</span>
               <span>{f}</span>
             </li>
           ))}
@@ -851,31 +933,153 @@ function NotesTab({
         </div>
         {pins.length === 0 ? (
           <p className="mt-2 text-xs text-muted-foreground">
-            Pin any contact message you find suspicious — they'll show up here for side-by-side
-            comparison against the dossier.
+            Pin any contact message you find suspicious — then tag which brief fact it collides with.
           </p>
         ) : (
-          <ul className="mt-2 space-y-2">
-            {pins.map((i) => (
-              <li
-                key={i}
-                className="rounded-md border border-caution/40 bg-caution/10 p-2 text-xs whitespace-pre-wrap"
-              >
-                {messages[i]?.text || "[voice note]"}
-                <button
-                  onClick={() => onUnpin(i)}
-                  className="mt-1 block font-mono text-[9px] tracking-widest text-caution/70 hover:text-caution"
+          <ul className="mt-2 space-y-3">
+            {pins.map((i) => {
+              const currentRef = pinTags[i];
+              const tagged = findRef(refs, currentRef);
+              const isGut = !currentRef || currentRef === "GUT";
+              return (
+                <li
+                  key={i}
+                  className="rounded-md border border-caution/40 bg-caution/10 p-2.5 text-xs"
                 >
-                  UNPIN
-                </button>
-              </li>
-            ))}
+                  <div className="whitespace-pre-wrap">
+                    {messages[i]?.text || "[voice note]"}
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1" role="group" aria-label="Tag this pin against a brief fact">
+                    {refs.map((r) => {
+                      const selected = currentRef === r.ref;
+                      const tone =
+                        r.kind === "known"
+                          ? selected
+                            ? "border-primary bg-primary/20 text-primary"
+                            : "border-primary/40 text-primary/80 hover:border-primary"
+                          : selected
+                            ? "border-muted-foreground bg-muted/40 text-foreground"
+                            : "border-border text-muted-foreground hover:border-foreground/50";
+                      return (
+                        <button
+                          key={r.ref}
+                          type="button"
+                          aria-pressed={selected}
+                          aria-label={r.ariaLabel}
+                          onClick={() => onTag(i, r.ref)}
+                          className={`rounded-sm border px-1.5 py-0.5 font-mono text-[10px] tracking-widest ${tone}`}
+                        >
+                          {r.ref}
+                        </button>
+                      );
+                    })}
+                    <button
+                      type="button"
+                      aria-pressed={isGut}
+                      aria-label="Tag as gut feeling — no fact attached yet"
+                      onClick={() => onTag(i, "GUT")}
+                      className={`rounded-sm border px-1.5 py-0.5 font-mono text-[10px] tracking-widest ${
+                        isGut
+                          ? "border-caution bg-caution/20 text-caution"
+                          : "border-border text-muted-foreground hover:border-caution/60"
+                      }`}
+                    >
+                      GUT
+                    </button>
+                  </div>
+                  {!isGut && (
+                    <div className="mt-2 rounded-sm border border-border/60 bg-background/40 p-2 text-[11px] italic text-muted-foreground">
+                      <span className="mr-1.5 font-mono not-italic text-primary/80">
+                        {tagged.ref}
+                      </span>
+                      {tagged.text}
+                    </div>
+                  )}
+                  {isGut && (
+                    <div className="mt-2 font-mono text-[10px] tracking-widest text-muted-foreground/80">
+                      gut feeling — no fact attached yet
+                    </div>
+                  )}
+                  <button
+                    onClick={() => onUnpin(i)}
+                    className="mt-2 block font-mono text-[9px] tracking-widest text-caution/70 hover:text-caution"
+                  >
+                    UNPIN
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
     </div>
   );
 }
+
+/** Above-composer quick-brief: horizontal ref badges + a one-line reveal strip. */
+function QuickBrief({
+  refs,
+  openRef,
+  onToggle,
+}: {
+  refs: FactRef[];
+  openRef: string | null;
+  onToggle: (ref: string) => void;
+}) {
+  const open = refs.find((r) => r.ref === openRef) ?? null;
+  return (
+    <div className="mb-2">
+      <div
+        aria-live="polite"
+        className="min-h-0"
+      >
+        {open && (
+          <div className="mb-1 flex items-start gap-2 rounded-md border border-primary/40 bg-primary/10 px-2 py-1.5 text-[11px] leading-relaxed text-primary">
+            <span className="font-mono tracking-widest">{open.ref}</span>
+            <span className="text-foreground/90">{open.text}</span>
+            <button
+              type="button"
+              onClick={() => onToggle(open.ref)}
+              aria-label="Close brief entry"
+              className="ml-auto font-mono text-[10px] tracking-widest text-primary/80 hover:text-primary"
+            >
+              ×
+            </button>
+          </div>
+        )}
+      </div>
+      <div className="flex flex-wrap gap-1" role="group" aria-label="Quick brief">
+        <span className="mr-1 font-mono text-[9px] tracking-widest text-white/40 self-center">
+          BRIEF
+        </span>
+        {refs.map((r) => {
+          const selected = openRef === r.ref;
+          const tone =
+            r.kind === "known"
+              ? selected
+                ? "border-primary bg-primary/20 text-primary"
+                : "border-primary/40 text-primary/80 hover:border-primary"
+              : selected
+                ? "border-white/60 bg-white/10 text-white"
+                : "border-white/20 text-white/60 hover:border-white/50";
+          return (
+            <button
+              key={r.ref}
+              type="button"
+              aria-pressed={selected}
+              aria-label={r.ariaLabel}
+              onClick={() => onToggle(r.ref)}
+              className={`rounded-sm border px-1.5 py-0.5 font-mono text-[10px] tracking-widest ${tone}`}
+            >
+              {r.ref}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 
 /* ─────────────────────────── VERDICT ─────────────────────────── */
 
@@ -897,6 +1101,8 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
   const sim = useMemo(() => loadSim(), []);
   const pinIdxs: number[] = (sim?.state as EngineState & { pins?: number[] })?.pins ?? [];
   const pinnedMsgs = pinIdxs.map((i) => sim?.messages[i]).filter((m): m is Message => !!m);
+  const pinTags = sim?.pinTags ?? {};
+  const refs = useMemo(() => factRefsFor(scenario), [scenario]);
   const voiceMsg = sim?.messages.find((m) => m.kind === "voice");
   const vobArtifact = sim?.vobArtifact;
   const usedVob = sim?.endReason === "vob_used";
@@ -929,23 +1135,46 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
           CASE FILE · AUTO-COLLECTED
         </div>
 
-        {pinnedMsgs.length > 0 && (
-          <div>
-            <div className="font-mono text-[10px] tracking-widest text-caution mb-1.5">
-              PINNED MESSAGES · {pinnedMsgs.length}
-            </div>
-            <ul className="space-y-1.5">
-              {pinnedMsgs.map((m, i) => (
-                <li
-                  key={i}
-                  className="rounded-md border-l-2 border-caution bg-caution/5 pl-2.5 py-1.5 text-xs italic"
-                >
-                  "{m.text || "[voice note]"}"
-                </li>
-              ))}
-            </ul>
+        <div>
+          <div className="font-mono text-[10px] tracking-widest text-caution mb-1.5">
+            WHAT YOU FLAGGED LIVE · {pinnedMsgs.length}
           </div>
-        )}
+          {pinnedMsgs.length === 0 ? (
+            <p className="text-xs italic text-muted-foreground">
+              You flagged nothing live. Verdict from memory.
+            </p>
+          ) : (
+            <ul className="space-y-1.5">
+              {pinIdxs.map((idx, i) => {
+                const m = sim?.messages[idx];
+                if (!m) return null;
+                const tagRef = pinTags[idx];
+                const tag = findRef(refs, tagRef);
+                const snippet = (m.text || "[voice note]").slice(0, 80);
+                const badgeTone =
+                  tag.kind === "known"
+                    ? "border-primary/50 text-primary bg-primary/10"
+                    : tag.kind === "public"
+                      ? "border-border text-muted-foreground bg-muted/30"
+                      : "border-caution/40 text-caution bg-caution/10";
+                return (
+                  <li
+                    key={i}
+                    className="flex items-start gap-2 rounded-md border-l-2 border-caution bg-caution/5 pl-2.5 py-1.5 text-xs"
+                  >
+                    <span
+                      className={`shrink-0 rounded-sm border px-1 py-0.5 font-mono text-[9px] tracking-widest ${badgeTone}`}
+                    >
+                      {tag.ref}
+                    </span>
+                    <span className="italic">"{snippet}"</span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+
 
         {voiceMsg && (
           <div>
@@ -1436,6 +1665,68 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           <p className="text-sm italic border-l-2 border-primary pl-3">"{verdictRaw.conclusion}"</p>
         </section>
       )}
+
+      {/* YOUR NOTES, GRADED — reads back the player's own pins and tags. */}
+      {(() => {
+        const pinIdxs: number[] =
+          (sim?.state as EngineState & { pins?: number[] })?.pins ?? [];
+        if (!sim || pinIdxs.length === 0) return null;
+        const tags = sim.pinTags ?? {};
+        const refs = factRefsFor(scenario);
+        return (
+          <section className="rounded-xl border border-border bg-card p-6">
+            <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
+              YOUR NOTES, GRADED
+            </div>
+            <ul className="space-y-2">
+              {pinIdxs.map((idx, i) => {
+                const m = sim.messages[idx];
+                if (!m) return null;
+                const tag = findRef(refs, tags[idx]);
+                const wasTell = m.role === "contact" && m.isTell === true;
+                const status = wasTell ? "TELL" : "CLEAN";
+                const statusTone = wasTell
+                  ? "border-caution text-caution bg-caution/10"
+                  : "border-border text-muted-foreground bg-muted/20";
+                const refTone =
+                  tag.kind === "known"
+                    ? "border-primary/50 text-primary bg-primary/10"
+                    : tag.kind === "public"
+                      ? "border-border text-muted-foreground bg-muted/30"
+                      : "border-caution/40 text-caution bg-caution/10";
+                return (
+                  <li
+                    key={i}
+                    className="rounded-md border border-border bg-background/30 p-3"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`rounded-sm border px-1 py-0.5 font-mono text-[9px] tracking-widest ${refTone}`}
+                      >
+                        {tag.ref}
+                      </span>
+                      <span
+                        className={`rounded-sm border px-1 py-0.5 font-mono text-[9px] tracking-widest ${statusTone}`}
+                      >
+                        {status}
+                      </span>
+                    </div>
+                    <div className="mt-1.5 text-sm italic">
+                      "{(m.text || "[voice note]").slice(0, 140)}"
+                    </div>
+                    {tag.kind !== "gut" && (
+                      <div className="mt-1 text-[11px] text-muted-foreground">
+                        vs {tag.ref}: {tag.text}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        );
+      })()}
+
 
       {/* Quoted tells from THIS conversation */}
       {result.tells.length > 0 && (
