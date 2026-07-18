@@ -35,6 +35,21 @@ import { useVisualMode } from "@/lib/visual-quality";
 import { SignalBeacons, BEACON_ANCHORS } from "@/components/city/SignalBeacons";
 import { AmbientLife } from "@/components/city/AmbientLife";
 import type { CitySignal } from "@/lib/city/signals";
+import { useSeason } from "@/components/season/SeasonAdvisory";
+
+/** Full-map seasonal wash — a whisper, never a shout. */
+function SeasonMapWash() {
+  const season = useSeason();
+  if (!season) return null;
+  return (
+    <div
+      className="pointer-events-none absolute inset-0"
+      aria-hidden="true"
+      style={{ background: season.mapTint }}
+    />
+  );
+}
+
 import {
   Dialog,
   DialogContent,
