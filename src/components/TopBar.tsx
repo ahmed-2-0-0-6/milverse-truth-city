@@ -1,6 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Volume2, VolumeX, BookOpen, Menu, X } from "lucide-react";
+import { InboxTray } from "@/components/inbox/InboxTray";
+import { useJuniorMode } from "@/hooks/useJuniorMode";
 import {
   Sheet,
   SheetContent,
@@ -60,6 +62,12 @@ export function TopBar() {
   const [manualUnlocks, setManualUnlocks] = useState(0);
   const [navOpen, setNavOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const junior = useJuniorMode();
+  const showInbox =
+    junior.ready &&
+    !junior.active &&
+    !pathname.startsWith("/visit") &&
+    !pathname.startsWith("/first-phone");
 
   useEffect(() => {
     setProfile(loadProfile());
@@ -154,6 +162,7 @@ export function TopBar() {
             <BookOpen className="h-3.5 w-3.5" />
             <span className="hidden lg:inline">MANUAL</span>
           </Link>
+          {showInbox && <InboxTray />}
           <VisualQualityToggle />
           <AccessPanel />
           <button

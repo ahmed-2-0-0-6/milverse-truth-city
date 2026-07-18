@@ -8,6 +8,8 @@ import { CaseCard } from "@/components/CaseCard";
 import feedArt from "@/assets/district-feed.jpg";
 import { Newspaper, Share2 } from "lucide-react";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
+import { InboxManager } from "@/components/inbox/InboxManager";
+import { IncomingToast } from "@/components/inbox/IncomingToast";
 
 export const Route = createFileRoute("/feed/")({
   head: () => ({
@@ -35,6 +37,8 @@ const TIER_NAMES: Record<1 | 2 | 3, string> = {
 function FeedIndex() {
   return (
     <div className="min-h-screen grain">
+      <InboxManager />
+      <IncomingToast />
       <TopBar />
       <DistrictHero
         art={feedArt}

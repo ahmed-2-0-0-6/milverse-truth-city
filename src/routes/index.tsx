@@ -11,6 +11,8 @@ import { ScrollStory } from "@/components/ScrollStory";
 import { Marquee } from "@/components/Marquee";
 import { DailyBeacon } from "@/components/DailyBeacon";
 import { useVisualMode } from "@/lib/visual-quality";
+import { InboxManager } from "@/components/inbox/InboxManager";
+import { IncomingToast } from "@/components/inbox/IncomingToast";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -67,6 +69,8 @@ function CityMap() {
 
   return (
     <div className="noir-landing min-h-screen relative overflow-x-hidden">
+      <InboxManager />
+      <IncomingToast />
       {!booted && <BootScreen onDone={() => setBooted(true)} />}
       <TopBar />
       {intro && booted && (
