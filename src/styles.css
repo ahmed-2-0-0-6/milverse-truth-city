@@ -2226,6 +2226,34 @@ html[data-force-reduce-motion="on"] .reopen-pulse {
   opacity: 1 !important;
 }
 
+/* ---------- THE CONFERRAL (First Phone license ceremony) ---------- */
+@keyframes confer-ring-draw {
+  from { stroke-dasharray: 0 1; }
+  to   { stroke-dasharray: 1 0; }
+}
+.confer-ring {
+  animation: confer-ring-draw 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes confer-stamp-settle {
+  0%   { transform: scale(1.18); }
+  60%  { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+.confer-stamp {
+  animation: confer-stamp-settle 200ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .confer-ring,
+  .confer-stamp { animation: none !important; }
+}
+html[data-high-legibility="on"] .confer-ring,
+html[data-high-legibility="on"] .confer-stamp,
+html[data-force-reduce-motion="on"] .confer-ring,
+html[data-force-reduce-motion="on"] .confer-stamp {
+  animation: none !important;
+}
+
 /* ---------- /visit — DIRECTOR MODE rec dot ---------- */
 @keyframes visit-rec-pulse {
   0%, 100% { opacity: 1; }
