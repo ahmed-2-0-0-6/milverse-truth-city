@@ -11,6 +11,8 @@ export interface HistoryEntry {
   result: "correct" | "missed_scam" | "false_alarm" | "lucky_guess";
   points: number;
   usedVob?: boolean;
+  /** Optional conviction pick at verdict-lock: 60 (HUNCH) | 75 (READ) | 90 (CERTAIN). */
+  confidence?: number;
   ts: number;
 }
 
