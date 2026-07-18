@@ -293,9 +293,11 @@ export function saveDoubleRun(entry: DoubleLog): void {
 }
 
 export function loadDoubleRun(): DoubleLog | null {
-  return readStore<DoubleLog>(LOG_KEY, (v): v is DoubleLog => {
-    if (!v || typeof v !== "object") return false;
-    const o = v as Record<string, unknown>;
+  const v = readStore<DoubleLog>(LOG_KEY, (raw): boolean => {
+    if (!raw || typeof raw !== "object") return false;
+    const o = raw as Record<string, unknown>;
     return typeof o.completed === "boolean" && typeof o.ts === "number";
   });
+  return v === "corrupt" ? null : v;
 }
+
