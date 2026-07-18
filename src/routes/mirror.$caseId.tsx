@@ -522,6 +522,10 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                   onPin={m.role === "contact" ? () => togglePin(i) : undefined}
                   speakerName={scenario.claimedIdentity}
                   speakerVoiceDesc={scenario.persona.voice}
+                  read={
+                    typing ||
+                    messages.some((later, j) => j > i && later.role === "contact")
+                  }
                 />
               ))}
               {typing && <TypingBubble name={scenario.claimedIdentity} />}
@@ -553,12 +557,15 @@ function MessageRow({
   onPin,
   speakerName,
   speakerVoiceDesc,
+  read,
 }: {
   m: Message;
   pinned: boolean;
   onPin?: () => void;
   speakerName?: string;
   speakerVoiceDesc?: string;
+  /** Player bubbles: has the contact "seen" this yet (replied or typing)? */
+  read?: boolean;
 }) {
   if (m.role === "system") {
     return (
@@ -607,16 +614,31 @@ function MessageRow({
           />
         </div>
       ) : (
-        <div
-          className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${
-            isPlayer
-              ? "bg-primary text-primary-foreground rounded-br-sm"
-              : pinned
-                ? "bg-caution/20 border border-caution/50 text-white rounded-bl-sm"
-                : "bg-neutral-800 border border-white/10 text-white rounded-bl-sm"
-          }`}
-        >
-          {m.text}
+        <div className="flex flex-col items-end gap-0.5" style={{ maxWidth: "80%" }}>
+          <div
+            className={`rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${
+              isPlayer
+                ? "bg-primary text-primary-foreground rounded-br-sm"
+                : pinned
+                  ? "bg-caution/20 border border-caution/50 text-white rounded-bl-sm"
+                  : "bg-neutral-800 border border-white/10 text-white rounded-bl-sm"
+            }`}
+          >
+            {m.text}
+          </div>
+          <div
+            className={`flex items-center gap-1 px-1 font-mono text-[9px] text-white/35 ${isPlayer ? "" : "self-start"}`}
+            aria-hidden
+          >
+            <span>
+              {new Date(m.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            </span>
+            {isPlayer && (
+              <span className={read ? "text-primary/80" : "text-white/35"}>
+                {read ? "✓✓" : "✓"}
+              </span>
+            )}
+          </div>
         </div>
       )}
     </div>
