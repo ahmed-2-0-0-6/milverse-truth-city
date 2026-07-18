@@ -420,23 +420,6 @@ export type Database = {
           total: number
         }[]
       }
-      get_assessment_group_entries: {
-        Args: { _code: string }
-        Returns: {
-          codename_hash: string
-          phase: string
-          form: string
-          items: Json
-          accuracy: number
-          mean_confidence: number
-          calibration_gap: number
-          overconfident_errors: number
-          missed_scams: number
-          false_alarms: number
-          unverifiable_recognized: number
-          created_at: string
-        }[]
-      }
       get_most_devious_designer: {
         Args: never
         Returns: {
@@ -450,19 +433,6 @@ export type Database = {
         Returns: {
           correct_count: number
           total: number
-        }[]
-      }
-      get_pilot_group_entries: {
-        Args: { _code: string }
-        Returns: {
-          device_id: string
-          wing: string
-          case_id: string
-          tier: number | null
-          result: string
-          points: number
-          probe_stats: Json | null
-          created_at: string
         }[]
       }
       get_sharpest_watch: {
