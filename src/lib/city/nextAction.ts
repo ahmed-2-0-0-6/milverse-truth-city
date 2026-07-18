@@ -48,7 +48,7 @@ function nextUnsolvedFeed(): { id: string; title: string } | null {
   const wall = loadFeedWall();
   const cleared = new Set(wall.filter((w) => w.result === "correct").map((w) => w.caseId));
   const next = FEED_SCENARIOS.find((s) => !cleared.has(s.id));
-  return next ? { id: next.id, title: next.headline ?? next.title ?? next.id } : null;
+  return next ? { id: next.id, title: next.title } : null;
 }
 
 function nextAvailableBoss(): { id: string; codename: string } | null {
