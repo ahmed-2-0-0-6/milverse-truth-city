@@ -73,12 +73,17 @@ function CityMap() {
 
   useEffect(() => {
     setView(preferredDefaultView());
-    setReturning(isReturningCitizen());
+    const isReturner = isReturningCitizen();
+    setReturning(isReturner);
     if (typeof window !== "undefined" && !localStorage.getItem(INTRO_KEY)) setIntro(true);
+    // LIVE BAIT — first-time visitors only, once per session. Returning
+    // citizens go straight to the desk (they've been baited already).
+    setShowBait(!isReturner && !hasSeenLiveBait());
     setShift(currentShift());
     const tick = window.setInterval(() => setShift(currentShift()), 60_000);
     return () => window.clearInterval(tick);
   }, []);
+
 
   useEffect(() => {
     if (mode !== "cinematic") setBooted(true);
