@@ -163,11 +163,26 @@ export function LessonPath() {
           </div>
         }
       >
-        <HomeScreen
-          state={state}
-          onOpenLesson={(n) => setOpenLesson(n)}
-          onOpenLicense={() => setShowLicense(true)}
-        />
+        <div ref={(el) => { setTourHost(el); (homeHostRef as { current: HTMLDivElement | null }).current = el; }} className="relative flex-1 min-h-0 flex flex-col">
+          <HomeScreen
+            state={state}
+            onOpenLesson={(n) => setOpenLesson(n)}
+            onOpenLicense={() => setShowLicense(true)}
+          />
+          {state.active &&
+            state.handoverSeen &&
+            !state.tourSeen &&
+            state.lessonsCompleted.length === 0 && (
+              <FirstBoot
+                container={tourHost}
+                onOpenLesson={(n) => {
+                  refresh();
+                  setOpenLesson(n);
+                }}
+                onClose={() => refresh()}
+              />
+            )}
+        </div>
       </ChatShell>
     </div>
   );
