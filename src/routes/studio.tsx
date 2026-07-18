@@ -443,7 +443,7 @@ function Studio() {
         )}
 
         {step === 2 && (
-          <Section title="THE TRUTH" hint="Real or imposter?">
+          <Section title="THE TRUTH" hint={mode === "mask" ? "The mind game. Bet on their paranoia — or their trust." : "Real or imposter?"}>
             <div className="grid grid-cols-2 gap-3">
               {(["REAL", "IMPOSTER"] as const).map((t) => (
                 <button
@@ -452,8 +452,14 @@ function Studio() {
                   className={`rounded-lg border-2 p-4 font-mono text-sm tracking-widest transition ${draft.truth === t ? "border-primary bg-primary/10 text-primary" : "border-border"}`}
                 >
                   {t}
+                  {mode === "mask" && (
+                    <div className="mt-1 text-[9px] opacity-70">
+                      {t === "REAL" ? "bet on their paranoia" : "bet on their trust"}
+                    </div>
+                  )}
                 </button>
               ))}
+
             </div>
             {draft.truth === "IMPOSTER" && (
               <>
