@@ -167,10 +167,26 @@ function ProfilePage() {
 
             <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
               <Stat label="CASES" value={total} />
-              <Stat label="CORRECT" value={correct} tone="good" />
+              <Stat label="TAKEDOWNS" value={correct} tone="good" />
               <Stat label="MISSED" value={missed} tone="bad" />
               <Stat label="FALSE ALARM" value={falseAlarms} tone="warn" />
             </div>
+            {timeStolen > 0 && (
+              <div className="mt-3 rounded-md border border-primary/30 bg-primary/5 px-4 py-3 flex items-baseline justify-between">
+                <div>
+                  <div className="font-mono text-[10px] tracking-[0.25em] text-primary">
+                    TIME STOLEN FROM SCAMMERS
+                  </div>
+                  <div className="mt-0.5 text-[11px] text-muted-foreground">
+                    Minutes they burned on you, not on a real victim.
+                  </div>
+                </div>
+                <div className="font-mono text-2xl tabular-nums text-primary">
+                  {formatHM(timeStolen)}
+                </div>
+              </div>
+            )}
+
 
             {total === 0 && (
               <div className="mt-4 rounded-md border border-dashed border-border bg-background/50 p-4">
