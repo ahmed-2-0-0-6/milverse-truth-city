@@ -1,13 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TopBar } from "@/components/TopBar";
-import { MANUAL_ENTRIES } from "@/lib/manual/entries";
+import { MANUAL_ENTRIES, type TacticId } from "@/lib/manual/entries";
 import { loadUnlocked } from "@/lib/manual/state";
 import { BOSSES } from "@/lib/boss/scenarios";
 import { loadBossProfile } from "@/lib/boss/profile";
 import { RedactedTitle } from "@/components/RedactedTitle";
 import { EngravedReveal } from "@/components/civic/EngravedReveal";
 import { FileText, Lock, ExternalLink, Skull } from "lucide-react";
+import { loadProfile } from "@/lib/mirror/profile";
+import { encountersFor } from "@/lib/manual/encounters";
+
 
 export const Route = createFileRoute("/manual/")({
   head: () => ({
