@@ -171,30 +171,16 @@ function CityMap() {
                 {kicker}
               </div>
               <HeroType />
-              <p className="mt-4 max-w-xl text-center text-white/70 text-sm sm:text-base">
-                A city that trains your trust — play today's forward.
-
-              </p>
-              <p className="mt-2 max-w-xl text-center text-white/50 text-xs sm:text-sm">
-                Fakes beat eyes. They don't beat verification.
+              <p className="mt-4 max-w-xl text-center text-white/80 text-sm sm:text-base">
+                Scammers are about to text you. Catch them. Level up.
               </p>
 
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                <Link
-                  to="/drop"
-                  className="cta-glow inline-flex items-center gap-2 rounded-sm bg-primary px-6 py-3 text-primary-foreground stencil text-xs"
-                >
-                  <Sparkles className="h-3.5 w-3.5" /> PLAY TODAY'S DROP →
-                </Link>
-                <a
-                  href="#enter"
-                  className="inline-flex items-center gap-2 rounded-sm border border-white/25 px-6 py-3 text-white/80 stencil text-xs hover:border-cyan-300 hover:text-cyan-200 transition"
-                >
-                  ENTER THE CITY ↓
-                </a>
+              <div className="mt-8 w-full max-w-[360px]">
+                <PlayButton />
+                <StatStrip />
               </div>
 
-              <div className="mt-8 w-full max-w-xl">
+              <div className="mt-6 w-full max-w-xl">
                 <DailyBeacon />
               </div>
             </>
@@ -213,12 +199,12 @@ function CityMap() {
 
       <Marquee />
 
-      {/* ── ENTER THE CITY (interactive map / list) ── */}
+      {/* ── EXPLORE THE CITY (interactive map / list) ── */}
       <section id="enter" className="relative pt-16 pb-6 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px flex-1 max-w-[60px] bg-cyan-400/60" />
-            <div className="stencil text-[10px] text-cyan-300">// ENTER THE CITY</div>
+            <div className="stencil text-[10px] text-cyan-300">// EXPLORE THE CITY ↓</div>
             <div className="h-px flex-1 bg-cyan-400/20" />
           </div>
           <div className="flex flex-wrap items-end justify-between gap-3">
