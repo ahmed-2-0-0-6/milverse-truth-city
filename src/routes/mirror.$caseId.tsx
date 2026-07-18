@@ -902,6 +902,54 @@ function MessageRow({
 
   const isPlayer = m.role === "player";
   const showMark = isPlayer && !!grade && !!hasReply && !!why && !!onOpenMark && !!onCloseMark;
+  // Long-press affordance: hold a contact bubble for 500ms to toggle the pin.
+  // Touch-only so desktop text selection is unaffected. Cancels on move > 10px.
+  const lpRef = useRef<{
+    timer: number | null;
+    startX: number;
+    startY: number;
+    fired: boolean;
+    holding: boolean;
+  }>({ timer: null, startX: 0, startY: 0, fired: false, holding: false });
+  const [holding, setHolding] = useState(false);
+  const canLongPress = !isPlayer && !!onPin;
+  const clearLp = () => {
+    if (lpRef.current.timer !== null) {
+      window.clearTimeout(lpRef.current.timer);
+      lpRef.current.timer = null;
+    }
+    lpRef.current.holding = false;
+    setHolding(false);
+  };
+  const bubbleTouchProps = canLongPress
+    ? {
+        onPointerDown: (e: React.PointerEvent) => {
+          if (e.pointerType !== "touch") return;
+          lpRef.current.startX = e.clientX;
+          lpRef.current.startY = e.clientY;
+          lpRef.current.fired = false;
+          lpRef.current.holding = true;
+          setHolding(true);
+          lpRef.current.timer = window.setTimeout(() => {
+            if (!lpRef.current.holding) return;
+            lpRef.current.fired = true;
+            onPin?.();
+            setHolding(false);
+          }, 500);
+        },
+        onPointerMove: (e: React.PointerEvent) => {
+          if (e.pointerType !== "touch" || !lpRef.current.holding) return;
+          const dx = Math.abs(e.clientX - lpRef.current.startX);
+          const dy = Math.abs(e.clientY - lpRef.current.startY);
+          if (dx > 10 || dy > 10) clearLp();
+        },
+        onPointerUp: clearLp,
+        onPointerCancel: clearLp,
+        onContextMenu: (e: React.MouseEvent) => {
+          if (lpRef.current.holding || lpRef.current.fired) e.preventDefault();
+        },
+      }
+    : {};
   return (
     <div className={`msg-in flex ${isPlayer ? "justify-end" : "justify-start"} gap-2`}>
       {!isPlayer && onPin && (
@@ -909,7 +957,7 @@ function MessageRow({
           onClick={onPin}
           aria-pressed={pinned}
           aria-label={pinned ? "Unpin evidence" : "Pin as suspicious"}
-          className={`self-end mb-1 rounded p-1 transition ${
+          className={`self-end mb-1 rounded p-2.5 transition touch-manipulation active:bg-caution/10 ${
             pinned ? "bg-caution/20 text-caution" : "text-muted-foreground hover:text-caution"
           }`}
         >
@@ -939,13 +987,14 @@ function MessageRow({
       ) : (
         <div className="flex flex-col items-end gap-0.5" style={{ maxWidth: "80%" }}>
           <div
-            className={`px-3.5 py-2 text-sm whitespace-pre-wrap shadow-sm ${
+            {...bubbleTouchProps}
+            className={`px-3.5 py-2 text-sm whitespace-pre-wrap shadow-sm transition ${
               isPlayer
                 ? skin.outBubble
                 : pinned
                   ? "bg-caution/20 border border-caution/50 text-white rounded-lg rounded-tl-none"
                   : skin.inBubble
-            }`}
+            } ${holding ? "ring-1 ring-caution/50" : ""}`}
           >
             <span className="sr-only">{isPlayer ? "You" : speakerName}: </span>
             {m.text}
