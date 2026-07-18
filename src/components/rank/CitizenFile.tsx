@@ -13,6 +13,7 @@ import { operatorCallsign, type TrustProfile } from "@/lib/mirror/profile";
 import { rankFromXp } from "@/lib/ranks";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 import { getActiveGroup } from "@/lib/pilot";
+import { computeConviction } from "@/lib/mirror/conviction";
 
 interface Props {
   open: boolean;
