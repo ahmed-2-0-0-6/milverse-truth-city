@@ -2145,6 +2145,24 @@ html[data-force-reduce-motion="on"] .inbox-toast-in {
   animation: none !important;
 }
 
+/* ---------- THE MISSED CALL (incoming-call overlay) ---------- */
+@keyframes call-pulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+.call-pulse {
+  animation: call-pulse 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .call-pulse { animation: none !important; opacity: 0 !important; }
+}
+html[data-high-legibility="on"] .call-pulse,
+html[data-force-reduce-motion="on"] .call-pulse {
+  animation: none !important;
+  opacity: 0 !important;
+}
+
 /* ---------- FIRST PHONE (junior surface) ---------- */
 /* Softer backdrop behind the junior phone frame. */
 .chat-shell-backdrop--junior {
