@@ -1,12 +1,21 @@
 // MILVERSE — THE SECOND-VISIT CITY
 // Pure, local-only detection + desk-report composition. No cloud, no engine
-// diffs. Every store read is guarded — a missing/corrupt source is skipped,
-// never thrown. Deterministic: same profile + same `now` → same desk.
+// diffs. Every store read is wrapped in try/catch — a corrupt or missing
+// source is skipped silently, never thrown. Deterministic: same profile +
+// same `now` → same desk.
 //
 // Overlap with src/lib/city/signals.ts is intentional: this module composes
 // a *player-facing report* (ordered, capped, spoken in the desk voice) and
 // reuses the same underlying readers where they exist, rather than
 // re-deriving them.
+
+import { loadProfile } from "@/lib/mirror/profile";
+import { loadFirstPhone } from "@/lib/firstPhone/profile";
+import { readDailyStatus } from "@/lib/daily/profile";
+import { secondsToNextDrop } from "@/lib/daily/rotation";
+import { dueRetests } from "@/lib/mirror/retests";
+import { supplementWeek, readLastSeenWeek } from "@/lib/paper/supplement";
+import { loadBossProfile, canRematch } from "@/lib/boss/profile";
 
 export type DeskUrgency = "dying" | "due" | "standing";
 
@@ -20,9 +29,7 @@ export interface DeskItem {
 /** True when the visitor has any real play footprint on this device. */
 export function isReturningCitizen(): boolean {
   if (typeof window === "undefined") return false;
-  // Mirror trust profile — casesPlayed or a daily-play log both count.
   try {
-    const { loadProfile } = require("@/lib/mirror/profile") as typeof import("@/lib/mirror/profile");
     const p = loadProfile();
     if ((p?.casesPlayed ?? 0) > 0) return true;
     if ((p?.dailyPlays?.length ?? 0) > 0) return true;
@@ -30,10 +37,8 @@ export function isReturningCitizen(): boolean {
   } catch {
     /* mirror profile unavailable */
   }
-  // First-phone progress counts too.
   try {
-    const fp = require("@/lib/firstPhone/profile") as typeof import("@/lib/firstPhone/profile");
-    const s = fp.loadFirstPhone();
+    const s = loadFirstPhone();
     if (s?.active) return true;
     if ((s?.lessonsCompleted?.length ?? 0) > 0) return true;
   } catch {
@@ -42,7 +47,6 @@ export function isReturningCitizen(): boolean {
   return false;
 }
 
-/** Ordered urgency rank: dying(0) < due(1) < standing(2). */
 const URGENCY_ORDER: Record<DeskUrgency, number> = { dying: 0, due: 1, standing: 2 };
 
 /**
@@ -55,10 +59,8 @@ export function deskReport(now: Date = new Date()): DeskItem[] {
 
   // 1) THE STREAK — real time-to-rollover from the drop's own UTC+5 clock.
   try {
-    const daily = require("@/lib/daily/profile") as typeof import("@/lib/daily/profile");
-    const rotation = require("@/lib/daily/rotation") as typeof import("@/lib/daily/rotation");
-    const s = daily.readDailyStatus();
-    const secs = rotation.secondsToNextDrop(now);
+    const s = readDailyStatus();
+    const secs = secondsToNextDrop(now);
     const hours = secs / 3600;
     if (s.playedToday) {
       items.push({
@@ -95,11 +97,10 @@ export function deskReport(now: Date = new Date()): DeskItem[] {
     /* daily source unavailable — skip */
   }
 
-  // 2) RETESTS — a reopened file, if the retest system is built.
+  // 2) RETESTS — a reopened file, if one is due.
   try {
-    const retests = require("@/lib/mirror/retests") as typeof import("@/lib/mirror/retests");
-    const { loadProfile } = require("@/lib/mirror/profile") as typeof import("@/lib/mirror/profile");
-    const due = retests.dueRetests(loadProfile(), now.getTime());
+    const p = loadProfile();
+    const due = dueRetests(p, now.getTime());
     if (due.length >= 1) {
       items.push({
         id: "retest-due",
@@ -114,9 +115,8 @@ export function deskReport(now: Date = new Date()): DeskItem[] {
 
   // 3) THE PAPER / SUPPLEMENT — unread supplement week.
   try {
-    const sup = require("@/lib/paper/supplement") as typeof import("@/lib/paper/supplement");
-    const week = sup.supplementWeek(now);
-    const seen = sup.readLastSeenWeek();
+    const week = supplementWeek(now);
+    const seen = readLastSeenWeek();
     if (week.weekKey && seen !== week.weekKey) {
       items.push({
         id: "supplement-unread",
@@ -131,8 +131,7 @@ export function deskReport(now: Date = new Date()): DeskItem[] {
 
   // 4) BOSS — pending Handler assignment or an open rematch.
   try {
-    const bp = require("@/lib/boss/profile") as typeof import("@/lib/boss/profile");
-    const boss = bp.loadBossProfile();
+    const boss = loadBossProfile();
     const pending = boss.assignments.filter((a) => !a.completed);
     if (pending.length > 0) {
       items.push({
@@ -143,7 +142,7 @@ export function deskReport(now: Date = new Date()): DeskItem[] {
       });
     } else {
       const attempted = Array.from(new Set(boss.attempts.map((a) => a.bossId)));
-      const rematchable = attempted.filter((b) => bp.canRematch(b));
+      const rematchable = attempted.filter((b) => canRematch(b));
       if (rematchable.length > 0) {
         items.push({
           id: "boss-rematch",
@@ -170,51 +169,4 @@ export function deskReport(now: Date = new Date()): DeskItem[] {
   // Order: dying > due > standing, stable within each band, cap 4.
   items.sort((a, b) => URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency]);
   return items.slice(0, 4);
-}
-
-/** For diagnostics/tests: report which sources were live vs skipped. */
-export interface DeskSourceTrace {
-  streak: boolean;
-  retests: boolean;
-  supplement: boolean;
-  boss: boolean;
-}
-
-export function deskSources(now: Date = new Date()): DeskSourceTrace {
-  const trace: DeskSourceTrace = {
-    streak: false,
-    retests: false,
-    supplement: false,
-    boss: false,
-  };
-  try {
-    const daily = require("@/lib/daily/profile") as typeof import("@/lib/daily/profile");
-    daily.readDailyStatus();
-    trace.streak = true;
-  } catch {
-    /* skip */
-  }
-  try {
-    const retests = require("@/lib/mirror/retests") as typeof import("@/lib/mirror/retests");
-    const { loadProfile } = require("@/lib/mirror/profile") as typeof import("@/lib/mirror/profile");
-    retests.dueRetests(loadProfile(), now.getTime());
-    trace.retests = true;
-  } catch {
-    /* skip */
-  }
-  try {
-    const sup = require("@/lib/paper/supplement") as typeof import("@/lib/paper/supplement");
-    sup.supplementWeek(now);
-    trace.supplement = true;
-  } catch {
-    /* skip */
-  }
-  try {
-    const bp = require("@/lib/boss/profile") as typeof import("@/lib/boss/profile");
-    bp.loadBossProfile();
-    trace.boss = true;
-  } catch {
-    /* skip */
-  }
-  return trace;
 }
