@@ -50,6 +50,7 @@ import { ClockChip } from "@/components/mirror/ClockChip";
 import { pendingRetestForCase, scheduleRetest, resolveRetest, type RetestResolution } from "@/lib/mirror/retests";
 import { CONVICTION_CHIPS, computeConviction, debriefLineFor } from "@/lib/mirror/conviction";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
+import { aftermathFor } from "@/lib/mirror/aftermath";
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
