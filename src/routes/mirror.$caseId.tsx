@@ -676,7 +676,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                         setTab(next);
                       }
                     }}
-                    className={`rounded px-3 py-1 font-mono text-[10px] tracking-widest transition ${
+                    className={`touch-manipulation rounded px-4 py-1 font-mono text-[10px] tracking-widest transition min-h-[36px] sm:min-h-0 sm:px-3 ${
                       tab === t ? "bg-primary/15 text-primary" : "text-white/50 hover:text-white"
                     }`}
                   >
@@ -685,17 +685,19 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 ))}
 
                 <div className="flex-1" />
+                {/* Desktop-only: VERIFY / CALL IT live in the meter row.
+                    On mobile they move down into the composer cluster (Fix 4). */}
                 <button
                   onClick={() => setShowVob(true)}
                   disabled={ended || messages.length < 2}
-                  className="rounded border border-primary/50 bg-primary/10 px-2 py-1 text-[9px] font-mono tracking-widest text-primary hover:bg-primary/20 disabled:opacity-40"
+                  className="hidden sm:inline-flex items-center rounded border border-primary/50 bg-primary/10 px-2 py-1 text-[9px] font-mono tracking-widest text-primary hover:bg-primary/20 disabled:opacity-40"
                 >
                   <ShieldCheck className="inline h-3 w-3 mr-1" /> VERIFY
                 </button>
                 <button
                   onClick={onEnd}
                   disabled={messages.length < 2}
-                  className="rounded border border-destructive/50 bg-destructive/10 px-2 py-1 text-[9px] font-mono tracking-widest text-destructive hover:bg-destructive/20 disabled:opacity-40"
+                  className="hidden sm:inline-flex items-center rounded border border-destructive/50 bg-destructive/10 px-2 py-1 text-[9px] font-mono tracking-widest text-destructive hover:bg-destructive/20 disabled:opacity-40"
                 >
                   <Phone className="inline h-3 w-3 mr-1" /> CALL IT
                 </button>
