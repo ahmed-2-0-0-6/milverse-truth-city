@@ -79,6 +79,14 @@ export function markCallFired(caseId: string) {
   }
 }
 
+export function markPaperRead(editionId: string) {
+  const p = loadInbox();
+  if (p.paperRead !== editionId) {
+    p.paperRead = editionId;
+    saveInbox(p);
+  }
+}
+
 export function unreadCount(): number {
   const p = loadInbox();
   const opened = new Set(p.opened);
