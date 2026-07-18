@@ -9,10 +9,12 @@ export interface InboxProfile {
   dateKey: string;
   arrived: string[];
   opened: string[];
+  /** caseIds for which "The Missed Call" ring already fired today. */
+  firedCalls: string[];
 }
 
 function fresh(dateKey = dropDateKey()): InboxProfile {
-  return { dateKey, arrived: [], opened: [] };
+  return { dateKey, arrived: [], opened: [], firedCalls: [] };
 }
 
 export function loadInbox(): InboxProfile {
@@ -27,6 +29,7 @@ export function loadInbox(): InboxProfile {
       dateKey: today,
       arrived: Array.isArray(p.arrived) ? p.arrived : [],
       opened: Array.isArray(p.opened) ? p.opened : [],
+      firedCalls: Array.isArray(p.firedCalls) ? p.firedCalls : [],
     };
   } catch {
     return fresh();
@@ -63,6 +66,14 @@ export function markOpened(id: string) {
     changed = true;
   }
   if (changed) saveInbox(p);
+}
+
+export function markCallFired(caseId: string) {
+  const p = loadInbox();
+  if (!p.firedCalls.includes(caseId)) {
+    p.firedCalls.push(caseId);
+    saveInbox(p);
+  }
 }
 
 export function unreadCount(): number {
