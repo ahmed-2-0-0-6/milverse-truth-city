@@ -80,6 +80,7 @@ import {
 } from "@/lib/mirror/coldreads";
 import { fetchPinnedLines, type PinnedLine } from "@/lib/mirror/pinned.functions";
 import { consumeStandoffArm } from "@/lib/standoff/rules";
+import { buildHand, toHandScenario, type HandChip } from "@/lib/mirror/hand";
 
 /**
  * THE MOST SUSPECTED LINE — hash architecture.
