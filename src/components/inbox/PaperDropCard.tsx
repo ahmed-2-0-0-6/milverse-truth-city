@@ -8,6 +8,7 @@ import { X } from "lucide-react";
 import { PAPER_NAME } from "@/lib/paper/masthead";
 import { markPaperRead } from "@/lib/inbox/profile";
 import { shouldReduceMotion } from "@/lib/access";
+import { paperThud } from "@/lib/mirror/audio";
 
 interface Props {
   editionId: string;
