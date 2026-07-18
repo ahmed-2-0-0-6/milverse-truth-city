@@ -62,6 +62,12 @@ export function TopBar() {
   const [manualUnlocks, setManualUnlocks] = useState(0);
   const [navOpen, setNavOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const junior = useJuniorMode();
+  const showInbox =
+    junior.ready &&
+    !junior.active &&
+    !pathname.startsWith("/visit") &&
+    !pathname.startsWith("/first-phone");
 
   useEffect(() => {
     setProfile(loadProfile());
