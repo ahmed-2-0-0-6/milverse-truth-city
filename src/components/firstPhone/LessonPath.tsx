@@ -9,6 +9,7 @@ import { LessonCleared } from "./LessonCleared";
 import { LockScreen } from "./LockScreen";
 import { FirstBoot } from "./FirstBoot";
 import { ChatShell } from "@/components/chat/ChatShell";
+import { SpotIt } from "./SpotIt";
 import { ChevronLeft } from "lucide-react";
 
 function freshState(): FirstPhoneState {
