@@ -1990,6 +1990,103 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     }
   }, [result, scenario.id, scenario.tier, scenario.truth, scenario.tactic, verdictRaw, pendingBefore]);
 
+  // ─── THE MOST SUSPECTED LINE ───────────────────────────────────
+  // On debrief mount: (a) send one pin_flag per final pinned CONTACT
+  // line — max 5, hashes only, never text; (b) fetch the city's top
+  // three hashes and locate one that appears in this player's own
+  // transcript. Anything that fails silently: the block just doesn't
+  // render. Cold reads and /visit render different components and so
+  // never reach this effect.
+  const pinnedSentRef = useRef(false);
+  const [cityLine, setCityLine] = useState<
+    | { text: string; pins: number; playerPinned: boolean }
+    | { fallback: true }
+    | null
+  >(null);
+  const callFetchPinned = useServerFn(fetchPinnedLines);
+  useEffect(() => {
+    if (pinnedSentRef.current || !sim || !result) return;
+    pinnedSentRef.current = true;
+    let cancelled = false;
+
+    (async () => {
+      const finalPinIdxs: number[] =
+        (sim.state as EngineState & { pins?: number[] })?.pins ?? [];
+      // Contact messages only. onPin in the chat UI is gated to
+      // role === "contact"; player messages are unpinnable by
+      // construction, so nothing player-typed ever hashes here.
+      const pinnedContact = finalPinIdxs
+        .map((idx) => ({ idx, msg: sim.messages[idx] }))
+        .filter(
+          (p) => p.msg && p.msg.role === "contact" && typeof p.msg.text === "string" && p.msg.text.trim().length > 0,
+        )
+        .slice(0, 5);
+
+      const playerHashes = new Set<string>();
+      for (const p of pinnedContact) {
+        try {
+          const h = await hashLine12(p.msg.text as string);
+          playerHashes.add(h);
+          try {
+            track("pin_flag", {
+              case_id: scenario.id,
+              payload: { line: h },
+            });
+          } catch {
+            /* noop */
+          }
+        } catch {
+          /* noop */
+        }
+      }
+
+      // Hash every contact line in the transcript so we can match the
+      // city's top hash even when the player didn't pin it.
+      const contactHashes: { text: string; hash: string }[] = [];
+      for (const m of sim.messages) {
+        if (m.role !== "contact") continue;
+        if (typeof m.text !== "string" || m.text.trim().length === 0) continue;
+        try {
+          const h = await hashLine12(m.text);
+          contactHashes.push({ text: m.text, hash: h });
+        } catch {
+          /* noop */
+        }
+      }
+
+      let rows: PinnedLine[] = [];
+      try {
+        rows = await callFetchPinned({ data: { caseId: scenario.id } });
+      } catch {
+        rows = [];
+      }
+      if (cancelled) return;
+      if (!rows.length) {
+        setCityLine(null);
+        return;
+      }
+
+      const match = rows
+        .map((r) => ({ row: r, hit: contactHashes.find((c) => c.hash === r.lineHash) }))
+        .find((x) => !!x.hit);
+
+      if (match && match.hit) {
+        setCityLine({
+          text: match.hit.text,
+          pins: match.row.pins,
+          playerPinned: playerHashes.has(match.hit.hash),
+        });
+      } else {
+        setCityLine({ fallback: true });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sim, result, scenario.id, callFetchPinned]);
+
+
   if (!result || !verdictRaw) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-10 text-muted-foreground">
