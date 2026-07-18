@@ -1,9 +1,11 @@
 // MILVERSE — /pressroom  THE DAILY MIRAGE editor. Passcode-gated.
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { TopBar } from "@/components/TopBar";
 import { Lock, Save, Send, Eye } from "lucide-react";
+import { stoneCheckWithDate, countStops, countAdvisories, type StoneNote } from "@/lib/paper/stone";
+
 import {
   pressroomList,
   pressroomGet,
@@ -109,11 +111,22 @@ function PressroomPage() {
       const r = await listFn({ data: { passcode } });
       setRows((r as { rows: Row[] }).rows);
       setStatus("published");
-      alert("Published. It's the live paper now.");
+      const tail = advisories > 0 ? ` · ${advisories} notes rode along.` : "";
+      alert(`Published. It's the live paper now.${tail}`);
     } catch (e) {
       setErr((e as Error).message);
     }
   }
+
+  // THE STONE — deterministic pre-flight lint. Recomputed on content/date change.
+  const today = new Date().toISOString().slice(0, 10);
+  const stone: StoneNote[] = useMemo(
+    () => (content ? stoneCheckWithDate(content, date, today) : []),
+    [content, date, today],
+  );
+  const stops = countStops(stone);
+  const advisories = countAdvisories(stone);
+
 
   if (!authed) {
     return (
@@ -255,13 +268,22 @@ function PressroomPage() {
                   </button>
                   <button
                     onClick={publish}
-                    disabled={status === "published" || status === "locked"}
+                    disabled={status === "published" || status === "locked" || stops > 0}
                     className="rounded-sm bg-primary text-primary-foreground px-3 py-1.5 stencil text-[10px] inline-flex items-center gap-1 disabled:opacity-40"
                   >
                     <Send className="h-3 w-3" /> PUBLISH
                   </button>
                 </div>
+                {stops > 0 && (
+                  <p className="stencil text-[10px] text-destructive mb-2">
+                    {stops} stop{stops === 1 ? "" : "s"} on the stone.
+                  </p>
+                )}
                 {err && <p className="text-destructive text-xs mb-2">{err}</p>}
+
+                <StonePanel notes={stone} stops={stops} advisories={advisories} />
+
+
 
                 {preview ? (
                   <div className="paper rounded-sm border border-border p-6">
@@ -671,6 +693,88 @@ function TacticSelect({ v, on }: { v: string | undefined; on: (v: string) => voi
     </select>
   );
 }
+
+function StonePanel({
+  notes,
+  stops,
+  advisories,
+}: {
+  notes: StoneNote[];
+  stops: number;
+  advisories: number;
+}) {
+  const clean = stops === 0 && advisories === 0;
+  const header = clean
+    ? "THE STONE IS CLEAN. CAST THE PLATES."
+    : `THE STONE · ${stops} STOP${stops === 1 ? "" : "S"} · ${advisories} NOTE${advisories === 1 ? "" : "S"}`;
+
+  const stopsRows = notes.filter((n) => n.severity === "stop");
+  const adviseRows = notes.filter((n) => n.severity === "advise");
+  const passRows = notes.filter((n) => n.severity === "pass");
+
+  function Row({ n }: { n: StoneNote }) {
+    const g =
+      n.severity === "stop"
+        ? { glyph: "■", cls: "text-destructive", label: "stop" }
+        : n.severity === "advise"
+          ? { glyph: "✎", cls: "text-caution", label: "advise" }
+          : { glyph: "✓", cls: "text-muted-foreground", label: "pass" };
+    return (
+      <li className="grid grid-cols-[auto_auto_1fr] gap-2 items-baseline py-1 border-b border-border/40 last:border-0">
+        <span aria-label={g.label} className={`font-mono text-xs ${g.cls}`}>
+          {g.glyph}
+        </span>
+        <span className="stencil text-[10px] text-muted-foreground">{n.section}</span>
+        <span className="text-xs text-foreground/90">{n.note}</span>
+      </li>
+    );
+  }
+
+  return (
+    <section className="mt-6 rounded-sm border border-border p-4">
+      <div
+        aria-live="polite"
+        className={`stencil text-[10px] tracking-[0.25em] ${clean ? "text-muted-foreground" : "text-primary"}`}
+      >
+        {header}
+      </div>
+      {stopsRows.length > 0 && (
+        <div className="mt-3">
+          <div className="stencil text-[10px] text-destructive mb-1">STOP</div>
+          <ul>
+            {stopsRows.map((n) => (
+              <Row key={n.id} n={n} />
+            ))}
+          </ul>
+        </div>
+      )}
+      {adviseRows.length > 0 && (
+        <div className="mt-3">
+          <div className="stencil text-[10px] text-caution mb-1">ADVISE</div>
+          <ul>
+            {adviseRows.map((n) => (
+              <Row key={n.id} n={n} />
+            ))}
+          </ul>
+        </div>
+      )}
+      {passRows.length > 0 && (
+        <details className="mt-3">
+          <summary className="cursor-pointer stencil text-[10px] text-muted-foreground">
+            PASS · {passRows.length}
+          </summary>
+          <ul className="mt-1">
+            {passRows.map((n) => (
+              <Row key={n.id} n={n} />
+            ))}
+          </ul>
+        </details>
+      )}
+    </section>
+  );
+}
+
+
 
 function blankContent(): EditionContent {
   return {
