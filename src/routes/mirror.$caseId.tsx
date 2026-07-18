@@ -1055,7 +1055,19 @@ function NotesTab({
         </ul>
       </section>
 
+      {(() => {
+        const s = messages.filter((m) => m.role === "player" && m.probeQuality === "strong").length;
+        const w = messages.filter((m) => m.role === "player" && m.probeQuality === "weak").length;
+        const x = messages.filter((m) => m.role === "player" && m.probeQuality === "wasted").length;
+        return (
+          <div className="font-mono text-[10px] tracking-widest text-muted-foreground">
+            PROBES THIS CALL: {s} strong · {w} weak · {x} wasted
+          </div>
+        );
+      })()}
+
       <section>
+
         <div className="flex items-center gap-2 font-mono text-[10px] tracking-widest text-caution">
           <Pin className="h-3 w-3" /> PINNED · {pins.length}/5
         </div>
