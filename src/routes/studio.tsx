@@ -282,14 +282,15 @@ function Studio() {
     }
     // MASK MODE — fairness gate + always private lane.
     if (mode === "mask") {
-      const gate = fairnessGate(draft);
-      if (!gate.ok) {
-        setError(gate.reason ?? "The desk won't route it.");
-        toast.error("A mask nobody can beat proves nothing.", { description: gate.reason });
+      const gateErr = fairnessGate(draft);
+      if (gateErr) {
+        setError(gateErr);
+        toast.error("A mask nobody can beat proves nothing.", { description: gateErr });
         return;
       }
       lane = "private";
     }
+
     setPublishing(true);
     setError(null);
     const s = buildScenario(draft);
