@@ -415,7 +415,7 @@ function Sim({
                   <button
                     key={t}
                     onClick={() => setTab(t)}
-                    className={`rounded px-3 py-1 font-mono text-[10px] tracking-widest transition ${
+                    className={`touch-manipulation rounded px-4 py-1 font-mono text-[10px] tracking-widest transition min-h-[36px] sm:min-h-0 sm:px-3 ${
                       tab === t ? "bg-primary/15 text-primary" : "text-white/50 hover:text-white"
                     }`}
                   >
@@ -425,10 +425,11 @@ function Sim({
                   </button>
                 ))}
                 <div className="flex-1" />
+                {/* Mobile: DELIVER VERDICT moves to composer cluster (Fix 4). */}
                 <button
                   onClick={onDeliverVerdict}
                   disabled={messages.length < 2}
-                  className="rounded border border-primary/50 bg-primary/10 px-2 py-1 text-[9px] font-mono tracking-widest text-primary hover:bg-primary/20 disabled:opacity-40"
+                  className="hidden sm:inline-flex rounded border border-primary/50 bg-primary/10 px-2 py-1 text-[9px] font-mono tracking-widest text-primary hover:bg-primary/20 disabled:opacity-40"
                 >
                   DELIVER VERDICT →
                 </button>
