@@ -3,6 +3,7 @@
 
 import { Forward, Heart, MessageCircle, Bookmark, Play } from "lucide-react";
 import type { FeedForward, FeedFormat } from "@/lib/feed/scenarios";
+import { ArtifactScene } from "./ArtifactScene";
 
 interface Props {
   format: FeedFormat;
@@ -27,8 +28,14 @@ export function FormatFrame({ format, senderName, forward: f, aiGenerated }: Pro
           </div>
           {chip}
         </div>
-        <div className="aspect-square bg-muted/40 flex items-center justify-center text-7xl">
-          {f.imageEmoji ?? "🖼️"}
+        <div className="aspect-square">
+          <ArtifactScene
+            emoji={f.imageEmoji}
+            alt={f.imageAlt}
+            seed={f.headline ?? senderName}
+            aspect="square"
+            chrome="none"
+          />
         </div>
         <div className="px-3 py-2 space-y-1.5">
           <div className="flex items-center gap-3 text-muted-foreground">
@@ -76,8 +83,13 @@ export function FormatFrame({ format, senderName, forward: f, aiGenerated }: Pro
             {f.headline}
           </div>
           {f.imageEmoji && (
-            <div className="mt-3 aspect-[16/9] bg-muted/40 flex items-center justify-center text-6xl border border-border">
-              {f.imageEmoji}
+            <div className="mt-3 border border-border">
+              <ArtifactScene
+                emoji={f.imageEmoji}
+                alt={f.imageAlt}
+                seed={f.headline ?? senderName}
+                chrome="screenshot"
+              />
             </div>
           )}
           <div className="mt-3 space-y-1.5 text-xs text-muted-foreground leading-relaxed">
@@ -102,9 +114,12 @@ export function FormatFrame({ format, senderName, forward: f, aiGenerated }: Pro
           </div>
           {chip}
         </div>
-        <div className="aspect-video bg-muted/20 flex items-center justify-center text-8xl">
-          {f.imageEmoji ?? "🖼️"}
-        </div>
+        <ArtifactScene
+          emoji={f.imageEmoji}
+          alt={f.imageAlt}
+          seed={f.headline ?? senderName}
+          chrome="photo"
+        />
         <div className="p-3">
           {f.headline && <div className="text-sm font-semibold text-white">{f.headline}</div>}
           <div className="mt-1 space-y-1 text-xs text-white/70">
@@ -127,12 +142,21 @@ export function FormatFrame({ format, senderName, forward: f, aiGenerated }: Pro
           <div className="stencil text-[10px] tracking-widest text-primary">▶ SHORT VIDEO CLIP</div>
           {chip}
         </div>
-        <div className="relative aspect-video bg-black flex items-center justify-center">
-          <div className="text-7xl opacity-60">{f.imageEmoji ?? "🎬"}</div>
-          <div className="absolute inset-0 flex items-center justify-center">
+        <div className="relative">
+          <ArtifactScene
+            emoji={f.imageEmoji ?? "🎬"}
+            alt={f.imageAlt}
+            seed={f.headline ?? senderName}
+            chrome="none"
+          />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/25">
             <div className="rounded-full bg-white/90 p-4 shadow-2xl">
               <Play className="h-6 w-6 text-black fill-black" />
             </div>
+          </div>
+          {/* fake progress bar */}
+          <div aria-hidden className="absolute bottom-0 inset-x-0 h-0.5 bg-white/20">
+            <div className="h-full w-1/3 bg-red-500" />
           </div>
           <div className="absolute bottom-2 right-2 stencil text-[10px] text-white/70 bg-black/50 px-2 py-0.5 rounded">
             0:42
@@ -160,12 +184,12 @@ export function FormatFrame({ format, senderName, forward: f, aiGenerated }: Pro
         {chip}
       </div>
       {f.imageEmoji && (
-        <div
-          className="flex items-center justify-center bg-muted/40 py-8 text-6xl"
-          aria-label={f.imageAlt}
-        >
-          {f.imageEmoji}
-        </div>
+        <ArtifactScene
+          emoji={f.imageEmoji}
+          alt={f.imageAlt}
+          seed={f.headline ?? senderName}
+          chrome="photo"
+        />
       )}
       <div className="p-3">
         {f.headline && <div className="text-sm font-semibold">{f.headline}</div>}
