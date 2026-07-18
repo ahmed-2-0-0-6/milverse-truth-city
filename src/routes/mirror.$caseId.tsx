@@ -31,6 +31,8 @@ import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer } from "l
 import { RealCaseFile } from "@/components/RealCaseFile";
 import { NextCaseCard } from "@/components/NextCaseCard";
 import { RookieIntro } from "@/components/handler/RookieIntro";
+import { SendOff } from "@/components/handler/SendOff";
+import { LossBeat } from "@/components/handler/LossBeat";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 import { TacticStamp } from "@/components/TacticStamp";
 import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
