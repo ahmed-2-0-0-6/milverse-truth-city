@@ -2904,7 +2904,7 @@ function CinematicResult({
   if (kind === "missed_scam") {
     return (
       <div className="msg-in rounded-2xl border-2 border-destructive/50 bg-destructive/10 p-8 text-center">
-        <div className="font-mono text-[10px] tracking-[0.4em] text-destructive">MISSED SCAM</div>
+        <div className="font-mono text-[10px] tracking-[0.4em] text-destructive">HE PLAYED THE BAITER</div>
         <div className="mt-4 text-4xl sm:text-5xl font-semibold text-destructive">
           ₨15,000 gone.
         </div>
@@ -2917,8 +2917,8 @@ function CinematicResult({
           </div>
         )}
         <p className="mt-4 text-sm text-muted-foreground max-w-md mx-auto">
-          Once money leaves — especially via gift cards, wallet, or crypto — it doesn't come back.
-          Verification, not spotting, is the only defence.
+          He played you like you were the victim. Next line, run <b>him</b>. Verification, not
+          spotting, is how the desk works.
         </p>
       </div>
     );
@@ -2926,36 +2926,40 @@ function CinematicResult({
   if (kind === "false_alarm") {
     return (
       <div className="msg-in rounded-2xl border-2 border-caution/50 bg-caution/10 p-8 text-center">
-        <div className="font-mono text-[10px] tracking-[0.4em] text-caution">FALSE ALARM</div>
+        <div className="font-mono text-[10px] tracking-[0.4em] text-caution">DISCIPLINE BREAK</div>
         <div className="mt-4 text-3xl sm:text-4xl font-semibold text-caution leading-tight">
           {truth === "REAL" ? "She was really your cousin." : "That was really them."}
         </div>
         <p className="mt-3 text-sm">
           {truth === "REAL"
-            ? "She waited at the stop for 40 minutes. Then walked home in the cold."
-            : "You just accused a real person of being an imposter."}
+            ? "You burned a real citizen. The desk logs both kinds of miss."
+            : "You called it before you had it. The desk logs both kinds of miss."}
         </p>
         <p className="mt-4 text-xs text-muted-foreground max-w-md mx-auto">
-          Wrongly accusing a real person costs the relationship — that IS a loss. The skill is
-          calibration, not suspicion.
+          A baiter without discipline is just noise on the line. Verify, then call it.
         </p>
       </div>
     );
   }
   if (kind === "correct") {
+    const takedown = truth === "IMPOSTER";
     return (
       <div className="msg-in rounded-2xl border-2 border-primary/50 bg-primary/10 p-8 text-center">
-        <div className="font-mono text-[10px] tracking-[0.4em] text-primary">CALIBRATED WIN</div>
+        <div className="font-mono text-[10px] tracking-[0.4em] text-primary">
+          {takedown ? "TAKEDOWN · CASE CLOSED" : "CLEAN CALL · CITIZEN CLEARED"}
+        </div>
         <div className="mt-4 text-3xl sm:text-4xl font-semibold text-primary leading-tight">
-          You verified without insulting.
+          {takedown ? "Number burned citywide." : "You verified without insulting."}
         </div>
         <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto">
-          That's the skill. Caught the imposter OR trusted the real person — with reasoning, not
-          luck.
+          {takedown
+            ? "Your intel is in the file. Every minute you held him was a minute stolen from a real victim."
+            : "That's the skill. Trusted the real person — with reasoning, not luck."}
         </p>
       </div>
     );
   }
+
   return (
     <div className="msg-in rounded-2xl border-2 border-caution/50 bg-caution/10 p-8 text-center">
       <div className="font-mono text-[10px] tracking-[0.4em] text-caution">LUCKY GUESS</div>
