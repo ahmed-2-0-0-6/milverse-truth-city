@@ -1434,6 +1434,19 @@ function Debrief({ scenario }: { scenario: Scenario }) {
         <PauseRow letter="E" title="Evidence" body={pauseText(scenario, "E")} />
       </section>
 
+      {(() => {
+        const dc = clockFor(scenario.id);
+        if (!dc) return null;
+        return (
+          <section className="rounded-xl border border-caution/40 bg-caution/5 p-6">
+            <div className="font-mono text-xs tracking-[0.3em] text-caution mb-2">
+              THE CLOCK
+            </div>
+            <p className="text-sm leading-relaxed">{dc.debriefNote}</p>
+          </section>
+        );
+      })()}
+
       <RealCaseFile caseId={scenario.id} inline={scenario.inspiredBy} />
 
       <CitySolved caseId={scenario.id} playerResult={result.resultKind === "correct" ? "correct" : result.resultKind === "missed_scam" ? "missed_scam" : result.resultKind === "false_alarm" ? "false_alarm" : "correct"} />
