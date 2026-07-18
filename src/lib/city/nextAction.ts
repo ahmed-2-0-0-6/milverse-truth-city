@@ -13,6 +13,7 @@ import { getScenario } from "@/lib/mirror/scenarios";
 import { BOSSES } from "@/lib/boss/scenarios";
 import { loadBossProfile } from "@/lib/boss/profile";
 import { loadColdReads } from "@/lib/mirror/coldreads";
+import { getActiveShift } from "@/lib/shift/state";
 
 export interface NextAction {
   label: string;
