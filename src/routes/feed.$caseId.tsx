@@ -774,7 +774,7 @@ function VerdictScreen({
           onChange={(e) => setFinalReply(e.target.value)}
           rows={5}
           placeholder="Type what you'd actually send them…"
-          className="w-full rounded-md border border-input bg-background p-3 text-sm outline-none focus:border-primary"
+          className="w-full rounded-md border border-input bg-background p-3 text-base outline-none focus:border-primary sm:text-sm"
         />
         <div className={`mt-1 font-mono text-[10px] tracking-widest ${toneColor}`}>
           TONE READ: {tone.toUpperCase()}
