@@ -262,7 +262,7 @@ function Studio() {
     const err = validate(draft);
     if (err) {
       setError(err);
-      toast.error("Fix before publishing", { description: err });
+      toast.error("Fix it before publishing.", { description: err });
       return;
     }
     setPublishing(true);
