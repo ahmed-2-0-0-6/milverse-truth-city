@@ -27,6 +27,8 @@ import { CaseCard, TierMeter } from "@/components/CaseCard";
 import mirrorArt from "@/assets/district-mirror.jpg";
 import mirrorVideo from "@/assets/mirror.mp4.asset.json";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
+import { InboxManager } from "@/components/inbox/InboxManager";
+import { IncomingToast } from "@/components/inbox/IncomingToast";
 
 export const Route = createFileRoute("/mirror/")({
   head: () => ({
