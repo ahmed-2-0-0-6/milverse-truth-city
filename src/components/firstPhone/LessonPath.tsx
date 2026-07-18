@@ -22,6 +22,7 @@ function freshState(): FirstPhoneState {
     wallpaper: 0,
     handoverSeen: false,
     tourSeen: false,
+    spotItBest: 0,
   };
 }
 
