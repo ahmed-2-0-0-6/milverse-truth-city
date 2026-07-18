@@ -280,6 +280,7 @@ export function TopBar() {
           </Sheet>
         </div>
       </div>
+      <SoundIntroChip />
     </header>
   );
 }
