@@ -247,7 +247,7 @@ function AssessmentTab({ passcode }: { passcode: string }) {
       setRows(res.entries ?? []);
       setPhase(res.phase?.phase ?? "intake");
       setLoadedCode(upper);
-      toast.success(`Loaded group ${upper}`, {
+      toast.success(`Loaded group ${upper}.`, {
         description: `${res.entries?.length ?? 0} responses.`,
       });
     } catch (e) {
@@ -265,7 +265,7 @@ function AssessmentTab({ passcode }: { passcode: string }) {
     try {
       await flipFn({ data: { passcode, groupCode: loadedCode, phase: next } as never });
       setPhase(next);
-      toast.success(`Group phase → ${next.toUpperCase()}`);
+      toast.success(`Group phase → ${next.toUpperCase()}.`);
     } catch (e) {
       const msg = (e as Error).message;
       setErr(msg);
@@ -394,7 +394,7 @@ function AssessmentTab({ passcode }: { passcode: string }) {
     a.download = `assessment-${loadedCode}-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success(`Exported ${rows.length} rows`);
+    toast.success(`Exported ${rows.length} rows.`);
   }
 
   return (

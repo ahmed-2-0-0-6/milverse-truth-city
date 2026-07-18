@@ -171,7 +171,7 @@ function PilotPage() {
     }
     setActiveGroup(c);
     setCode("");
-    toast.success(`Joined group ${c}`);
+    toast.success(`Joined group ${c}.`);
   }
   function leave() {
     setActiveGroup(null);
@@ -270,7 +270,7 @@ function PilotPage() {
     a.download = `pilot-${active}-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success(`Exported ${cloud.length} entries`);
+    toast.success(`Exported ${cloud.length} entries.`);
   }
 
   return (
