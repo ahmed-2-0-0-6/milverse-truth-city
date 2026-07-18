@@ -1101,6 +1101,8 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
   const sim = useMemo(() => loadSim(), []);
   const pinIdxs: number[] = (sim?.state as EngineState & { pins?: number[] })?.pins ?? [];
   const pinnedMsgs = pinIdxs.map((i) => sim?.messages[i]).filter((m): m is Message => !!m);
+  const pinTags = sim?.pinTags ?? {};
+  const refs = useMemo(() => factRefsFor(scenario), [scenario]);
   const voiceMsg = sim?.messages.find((m) => m.kind === "voice");
   const vobArtifact = sim?.vobArtifact;
   const usedVob = sim?.endReason === "vob_used";
