@@ -226,15 +226,20 @@ interface StoredSim {
   ended: boolean;
   endReason?: "contact_left" | "vob_used";
   vobArtifact?: string | null;
+  /** Message index → fact ref ("K2", "P1", "GUT"). Presentation-only. */
+  pinTags?: Record<number, string>;
 }
 
 function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void }) {
   const skin = skinForCase(scenario.id);
+  const refs = useMemo(() => factRefsFor(scenario), [scenario]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [state, setState] = useState<EngineState>(() => initState(scenario));
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const [pins, setPins] = useState<number[]>([]);
+  const [pinTags, setPinTags] = useState<Record<number, string>>({});
+  const [openRef, setOpenRef] = useState<string | null>(null);
   const [tab, setTab] = useState<"chat" | "notes">("chat");
   const [ended, setEnded] = useState(false);
   const [endReason, setEndReason] = useState<"contact_left" | "vob_used" | null>(null);
