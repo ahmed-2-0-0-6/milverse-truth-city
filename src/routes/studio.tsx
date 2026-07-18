@@ -650,41 +650,48 @@ function Studio() {
             <div className="-mt-2 text-center font-mono text-[9px] tracking-widest text-muted-foreground">
               THE ONLY REVIEW THAT COUNTS.
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className={mode === "mask" ? "grid grid-cols-1 gap-3" : "grid grid-cols-1 sm:grid-cols-2 gap-3"}>
               <button
                 onClick={() => void publish("private")}
                 disabled={publishing}
                 className="rounded-md border-2 border-primary/60 bg-card py-4 px-4 text-left disabled:opacity-50 hover:border-primary transition"
               >
                 <div className="font-mono text-[10px] tracking-widest text-primary">
-                  PRIVATE CASE
+                  {mode === "mask" ? "FORGE THE MASK" : "PRIVATE CASE"}
                 </div>
-                <div className="mt-1 text-sm font-semibold">Share by code only</div>
+                <div className="mt-1 text-sm font-semibold">
+                  {mode === "mask" ? "Get a code, text it to a friend" : "Share by code only"}
+                </div>
                 <div className="mt-1 text-xs text-muted-foreground">
-                  Playable by anyone with the code. Never appears on any public shelf.
+                  {mode === "mask"
+                    ? "Four minutes on the clock. Every fact you wrote, every dodge you planned — aimed at them."
+                    : "Playable by anyone with the code. Never appears on any public shelf."}
                 </div>
                 <div className="mt-3 font-mono text-[10px] tracking-widest text-primary">
-                  {publishing ? "…" : "PUBLISH PRIVATELY →"}
+                  {publishing ? "…" : mode === "mask" ? "FORGE →" : "PUBLISH PRIVATELY →"}
                 </div>
               </button>
-              <button
-                onClick={() => void publish("community")}
-                disabled={publishing}
-                className="rounded-md border-2 border-caution/60 bg-card py-4 px-4 text-left disabled:opacity-50 hover:border-caution transition"
-              >
-                <div className="font-mono text-[10px] tracking-widest text-caution">
-                  SUBMIT TO COMMUNITY LIBRARY
-                </div>
-                <div className="mt-1 text-sm font-semibold">Human review, then public</div>
-                <div className="mt-1 text-xs text-muted-foreground">
-                  Sent to the moderation queue. Only human-approved cases appear on the Community
-                  shelf, marked "Human-reviewed ✓".
-                </div>
-                <div className="mt-3 font-mono text-[10px] tracking-widest text-caution">
-                  {publishing ? "…" : "SUBMIT FOR REVIEW →"}
-                </div>
-              </button>
+              {mode === "city" && (
+                <button
+                  onClick={() => void publish("community")}
+                  disabled={publishing}
+                  className="rounded-md border-2 border-caution/60 bg-card py-4 px-4 text-left disabled:opacity-50 hover:border-caution transition"
+                >
+                  <div className="font-mono text-[10px] tracking-widest text-caution">
+                    SUBMIT TO COMMUNITY LIBRARY
+                  </div>
+                  <div className="mt-1 text-sm font-semibold">Human review, then public</div>
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    Sent to the moderation queue. Only human-approved cases appear on the Community
+                    shelf, marked "Human-reviewed ✓".
+                  </div>
+                  <div className="mt-3 font-mono text-[10px] tracking-widest text-caution">
+                    {publishing ? "…" : "SUBMIT FOR REVIEW →"}
+                  </div>
+                </button>
+              )}
             </div>
+
             <p className="text-[10px] font-mono tracking-widest text-muted-foreground text-center">
               AI SAFETY GATE · NO HATE · NO REAL PEOPLE · NO PII · NO POLITICAL ATTACKS
             </p>
