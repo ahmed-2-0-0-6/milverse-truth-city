@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Timer } from "lucide-react";
 import type { ClaimedClock } from "@/lib/mirror/clocks";
+import { clockTense } from "@/lib/mirror/audio";
 
 interface Props {
   clock: ClaimedClock;
