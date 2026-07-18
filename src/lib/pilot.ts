@@ -3,6 +3,9 @@
 // is active and the network is available, we also insert into pilot_entries
 // so a real classroom on multiple devices aggregates on the dashboard.
 
+import { readStore, recoverStore, writeStore } from "@/lib/storage";
+
+
 export interface PilotEntry {
   wing: "mirror" | "feed" | "daily";
   caseId: string;
