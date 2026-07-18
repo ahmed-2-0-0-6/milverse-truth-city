@@ -92,29 +92,12 @@ function ClockIn() {
   useEffect(() => {
     setProfile(loadProfile());
   }, []);
-  const [preview, setPreview] = useState<{ seed: string; refs: SlotRef[] } | null>(null);
-
-  useEffect(() => {
-    // Preview today's docket kinds only (no titles, no truths).
-    if (!profile) return;
-    const active = clockIn(new Date(), profile);
-    // NOTE: clockIn actually starts the shift on first call. Undo it so
-    // the preview stays face-down until the user hits CLOCK IN.
-    // Simpler: use a dry-run by building the docket manually.
-  }, [profile]);
-
-  // Face-down slots preview via a dry docket build (no state writes).
-  const dry = useMemo(() => {
+  // Face-down docket preview — pure buildDocket, no state writes.
+  const preview = useMemo(() => {
     if (!profile) return null;
-    // Import lazily to avoid a heavier module in SSR trees.
-    const { buildDocket, shiftDateKey } = require("@/lib/shift/docket") as typeof import("@/lib/shift/docket");
     const d = buildDocket(shiftDateKey(), profile);
-    return d;
+    return { seed: d.seed, refs: d.caseRefs };
   }, [profile]);
-
-  useEffect(() => {
-    if (dry) setPreview({ seed: dry.seed, refs: dry.caseRefs });
-  }, [dry]);
 
   const handleClockIn = () => {
     if (!profile) return;
