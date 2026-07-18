@@ -1737,7 +1737,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
         <div className="font-mono text-xs tracking-[0.3em] opacity-80">
           DEBRIEF · TIER {scenario.tier}
         </div>
-        <h1 className="mt-2 text-2xl font-semibold">{truthHeadline}</h1>
+        <h1 data-phase-anchor="mirror" tabIndex={-1} className="mt-2 text-2xl font-semibold outline-none">{truthHeadline}</h1>
         <div className="mt-3">
           <XpDeltaLine />
         </div>
