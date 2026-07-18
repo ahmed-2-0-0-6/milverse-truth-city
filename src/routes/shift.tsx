@@ -19,8 +19,10 @@ import {
   type SlotResult,
   type FinishedShift,
 } from "@/lib/shift/state";
-import { historyKey, slotTitle, type SlotRef } from "@/lib/shift/docket";
+import { buildDocket, historyKey, shiftDateKey, slotTitle, type SlotRef } from "@/lib/shift/docket";
 import { loadProfile } from "@/lib/mirror/profile";
+import { readDailyStatus } from "@/lib/daily/profile";
+import type { FinishedShift } from "@/lib/shift/state";
 
 export const Route = createFileRoute("/shift")({
   head: () => ({
