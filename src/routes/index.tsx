@@ -65,9 +65,11 @@ function CityMap() {
   // mount when localStorage is readable. Wrapped in a stable-height
   // container to avoid layout shift on either path.
   const [returning, setReturning] = useState(false);
+  const [showBait, setShowBait] = useState(false);
   // THE NIGHT SHIFT — landing recomputes its band every 60s so a session
   // left open across a boundary catches up. Elsewhere band is per-mount.
   const [shift, setShift] = useState<Shift>(() => currentShift());
+
 
   useEffect(() => {
     setView(preferredDefaultView());
