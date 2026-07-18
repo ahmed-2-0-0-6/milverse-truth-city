@@ -128,6 +128,7 @@ function FeedPlay() {
   return (
     <div className="min-h-screen grain">
       <TopBar />
+      <ShiftBanner kind="feed" caseId={scenario.id} phase={phase} />
       <div className="mx-auto max-w-3xl px-4 pt-4">
         <RookieIntro />
       </div>
