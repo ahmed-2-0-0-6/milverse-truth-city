@@ -3,12 +3,10 @@
 @import "tw-animate-css";
 @import "@fontsource/bebas-neue/400.css";
 @import "@fontsource-variable/space-grotesk";
-/* Paper serif set — self-hosted; no Google CDN dependency on school wifi. */
-@import "@fontsource/playfair-display/400.css";
-@import "@fontsource/playfair-display/400-italic.css";
-@import "@fontsource/playfair-display/700.css";
-@import "@fontsource/playfair-display/900.css";
-@import "@fontsource/unifrakturcook/700.css";
+/* Paper serif/blackletter set moved to src/styles/paper-fonts.css and
+   imported per-surface (paper route, pressroom, PaperDropCard, InboxTray,
+   civic marginalia/countersign). Keeps ~200KB of woff2 off the app shell. */
+
 
 @custom-variant dark (&:is(.dark *));
 

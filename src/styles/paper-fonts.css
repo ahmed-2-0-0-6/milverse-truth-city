@@ -1,0 +1,8 @@
+/* Paper/newsprint typography — imported ONLY by Paper-styled surfaces.
+   Kept out of styles.css so a cold load of / doesn't pull ~200KB of
+   serif+blackletter faces the shell never renders. */
+@import "@fontsource/playfair-display/400.css";
+@import "@fontsource/playfair-display/400-italic.css";
+@import "@fontsource/playfair-display/700.css";
+@import "@fontsource/playfair-display/900.css";
+@import "@fontsource/unifrakturcook/700.css";
