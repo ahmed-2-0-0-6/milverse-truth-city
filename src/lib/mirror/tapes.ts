@@ -3,6 +3,8 @@
 // playback. Message bodies never leave the device. No telemetry.
 
 import type { Message, VoicePayload } from "./engine";
+import { readStore, recoverStore, writeStore } from "@/lib/storage";
+
 
 /** Fields the tape renders. Everything else is stripped on save. */
 export interface TapeMessage {
