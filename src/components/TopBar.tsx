@@ -162,6 +162,7 @@ export function TopBar() {
             <BookOpen className="h-3.5 w-3.5" />
             <span className="hidden lg:inline">MANUAL</span>
           </Link>
+          {showInbox && <InboxTray />}
           <VisualQualityToggle />
           <AccessPanel />
           <button
