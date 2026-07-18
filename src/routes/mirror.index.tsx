@@ -218,6 +218,11 @@ function CaseFiles() {
             "Your turn to answer better. Verify the person, not the vibe.",
           ]}
         />
+        <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
+          {/* PLAIN signage under the noir title. */}
+          Catch the scammer sliding into your DMs.
+        </p>
+
 
         {/* Share code entry */}
         <div className="mt-6 mb-8 flex flex-wrap items-center gap-2">
