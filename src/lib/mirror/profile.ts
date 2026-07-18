@@ -52,8 +52,11 @@ export interface TrustProfile {
   dailyPlays: DailyPlayEntry[]; // append-only, most recent last
 }
 
+// Owner: mirror/profile (TrustProfile). Bump the suffix on breaking
+// shape change; readStore validators are the compatibility gate.
 const KEY = "milverse.profile.v2";
 const OLD_KEY = "milverse.profile.v1";
+
 
 function newProfile(): TrustProfile {
   return {
