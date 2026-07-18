@@ -324,6 +324,10 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
 
   // Sound design: tick on meter change; tension cue when critical (<30).
   const [meterDelta, setMeterDelta] = useState<number | null>(null);
+  const [sendTick, setSendTick] = useState(0);
+  const showBandOnMount = useRef(loadProfile().casesPlayed === 0).current;
+  const currentBand = bandFor(state.meter);
+
   useEffect(() => {
     let t: number | undefined;
     if (state.meter !== prevMeter.current) {
