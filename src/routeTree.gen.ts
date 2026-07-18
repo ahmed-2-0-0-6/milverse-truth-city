@@ -24,6 +24,7 @@ import { Route as FirstPhoneRouteImport } from './routes/first-phone'
 import { Route as FamilyRouteImport } from './routes/family'
 import { Route as EducatorsRouteImport } from './routes/educators'
 import { Route as DropRouteImport } from './routes/drop'
+import { Route as DoubleRouteImport } from './routes/double'
 import { Route as DevintelRouteImport } from './routes/devintel'
 import { Route as CityHallRouteImport } from './routes/city-hall'
 import { Route as CharterRouteImport } from './routes/charter'
@@ -118,6 +119,11 @@ const EducatorsRoute = EducatorsRouteImport.update({
 const DropRoute = DropRouteImport.update({
   id: '/drop',
   path: '/drop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DoubleRoute = DoubleRouteImport.update({
+  id: '/double',
+  path: '/double',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DevintelRoute = DevintelRouteImport.update({
@@ -230,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/charter': typeof CharterRoute
   '/city-hall': typeof CityHallRoute
   '/devintel': typeof DevintelRoute
+  '/double': typeof DoubleRoute
   '/drop': typeof DropRoute
   '/educators': typeof EducatorsRoute
   '/family': typeof FamilyRoute
@@ -267,6 +274,7 @@ export interface FileRoutesByTo {
   '/charter': typeof CharterRoute
   '/city-hall': typeof CityHallRoute
   '/devintel': typeof DevintelRoute
+  '/double': typeof DoubleRoute
   '/drop': typeof DropRoute
   '/educators': typeof EducatorsRoute
   '/family': typeof FamilyRoute
@@ -305,6 +313,7 @@ export interface FileRoutesById {
   '/charter': typeof CharterRoute
   '/city-hall': typeof CityHallRoute
   '/devintel': typeof DevintelRoute
+  '/double': typeof DoubleRoute
   '/drop': typeof DropRoute
   '/educators': typeof EducatorsRoute
   '/family': typeof FamilyRoute
@@ -344,6 +353,7 @@ export interface FileRouteTypes {
     | '/charter'
     | '/city-hall'
     | '/devintel'
+    | '/double'
     | '/drop'
     | '/educators'
     | '/family'
@@ -381,6 +391,7 @@ export interface FileRouteTypes {
     | '/charter'
     | '/city-hall'
     | '/devintel'
+    | '/double'
     | '/drop'
     | '/educators'
     | '/family'
@@ -418,6 +429,7 @@ export interface FileRouteTypes {
     | '/charter'
     | '/city-hall'
     | '/devintel'
+    | '/double'
     | '/drop'
     | '/educators'
     | '/family'
@@ -456,6 +468,7 @@ export interface RootRouteChildren {
   CharterRoute: typeof CharterRoute
   CityHallRoute: typeof CityHallRoute
   DevintelRoute: typeof DevintelRoute
+  DoubleRoute: typeof DoubleRoute
   DropRoute: typeof DropRoute
   EducatorsRoute: typeof EducatorsRoute
   FamilyRoute: typeof FamilyRoute
@@ -588,6 +601,13 @@ declare module '@tanstack/react-router' {
       path: '/drop'
       fullPath: '/drop'
       preLoaderRoute: typeof DropRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/double': {
+      id: '/double'
+      path: '/double'
+      fullPath: '/double'
+      preLoaderRoute: typeof DoubleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/devintel': {
@@ -763,6 +783,7 @@ const rootRouteChildren: RootRouteChildren = {
   CharterRoute: CharterRoute,
   CityHallRoute: CityHallRoute,
   DevintelRoute: DevintelRoute,
+  DoubleRoute: DoubleRoute,
   DropRoute: DropRoute,
   EducatorsRoute: EducatorsRoute,
   FamilyRoute: FamilyRoute,
