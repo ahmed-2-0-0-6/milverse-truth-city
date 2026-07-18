@@ -10,6 +10,7 @@ import { feedTacticMap } from "@/lib/handler/feedTactics";
 import { buildSendOff, sendOffSeed } from "@/lib/handler/sendoff";
 import { useHandlerLine } from "@/lib/handler/useHandlerLine";
 import { dropDateKey } from "@/lib/daily/rotation";
+import { computeConviction } from "@/lib/mirror/conviction";
 
 export function SendOff() {
   const [profile, setProfile] = useState<TrustProfile | null>(null);
