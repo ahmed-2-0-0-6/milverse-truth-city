@@ -21,8 +21,10 @@ import { IncomingToast } from "@/components/inbox/IncomingToast";
 import { IncomingCall } from "@/components/inbox/IncomingCall";
 import { FirstCall } from "@/components/onboarding/FirstCall";
 import { CitizenDesk } from "@/components/landing/CitizenDesk";
+import { LiveBait, hasSeenLiveBait } from "@/components/landing/LiveBait";
 import { isReturningCitizen } from "@/lib/city/returning";
 import { currentShift, isNightRegister, type Shift } from "@/lib/city/shift";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -63,18 +65,25 @@ function CityMap() {
   // mount when localStorage is readable. Wrapped in a stable-height
   // container to avoid layout shift on either path.
   const [returning, setReturning] = useState(false);
+  const [showBait, setShowBait] = useState(false);
   // THE NIGHT SHIFT — landing recomputes its band every 60s so a session
   // left open across a boundary catches up. Elsewhere band is per-mount.
   const [shift, setShift] = useState<Shift>(() => currentShift());
 
+
   useEffect(() => {
     setView(preferredDefaultView());
-    setReturning(isReturningCitizen());
+    const isReturner = isReturningCitizen();
+    setReturning(isReturner);
     if (typeof window !== "undefined" && !localStorage.getItem(INTRO_KEY)) setIntro(true);
+    // LIVE BAIT — first-time visitors only, once per session. Returning
+    // citizens go straight to the desk (they've been baited already).
+    setShowBait(!isReturner && !hasSeenLiveBait());
     setShift(currentShift());
     const tick = window.setInterval(() => setShift(currentShift()), 60_000);
     return () => window.clearInterval(tick);
   }, []);
+
 
   useEffect(() => {
     if (mode !== "cinematic") setBooted(true);
@@ -107,7 +116,7 @@ function CityMap() {
       <IncomingCall />
       {!booted && <BootScreen onDone={() => setBooted(true)} />}
       <TopBar />
-      {intro && booted && (
+      {intro && booted && !showBait && (
         <FirstCall
           onDone={() => {
             try {
@@ -119,6 +128,7 @@ function CityMap() {
           }}
         />
       )}
+
 
       {/* ── HERO ── full-viewport cinematic */}
       <section
@@ -168,7 +178,14 @@ function CityMap() {
             layout shift on either path — hydration idiom follows the
             existing setView pattern above. */}
         <div className="w-full flex flex-col items-center min-h-[420px] sm:min-h-[460px]">
-          {returning ? (
+          {showBait ? (
+            <div className="w-full">
+              <div className="stencil text-[10px] text-destructive/90 mb-4 hud-blink text-center">
+                // INCOMING · UNKNOWN NUMBER · CALL IT
+              </div>
+              <LiveBait onDismiss={() => setShowBait(false)} />
+            </div>
+          ) : returning ? (
             <CitizenDesk shift={shift} />
           ) : (
             <>
@@ -192,6 +209,7 @@ function CityMap() {
             </>
           )}
         </div>
+
 
 
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 scroll-hint">
