@@ -1996,13 +1996,36 @@ html[data-force-reduce-motion="on"] .marquee-track {
   }
 }
 
+/* ── GAME-FEEL — junior LessonCleared confetti (soft, one pass) ── */
+.confetti-fall {
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.3, 0.4, 0.6, 1);
+  animation-fill-mode: both;
+}
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(105vh) rotate(320deg);
+    opacity: 0.7;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .scanlines-live,
   .neon-flicker-edge,
   .glitch-flicker,
   .hud-blink-slow,
   .district-card.submerging,
-  .submerge-flash {
+  .submerge-flash,
+  .streak-flame-pop,
+  .ember,
+  .confetti-fall {
     animation: none !important;
   }
 }
@@ -2095,7 +2118,9 @@ html[data-high-legibility="on"] .fx-rain-hard,
 html[data-high-legibility="on"] .fx-lightning,
 html[data-high-legibility="on"] .kenburns,
 html[data-high-legibility="on"] .scan-sweep::before,
-html[data-high-legibility="on"] .scan-sweep-red::before {
+html[data-high-legibility="on"] .scan-sweep-red::before,
+html[data-high-legibility="on"] .ember,
+html[data-high-legibility="on"] .confetti-fall {
   display: none !important;
   animation: none !important;
 }

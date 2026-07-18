@@ -9,6 +9,7 @@ import { logPilotEntry } from "@/lib/pilot";
 import { LicenseCard } from "./LicenseCard";
 import { HomeScreen } from "./HomeScreen";
 import { JuniorLesson } from "./JuniorLesson";
+import { LessonCleared } from "./LessonCleared";
 import { LockScreen } from "./LockScreen";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChevronLeft } from "lucide-react";
@@ -36,6 +37,7 @@ export function LessonPath() {
   const [openLesson, setOpenLesson] = useState<number | null>(null);
   const [showLicense, setShowLicense] = useState(false);
   const [graduated, setGraduated] = useState(false);
+  const [cleared, setCleared] = useState<number | null>(null);
 
   useEffect(() => {
     setState(loadFirstPhone());
@@ -64,6 +66,9 @@ export function LessonPath() {
       // Show graduation on the device (lock screen with LICENSED CITIZEN),
       // then open the LicenseCard.
       setGraduated(true);
+    } else {
+      // Small cleared beat before the home screen. Graduation replaces it on L10.
+      setCleared(n);
     }
   }
 
@@ -136,6 +141,14 @@ export function LessonPath() {
   // Home screen (phone)
   return (
     <div className="mt-4">
+      {cleared !== null && (
+        <LessonCleared
+          lessonN={cleared}
+          totalDone={state.lessonsCompleted.length}
+          totalLessons={LESSONS.length}
+          onDone={() => setCleared(null)}
+        />
+      )}
       <ChatShell
         variant="junior"
         header={
