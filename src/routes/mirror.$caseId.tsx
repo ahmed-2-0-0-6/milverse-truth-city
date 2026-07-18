@@ -341,6 +341,45 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
     }
   }, [showBandOnMount]);
 
+  // Craft Marks — per-profile snapshot of grades that have auto-explained.
+  // Snapshotted on mount so mid-case flips don't retrigger.
+  const craftSeenRef = useRef<CraftGrade[]>([]);
+  useEffect(() => {
+    craftSeenRef.current = loadCraftSeen();
+  }, []);
+  const [openMarkIdx, setOpenMarkIdx] = useState<number | null>(null);
+  const wastedCaseKey = `milverse.craftmarks.wasted:${caseId}`;
+  const wastedFiredThisCase = () =>
+    typeof window !== "undefined" && window.sessionStorage.getItem(wastedCaseKey) === "1";
+  const markWastedFired = () => {
+    if (typeof window !== "undefined") window.sessionStorage.setItem(wastedCaseKey, "1");
+  };
+
+  // First-occurrence indices per grade among player messages whose reply has landed.
+  const firstOfGrade = useMemo(() => {
+    const out: Record<CraftGrade, number | undefined> = { strong: undefined, weak: undefined, wasted: undefined };
+    for (let i = 0; i < messages.length; i++) {
+      const m = messages[i];
+      if (m.role !== "player" || !m.probeQuality) continue;
+      const g = m.probeQuality as CraftGrade;
+      const hasReply = messages.some((later, j) => j > i && later.role === "contact");
+      if (!hasReply) continue;
+      if (out[g] === undefined) out[g] = i;
+    }
+    return out;
+  }, [messages]);
+
+  // Persist first-of-grade sightings so this profile only auto-explains once.
+  useEffect(() => {
+    (["strong", "weak", "wasted"] as CraftGrade[]).forEach((g) => {
+      if (firstOfGrade[g] !== undefined && !craftSeenRef.current.includes(g)) {
+        markCraftSeen(g);
+        craftSeenRef.current = [...craftSeenRef.current, g];
+      }
+    });
+  }, [firstOfGrade]);
+
+
   const currentBand = bandFor(state.meter);
 
   useEffect(() => {
