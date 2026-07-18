@@ -560,8 +560,10 @@ function FeedRow({ m, read }: { m: FeedMessage; read?: boolean }) {
               : "bg-neutral-800 border border-white/10 text-white rounded-bl-sm"
           }`}
         >
+          <span className="sr-only">{isPlayer ? "You" : "Sender"}: </span>
           {m.text}
         </div>
+
         <div className="px-1 font-mono text-[9px] tabular-nums text-white/35" aria-hidden>
           {stamp}
           {isPlayer && (
