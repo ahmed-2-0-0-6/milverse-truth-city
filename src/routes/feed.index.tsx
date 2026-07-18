@@ -44,6 +44,8 @@ const TIER_NAMES: Record<1 | 2 | 3, string> = {
 function FeedIndex() {
   const [outcomes, setOutcomes] = useState<Map<string, CaseCardOutcome>>(new Map());
   const [unread, setUnread] = useState<Set<string>>(new Set());
+  const season = useSeason();
+
 
   useEffect(() => {
     const readOutcomes = () => {
