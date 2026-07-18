@@ -44,6 +44,7 @@ export function PaperDropCard({
 
   useEffect(() => {
     setLive("The morning edition arrived.");
+    paperThud();
     if (reduce) return; // no auto-dismiss under reduced motion
     const t = window.setTimeout(onDismiss, AUTO_DISMISS_MS);
     return () => window.clearTimeout(t);
