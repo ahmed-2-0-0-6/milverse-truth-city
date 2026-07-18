@@ -7,6 +7,7 @@ import { PhoneOff, Phone } from "lucide-react";
 import { toast } from "sonner";
 import type { InboxItem } from "@/lib/inbox/scheduler";
 import { markArrived, markCallFired } from "@/lib/inbox/profile";
+import { ringPulse, stopRing } from "@/lib/mirror/audio";
 import { VoicemailSheet } from "./VoicemailSheet";
 
 const RING_MS = 8000;
