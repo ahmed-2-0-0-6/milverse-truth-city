@@ -374,7 +374,11 @@ function Sim({
             />
             <div className="px-3 py-2 bg-neutral-950/80 border-b border-white/10">
               <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-white/50">
-                <span>DIGNITY · {scenario.sender.name.split(" ")[0]}</span>
+                <span
+                  aria-label={`Dignity, ${currentBand.label}, ${Math.round(state.dignity)}`}
+                >
+                  DIGNITY · {scenario.sender.name.split(" ")[0]} · {currentBand.label}
+                </span>
                 <span>{Math.round(state.dignity)}</span>
               </div>
               <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
@@ -383,6 +387,14 @@ function Sim({
                   style={{ width: `${state.dignity}%` }}
                 />
               </div>
+              <MeterNote
+                bandKey={currentBand.key}
+                label={currentBand.label}
+                note={currentBand.note}
+                sendTick={sendTick}
+                showOnMount={showBandOnMount}
+              />
+
               <div className="mt-2 flex gap-1">
                 {(["chat", "toolkit"] as const).map((t) => (
                   <button
