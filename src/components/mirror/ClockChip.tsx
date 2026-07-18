@@ -45,10 +45,6 @@ export function ClockChip({ clock, onExpire }: Props) {
         tenseFiredRef.current = true;
         clockTense();
       }
-    const iv = window.setInterval(() => {
-      const elapsed = (Date.now() - startedAtRef.current) / 1000;
-      const left = Math.max(0, clock.seconds - elapsed);
-      setRemaining(left);
       if (left <= 0 && !firedRef.current) {
         firedRef.current = true;
         setAnnounceExpire(clock.expiredLine);
