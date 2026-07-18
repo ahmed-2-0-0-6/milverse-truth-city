@@ -64,10 +64,13 @@ export function LockScreen({
 
       <div className="relative flex-1 flex flex-col items-center px-4 pt-8">
         <div className="text-center drop-shadow-md">
-          <div className="text-[10px] font-mono tracking-[0.3em] opacity-80">
-            {day.toUpperCase()}
+          <div
+            className="text-6xl font-thin tabular-nums leading-none"
+            aria-hidden="true"
+          >{`${h12}:${mm}`}</div>
+          <div className="mt-2 text-[13px] font-medium tracking-wide opacity-90" aria-hidden="true">
+            {day}
           </div>
-          <div className="mt-2 text-6xl font-thin tabular-nums leading-none">{`${hh}:${mm}`}</div>
           {cityName && <div className="mt-4 text-sm font-medium opacity-90">Hey {cityName}.</div>}
           {hint && <div className="mt-1 text-[11px] opacity-70">{hint}</div>}
         </div>
