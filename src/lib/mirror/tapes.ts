@@ -51,16 +51,18 @@ function strip(m: Message): TapeMessage {
   return out;
 }
 
+function isTapeListShape(v: unknown): v is StoredTape[] {
+  return Array.isArray(v);
+}
+
 export function readTapes(): StoredTape[] {
   if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as StoredTape[]) : [];
-  } catch {
-    return [];
+  const read = readStore<StoredTape[]>(KEY, isTapeListShape);
+  if (read === "corrupt") {
+    const rec = recoverStore<StoredTape[]>(KEY, isTapeListShape);
+    return rec ?? [];
   }
+  return read ?? [];
 }
 
 export function saveTape(entry: {
@@ -82,12 +84,9 @@ export function saveTape(entry: {
   list.push(tape);
   // FIFO cap.
   while (list.length > CAP) list.shift();
-  try {
-    localStorage.setItem(KEY, JSON.stringify(list));
-  } catch {
-    /* quota — silently drop */
-  }
+  writeStore(KEY, list);
 }
+
 
 export function clearTapes(): void {
   if (typeof window === "undefined") return;
