@@ -11,10 +11,12 @@ export interface InboxProfile {
   opened: string[];
   /** caseIds for which "The Missed Call" ring already fired today. */
   firedCalls: string[];
+  /** Edition id the player last opened via a Morning Edition delivery. */
+  paperRead: string | null;
 }
 
 function fresh(dateKey = dropDateKey()): InboxProfile {
-  return { dateKey, arrived: [], opened: [], firedCalls: [] };
+  return { dateKey, arrived: [], opened: [], firedCalls: [], paperRead: null };
 }
 
 export function loadInbox(): InboxProfile {
@@ -30,6 +32,7 @@ export function loadInbox(): InboxProfile {
       arrived: Array.isArray(p.arrived) ? p.arrived : [],
       opened: Array.isArray(p.opened) ? p.opened : [],
       firedCalls: Array.isArray(p.firedCalls) ? p.firedCalls : [],
+      paperRead: typeof p.paperRead === "string" ? p.paperRead : null,
     };
   } catch {
     return fresh();
@@ -72,6 +75,14 @@ export function markCallFired(caseId: string) {
   const p = loadInbox();
   if (!p.firedCalls.includes(caseId)) {
     p.firedCalls.push(caseId);
+    saveInbox(p);
+  }
+}
+
+export function markPaperRead(editionId: string) {
+  const p = loadInbox();
+  if (p.paperRead !== editionId) {
+    p.paperRead = editionId;
     saveInbox(p);
   }
 }

@@ -18,5 +18,7 @@ export function platformStyle(p: InboxPlatform): PlatformStyle {
       return { border: "#e1306c", dot: "#e1306c", glyph: "◈", label: "DM" };
     case "drop":
       return { border: "oklch(0.82 0.14 195)", dot: "oklch(0.82 0.14 195)", glyph: "★", label: "Aaj ka Forward" };
+    case "paper":
+      return { border: "#c9b78b", dot: "#c9b78b", glyph: "❡", label: "Morning Edition" };
   }
 }
