@@ -21,6 +21,7 @@ import {
 import { loadProfile, unlockedMaxTier, tierWins, type TrustProfile } from "@/lib/mirror/profile";
 import { fetchCitizenCase } from "@/lib/citizen.functions";
 import { RecommendedStrip } from "@/components/RecommendedStrip";
+import { ReopenedStrip } from "@/components/mirror/ReopenedStrip";
 import { DistrictIntro } from "@/components/DistrictIntro";
 import { DistrictHero } from "@/components/DistrictHero";
 import { CaseCard, TierMeter, type CaseCardOutcome, type ArtifactChip } from "@/components/CaseCard";
