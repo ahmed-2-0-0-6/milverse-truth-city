@@ -48,6 +48,9 @@ import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 import { clockFor } from "@/lib/mirror/clocks";
 import { ClockChip } from "@/components/mirror/ClockChip";
 import { pendingRetestForCase, scheduleRetest, resolveRetest, type RetestResolution } from "@/lib/mirror/retests";
+import { bandFor } from "@/lib/mirror/meterBands";
+import { MeterNote } from "@/components/chat/MeterNote";
+
 import { CONVICTION_CHIPS, computeConviction, debriefLineFor } from "@/lib/mirror/conviction";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 import { aftermathFor } from "@/lib/mirror/aftermath";
