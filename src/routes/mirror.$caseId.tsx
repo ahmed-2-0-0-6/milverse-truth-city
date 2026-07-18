@@ -776,8 +776,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               className={`flex-1 overflow-y-auto p-3 space-y-2.5 ${skin.bodyClass}`}
               style={skin.bodyStyle}
             >
-              <div className="sr-only" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation messages" />
-
+              <div role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation messages" className="contents">
               {skin.systemNote && (
                 <div className="flex justify-center">
                   <div className="max-w-[85%] rounded-md bg-black/40 border border-white/10 px-3 py-1.5 text-center text-[10px] leading-relaxed text-amber-200/80">
@@ -785,6 +784,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                   </div>
                 </div>
               )}
+
               {messages.map((m, i) => {
                 const hasReply = messages.some((later, j) => j > i && later.role === "contact");
                 const grade = m.role === "player" ? (m.probeQuality as CraftGrade | undefined) : undefined;
