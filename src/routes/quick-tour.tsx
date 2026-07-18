@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import { Sparkles, Pin, ArrowRight, Search, Heart } from "lucide-react";
+import { MIRROR_SCRIPT } from "@/lib/tour/script";
 
 export const Route = createFileRoute("/quick-tour")({
   head: () => ({
@@ -16,39 +17,7 @@ export const Route = createFileRoute("/quick-tour")({
   component: QuickTour,
 });
 
-interface Scripted {
-  from: "contact" | "player" | "system";
-  text: string;
-  tip?: string;
-  meter?: number;
-  isTell?: boolean;
-}
-
-const MIRROR_SCRIPT: Scripted[] = [
-  { from: "system", text: "THE MIRROR · personal deception" },
-  {
-    from: "contact",
-    text: "Hi — it's Sana. Lost my phone, this is a temp number. Small urgent favor?",
-    meter: 90,
-    tip: "New number + urgency + a favor. Your real Sana calls after hours, not texts.",
-  },
-  { from: "player", text: "Wait — what was your old number's last 4 digits?" },
-  {
-    from: "contact",
-    text: "temp SIM. don't call the old one, it's bricked.",
-    meter: 78,
-    isTell: true,
-    tip: "She DODGED a dossier question. A real Sana says '4472' instantly.",
-  },
-  { from: "player", text: "Can I call you back through Slack?" },
-  {
-    from: "contact",
-    text: "phone's dying, no time — sms is faster, promise.",
-    meter: 65,
-    isTell: true,
-    tip: "REFUSED out-of-band verification. That's the imposter signature.",
-  },
-];
+// MIRROR_SCRIPT + Scripted moved to src/lib/tour/script.ts (shared with FirstCall).
 
 // Feed segment: uncle forwards flood photo. Verdict = MISLEADING.
 interface FeedScripted {
