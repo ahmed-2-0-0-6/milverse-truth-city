@@ -46,6 +46,8 @@ const InputSchema = z
       "drop-line",
       "leaderboard-nudge",
       "psych-eval",
+      "send-off",
+      "loss-debrief",
     ]),
     fallback: z.string().min(1).max(600),
     // Compact, non-PII profile summary — the ONLY thing about the player
