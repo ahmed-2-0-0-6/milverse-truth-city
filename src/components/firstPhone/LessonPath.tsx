@@ -3,6 +3,7 @@ import { LESSONS } from "@/lib/firstPhone/lessons";
 import { loadFirstPhone, markLessonComplete, type FirstPhoneState } from "@/lib/firstPhone/profile";
 import { logPilotEntry } from "@/lib/pilot";
 import { LicenseCard } from "./LicenseCard";
+import { Conferral } from "./Conferral";
 import { HomeScreen } from "./HomeScreen";
 import { JuniorLesson } from "./JuniorLesson";
 import { LessonCleared } from "./LessonCleared";
@@ -90,8 +91,36 @@ export function LessonPath() {
     );
   }
 
-  // License "app"
+  // License "app" — with one-time Conferral ceremony before the card.
   if (showLicense) {
+    const CONFERRAL_KEY = "milverse.firstphone.conferral.seen";
+    let conferralSeen = true;
+    try {
+      conferralSeen = localStorage.getItem(CONFERRAL_KEY) === "1";
+    } catch {
+      /* storage unavailable — behave as seen */
+    }
+    const reduce =
+      typeof window !== "undefined" &&
+      (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ||
+        document.documentElement.getAttribute("data-force-reduce-motion") === "on" ||
+        document.documentElement.getAttribute("data-high-legibility") === "on");
+    if (!conferralSeen && !reduce) {
+      return (
+        <Conferral
+          onDone={() => {
+            try {
+              localStorage.setItem(CONFERRAL_KEY, "1");
+            } catch {
+              /* ignore */
+            }
+            // Force a re-render so the card branch renders next.
+            setShowLicense(false);
+            setTimeout(() => setShowLicense(true), 0);
+          }}
+        />
+      );
+    }
     return (
       <div className="mt-4">
         <button
