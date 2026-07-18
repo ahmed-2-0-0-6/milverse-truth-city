@@ -951,12 +951,13 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                     read={typing || hasReply}
                     skin={skin}
                     hasReply={hasReply}
-                    grade={grade}
-                    why={grade ? craftWhyFor(scenario, m.text, grade) : undefined}
+                    grade={coldMode ? undefined : grade}
+                    why={coldMode || !grade ? undefined : craftWhyFor(scenario, m.text, grade)}
                     markOpen={openMarkIdx === i}
-                    autoOpenMark={autoOpen}
+                    autoOpenMark={!coldMode && autoOpen}
                     onOpenMark={() => setOpenMarkIdx(i)}
                     onCloseMark={() => setOpenMarkIdx((cur) => (cur === i ? null : cur))}
+
                   />
                 );
               })}
