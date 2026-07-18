@@ -2302,3 +2302,20 @@ html[data-high-legibility="on"] .spot-slide,
 html[data-force-reduce-motion="on"] .spot-slide {
   transition: none !important;
 }
+
+/* ---------- THE CLAIMED CLOCK (amber pressure, not alarm) ---------- */
+@keyframes clockTensePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.clock-tense {
+  animation: clockTensePulse 1s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .clock-tense { animation: none !important; opacity: 1 !important; }
+}
+html[data-high-legibility="on"] .clock-tense,
+html[data-force-reduce-motion="on"] .clock-tense {
+  animation: none !important;
+  opacity: 1 !important;
+}

@@ -42,6 +42,8 @@ import { ChatHeader } from "@/components/chat/ChatHeader";
 import { skinForCase, receiptFor, type ChatSkin } from "@/lib/chat/skins";
 import { ContactsSheet } from "@/components/chat/ContactsSheet";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
+import { clockFor } from "@/lib/mirror/clocks";
+import { ClockChip } from "@/components/mirror/ClockChip";
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
@@ -212,6 +214,19 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
   const tacticFlashed = useRef<boolean>(false);
   const [tacticFlash, setTacticFlash] = useState<null | ReturnType<typeof tacticForMirror>>(null);
   const [contactsOpen, setContactsOpen] = useState(false);
+  const claimedClock = useMemo(() => clockFor(scenario.id), [scenario.id]);
+  const clockExpiredRef = useRef(false);
+  function handleClockExpire() {
+    if (clockExpiredRef.current || !claimedClock) return;
+    clockExpiredRef.current = true;
+    // UI-level appended row. role="system" is already excluded from the
+    // player SENT counter and from contact-based read-receipt logic — do
+    // NOT route through the engine or mutate EngineState.
+    setMessages((prev) => [
+      ...prev,
+      { role: "system", kind: "system", text: claimedClock.expiredLine, ts: Date.now() },
+    ]);
+  }
 
   useEffect(() => {
     const opener: Message = {
@@ -458,6 +473,9 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                     </span>
                   )}
                   {Math.round(state.meter)}
+                  {claimedClock && (
+                    <ClockChip clock={claimedClock} onExpire={handleClockExpire} />
+                  )}
                 </span>
               </div>
               <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
@@ -1415,6 +1433,19 @@ function Debrief({ scenario }: { scenario: Scenario }) {
         <PauseRow letter="S" title="Story / emotion" body={pauseText(scenario, "S")} />
         <PauseRow letter="E" title="Evidence" body={pauseText(scenario, "E")} />
       </section>
+
+      {(() => {
+        const dc = clockFor(scenario.id);
+        if (!dc) return null;
+        return (
+          <section className="rounded-xl border border-caution/40 bg-caution/5 p-6">
+            <div className="font-mono text-xs tracking-[0.3em] text-caution mb-2">
+              THE CLOCK
+            </div>
+            <p className="text-sm leading-relaxed">{dc.debriefNote}</p>
+          </section>
+        );
+      })()}
 
       <RealCaseFile caseId={scenario.id} inline={scenario.inspiredBy} />
 
