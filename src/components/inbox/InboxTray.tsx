@@ -139,6 +139,9 @@ export function InboxTray() {
             {rows.map((it) => {
               const s = platformStyle(it.platform);
               const isCall = it.type === "call";
+              const isPaper = it.type === "paper";
+              const leftBorder = isCall ? "#ef4444" : isPaper ? "#c9b78b" : s.border;
+              const iconBg = isCall ? "#ef4444" : isPaper ? "#1a1712" : s.border;
               return (
                 <li key={it.id}>
                   <button
@@ -146,20 +149,35 @@ export function InboxTray() {
                     className={`w-full text-left flex items-start gap-3 px-4 py-3 hover:bg-accent/40 focus-visible:outline-none focus-visible:bg-accent/60 transition-colors ${
                       it.read ? "opacity-50" : ""
                     }`}
-                    style={{ borderLeft: `3px solid ${isCall ? "#ef4444" : s.border}` }}
+                    style={{ borderLeft: `3px solid ${leftBorder}` }}
                   >
                     <span
                       className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                      style={{ background: isCall ? "#ef4444" : s.border }}
+                      style={{ background: iconBg }}
                       aria-hidden
                     >
-                      {isCall ? <Phone className="h-4 w-4" /> : s.glyph}
+                      {isCall ? (
+                        <Phone className="h-4 w-4" />
+                      ) : isPaper ? (
+                        <Newspaper className="h-4 w-4" style={{ color: "#f4efe4" }} />
+                      ) : (
+                        s.glyph
+                      )}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center gap-2 text-[13px] font-semibold text-foreground leading-tight">
-                        <span className="truncate">{it.senderName}</span>
+                        <span
+                          className={`truncate ${isPaper ? "" : ""}`}
+                          style={
+                            isPaper
+                              ? { fontFamily: "'Playfair Display', Georgia, serif" }
+                              : undefined
+                          }
+                        >
+                          {isPaper ? it.headline : it.senderName}
+                        </span>
                         <span className="ml-auto stencil text-[9px] text-muted-foreground">
-                          {isCall ? "MISSED" : s.label}
+                          {isCall ? "MISSED" : isPaper ? "MORNING EDITION" : s.label}
                         </span>
                       </span>
                       {isCall && it.number && (
@@ -168,7 +186,11 @@ export function InboxTray() {
                         </span>
                       )}
                       <span className="mt-0.5 block truncate text-xs text-muted-foreground">
-                        {isCall ? "Voicemail · tap to play" : it.preview}
+                        {isCall
+                          ? "Voicemail · tap to play"
+                          : isPaper
+                            ? "UNFOLD →"
+                            : it.preview}
                       </span>
                     </span>
                   </button>
