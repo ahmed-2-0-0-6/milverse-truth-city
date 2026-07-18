@@ -17,6 +17,10 @@ import { getLatestEdition, listArchive, getEdition } from "@/lib/paper.functions
 import type { Edition, EditionContent } from "@/lib/paper/types";
 import { dropDateKey } from "@/lib/daily/rotation";
 import { readEditionRecord } from "@/lib/paper/profile";
+import {
+  supplementWeek,
+  readLastSeenWeek,
+} from "@/lib/paper/supplement";
 import { Newspaper, Printer, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/paper")({
