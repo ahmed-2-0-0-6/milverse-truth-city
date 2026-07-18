@@ -73,7 +73,10 @@ interface CardShellProps {
   outcome?: CaseCardOutcome;
   artifactChip?: ArtifactChip;
   unreadThread?: boolean;
+  /** Show the seasonal-circulation ⛆ glyph beside the tier meter. */
+  seasonGlyph?: ReactNode;
 }
+
 
 function CardShell({
   icon,
