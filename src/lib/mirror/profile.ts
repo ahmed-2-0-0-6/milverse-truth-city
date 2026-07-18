@@ -79,9 +79,8 @@ function newProfile(): TrustProfile {
   };
 }
 
-export function loadProfile(): TrustProfile {
-  if (typeof window === "undefined") return newProfile();
 // Minimal shape check: what the merge below already assumes.
+
 function isTrustProfileShape(v: unknown): v is Partial<TrustProfile> {
   if (!v || typeof v !== "object") return false;
   const o = v as Record<string, unknown>;
