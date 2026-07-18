@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Bell } from "lucide-react";
+import { Bell, Phone } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -13,6 +13,7 @@ import {
 import { loadInbox, markOpened } from "@/lib/inbox/profile";
 import { todaysArrivals, type InboxItem } from "@/lib/inbox/scheduler";
 import { platformStyle } from "./platform-style";
+import { VoicemailSheet } from "./VoicemailSheet";
 
 export function InboxTray() {
   const [open, setOpen] = useState(false);
