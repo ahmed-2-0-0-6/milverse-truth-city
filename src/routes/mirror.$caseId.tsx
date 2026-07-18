@@ -50,6 +50,7 @@ import { ClockChip } from "@/components/mirror/ClockChip";
 import { pendingRetestForCase, scheduleRetest, resolveRetest, type RetestResolution } from "@/lib/mirror/retests";
 import { CONVICTION_CHIPS, computeConviction, debriefLineFor } from "@/lib/mirror/conviction";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
+import { aftermathFor } from "@/lib/mirror/aftermath";
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
@@ -114,6 +115,7 @@ function VerdictReveal({ scenario, onDone }: { scenario: Scenario; onDone: () =>
       stampLabel={raw?.verdict ?? "UNVERIFIED"}
       outcome={outcome}
       onDone={onDone}
+      register={scenario.isSurvivorStory ? "quiet" : "standard"}
     />
   );
 }
@@ -1566,6 +1568,45 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       <CitySolved caseId={scenario.id} playerResult={result.resultKind === "correct" ? "correct" : result.resultKind === "missed_scam" ? "missed_scam" : result.resultKind === "false_alarm" ? "false_alarm" : "correct"} />
 
       <NextCaseCard wing="mirror" currentId={scenario.id} />
+
+      {(() => {
+        const am = aftermathFor(scenario.id);
+        if (!am) return null;
+        return (
+          <section className="mt-6 border-t border-border pt-10 text-muted-foreground">
+            <div className="font-mono text-[10px] tracking-[0.3em]">
+              AFTER THE CASE · REPORTED PATTERN
+            </div>
+            <h2 className="mt-3 text-xl font-semibold text-foreground">{am.patternName}</h2>
+            <p className="mt-4 text-sm leading-relaxed text-foreground/85">
+              {am.reportedPattern}
+            </p>
+            <blockquote className="mt-5 border-l-2 border-border pl-4 text-sm italic leading-relaxed text-foreground/80">
+              {am.dayAfter}
+            </blockquote>
+            <p className="mt-2 font-mono text-[10px] tracking-wide text-muted-foreground">
+              COMPOSITE ACCOUNT, DRAWN FROM REPORTED CASES. NO REAL PERSON APPEARS IN THIS FILE.
+            </p>
+            <div className="mt-6 font-mono text-[11px] tracking-widest text-foreground/80">
+              IF IT'S EVER REAL:
+            </div>
+            <ol className="mt-3 list-decimal space-y-2 pl-6 text-sm text-foreground/85 marker:text-muted-foreground">
+              {am.steps.map((s, i) => (
+                <li key={i} className="leading-relaxed">{s}</li>
+              ))}
+            </ol>
+            <div className="mt-6">
+              <Link
+                to="/manual/take-it-outside"
+                className="inline-flex items-center gap-2 font-mono text-[11px] tracking-widest text-foreground/80 underline underline-offset-4 hover:text-foreground"
+              >
+                TAKE IT OUTSIDE →
+              </Link>
+            </div>
+          </section>
+        );
+      })()}
+
 
       <div className="flex gap-3">
         <Link

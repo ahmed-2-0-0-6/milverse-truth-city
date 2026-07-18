@@ -17,6 +17,13 @@ interface Props {
   stampLabel: string; // "TRUE" / "FAKE" / "MISLEADING" / etc.
   outcome: CalibrationOutcome;
   onDone: () => void;
+  /**
+   * "The Quiet File" — survivor cases end quiet. The stamp fades in over
+   * 400ms (no scale/slam), screen-shake and audio cues are skipped.
+   * Result text, outcome, and timing handoff are identical to standard.
+   * Default: "standard" — every existing call site is byte-identical.
+   */
+  register?: "standard" | "quiet";
 }
 
 const GRADES: Record<
@@ -60,7 +67,8 @@ const STING_KIND: Record<CalibrationOutcome, "win" | "loss"> = {
   false_alarm: "loss",
 };
 
-export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }: Props) {
+export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone, register = "standard" }: Props) {
+  const quiet = register === "quiet";
   const { mode } = useVisualMode();
   const grade = GRADES[outcome];
   const [stage, setStage] = useState<"enter" | "stamp" | "reveal" | "trail">("enter");
@@ -97,11 +105,11 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
     }
     const t1 = window.setTimeout(() => {
       setStage("stamp");
-      stampSlam();
+      if (!quiet) stampSlam();
     }, 380);
     const t2 = window.setTimeout(() => {
       setStage("reveal");
-      stampSting(STING_KIND[outcome]);
+      if (!quiet) stampSting(STING_KIND[outcome]);
     }, 680); // slam + 300ms per Sound of the City spec
     const tSkip = window.setTimeout(() => setCanSkip(true), 1500);
     const t3 = window.setTimeout(() => {
@@ -116,7 +124,7 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
     return () => {
       [t1, t2, tSkip, t3, t4].forEach(clearTimeout);
     };
-  }, [mode, outcome]);
+  }, [mode, outcome, quiet]);
 
   if (mode !== "cinematic") return null;
 
@@ -158,7 +166,7 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
 
       {/* Case file */}
       <div
-        className={`relative w-[min(88vw,520px)] rounded-sm border border-white/15 bg-[#0b0f16] shadow-[0_40px_120px_-20px_rgba(0,0,0,0.9)] ${stage === "stamp" || stage === "reveal" || stage === "trail" ? "verdict-shake" : ""}`}
+        className={`relative w-[min(88vw,520px)] rounded-sm border border-white/15 bg-[#0b0f16] shadow-[0_40px_120px_-20px_rgba(0,0,0,0.9)] ${!quiet && (stage === "stamp" || stage === "reveal" || stage === "trail") ? "verdict-shake" : ""}`}
         style={{ transform: "translateZ(0)" }}
       >
         <div className="px-5 py-3 border-b border-white/10 flex items-center gap-3">
@@ -178,30 +186,34 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
           {(stage === "stamp" || stage === "reveal" || stage === "trail") && (
             <>
               <div
-                className="verdict-stamp absolute right-6 bottom-6 rotate-[-8deg] border-[3px] px-5 py-2 tracking-[0.14em] text-3xl font-black"
+                className={`${quiet ? "stamp-quiet" : "verdict-stamp"} absolute right-6 bottom-6 rotate-[-8deg] border-[3px] px-5 py-2 tracking-[0.14em] text-3xl font-black`}
                 style={{
                   color: `rgb(${grade.rgb})`,
                   borderColor: `rgb(${grade.rgb})`,
                   fontFamily: '"Bebas Neue", sans-serif',
-                  textShadow: `0 0 18px rgba(${grade.rgb},0.55)`,
-                  boxShadow: `inset 0 0 0 1px rgba(${grade.rgb},0.15), 0 12px 40px -8px rgba(${grade.rgb},0.35)`,
+                  textShadow: quiet ? "none" : `0 0 18px rgba(${grade.rgb},0.55)`,
+                  boxShadow: quiet
+                    ? `inset 0 0 0 1px rgba(${grade.rgb},0.15)`
+                    : `inset 0 0 0 1px rgba(${grade.rgb},0.15), 0 12px 40px -8px rgba(${grade.rgb},0.35)`,
                 }}
               >
                 {stampLabel}
               </div>
-              {/* Ink spread */}
-              <div
-                className="ink-spread absolute right-6 bottom-6 h-24 w-24 rounded-full pointer-events-none"
-                aria-hidden
-                style={{
-                  background: `radial-gradient(circle, rgba(${grade.rgb},0.55), transparent 70%)`,
-                }}
-              />
+              {/* Ink spread — standard register only */}
+              {!quiet && (
+                <div
+                  className="ink-spread absolute right-6 bottom-6 h-24 w-24 rounded-full pointer-events-none"
+                  aria-hidden
+                  style={{
+                    background: `radial-gradient(circle, rgba(${grade.rgb},0.55), transparent 70%)`,
+                  }}
+                />
+              )}
             </>
           )}
 
-          {/* Paper dust */}
-          {(stage === "stamp" || stage === "reveal") &&
+          {/* Paper dust — standard register only */}
+          {!quiet && (stage === "stamp" || stage === "reveal") &&
             dust.map((p, i) => (
               <span
                 key={i}

@@ -849,6 +849,17 @@ html[data-force-reduce-motion="on"] .marquee-track {
   will-change: transform, opacity;
 }
 
+/* "The Quiet File" — survivor cases fade in the stamp (no scale/slam,
+   no shake, no sound). Rotation stays inline via Tailwind rotate-[-8deg]. */
+@keyframes stamp-quiet {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+.stamp-quiet {
+  animation: stamp-quiet 400ms ease-out both;
+  will-change: opacity;
+}
+
 @keyframes ink-spread {
   0% {
     transform: scale(0.2);
@@ -2559,5 +2570,23 @@ html[data-force-reduce-motion="on"] .fc-fade-in,
 html[data-force-reduce-motion="on"] .fc-notif {
   animation: none !important;
   transform: none !important;
+  opacity: 1 !important;
+}
+
+/* ---------- "THE QUIET FILE" · stamp-quiet kill lists ----------
+   The reduced-motion / LITE branches of VerdictMoment return before
+   render, so the fade never mounts under those modes. These rules
+   are a defensive belt-and-braces skip: if the class ever renders
+   under prefers-reduced-motion, forced reduce-motion, or high
+   legibility, it shows the final frame (opacity 1) with no motion. */
+@media (prefers-reduced-motion: reduce) {
+  .stamp-quiet {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
+html[data-high-legibility="on"] .stamp-quiet,
+html[data-force-reduce-motion="on"] .stamp-quiet {
+  animation: none !important;
   opacity: 1 !important;
 }
