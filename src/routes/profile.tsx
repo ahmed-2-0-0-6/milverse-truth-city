@@ -98,6 +98,12 @@ function ProfilePage() {
           ← CITY
         </Link>
 
+        <div className="mt-6">
+          <TheRoad id="the-road" />
+        </div>
+
+
+
         <div className="mt-6 rounded-2xl border-2 border-primary/40 bg-card p-6 sm:p-8 relative overflow-hidden">
           <div
             className="absolute inset-0 opacity-[0.04]"
