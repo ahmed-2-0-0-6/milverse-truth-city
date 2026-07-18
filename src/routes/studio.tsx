@@ -256,6 +256,9 @@ function buildScenario(d: Draft): Scenario {
 
 function Studio() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
+  const mode: "city" | "mask" = (search as { mode?: string }).mode === "mask" ? "mask" : "city";
+  const handoffCode = (search as { handoff?: string }).handoff ?? "";
   const [step, setStep] = useState(1);
   const [draft, setDraft] = useState<Draft>(BLANK);
   const [error, setError] = useState<string | null>(null);
@@ -265,6 +268,10 @@ function Studio() {
   const desk = deskScore(deskNotes);
   const advisories = deskNotes.filter((n) => n.status === "advise").length;
 
+  // Mask handoff view (post-publish): show code + share button, skip form.
+  if (mode === "mask" && handoffCode) {
+    return <MaskHandoff code={handoffCode} onDone={() => navigate({ to: "/studio", search: { mode: "mask" } as never })} />;
+  }
 
   async function publish(lane: "private" | "community") {
     const err = validate(draft);
@@ -273,9 +280,20 @@ function Studio() {
       toast.error("Fix it before publishing.", { description: err });
       return;
     }
+    // MASK MODE — fairness gate + always private lane.
+    if (mode === "mask") {
+      const gate = fairnessGate(draft);
+      if (!gate.ok) {
+        setError(gate.reason ?? "The desk won't route it.");
+        toast.error("A mask nobody can beat proves nothing.", { description: gate.reason });
+        return;
+      }
+      lane = "private";
+    }
     setPublishing(true);
     setError(null);
     const s = buildScenario(draft);
+    if (mode === "mask") s.isMask = true;
     const code = (s as Scenario & { shareCode: string }).shareCode;
 
     // Tag with the designer's current noir rank at publish time.
@@ -294,8 +312,12 @@ function Studio() {
           lane,
         } as never,
       })) as { lane: "private" | "community"; aiChecked: boolean };
-      // Successful publish → increment XP-layer counter (feeds ranks + prestige).
       incrementPublishedCount();
+      if (mode === "mask") {
+        setPublishing(false);
+        navigate({ to: "/studio", search: { mode: "mask", handoff: code } as never });
+        return;
+      }
       if (res.lane === "community") {
         toast.success("Submitted to the library.", {
           description: `Queued for human review · share code ${code}${res.aiChecked ? " · AI safety check passed" : " · manual review pending"}${advisories > 0 ? ` · ${advisories} desk note${advisories === 1 ? "" : "s"} traveled with it.` : ""}`,
@@ -326,6 +348,7 @@ function Studio() {
     saveCitizenCase(s);
     navigate({ to: "/mirror/$caseId", params: { caseId: s.id } });
   }
+
 
   return (
     <div className="min-h-screen grain">
