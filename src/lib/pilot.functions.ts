@@ -78,3 +78,37 @@ export const fetchPilotGroup = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return { entries: rows ?? [] };
   });
+
+// -----------------------------------------------------------------------------
+// The City Board — group-scoped pseudonymous leaderboard.
+// Reads via SECURITY DEFINER RPC get_city_board (SQL enforces n<5 suppression
+// and >=3 plays per device). We also compute the caller's own handle server-side
+// so the client can highlight "YOU" without shipping an md5 dependency.
+// -----------------------------------------------------------------------------
+
+export const fetchCityBoard = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        groupCode: z.string().regex(CODE_RE),
+        deviceId: z.string().min(8).max(64).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const supabase = serverClient();
+    const { data: rows, error } = await supabase.rpc("get_city_board", {
+      _code: data.groupCode,
+    });
+    if (error) throw new Error(error.message);
+
+    // Derive the caller's handle (first 6 chars of md5(deviceId)) so the
+    // client can mark "YOU" without any md5 dependency.
+    let myHandle: string | null = null;
+    if (data.deviceId) {
+      const { createHash } = await import("crypto");
+      myHandle = createHash("md5").update(data.deviceId).digest("hex").slice(0, 6);
+    }
+
+    return { rows: rows ?? [], myHandle };
+  });

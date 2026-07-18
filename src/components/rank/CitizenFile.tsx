@@ -8,9 +8,11 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { operatorCallsign, type TrustProfile } from "@/lib/mirror/profile";
 import { rankFromXp } from "@/lib/ranks";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
+import { getActiveGroup } from "@/lib/pilot";
 
 interface Props {
   open: boolean;
@@ -26,6 +28,15 @@ export function CitizenFile({ open, onOpenChange, profile, xp, manualUnlocks }: 
   const isMax = !rank.next;
   const codename = profile ? operatorCallsign(profile) : null;
   const delta = rank.next ? Math.max(0, rank.next.minXp - xp) : 0;
+
+  const [activeGroup, setActiveGroupState] = useState<string | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    setActiveGroupState(getActiveGroup());
+    const on = () => setActiveGroupState(getActiveGroup());
+    window.addEventListener("milverse:pilot", on);
+    return () => window.removeEventListener("milverse:pilot", on);
+  }, [open]);
 
   const casesPlayed = profile?.casesPlayed ?? 0;
   const correct = profile?.correctVerdicts ?? 0;
@@ -112,6 +123,16 @@ export function CitizenFile({ open, onOpenChange, profile, xp, manualUnlocks }: 
             <span>THE CASE WALL</span>
             <span aria-hidden>→</span>
           </Link>
+          {activeGroup && (
+            <Link
+              to="/board"
+              onClick={() => onOpenChange(false)}
+              className="mt-2 flex items-center justify-between rounded-md border border-border bg-background/40 px-3 py-2 stencil text-[10px] tracking-widest text-foreground transition-colors hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <span>THE CITY BOARD</span>
+              <span aria-hidden>→</span>
+            </Link>
+          )}
         </section>
 
         {/* Next */}
