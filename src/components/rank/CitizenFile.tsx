@@ -108,14 +108,16 @@ export function CitizenFile({ open, onOpenChange, profile, xp, manualUnlocks }: 
           <div className="stencil text-[10px] text-muted-foreground mb-3">THE LEDGER</div>
           <dl className="space-y-1.5 font-mono text-xs">
             <Row label="Cases played" value={casesPlayed} />
-            <Row label="Correct verdicts" value={correct} />
+            <Row label="Takedowns" value={correct} />
             <Row label="Missed scams" value={missed} />
             <Row label="False alarms" value={falseAlarms} />
             <Row label="Daily streak" value={streak} />
+            <Row label="Time stolen from scammers" value={formatHM(timeStolen)} />
             <Row
               label="Manual entries"
               value={`${manualUnlocks} / ${MANUAL_ENTRIES.length}`}
             />
+
           </dl>
           <p className="mt-3 text-[11px] text-muted-foreground italic">
             Both columns lose. Gullibility and paranoia are the same bill.
