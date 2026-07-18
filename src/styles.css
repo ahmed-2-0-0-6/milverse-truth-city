@@ -2210,3 +2210,28 @@ html[data-force-reduce-motion="on"] .paper-thud {
 }
 html[data-force-reduce-motion="on"] .animate-shudder-in,
 html[data-force-reduce-motion="on"] .animate-pulse-soft { animation: none !important; }
+
+/* ---------- CITIZEN FILE (rank chip pulse) ---------- */
+@keyframes rank-tick {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+.rank-tick {
+  animation: rank-tick 400ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.rank-underline {
+  transition: width 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .rank-tick { animation: none !important; }
+  .rank-underline { transition: none !important; }
+}
+html[data-high-legibility="on"] .rank-tick,
+html[data-force-reduce-motion="on"] .rank-tick {
+  animation: none !important;
+}
+html[data-high-legibility="on"] .rank-underline,
+html[data-force-reduce-motion="on"] .rank-underline {
+  transition: none !important;
+}

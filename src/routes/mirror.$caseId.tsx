@@ -19,6 +19,10 @@ import { generateContactReply } from "@/lib/mirror/ai.functions";
 import { ARTIFACT_LABEL } from "@/lib/mirror/voice";
 import { fakeNumberForCase } from "@/lib/chat/fakeNumber";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
+import { computeXp } from "@/lib/ranks";
+import { loadUnlocked } from "@/lib/manual/state";
+import { writeXpDelta } from "@/lib/rank/xpSnapshot";
+import { XpDeltaLine } from "@/components/rank/XpDeltaLine";
 import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
 import { track } from "@/lib/telemetry";
@@ -1138,6 +1142,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     if (!result || !verdictRaw || savedRef.current) return;
     savedRef.current = true;
     const p = loadProfile();
+    const xpBefore = computeXp(p, loadUnlocked().size, p.publishedCount ?? 0);
     p.casesPlayed += 1;
     p.points += result.points;
     p.strongProbesTotal += result.strong;
@@ -1161,6 +1166,8 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       ts: Date.now(),
     });
     saveProfile(p);
+    const xpAfter = computeXp(p, loadUnlocked().size, p.publishedCount ?? 0);
+    writeXpDelta(xpBefore, xpAfter);
     logPilotEntry({
       wing: "mirror",
       caseId: scenario.id,
@@ -1227,6 +1234,9 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           DEBRIEF · TIER {scenario.tier}
         </div>
         <h1 className="mt-2 text-2xl font-semibold">{truthHeadline}</h1>
+        <div className="mt-3">
+          <XpDeltaLine />
+        </div>
         <p className="mt-1 text-sm opacity-90">
           You said <b>{verdictRaw.verdict}</b> · Result:{" "}
           <b>{result.resultKind.replace("_", " ").toUpperCase()}</b>

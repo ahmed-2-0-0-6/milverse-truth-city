@@ -13,6 +13,10 @@ import {
   type FeedOutcome,
 } from "@/lib/feed/engine";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
+import { computeXp } from "@/lib/ranks";
+import { loadUnlocked } from "@/lib/manual/state";
+import { writeXpDelta } from "@/lib/rank/xpSnapshot";
+import { XpDeltaLine } from "@/components/rank/XpDeltaLine";
 import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
 import { Send, Search, Heart, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
@@ -120,6 +124,7 @@ function FeedPlay() {
             setOutcome(oc);
             // feed the ONE chart in City Hall
             const p = loadProfile();
+            const xpBefore = computeXp(p, loadUnlocked().size, p.publishedCount ?? 0);
             p.casesPlayed += 1;
             p.points += oc.points;
             if (oc.result === "correct") p.correctVerdicts += 1;
@@ -143,6 +148,8 @@ function FeedPlay() {
               ts: Date.now(),
             });
             saveProfile(p);
+            const xpAfter = computeXp(p, loadUnlocked().size, p.publishedCount ?? 0);
+            writeXpDelta(xpBefore, xpAfter);
             logPilotEntry({
               wing: "feed",
               caseId: scenario.id,
@@ -676,6 +683,9 @@ function Debrief({
         </div>
         <div className="mt-1 text-xl font-semibold">{outcome.headline}</div>
         <p className="mt-2 text-sm">{outcome.detail}</p>
+        <div className="mt-3">
+          <XpDeltaLine />
+        </div>
       </div>
 
       <CalibrationQuadrant profile={profileSnap} compact caption="CALIBRATION · AFTER THIS CASE" />
