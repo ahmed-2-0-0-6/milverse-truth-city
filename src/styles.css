@@ -2706,3 +2706,20 @@ html[data-force-reduce-motion="on"] .ritual-line {
   transform: none !important;
   filter: none !important;
 }
+
+/* ── COLD READ — drill clock tense pulse ─────────────────────────── */
+@keyframes cold-tense-kf {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+.cold-tense {
+  animation: cold-tense-kf 1s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cold-tense { animation: none !important; opacity: 1 !important; }
+}
+html[data-force-reduce-motion="on"] .cold-tense,
+html[data-high-legibility="on"] .cold-tense {
+  animation: none !important;
+  opacity: 1 !important;
+}
