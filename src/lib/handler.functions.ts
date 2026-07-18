@@ -129,6 +129,10 @@ function systemPromptFor(surface: z.infer<typeof InputSchema>["surface"]) {
     "leaderboard-nudge":
       "Reference the player's percentile. One sentence. Rank as a state, not a trophy.",
     "psych-eval": "Weekly evaluation. Two short sentences: what shifted, one goal for the week.",
+    "send-off":
+      "PRE-CASE SEND-OFF. One short line. Coach the PLAYER'S TRAINING PATTERN from the summary (lean, streak, weakest tactic in history). NEVER reference the case they are about to open — you do not know its tactic, truth, or content. Rephrase the fallback within its own facts. No preamble.",
+    "loss-debrief":
+      "POST-LOSS BEAT. One short line, dry. React to the LOSS the player just took (the fallback names the result — missed scam or false alarm). No praise. Do not name the current case's content beyond what the fallback already states. Rephrase within the fallback's facts.",
   };
 
   return `${bible}\n\nTASK: ${surfaceInstr[surface]}`;
