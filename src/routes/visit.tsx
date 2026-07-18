@@ -1,7 +1,16 @@
-// /visit — A GUIDED VISIT TO THE CITY. Judges/educators/press. ~3 min, 5 beats.
-// ZERO cloud, ZERO AI, ZERO real-profile writes. All content hardcoded below.
-// Reuses existing ChatShell/ChatHeader/CallScreen/VerdictMoment components.
+// /visit — THE JUDGE'S CUT.
+// A GUIDED VISIT + the filming location for the competition video.
+// SANDBOX LAWS: zero-AI, zero-cloud, zero-profile-writes. PRESENTATION imports
+// only (chat skins config + chat shell + VerdictMoment). No engine logic, no
+// server fns, no localStorage writes. Verified: `rg` this file's imports before
+// shipping — engine modules will trip the audit.
+//
+// Director Mode: ?director=1 auto-runs the whole tour for clean recording. It
+// is intentionally IGNORED under prefers-reduced-motion — recording happens on
+// a machine without that setting, and preserving accessibility trumps auto-run.
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
@@ -18,15 +27,50 @@ import {
   Search,
   GraduationCap,
   Printer,
+  Timer,
+  FileText,
+  Repeat,
+  HeartPulse,
+  Trophy,
 } from "lucide-react";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { CallScreen } from "@/components/chat/CallScreen";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
-import { useVisualMode } from "@/lib/visual-quality";
 import { DOCTRINE_RULES } from "@/lib/boss/doctrine";
+import { CHAT_SKINS } from "@/lib/chat/skins";
+
+// Timings live here so retiming for the video edit is arithmetic, not
+// archaeology. Comments are running totals (ms) from tour start.
+export const DIRECTOR_TIMINGS = {
+  arrival: 2800,             //  2.8s — Beat 0 hold
+  beat1_openerHold: 1400,    //  4.2s — read opener
+  beat1_press: 400,          // press flash before each firing
+  beat1_perTurn: 4800,       // per chat turn (× 4) = 19.2s → 23.4s
+  beat1_verdictOpen: 1200,   // 24.6s
+  beat1_convictionPick: 1400,// 26.0s
+  beat1_verdictPick: 1400,   // 27.4s (VerdictMoment then runs ~3.2s)
+  beat1_stampBudget: 3300,   // 30.7s
+  beat1_debriefHold: 5000,   // 35.7s
+  beat2_step0_read: 4200,    // 39.9s
+  beat2_step0_pick: 1400,    // 41.3s
+  beat2_step0_advance: 2600, // 43.9s
+  beat2_step1_read: 3600,    // 47.5s
+  beat2_step1_pick: 1400,    // 48.9s
+  beat2_callHold: 3500,      // 52.4s
+  beat2_doctrineAdvance: 2000, // 54.4s
+  beat2_doctrineHold: 7500,  // 61.9s
+  beat3_perPanel: 5000,      // per panel (× 6 = 30s) → 91.9s
+  beat3_advance: 1600,       // 93.5s
+  beat4_hold: 8000,          // 101.5s → rests on DEPARTURE
+} as const;
 
 export const Route = createFileRoute("/visit")({
+  validateSearch: zodValidator(
+    z.object({
+      director: fallback(z.string(), "").default(""),
+    }),
+  ),
   head: () => ({
     meta: [
       { title: "Visit MILVERSE — 3 minutes inside the city that trains trust" },
@@ -78,8 +122,14 @@ function usePrefersReducedMotion() {
 
 function VisitPage() {
   const navigate = useNavigate();
+  const { director: directorParam } = Route.useSearch();
   const [beat, setBeat] = useState<Beat>(0);
   const reducedMotion = usePrefersReducedMotion();
+
+  // Director is active only when explicitly requested AND not cancelled AND
+  // reduced motion is off. Any keypress/click during director flips the switch.
+  const [directorCancelled, setDirectorCancelled] = useState(false);
+  const director = directorParam === "1" && !reducedMotion && !directorCancelled;
 
   const leave = () => navigate({ to: "/" });
   const next = () => setBeat((b) => (b < 5 ? ((b + 1) as Beat) : b));
@@ -94,31 +144,59 @@ function VisitPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Any input during director hand-back to the user at the current beat.
+  useEffect(() => {
+    if (!director) return;
+    const cancel = () => setDirectorCancelled(true);
+    window.addEventListener("keydown", cancel, { once: true });
+    window.addEventListener("pointerdown", cancel, { once: true });
+    return () => {
+      window.removeEventListener("keydown", cancel);
+      window.removeEventListener("pointerdown", cancel);
+    };
+  }, [director]);
+
   return (
     <div className="min-h-[100dvh] bg-black text-white grain">
-      <TourChrome beat={beat} onSkip={skip} onLeave={leave} />
+      <TourChrome beat={beat} onSkip={skip} onLeave={leave} hideControls={director} />
+      {director && (
+        <div
+          aria-hidden
+          className="fixed top-3 right-4 z-50 flex items-center gap-1.5 rounded border border-red-500/60 bg-black/70 px-2 py-1 stencil text-[10px] tracking-[0.3em] text-red-400"
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-red-500 visit-rec-pulse" /> REC
+        </div>
+      )}
       <main className="mx-auto w-full max-w-3xl px-4 pb-16 pt-4">
-        {beat === 0 && <Beat0Arrival onNext={next} />}
-        {beat === 1 && <Beat1Scam onNext={next} reducedMotion={reducedMotion} />}
-        {beat === 2 && <Beat2Boss onNext={next} reducedMotion={reducedMotion} />}
-        {beat === 3 && <Beat3City onNext={next} reducedMotion={reducedMotion} />}
-        {beat === 4 && <Beat4License onNext={next} />}
+        {beat === 0 && <Beat0Arrival onNext={next} director={director} />}
+        {beat === 1 && (
+          <Beat1Scam onNext={next} reducedMotion={reducedMotion} director={director} />
+        )}
+        {beat === 2 && (
+          <Beat2Boss onNext={next} reducedMotion={reducedMotion} director={director} />
+        )}
+        {beat === 3 && (
+          <Beat3City onNext={next} reducedMotion={reducedMotion} director={director} />
+        )}
+        {beat === 4 && <Beat4License onNext={next} director={director} />}
         {beat === 5 && <Beat5Departure />}
       </main>
     </div>
   );
 }
 
-/* ---------- Chrome: progress dots, skip, leave ---------- */
+/* ---------- Chrome ---------- */
 
 function TourChrome({
   beat,
   onSkip,
   onLeave,
+  hideControls,
 }: {
   beat: Beat;
   onSkip: () => void;
   onLeave: () => void;
+  hideControls: boolean;
 }) {
   return (
     <div className="sticky top-0 z-40 border-b border-white/10 bg-black/85 backdrop-blur">
@@ -139,7 +217,7 @@ function TourChrome({
             />
           ))}
         </div>
-        {beat < 5 && (
+        {!hideControls && beat < 5 && (
           <button
             onClick={onSkip}
             className="flex items-center gap-1 rounded border border-white/15 px-2 py-1 stencil text-[10px] text-white/70 hover:bg-white/10"
@@ -148,13 +226,15 @@ function TourChrome({
             SKIP <SkipForward className="h-3 w-3" />
           </button>
         )}
-        <button
-          onClick={onLeave}
-          className="flex items-center gap-1 rounded border border-white/15 px-2 py-1 stencil text-[10px] text-white/70 hover:bg-white/10"
-          aria-label="Leave the tour"
-        >
-          LEAVE <X className="h-3 w-3" />
-        </button>
+        {!hideControls && (
+          <button
+            onClick={onLeave}
+            className="flex items-center gap-1 rounded border border-white/15 px-2 py-1 stencil text-[10px] text-white/70 hover:bg-white/10"
+            aria-label="Leave the tour"
+          >
+            LEAVE <X className="h-3 w-3" />
+          </button>
+        )}
       </div>
     </div>
   );
@@ -162,10 +242,15 @@ function TourChrome({
 
 /* ---------- BEAT 0 — ARRIVAL ---------- */
 
-function Beat0Arrival({ onNext }: { onNext: () => void }) {
+function Beat0Arrival({ onNext, director }: { onNext: () => void; director: boolean }) {
+  useEffect(() => {
+    if (!director) return;
+    const t = setTimeout(onNext, DIRECTOR_TIMINGS.arrival);
+    return () => clearTimeout(t);
+  }, [director, onNext]);
+
   return (
     <section className="relative mt-10 overflow-hidden rounded-lg border border-white/10 text-center sm:mt-16">
-      {/* night-arrival backdrop: runway glow + skyline bars, pure CSS */}
       <div
         className="absolute inset-0"
         aria-hidden
@@ -176,7 +261,6 @@ function Beat0Arrival({ onNext }: { onNext: () => void }) {
             "linear-gradient(180deg, #05070c 0%, #02040a 100%)",
         }}
       />
-      {/* skyline silhouette — repeating vertical bars along the bottom */}
       <div
         className="absolute inset-x-0 bottom-0 h-24 opacity-60 pointer-events-none"
         aria-hidden
@@ -186,7 +270,6 @@ function Beat0Arrival({ onNext }: { onNext: () => void }) {
           maskImage: "linear-gradient(0deg, black 55%, transparent 100%)",
         }}
       />
-      {/* lit windows */}
       <div
         className="absolute inset-x-0 bottom-0 h-20 opacity-30 pointer-events-none"
         aria-hidden
@@ -199,7 +282,6 @@ function Beat0Arrival({ onNext }: { onNext: () => void }) {
         }}
       />
       <div className="scan-sweep absolute inset-0 pointer-events-none" aria-hidden />
-
       <div className="relative p-6 sm:p-12">
         <div className="stencil text-[10px] tracking-[0.4em] text-primary hud-blink">
           MILVERSE · NOW ARRIVING
@@ -233,7 +315,43 @@ function Beat0Arrival({ onNext }: { onNext: () => void }) {
   );
 }
 
-/* ---------- BEAT 1 — GET SCAMMED (Mirror micro-case) ---------- */
+/* ---------- Local ClaimedClockChip (scripted, no engine coupling) ---------- */
+
+function ClaimedClockChip({
+  seconds,
+  label,
+  reducedMotion,
+}: {
+  seconds: number;
+  label: string;
+  reducedMotion: boolean;
+}) {
+  const [remaining, setRemaining] = useState(seconds);
+  useEffect(() => {
+    if (reducedMotion) return; // static at seconds
+    const start = Date.now();
+    const iv = window.setInterval(() => {
+      const left = seconds - Math.floor((Date.now() - start) / 1000);
+      setRemaining(left > 0 ? left : 0);
+      if (left <= 0) window.clearInterval(iv);
+    }, 500);
+    return () => window.clearInterval(iv);
+  }, [seconds, reducedMotion]);
+  const m = Math.floor(remaining / 60);
+  const s = (remaining % 60).toString().padStart(2, "0");
+  return (
+    <span
+      aria-hidden
+      className="inline-flex items-center gap-1 rounded border border-amber-500/50 bg-amber-500/10 px-1.5 py-0.5 font-mono text-[10px] tracking-widest text-amber-300"
+    >
+      <Timer className="h-3 w-3" />
+      <span className="stencil text-[9px] text-amber-300/80">{label}</span>
+      <span className="tabular-nums text-amber-100">{`${m}:${s}`}</span>
+    </span>
+  );
+}
+
+/* ---------- BEAT 1 — GET SCAMMED (SMS SKIN + CLAIMED CLOCK + CONVICTION) ---------- */
 
 interface ScamTurn {
   contact: string;
@@ -270,21 +388,41 @@ const SCAM_SCRIPT: ScamTurn[] = [
     contact: "slack's down for me. LOOK if u can't help just say so. i thought we were friends.",
     choices: [
       { text: "Fine, sending it now — don't be mad.", smart: false },
-      { text: "This is an imposter pattern. Blocking + reporting to Sana on Slack.", smart: true },
+      { text: "This is an imposter pattern. Blocking and reporting to Sana on Slack.", smart: true },
     ],
   },
 ];
 
-function Beat1Scam({ onNext, reducedMotion }: { onNext: () => void; reducedMotion: boolean }) {
+type Conviction = "HUNCH" | "READ" | "CERTAIN";
+const CONVICTION_OPTIONS: { id: Conviction; pct: number }[] = [
+  { id: "HUNCH", pct: 60 },
+  { id: "READ", pct: 75 },
+  { id: "CERTAIN", pct: 90 },
+];
+
+function Beat1Scam({
+  onNext,
+  reducedMotion,
+  director,
+}: {
+  onNext: () => void;
+  reducedMotion: boolean;
+  director: boolean;
+}) {
+  const skin = CHAT_SKINS.sms;
   const [turn, setTurn] = useState(0);
   const [log, setLog] = useState<{ from: "contact" | "you"; text: string }[]>([
     { from: "contact", text: SCAM_SCRIPT[0].contact },
   ]);
-  const [confidence, setConfidence] = useState(75);
   const [pickedSmart, setPickedSmart] = useState<boolean[]>([]);
   const [phase, setPhase] = useState<"chat" | "verdict" | "stamp" | "debrief">("chat");
   const [verdict, setVerdict] = useState<"REAL" | "FAKE" | null>(null);
+  const [conviction, setConviction] = useState<Conviction | null>(null);
+  const [pressedIdx, setPressedIdx] = useState<number | null>(null);
+  const [pressedConv, setPressedConv] = useState<Conviction | null>(null);
+  const [pressedVerdict, setPressedVerdict] = useState<"REAL" | "FAKE" | null>(null);
   const logEnd = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     logEnd.current?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" });
   }, [log, reducedMotion]);
@@ -299,6 +437,7 @@ function Beat1Scam({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
     const choice = t.choices[idx];
     setLog((L) => [...L, { from: "you", text: choice.text }]);
     setPickedSmart((s) => [...s, choice.smart]);
+    setPressedIdx(null);
     if (turn + 1 < SCAM_SCRIPT.length) {
       setTimeout(
         () => {
@@ -312,8 +451,72 @@ function Beat1Scam({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
     }
   };
 
+  // Director auto-play — chat turns
+  useEffect(() => {
+    if (!director || phase !== "chat") return;
+    const smartIdx = SCAM_SCRIPT[turn].choices.findIndex((c) => c.smart);
+    const initial = turn === 0 ? DIRECTOR_TIMINGS.beat1_openerHold : 0;
+    const t1 = setTimeout(
+      () => setPressedIdx(smartIdx),
+      initial + DIRECTOR_TIMINGS.beat1_perTurn - DIRECTOR_TIMINGS.beat1_press,
+    );
+    const t2 = setTimeout(
+      () => choose(smartIdx),
+      initial + DIRECTOR_TIMINGS.beat1_perTurn,
+    );
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [director, phase, turn]);
+
+  // Director auto-play — verdict
+  useEffect(() => {
+    if (!director || phase !== "verdict") return;
+    const t1 = setTimeout(
+      () => setPressedConv("CERTAIN"),
+      DIRECTOR_TIMINGS.beat1_verdictOpen + DIRECTOR_TIMINGS.beat1_convictionPick -
+        DIRECTOR_TIMINGS.beat1_press,
+    );
+    const t2 = setTimeout(() => {
+      setConviction("CERTAIN");
+      setPressedConv(null);
+    }, DIRECTOR_TIMINGS.beat1_verdictOpen + DIRECTOR_TIMINGS.beat1_convictionPick);
+    const t3 = setTimeout(
+      () => setPressedVerdict("FAKE"),
+      DIRECTOR_TIMINGS.beat1_verdictOpen +
+        DIRECTOR_TIMINGS.beat1_convictionPick +
+        DIRECTOR_TIMINGS.beat1_verdictPick -
+        DIRECTOR_TIMINGS.beat1_press,
+    );
+    const t4 = setTimeout(() => {
+      setVerdict("FAKE");
+      setPhase("stamp");
+    }, DIRECTOR_TIMINGS.beat1_verdictOpen +
+      DIRECTOR_TIMINGS.beat1_convictionPick +
+      DIRECTOR_TIMINGS.beat1_verdictPick);
+    return () => {
+      [t1, t2, t3, t4].forEach(clearTimeout);
+    };
+  }, [director, phase]);
+
+  // Director auto-advance from debrief
+  useEffect(() => {
+    if (!director || phase !== "debrief") return;
+    const t = setTimeout(onNext, DIRECTOR_TIMINGS.beat1_debriefHold);
+    return () => clearTimeout(t);
+  }, [director, phase, onNext]);
+
   const outcome: CalibrationOutcome =
     verdict === "FAKE" ? "correct" : verdict === "REAL" ? "missed_scam" : "correct";
+  const gotIt = verdict === "FAKE";
+  const convictionLine =
+    conviction === "CERTAIN" && !gotIt
+      ? "Certain, and wrong. That combination is the one that empties accounts."
+      : conviction === "HUNCH" && gotIt
+        ? "Right on a hunch. Luck is not a method."
+        : "Your sureness is data too. The city tracks it.";
 
   return (
     <section aria-label="Beat 1 of 5 — Get scammed">
@@ -329,27 +532,52 @@ function Beat1Scam({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
                 name="Sana (work?)"
                 number={SCAM_NUMBER}
                 isSaved={false}
-                subtitle="unknown number · claims to be Sana"
+                subtitle={skin.presenceLine}
+                chrome={skin.headerClass}
+                right={
+                  phase === "chat" ? (
+                    <ClaimedClockChip
+                      seconds={120}
+                      label="THEIR CLAIM · 2 MIN"
+                      reducedMotion={reducedMotion}
+                    />
+                  ) : undefined
+                }
               />
             }
           >
-            <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2">
-              {log.map((m, i) => (
-                <div
-                  key={i}
-                  className={`flex ${m.from === "you" ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
-                      m.from === "you"
-                        ? "bg-primary text-primary-foreground rounded-br-sm"
-                        : "bg-neutral-800 text-white rounded-bl-sm border border-white/5"
-                    }`}
-                  >
-                    {m.text}
+            <div
+              className={`flex-1 overflow-y-auto px-3 py-3 space-y-2 ${skin.bodyClass}`}
+              style={skin.bodyStyle}
+            >
+              {skin.systemNote && (
+                <div className="flex justify-center">
+                  <div className="max-w-[90%] rounded-md bg-black/50 border border-white/10 px-3 py-1.5 text-center text-[10px] leading-relaxed text-amber-200/80">
+                    🔒 {skin.systemNote}
                   </div>
                 </div>
-              ))}
+              )}
+              <div className="sr-only">The contact claims a deadline.</div>
+              {log.map((m, i) => {
+                const isYou = m.from === "you";
+                const isLast = i === log.length - 1;
+                return (
+                  <div key={i} className={`flex ${isYou ? "justify-end" : "justify-start"}`}>
+                    <div className="max-w-[80%]">
+                      <div
+                        className={`px-3 py-2 text-sm shadow-sm ${isYou ? skin.outBubble : skin.inBubble}`}
+                      >
+                        {m.text}
+                      </div>
+                      {isYou && isLast && (
+                        <div className={`mt-0.5 text-right text-[10px] ${skin.readColor}`}>
+                          Delivered · now
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
               <div ref={logEnd} />
             </div>
             {phase === "chat" && (
@@ -357,15 +585,23 @@ function Beat1Scam({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
                 <div className="stencil text-[9px] tracking-[0.25em] text-white/40 px-1">
                   CHOOSE YOUR REPLY
                 </div>
-                {SCAM_SCRIPT[turn].choices.map((c, i) => (
-                  <button
-                    key={i}
-                    onClick={() => choose(i)}
-                    className="w-full rounded-md border border-white/15 bg-neutral-900 px-3 py-2 text-left text-sm text-white hover:bg-neutral-800 focus:outline-none focus:ring-1 focus:ring-primary"
-                  >
-                    {c.text}
-                  </button>
-                ))}
+                {SCAM_SCRIPT[turn].choices.map((c, i) => {
+                  const pressed = pressedIdx === i;
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => choose(i)}
+                      aria-pressed={pressed}
+                      className={`w-full rounded-md border px-3 py-2 text-left text-sm text-white transition-colors focus:outline-none focus:ring-1 focus:ring-primary ${
+                        pressed
+                          ? "border-primary bg-primary/20 ring-1 ring-primary/60"
+                          : "border-white/15 bg-neutral-900 hover:bg-neutral-800"
+                      }`}
+                    >
+                      {c.text}
+                    </button>
+                  );
+                })}
               </div>
             )}
             {phase === "verdict" && (
@@ -374,40 +610,73 @@ function Beat1Scam({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
                   CALL IT — REAL OR FAKE?
                 </div>
                 <div>
-                  <label className="mb-1 flex items-center justify-between stencil text-[9px] tracking-widest text-white/50">
-                    <span>CONFIDENCE</span>
-                    <span>{confidence}%</span>
-                  </label>
-                  <input
-                    type="range"
-                    min={0}
-                    max={100}
-                    value={confidence}
-                    onChange={(e) => setConfidence(parseInt(e.target.value))}
-                    className="w-full accent-primary"
-                    aria-label="Confidence percent"
-                  />
+                  <div className="mb-1.5 stencil text-[9px] tracking-widest text-white/50">
+                    HOW SURE ARE YOU?
+                  </div>
+                  <div
+                    role="radiogroup"
+                    aria-label="Conviction"
+                    className="grid grid-cols-3 gap-1.5"
+                  >
+                    {CONVICTION_OPTIONS.map((opt) => {
+                      const active = conviction === opt.id;
+                      const pressed = pressedConv === opt.id;
+                      return (
+                        <button
+                          key={opt.id}
+                          role="radio"
+                          aria-checked={active}
+                          onClick={() => setConviction(opt.id)}
+                          className={`rounded border px-2 py-1.5 stencil text-[10px] tracking-widest transition-colors ${
+                            active || pressed
+                              ? "border-primary bg-primary/20 text-primary"
+                              : "border-white/15 bg-neutral-900 text-white/70 hover:bg-neutral-800"
+                          }`}
+                        >
+                          <div>{opt.id}</div>
+                          <div className="mt-0.5 font-mono text-[9px] tabular-nums text-white/60">
+                            {opt.pct}%
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <button
+                    disabled={!conviction}
                     onClick={() => {
                       setVerdict("REAL");
                       setPhase("stamp");
                     }}
-                    className="rounded-md border-2 border-white/15 px-3 py-2 stencil text-xs tracking-widest hover:border-primary/50"
+                    className={`rounded-md border-2 px-3 py-2 stencil text-xs tracking-widest disabled:opacity-40 ${
+                      pressedVerdict === "REAL"
+                        ? "border-primary/80 bg-primary/10"
+                        : "border-white/15 hover:border-primary/50"
+                    }`}
                   >
                     REAL
                   </button>
                   <button
+                    disabled={!conviction}
                     onClick={() => {
                       setVerdict("FAKE");
                       setPhase("stamp");
                     }}
-                    className="rounded-md border-2 border-white/15 px-3 py-2 stencil text-xs tracking-widest hover:border-destructive/50"
+                    className={`rounded-md border-2 px-3 py-2 stencil text-xs tracking-widest disabled:opacity-40 ${
+                      pressedVerdict === "FAKE"
+                        ? "border-destructive/80 bg-destructive/10"
+                        : "border-white/15 hover:border-destructive/50"
+                    }`}
                   >
                     FAKE
                   </button>
                 </div>
+                {!conviction && (
+                  <div className="text-center font-mono text-[10px] text-white/40">
+                    Pick your conviction first.
+                  </div>
+                )}
               </div>
             )}
             {phase === "debrief" && (
@@ -442,8 +711,12 @@ function Beat1Scam({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
             <div className="mt-1 text-lg font-semibold text-primary">IMPERSONATION</div>
             <p className="mt-2 text-sm text-white/80">
               New number + urgency + a favor + refusal to verify out-of-band. Every scammer's
-              signature. Verdict: <b>{verdict}</b> · Confidence: <b>{confidence}%</b> ·
-              Smart-question rate: <b>{Math.round(smartRate * 100)}%</b>.
+              signature. Verdict: <b>{verdict}</b> · Conviction:{" "}
+              <b>{conviction ?? "—"}</b> · Smart-question rate:{" "}
+              <b>{Math.round(smartRate * 100)}%</b>.
+            </p>
+            <p className="mt-2 font-mono text-[11px] tracking-wide text-white/70">
+              {convictionLine}
             </p>
           </div>
           <div className="rounded-md border border-white/15 bg-neutral-900 p-4">
@@ -479,7 +752,7 @@ function Beat1Scam({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
   );
 }
 
-/* ---------- BEAT 2 — MEET A BOSS (Ghost of Bali excerpt) ---------- */
+/* ---------- BEAT 2 — MEET A BOSS (WHATSAPP SKIN) ---------- */
 
 interface BossStep {
   msg: string;
@@ -532,9 +805,19 @@ const BOSS_STEPS: BossStep[] = [
   },
 ];
 
-function Beat2Boss({ onNext, reducedMotion }: { onNext: () => void; reducedMotion: boolean }) {
+function Beat2Boss({
+  onNext,
+  reducedMotion,
+  director,
+}: {
+  onNext: () => void;
+  reducedMotion: boolean;
+  director: boolean;
+}) {
+  const skin = CHAT_SKINS.whatsapp;
   const [step, setStep] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
+  const [pressedIdx, setPressedIdx] = useState<number | null>(null);
   const [showCall, setShowCall] = useState(false);
   const [showDoctrine, setShowDoctrine] = useState(false);
 
@@ -544,6 +827,53 @@ function Beat2Boss({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
     if (step + 1 < BOSS_STEPS.length) setStep(step + 1);
     else setShowDoctrine(true);
   };
+
+  const pick = (i: number) => {
+    setPicked(i);
+    setPressedIdx(null);
+    if (step === 1 && current.choices[i].correct) {
+      setTimeout(() => setShowCall(true), reducedMotion ? 60 : 400);
+    }
+  };
+
+  // Director auto-play
+  useEffect(() => {
+    if (!director || showDoctrine) return;
+    if (picked !== null) return;
+    const readMs = step === 0 ? DIRECTOR_TIMINGS.beat2_step0_read : DIRECTOR_TIMINGS.beat2_step1_read;
+    const pickMs = step === 0 ? DIRECTOR_TIMINGS.beat2_step0_pick : DIRECTOR_TIMINGS.beat2_step1_pick;
+    // step 0: first correct fact-check (idx 0). step 1: hang-up (idx 1).
+    const targetIdx = step === 0 ? 0 : 1;
+    const t1 = setTimeout(
+      () => setPressedIdx(targetIdx),
+      readMs + pickMs - DIRECTOR_TIMINGS.beat1_press,
+    );
+    const t2 = setTimeout(() => pick(targetIdx), readMs + pickMs);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [director, step, picked, showDoctrine]);
+
+  useEffect(() => {
+    if (!director || picked === null || showDoctrine) return;
+    if (showCall) {
+      const t = setTimeout(() => setShowCall(false), DIRECTOR_TIMINGS.beat2_callHold);
+      return () => clearTimeout(t);
+    }
+    const advMs =
+      step === 0 ? DIRECTOR_TIMINGS.beat2_step0_advance : DIRECTOR_TIMINGS.beat2_doctrineAdvance;
+    const t = setTimeout(advance, advMs);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [director, picked, showCall, showDoctrine, step]);
+
+  useEffect(() => {
+    if (!director || !showDoctrine) return;
+    const t = setTimeout(onNext, DIRECTOR_TIMINGS.beat2_doctrineHold);
+    return () => clearTimeout(t);
+  }, [director, showDoctrine, onNext]);
 
   return (
     <section aria-label="Beat 2 of 5 — Meet a boss">
@@ -561,12 +891,23 @@ function Beat2Boss({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
                 isSaved={false}
                 subtitle="claims to be your bank"
                 accent="destructive"
+                chrome={skin.headerClass}
               />
             }
           >
-            <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2">
+            <div
+              className={`flex-1 overflow-y-auto px-3 py-3 space-y-2 ${skin.bodyClass}`}
+              style={skin.bodyStyle}
+            >
+              {skin.systemNote && (
+                <div className="flex justify-center">
+                  <div className="max-w-[90%] rounded-md bg-black/50 border border-white/10 px-3 py-1.5 text-center text-[10px] leading-relaxed text-emerald-200/70">
+                    🔒 {skin.systemNote}
+                  </div>
+                </div>
+              )}
               <div className="flex justify-start">
-                <div className="max-w-[85%] rounded-2xl rounded-bl-sm bg-neutral-800 border border-white/5 px-3 py-2 text-sm text-white">
+                <div className={`max-w-[85%] px-3 py-2 text-sm shadow-sm ${skin.inBubble}`}>
                   {current.msg}
                 </div>
               </div>
@@ -593,21 +934,23 @@ function Beat2Boss({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
                   : "RESULT"}
               </div>
               {picked === null ? (
-                current.choices.map((c, i) => (
-                  <button
-                    key={i}
-                    onClick={() => {
-                      setPicked(i);
-                      // "Call his saved number yourself" trigger
-                      if (step === 1 && c.correct) {
-                        setTimeout(() => setShowCall(true), reducedMotion ? 60 : 400);
-                      }
-                    }}
-                    className="w-full rounded-md border border-white/15 bg-neutral-900 px-3 py-2 text-left text-sm text-white hover:bg-neutral-800"
-                  >
-                    {c.text}
-                  </button>
-                ))
+                current.choices.map((c, i) => {
+                  const pressed = pressedIdx === i;
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => pick(i)}
+                      aria-pressed={pressed}
+                      className={`w-full rounded-md border px-3 py-2 text-left text-sm text-white transition-colors ${
+                        pressed
+                          ? "border-primary bg-primary/20 ring-1 ring-primary/60"
+                          : "border-white/15 bg-neutral-900 hover:bg-neutral-800"
+                      }`}
+                    >
+                      {c.text}
+                    </button>
+                  );
+                })
               ) : (
                 <button
                   onClick={advance}
@@ -664,40 +1007,102 @@ function Beat2Boss({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
   );
 }
 
-/* ---------- BEAT 3 — THE CITY IS BIGGER (auto-advancing panels) ---------- */
+/* ---------- BEAT 3 — THE CITY IS BIGGER (honest evidence only) ----------
+ * Panels are gated at authoring time — each entry names its backing file.
+ * When any candidate's file is removed from the repo, delete the entry here
+ * in the same change. Order is honored; cap 6. This gate is a discipline, not
+ * runtime feature-detection (the sandbox does zero I/O).
+ */
 
-const CITY_PANELS = [
-  {
-    icon: Newspaper,
-    title: "THE PAPER",
-    body: "A daily newspaper where every story is false — published by a live human newsroom. Spot the forgery on the front page.",
-  },
-  {
-    icon: BookOpen,
-    title: "FIELD MANUAL",
-    body: "Every tactic you name enters your Manual. A personal, growing dictionary of manipulation.",
-  },
-  {
-    icon: Coins,
-    title: "AAJ KA FORWARD",
-    body: "Daily wager. Verify one viral forward. Winners take receipts; losers learn faster.",
-  },
-  {
-    icon: Users,
-    title: "STUDIO → ARCHIVE",
-    body: "Players design the city's next cases. The community authors the curriculum.",
-  },
-];
+interface CityPanel {
+  icon: typeof Newspaper;
+  title: string;
+  body: string;
+}
 
-function Beat3City({ onNext, reducedMotion }: { onNext: () => void; reducedMotion: boolean }) {
+// Always-on
+const PANEL_MIRROR_FEED: CityPanel = {
+  icon: Users,
+  title: "THE MIRROR & THE FEED",
+  body: "Two districts. Personal cons and public lies. Both die the same way.",
+};
+const PANEL_DROP: CityPanel = {
+  icon: Coins,
+  title: "THE DAILY DROP",
+  body: "One case a day. Stake your trust, build your streak.",
+};
+// Conditional (backing files verified present in this repo at authoring time)
+const PANEL_BOARD: CityPanel = {
+  // src/routes/board.tsx
+  icon: Trophy,
+  title: "THE CITY BOARD",
+  body: "Classroom leaderboards with no names. Callsigns only. Dark below five citizens — privacy is a feature.",
+};
+const PANEL_SUPPLEMENT: CityPanel = {
+  // src/lib/paper/supplement.ts
+  icon: Newspaper,
+  title: "THE SUNDAY SUPPLEMENT",
+  body: "Once a week the Paper prints your week. Circulation: 1.",
+};
+const PANEL_REOPENED: CityPanel = {
+  // src/lib/mirror/retests.ts
+  icon: Repeat,
+  title: "REOPENED FILES",
+  body: "Lose a case and the city checks back days later with the same trick in new clothes.",
+};
+const PANEL_SURVIVOR: CityPanel = {
+  // src/lib/mirror/aftermath.ts
+  icon: HeartPulse,
+  title: "SURVIVOR FILES",
+  body: "Two cases drawn from reported scams end quiet, with the day-after steps that matter.",
+};
+const PANEL_FIRSTPHONE: CityPanel = {
+  icon: GraduationCap,
+  title: "FIRST PHONE",
+  body: "Ten lessons for the youngest citizens. Then the phone's theirs.",
+};
+
+const CITY_PANELS: CityPanel[] = (() => {
+  const list = [
+    PANEL_MIRROR_FEED,
+    PANEL_DROP,
+    PANEL_BOARD,
+    PANEL_SUPPLEMENT,
+    PANEL_REOPENED,
+    PANEL_SURVIVOR,
+    PANEL_FIRSTPHONE,
+  ];
+  // FIRST PHONE is the required tail; trim from the middle if over cap.
+  if (list.length <= 6) return list;
+  return [...list.slice(0, 5), PANEL_FIRSTPHONE];
+})();
+
+function Beat3City({
+  onNext,
+  reducedMotion,
+  director,
+}: {
+  onNext: () => void;
+  reducedMotion: boolean;
+  director: boolean;
+}) {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
+  const dwell = director ? DIRECTOR_TIMINGS.beat3_perPanel : 6500;
   useEffect(() => {
-    if (paused || reducedMotion) return;
+    if ((paused && !director) || reducedMotion) return;
     if (i >= CITY_PANELS.length - 1) return;
-    const t = setTimeout(() => setI((x) => x + 1), 6500);
+    const t = setTimeout(() => setI((x) => x + 1), dwell);
     return () => clearTimeout(t);
-  }, [i, paused, reducedMotion]);
+  }, [i, paused, reducedMotion, dwell, director]);
+
+  // Director advance to Beat 4 after the final panel dwells.
+  useEffect(() => {
+    if (!director) return;
+    if (i < CITY_PANELS.length - 1) return;
+    const t = setTimeout(onNext, dwell + DIRECTOR_TIMINGS.beat3_advance);
+    return () => clearTimeout(t);
+  }, [director, i, dwell, onNext]);
 
   return (
     <section aria-label="Beat 3 of 5 — The city is bigger">
@@ -759,7 +1164,12 @@ function Beat3City({ onNext, reducedMotion }: { onNext: () => void; reducedMotio
 
 /* ---------- BEAT 4 — THE LICENSE ---------- */
 
-function Beat4License({ onNext }: { onNext: () => void }) {
+function Beat4License({ onNext, director }: { onNext: () => void; director: boolean }) {
+  useEffect(() => {
+    if (!director) return;
+    const t = setTimeout(onNext, DIRECTOR_TIMINGS.beat4_hold);
+    return () => clearTimeout(t);
+  }, [director, onNext]);
   return (
     <section aria-label="Beat 4 of 5 — The license">
       <div className="mb-3 text-center stencil text-[10px] tracking-[0.3em] text-white/60">
@@ -798,7 +1208,6 @@ function Beat4License({ onNext }: { onNext: () => void }) {
           </ol>
         </div>
 
-        {/* Specimen license */}
         <div className="relative overflow-hidden rounded-lg border-2 border-primary/50 bg-gradient-to-br from-neutral-900 to-black p-5">
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-10">
             <div className="stencil rotate-[-18deg] text-6xl tracking-[0.4em] text-primary">
@@ -934,3 +1343,8 @@ function ExitDoor({
     </Link>
   );
 }
+
+// Retain unused import placeholder for the boss title constant to keep the
+// SCAM_TITLE identifier live for future non-visual reference in the tour edit.
+void SCAM_TITLE;
+void FileText;

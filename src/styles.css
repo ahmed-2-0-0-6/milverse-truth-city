@@ -2208,6 +2208,24 @@ html[data-force-reduce-motion="on"] .reopen-pulse {
   opacity: 1 !important;
 }
 
+/* ---------- /visit — DIRECTOR MODE rec dot ---------- */
+@keyframes visit-rec-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+.visit-rec-pulse {
+  animation: visit-rec-pulse 1.1s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .visit-rec-pulse { animation: none !important; opacity: 1 !important; }
+}
+html[data-high-legibility="on"] .visit-rec-pulse,
+html[data-force-reduce-motion="on"] .visit-rec-pulse {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+
 
 
 /* ---------- FIRST PHONE (junior surface) ---------- */
