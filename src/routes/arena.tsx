@@ -88,7 +88,30 @@ function ArenaRoute() {
             </Link>
           )}
         </div>
+
+        {/* The Standoff — pass-the-phone couch duel. Below Red Hands, above the blueprint. */}
+        <div className="mt-4 rounded-lg border border-caution/60 bg-caution/[0.06] p-5">
+          <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.3em] text-caution">
+            <Users className="h-3.5 w-3.5" />
+            THE ARENA · EXHIBIT — LIVE
+          </div>
+          <h2 className="mt-2 text-xl font-semibold">THE STANDOFF</h2>
+          <p className="mt-2 text-sm leading-relaxed text-foreground/80">
+            One phone. Two citizens. The warden knows the truth; the reader has four minutes to
+            find it.
+          </p>
+          <div className="mt-3 font-mono text-[10px] tracking-widest text-muted-foreground">
+            ROUNDS ON RECORD · {standoffRounds}
+          </div>
+          <Link
+            to="/standoff"
+            className="mt-4 inline-flex min-h-[44px] items-center rounded-md bg-caution px-4 py-2 font-mono text-xs tracking-widest text-black hover:brightness-110"
+          >
+            START A STANDOFF →
+          </Link>
+        </div>
       </div>
+
 
       <DistrictBlueprint
         district="arena"
