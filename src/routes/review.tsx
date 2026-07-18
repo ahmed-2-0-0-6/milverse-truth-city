@@ -23,6 +23,7 @@ import {
 import { fetchAssessmentGroup, setGroupPhase } from "@/lib/assessment.functions";
 import type { ItemResponse, Metrics } from "@/lib/assessment/scoring";
 import { rollupCohort, headlineSentence, type CohortAttempt } from "@/lib/assessment/scoring";
+import { interpretCohort } from "@/lib/assessment/interpret";
 import { FORMS, type FormId } from "@/lib/assessment/items";
 
 export const Route = createFileRoute("/review")({
