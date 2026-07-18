@@ -1138,6 +1138,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     if (!result || !verdictRaw || savedRef.current) return;
     savedRef.current = true;
     const p = loadProfile();
+    const xpBefore = computeXp(p, loadUnlocked().size, p.publishedCount ?? 0);
     p.casesPlayed += 1;
     p.points += result.points;
     p.strongProbesTotal += result.strong;
@@ -1161,6 +1162,8 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       ts: Date.now(),
     });
     saveProfile(p);
+    const xpAfter = computeXp(p, loadUnlocked().size, p.publishedCount ?? 0);
+    writeXpDelta(xpBefore, xpAfter);
     logPilotEntry({
       wing: "mirror",
       caseId: scenario.id,
