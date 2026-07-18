@@ -39,6 +39,7 @@ export function ChatShell({
   className,
   variant = "detective",
   style,
+  logRegion = true,
 }: Props) {
   const isJunior = variant === "junior";
   const outer = isJunior
@@ -49,6 +50,14 @@ export function ChatShell({
     : "bg-black text-white sm:rounded-[36px] sm:ring-1 sm:ring-white/5";
   const inner = isJunior ? "bg-neutral-900/80" : "bg-neutral-950";
   const composerBg = isJunior ? "bg-neutral-900/95" : "bg-neutral-950/95";
+  const contentAria = logRegion
+    ? {
+        role: "log" as const,
+        "aria-live": "polite" as const,
+        "aria-relevant": "additions text" as const,
+        "aria-label": "Chat conversation",
+      }
+    : {};
   return (
     <div className={`${outer} min-h-[100dvh] w-full ${className ?? ""}`} style={style}>
       <div
@@ -57,14 +66,12 @@ export function ChatShell({
         <StatusBar />
         {header}
         <div
-          role="log"
-          aria-live="polite"
-          aria-relevant="additions text"
-          aria-label="Chat conversation"
+          {...contentAria}
           className={`relative flex-1 min-h-0 flex flex-col overflow-hidden ${inner}`}
         >
           {children}
         </div>
+
         {composer && <div className={`border-t border-white/10 ${composerBg}`}>{composer}</div>}
         {overlay}
       </div>
