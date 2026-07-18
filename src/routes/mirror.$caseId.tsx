@@ -51,6 +51,8 @@ import { pendingRetestForCase, scheduleRetest, resolveRetest, type RetestResolut
 import { CONVICTION_CHIPS, computeConviction, debriefLineFor } from "@/lib/mirror/conviction";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 import { aftermathFor } from "@/lib/mirror/aftermath";
+import { saveTape } from "@/lib/mirror/tapes";
+import { TapeReview } from "@/components/mirror/TapeReview";
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
