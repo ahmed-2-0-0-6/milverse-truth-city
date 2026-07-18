@@ -17,6 +17,7 @@ import { IncomingCall } from "@/components/inbox/IncomingCall";
 import { FirstCall } from "@/components/onboarding/FirstCall";
 import { CitizenDesk } from "@/components/landing/CitizenDesk";
 import { isReturningCitizen } from "@/lib/city/returning";
+import { currentShift, isNightRegister, type Shift } from "@/lib/city/shift";
 
 export const Route = createFileRoute("/")({
   head: () => ({
