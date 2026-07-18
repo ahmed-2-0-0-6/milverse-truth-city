@@ -127,7 +127,15 @@ const ColdReadContext = createContext<boolean>(false);
  * in the phase-router below. Zero engine diffs.
  */
 const StandoffContext = createContext<boolean>(false);
+/**
+ * THE MASK — same drill fence as cold reads/standoff. When true, the
+ * mirror route runs in drill chrome (4:00 clock, no profile writes) and
+ * the debrief slot renders <MaskDebrief/> — the RESULT CARD for the
+ * receiver of a friend-forged challenge case. Zero engine diffs.
+ */
+const MaskContext = createContext<{ active: boolean; shareCode: string }>({ active: false, shareCode: "" });
 const COLD_START_KEY = "milverse.coldread.startTs";
+
 
 
 export const Route = createFileRoute("/mirror/$caseId")({
