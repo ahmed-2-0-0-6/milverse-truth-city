@@ -7,6 +7,7 @@ import { PhoneOff, Phone } from "lucide-react";
 import { toast } from "sonner";
 import type { InboxItem } from "@/lib/inbox/scheduler";
 import { markArrived, markCallFired } from "@/lib/inbox/profile";
+import { ringPulse, stopRing } from "@/lib/mirror/audio";
 import { VoicemailSheet } from "./VoicemailSheet";
 
 const RING_MS = 8000;
@@ -37,11 +38,13 @@ export function IncomingCall() {
   useEffect(() => {
     if (!call || phase !== "ringing") return;
     const raf = requestAnimationFrame(() => declineRef.current?.focus());
+    ringPulse();
     ringTimer.current = window.setTimeout(() => landVoicemail("timeout"), RING_MS);
     return () => {
       cancelAnimationFrame(raf);
       if (ringTimer.current) window.clearTimeout(ringTimer.current);
       ringTimer.current = null;
+      stopRing();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [call, phase]);
@@ -59,6 +62,7 @@ export function IncomingCall() {
 
   function landVoicemail(_reason: "decline" | "timeout" | "answer") {
     if (!call) return;
+    stopRing();
     if (ringTimer.current) {
       window.clearTimeout(ringTimer.current);
       ringTimer.current = null;
@@ -73,6 +77,7 @@ export function IncomingCall() {
 
   function answer() {
     if (!call || phase !== "ringing") return;
+    stopRing();
     if (ringTimer.current) {
       window.clearTimeout(ringTimer.current);
       ringTimer.current = null;
@@ -87,6 +92,7 @@ export function IncomingCall() {
 
   useEffect(() => {
     return () => {
+      stopRing();
       if (ringTimer.current) window.clearTimeout(ringTimer.current);
       if (connectTimer.current) window.clearTimeout(connectTimer.current);
     };

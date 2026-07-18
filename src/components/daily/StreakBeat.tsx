@@ -6,6 +6,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { Flame } from "lucide-react";
 import { useVisualMode } from "@/lib/visual-quality";
+import { streakLick } from "@/lib/mirror/audio";
 
 interface Props {
   streak: number;
@@ -52,6 +53,7 @@ export function StreakBeat({ streak, onDone }: Props) {
       }
       return;
     }
+    streakLick(streak);
     const t = window.setTimeout(
       () => {
         if (!doneRef.current) {

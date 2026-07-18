@@ -20,6 +20,7 @@ import {
 } from "@/lib/mirror/profile";
 import { isMuted, setMuted } from "@/lib/mirror/audio";
 import { VisualQualityToggle } from "@/components/VisualQualityToggle";
+import { SoundIntroChip } from "@/components/SoundIntroChip";
 import { AccessPanel } from "@/components/AccessPanel";
 import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp } from "@/lib/ranks";
@@ -279,6 +280,7 @@ export function TopBar() {
           </Sheet>
         </div>
       </div>
+      <SoundIntroChip />
     </header>
   );
 }

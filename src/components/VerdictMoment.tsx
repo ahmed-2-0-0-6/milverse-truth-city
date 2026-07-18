@@ -7,7 +7,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useVisualMode } from "@/lib/visual-quality";
-import { isMuted } from "@/lib/mirror/audio";
+import { stampSlam, stampSting } from "@/lib/mirror/audio";
 
 export type CalibrationOutcome = "correct" | "missed_scam" | "false_alarm";
 
@@ -52,55 +52,13 @@ const GRADES: Record<
   },
 };
 
-function playThud(freq = 90, decay = 0.45) {
-  if (isMuted()) return;
-  try {
-    const AC = (window.AudioContext ||
-      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext) as
-      | typeof AudioContext
-      | undefined;
-    if (!AC) return;
-    const ctx = new AC();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = "sine";
-    o.frequency.setValueAtTime(freq, ctx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + decay);
-    g.gain.setValueAtTime(0.55, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + decay);
-    o.connect(g).connect(ctx.destination);
-    o.start();
-    o.stop(ctx.currentTime + decay + 0.02);
-    setTimeout(() => ctx.close().catch(() => {}), (decay + 0.2) * 1000);
-  } catch {
-    /* silently ignore */
-  }
-}
-
-function playSting(freq: number) {
-  if (isMuted()) return;
-  try {
-    const AC = (window.AudioContext ||
-      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext) as
-      | typeof AudioContext
-      | undefined;
-    if (!AC) return;
-    const ctx = new AC();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = "triangle";
-    o.frequency.setValueAtTime(freq, ctx.currentTime);
-    g.gain.setValueAtTime(0.001, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.28, ctx.currentTime + 0.03);
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.9);
-    o.connect(g).connect(ctx.destination);
-    o.start();
-    o.stop(ctx.currentTime + 0.95);
-    setTimeout(() => ctx.close().catch(() => {}), 1100);
-  } catch {
-    /* silently ignore */
-  }
-}
+// Verdict stinger palette — win = clean chime; loss = triangle w/ tremolo.
+// Both live in @/lib/mirror/audio so mute + first-sound consent are honored.
+const STING_KIND: Record<CalibrationOutcome, "win" | "loss"> = {
+  correct: "win",
+  missed_scam: "loss",
+  false_alarm: "loss",
+};
 
 export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }: Props) {
   const { mode } = useVisualMode();
@@ -139,12 +97,12 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
     }
     const t1 = window.setTimeout(() => {
       setStage("stamp");
-      playThud();
+      stampSlam();
     }, 380);
     const t2 = window.setTimeout(() => {
       setStage("reveal");
-      playSting(grade.sting);
-    }, 900);
+      stampSting(STING_KIND[outcome]);
+    }, 680); // slam + 300ms per Sound of the City spec
     const tSkip = window.setTimeout(() => setCanSkip(true), 1500);
     const t3 = window.setTimeout(() => {
       setStage("trail");
@@ -158,7 +116,7 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
     return () => {
       [t1, t2, tSkip, t3, t4].forEach(clearTimeout);
     };
-  }, [mode, grade.sting]);
+  }, [mode, outcome]);
 
   if (mode !== "cinematic") return null;
 

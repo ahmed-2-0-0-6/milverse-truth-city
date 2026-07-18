@@ -8,6 +8,7 @@ import { X } from "lucide-react";
 import { PAPER_NAME } from "@/lib/paper/masthead";
 import { markPaperRead } from "@/lib/inbox/profile";
 import { shouldReduceMotion } from "@/lib/access";
+import { paperThud } from "@/lib/mirror/audio";
 
 interface Props {
   editionId: string;
@@ -43,6 +44,7 @@ export function PaperDropCard({
 
   useEffect(() => {
     setLive("The morning edition arrived.");
+    paperThud();
     if (reduce) return; // no auto-dismiss under reduced motion
     const t = window.setTimeout(onDismiss, AUTO_DISMISS_MS);
     return () => window.clearTimeout(t);

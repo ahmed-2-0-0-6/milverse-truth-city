@@ -7,6 +7,7 @@ import { useNavigate } from "@tanstack/react-router";
 import type { InboxItem } from "@/lib/inbox/scheduler";
 import { markOpened } from "@/lib/inbox/profile";
 import { shouldReduceMotion } from "@/lib/access";
+import { arrivalTap } from "@/lib/mirror/audio";
 import { platformStyle } from "./platform-style";
 
 const AUTO_HIDE_MS = 6000;
@@ -21,7 +22,11 @@ export function IncomingToast() {
     const onArrive = (e: Event) => {
       const detail = (e as CustomEvent<InboxItem>).detail;
       if (!detail) return;
-      setItems((cur) => (cur.some((i) => i.id === detail.id) ? cur : [...cur, detail]));
+      setItems((cur) => {
+        if (cur.some((i) => i.id === detail.id)) return cur;
+        arrivalTap();
+        return [...cur, detail];
+      });
       if (!reduce) {
         const t = window.setTimeout(() => {
           setItems((cur) => cur.filter((i) => i.id !== detail.id));

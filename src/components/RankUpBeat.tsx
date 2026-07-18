@@ -9,6 +9,7 @@ import { loadProfile } from "@/lib/mirror/profile";
 import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp, RANKS, type RankInfo } from "@/lib/ranks";
 import { useVisualMode } from "@/lib/visual-quality";
+import { rankRise } from "@/lib/mirror/audio";
 import { ShieldCheck, Eye, Search, Compass, FileText, Building2 } from "lucide-react";
 
 const KEY = "milverse.rank.v1";
@@ -64,6 +65,7 @@ export function RankUpBeat() {
       const t = window.setTimeout(() => setRankUp(null), 400);
       return () => window.clearTimeout(t);
     }
+    rankRise();
     const t = window.setTimeout(() => setRankUp(null), 3400);
     return () => window.clearTimeout(t);
   }, [rankUp, mode]);
