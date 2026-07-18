@@ -67,7 +67,8 @@ const STING_KIND: Record<CalibrationOutcome, "win" | "loss"> = {
   false_alarm: "loss",
 };
 
-export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }: Props) {
+export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone, register = "standard" }: Props) {
+  const quiet = register === "quiet";
   const { mode } = useVisualMode();
   const grade = GRADES[outcome];
   const [stage, setStage] = useState<"enter" | "stamp" | "reveal" | "trail">("enter");
