@@ -25,7 +25,10 @@ import {
   type BossState,
   type BossOutcome,
 } from "@/lib/boss/engine";
-import { attemptCount, recordBossAttempt, canRematch } from "@/lib/boss/profile";
+import { attemptCount, recordBossAttempt, canRematch, loadBossProfile } from "@/lib/boss/profile";
+import { ColdOpen } from "@/components/boss/ColdOpen";
+import { useVisualMode } from "@/lib/visual-quality";
+import { shouldReduceMotion } from "@/lib/access";
 import { DOCTRINE_RULES } from "@/lib/boss/doctrine";
 import { logPilotEntry } from "@/lib/pilot";
 import { loadProfile } from "@/lib/mirror/profile";
