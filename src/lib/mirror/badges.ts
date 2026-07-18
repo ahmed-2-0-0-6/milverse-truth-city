@@ -59,21 +59,29 @@ export const BADGES: BadgeDef[] = [
   },
 ];
 
+// Owner: mirror/badges (earned badge id list). Bump the suffix on
+// breaking shape change; readStore validators are the compatibility gate.
 const KEY = "milverse.badges";
+
+function isBadgeListShape(v: unknown): v is string[] {
+  return Array.isArray(v);
+}
 
 export function loadEarnedBadges(): string[] {
   if (typeof window === "undefined") return [];
-  try {
-    return JSON.parse(localStorage.getItem(KEY) || "[]");
-  } catch {
-    return [];
+  const read = readStore<string[]>(KEY, isBadgeListShape);
+  if (read === "corrupt") {
+    const rec = recoverStore<string[]>(KEY, isBadgeListShape);
+    return rec ?? [];
   }
+  return read ?? [];
 }
 
-function saveEarnedBadges(ids: string[]) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(KEY, JSON.stringify(ids));
+function saveEarnedBadges(ids: string[]): boolean {
+  if (typeof window === "undefined") return false;
+  return writeStore(KEY, ids);
 }
+
 
 /** Compare profile against all badges and emit `milverse:badge` events for new ones. */
 export function checkAndAwardBadges(p: TrustProfile): BadgeDef[] {
