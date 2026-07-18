@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import { Sparkles, Pin, ArrowRight, Search, Heart } from "lucide-react";
-import { MIRROR_SCRIPT, type Scripted } from "@/lib/tour/script";
+import { MIRROR_SCRIPT } from "@/lib/tour/script";
 
 export const Route = createFileRoute("/quick-tour")({
   head: () => ({
