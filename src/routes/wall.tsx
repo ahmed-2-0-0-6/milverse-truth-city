@@ -3,7 +3,7 @@
 // all four district profiles. Presentation only.
 
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import { CaseStampCard, type WallCard } from "@/components/wall/CaseStampCard";
 import { loadProfile, type HistoryEntry, type DailyPlayEntry } from "@/lib/mirror/profile";
@@ -14,6 +14,8 @@ import { getFeedScenario } from "@/lib/feed/scenarios";
 import { getBoss } from "@/lib/boss/scenarios";
 import { caseForDate } from "@/lib/daily/rotation";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
+import { readTapes, clearTapes, type StoredTape } from "@/lib/mirror/tapes";
+import { TapeReview } from "@/components/mirror/TapeReview";
 
 export const Route = createFileRoute("/wall")({
   head: () => ({
@@ -217,6 +219,10 @@ function WallPage() {
   const [districts, setDistricts] = useState<Set<District>>(new Set());
   const [outcomes, setOutcomes] = useState<Set<Outcome>>(new Set());
   const [announce, setAnnounce] = useState("");
+  const [tapes, setTapes] = useState<StoredTape[]>([]);
+  const [openTape, setOpenTape] = useState<StoredTape | null>(null);
+  const [burnArmed, setBurnArmed] = useState(false);
+  const burnTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const rebuild = () => {
@@ -240,6 +246,7 @@ function WallPage() {
         falseAlarms: p.falseAlarms,
         streak: p.dailyStreak,
       });
+      setTapes(readTapes());
     };
     rebuild();
     const on = () => rebuild();
@@ -268,6 +275,39 @@ function WallPage() {
       return true;
     });
   }, [cards, districts, outcomes]);
+
+  const tapeIndex = useMemo(() => {
+    const m = new Map<string, StoredTape>();
+    for (const t of tapes) m.set(`${t.caseId}:${t.ts}`, t);
+    return m;
+  }, [tapes]);
+
+  const tapeForCard = (c: WallCard): StoredTape | null => {
+    if (c.district !== "MIRROR") return null;
+    // WallCard.key for Mirror is `mirror:{caseId}:{ts}`; tape keys on the raw caseId+ts.
+    const caseId = c.key.split(":").slice(1, -1).join(":");
+    return tapeIndex.get(`${caseId}:${c.ts}`) ?? null;
+  };
+
+  const armedTimeoutMs = 4000;
+  const armBurn = () => {
+    setBurnArmed(true);
+    if (burnTimerRef.current) window.clearTimeout(burnTimerRef.current);
+    burnTimerRef.current = window.setTimeout(() => setBurnArmed(false), armedTimeoutMs);
+  };
+  const doBurn = () => {
+    if (burnTimerRef.current) window.clearTimeout(burnTimerRef.current);
+    clearTapes();
+    setTapes([]);
+    setBurnArmed(false);
+    setOpenTape(null);
+  };
+  useEffect(
+    () => () => {
+      if (burnTimerRef.current) window.clearTimeout(burnTimerRef.current);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (districts.size === 0 && outcomes.size === 0) {
@@ -394,14 +434,51 @@ function WallPage() {
             aria-label="Closed cases"
             className="[column-fill:_balance] columns-1 sm:columns-2 lg:columns-3 gap-4"
           >
-            {filtered.map((c, i) => (
-              <div role="listitem" key={c.key} className="relative">
-                <CaseStampCard card={c} index={i} />
-              </div>
-            ))}
+            {filtered.map((c, i) => {
+              const t = tapeForCard(c);
+              return (
+                <div role="listitem" key={c.key} className="relative">
+                  <CaseStampCard
+                    card={c}
+                    index={i}
+                    onOpenTape={t ? () => setOpenTape(t) : undefined}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {tapes.length > 0 && (
+          <div className="mt-8 flex justify-end">
+            <button
+              type="button"
+              onClick={burnArmed ? doBurn : armBurn}
+              className={`stencil text-[10px] tracking-widest rounded-md border px-3 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive ${
+                burnArmed
+                  ? "border-destructive/60 text-destructive bg-destructive/10"
+                  : "border-border text-muted-foreground hover:text-foreground"
+              }`}
+              aria-label={burnArmed ? `Confirm burn all ${tapes.length} tapes` : "Burn the tapes"}
+            >
+              {burnArmed ? `SURE? BURN ALL ${tapes.length}` : "BURN THE TAPES"}
+            </button>
           </div>
         )}
       </main>
+
+      {openTape ? (() => {
+        const sc = getScenario(openTape.caseId);
+        if (!sc) return null;
+        return (
+          <TapeReview
+            scenario={sc}
+            messages={openTape.messages}
+            result={openTape.result}
+            onClose={() => setOpenTape(null)}
+          />
+        );
+      })() : null}
     </div>
   );
 }

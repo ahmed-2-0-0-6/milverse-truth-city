@@ -1,0 +1,98 @@
+// MILVERSE — The Tape (local-only, never synced, never logged).
+// Additive record of Mirror conversations for post-verdict annotated
+// playback. Message bodies never leave the device. No telemetry.
+
+import type { Message, VoicePayload } from "./engine";
+
+/** Fields the tape renders. Everything else is stripped on save. */
+export interface TapeMessage {
+  role: "player" | "contact" | "system";
+  kind?: "text" | "voice" | "system";
+  text: string;
+  ts: number;
+  factId?: string;
+  probeQuality?: "strong" | "weak" | "wasted";
+  isTell?: boolean;
+  tellExplanation?: string;
+  voice?: VoicePayload;
+}
+
+export type TapeResult = "correct" | "missed_scam" | "false_alarm" | "lucky_guess";
+
+export interface StoredTape {
+  caseId: string;
+  ts: number;
+  result: TapeResult;
+  messages: TapeMessage[];
+}
+
+const KEY = "milverse.tapes.v1";
+const CAP = 10;
+
+function strip(m: Message): TapeMessage {
+  const out: TapeMessage = { role: m.role, text: m.text ?? "", ts: m.ts };
+  if (m.kind) out.kind = m.kind;
+  if (m.factId) out.factId = m.factId;
+  if (m.probeQuality) out.probeQuality = m.probeQuality;
+  if (m.isTell) out.isTell = true;
+  if (m.tellExplanation) out.tellExplanation = m.tellExplanation;
+  if (m.voice) {
+    out.voice = {
+      text: m.voice.text,
+      artifact: m.voice.artifact,
+      artifactPos: m.voice.artifactPos,
+    };
+  }
+  return out;
+}
+
+export function readTapes(): StoredTape[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as StoredTape[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveTape(entry: {
+  caseId: string;
+  ts: number;
+  result: TapeResult;
+  messages: Message[];
+}): void {
+  if (typeof window === "undefined") return;
+  const list = readTapes();
+  // Dedupe by (caseId, ts) — guards double-save on re-render.
+  if (list.some((t) => t.caseId === entry.caseId && t.ts === entry.ts)) return;
+  const tape: StoredTape = {
+    caseId: entry.caseId,
+    ts: entry.ts,
+    result: entry.result,
+    messages: entry.messages.map(strip),
+  };
+  list.push(tape);
+  // FIFO cap.
+  while (list.length > CAP) list.shift();
+  try {
+    localStorage.setItem(KEY, JSON.stringify(list));
+  } catch {
+    /* quota — silently drop */
+  }
+}
+
+export function clearTapes(): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    /* noop */
+  }
+}
+
+export function findTape(caseId: string, ts: number): StoredTape | null {
+  return readTapes().find((t) => t.caseId === caseId && t.ts === ts) ?? null;
+}

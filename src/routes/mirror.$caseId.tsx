@@ -51,6 +51,8 @@ import { pendingRetestForCase, scheduleRetest, resolveRetest, type RetestResolut
 import { CONVICTION_CHIPS, computeConviction, debriefLineFor } from "@/lib/mirror/conviction";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 import { aftermathFor } from "@/lib/mirror/aftermath";
+import { saveTape } from "@/lib/mirror/tapes";
+import { TapeReview } from "@/components/mirror/TapeReview";
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
@@ -1113,6 +1115,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
   const navigate = useNavigate();
   const sim = useMemo(() => loadSim(), []);
   const [profileSnap, setProfileSnap] = useState(() => loadProfile());
+  const [tapeOpen, setTapeOpen] = useState(false);
   useEffect(() => {
     const on = () => setProfileSnap(loadProfile());
     window.addEventListener("milverse:profile", on);
@@ -1254,6 +1257,16 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       ts: nowTs,
     });
     saveProfile(p);
+    // The Tape — local-only annotated transcript, keyed to the same ts the
+    // wall row uses so /wall can attach a "TAPE ON FILE →" affordance.
+    if (sim?.messages?.length) {
+      saveTape({
+        caseId: scenario.id,
+        ts: nowTs,
+        result: result.resultKind,
+        messages: sim.messages,
+      });
+    }
     const xpAfter = computeXp(p, loadUnlocked().size, p.publishedCount ?? 0);
     writeXpDelta(xpBefore, xpAfter);
     logPilotEntry({
@@ -1447,6 +1460,28 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           </ul>
         </section>
       )}
+
+      {/* The Tape — annotated playback of the whole exchange. */}
+      {sim?.messages?.length ? (
+        <div>
+          <button
+            type="button"
+            onClick={() => setTapeOpen(true)}
+            className="w-full rounded-md border border-caution/50 bg-caution/5 py-3 font-mono text-xs tracking-widest text-caution hover:bg-caution/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-caution"
+          >
+            PLAY THE TAPE →
+          </button>
+        </div>
+      ) : null}
+
+      {tapeOpen && sim?.messages?.length ? (
+        <TapeReview
+          scenario={scenario}
+          messages={sim.messages}
+          result={result.resultKind}
+          onClose={() => setTapeOpen(false)}
+        />
+      ) : null}
 
       {/* Voice note breakdown */}
       {result.voiceArtifact !== undefined && sim?.messages.some((m) => m.kind === "voice") && (
