@@ -91,10 +91,10 @@ export function EmptyState({
 }
 
 export function ErrorState({
-  title = "Something went wrong",
-  description = "Please try again. If the problem persists, refresh the page.",
+  title = "This didn't load.",
+  description = "The fault's on our end. A refresh usually clears it.",
   onRetry,
-  retryLabel = "Try again",
+  retryLabel = "Refresh",
 }: {
   title?: string;
   description?: ReactNode;
