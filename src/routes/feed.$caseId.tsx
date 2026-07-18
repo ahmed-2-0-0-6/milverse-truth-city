@@ -263,6 +263,7 @@ function Brief({ scenario, onStart }: { scenario: FeedScenario; onStart: () => v
           </div>
         </section>
       </div>
+      <SendOff />
       <button
         onClick={onStart}
         className="mt-6 w-full rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground transition-transform hover:scale-[1.01]"
