@@ -55,7 +55,14 @@ export function loadFirstPhone(): FirstPhoneState {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return fresh();
-    return { ...fresh(), ...(JSON.parse(raw) as Partial<FirstPhoneState>) };
+    const parsed = JSON.parse(raw) as Partial<FirstPhoneState>;
+    const merged: FirstPhoneState = { ...fresh(), ...parsed };
+    // Silent migration: pre-existing profile with any lesson progress
+    // never sees the tour (feature shipped after their first boot).
+    if (parsed.tourSeen === undefined && (merged.lessonsCompleted?.length ?? 0) > 0) {
+      merged.tourSeen = true;
+    }
+    return merged;
   } catch {
     return fresh();
   }
