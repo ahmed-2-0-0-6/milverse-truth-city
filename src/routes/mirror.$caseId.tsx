@@ -575,6 +575,14 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                   }}
                 />
               </div>
+              <MeterNote
+                bandKey={currentBand.key}
+                label={currentBand.label}
+                note={currentBand.note}
+                sendTick={sendTick}
+                showOnMount={showBandOnMount}
+              />
+
               <div className="mt-2 flex gap-1">
                 {(["chat", "notes"] as const).map((t) => (
                   <button
