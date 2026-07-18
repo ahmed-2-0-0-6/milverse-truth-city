@@ -9,6 +9,7 @@ import { FormatFrame } from "@/components/feed/FormatFrame";
 import { VerdictMoment } from "@/components/VerdictMoment";
 import { TacticFlash } from "@/components/TacticFlash";
 import { ReceiptCard, type ReceiptData } from "@/components/daily/ReceiptCard";
+import { StreakBeat } from "@/components/daily/StreakBeat";
 import { HandlerDropLine } from "@/components/handler/HandlerDropLine";
 import {
   todaysDailyCase,
@@ -49,7 +50,7 @@ export const Route = createFileRoute("/drop")({
   component: DropPage,
 });
 
-type Stage = "intake" | "wager" | "verdict-cinema" | "reveal" | "receipt";
+type Stage = "intake" | "wager" | "verdict-cinema" | "streak" | "reveal" | "receipt";
 
 function DropPage() {
   const emptyStatus = { playedToday: false, todayEntry: null, streak: 0, trust: 100 };
@@ -388,6 +389,7 @@ function PlayFlow({
 
   const [showTactic, setShowTactic] = useState(false);
   const [committing, setCommitting] = useState(false);
+  const [newStreak, setNewStreak] = useState<number | null>(null);
 
   const runProbe = (kind: FeedToolKind) => {
     if (probesUsed.length >= 2 || probesUsed.includes(kind)) return;
@@ -461,6 +463,7 @@ function PlayFlow({
       });
     }
 
+    if (result.correct && result.newStreak > status.streak) setNewStreak(result.newStreak);
     setStage("verdict-cinema");
   };
 
@@ -542,13 +545,18 @@ function PlayFlow({
             }
             onDone={() => {
               setShowTactic(!!scenario.tacticId);
-              setStage("reveal");
+              setStage(newStreak !== null ? "streak" : "reveal");
             }}
           />
           {showTactic && scenario.tacticId && (
             <TacticFlash tacticId={scenario.tacticId} onDone={() => setShowTactic(false)} />
           )}
         </>
+      )}
+
+      {/* Streak celebration — only when the watch grew */}
+      {stage === "streak" && newStreak !== null && (
+        <StreakBeat streak={newStreak} onDone={() => setStage("reveal")} />
       )}
 
       {/* Reveal → auto-shows via onDone flip; the parent re-reads status and shows PostPlayState next mount */}

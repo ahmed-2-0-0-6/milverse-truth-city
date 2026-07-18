@@ -108,6 +108,11 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
   const [stage, setStage] = useState<"enter" | "stamp" | "reveal" | "trail">("enter");
   const [canSkip, setCanSkip] = useState(false);
   const doneRef = useRef(false);
+  // Keep the latest onDone without making it an effect dep — parents that
+  // re-render every second (e.g. /drop's countdown) pass a fresh closure each
+  // tick, and re-running the effect would reset the whole timeline forever.
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
 
   // Deterministic dust particles per case — no re-shuffle on rerender.
   const dust = useMemo(
@@ -128,7 +133,7 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
     if (mode !== "cinematic" || reduce) {
       if (!doneRef.current) {
         doneRef.current = true;
-        queueMicrotask(onDone);
+        queueMicrotask(() => onDoneRef.current());
       }
       return;
     }
@@ -147,13 +152,13 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
     const t4 = window.setTimeout(() => {
       if (!doneRef.current) {
         doneRef.current = true;
-        onDone();
+        onDoneRef.current();
       }
     }, 3200);
     return () => {
       [t1, t2, tSkip, t3, t4].forEach(clearTimeout);
     };
-  }, [mode, grade.sting, onDone]);
+  }, [mode, grade.sting]);
 
   if (mode !== "cinematic") return null;
 
