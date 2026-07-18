@@ -32,7 +32,15 @@ function shortHash(s: string): number {
   return h;
 }
 
-export function CaseStampCard({ card, index }: { card: WallCard; index: number }) {
+export function CaseStampCard({
+  card,
+  index,
+  onOpenTape,
+}: {
+  card: WallCard;
+  index: number;
+  onOpenTape?: () => void;
+}) {
   const [flipped, setFlipped] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const h = shortHash(card.key + ":" + index);
@@ -117,6 +125,15 @@ export function CaseStampCard({ card, index }: { card: WallCard; index: number }
           </div>
         )}
       </button>
+      {onOpenTape && (
+        <button
+          type="button"
+          onClick={onOpenTape}
+          className="mt-1 block w-full rounded-md border border-caution/40 bg-caution/5 px-2 py-1 stencil text-[9px] tracking-widest text-caution hover:bg-caution/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-caution"
+        >
+          TAPE ON FILE →
+        </button>
+      )}
     </div>
   );
 }
