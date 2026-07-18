@@ -318,6 +318,7 @@ function CaseFiles() {
                     );
                     const coldOk = !!profile && isColdEligible(profile, s.id);
                     const best = coldOk ? bestClearedSeconds(s.id) : null;
+                    const inSeason = !!season && season.tactics.includes(tacticForMirror(s.id));
                     return (
                       <CaseCard
                         key={s.id}
@@ -326,11 +327,14 @@ function CaseFiles() {
                         locked={!isUnlocked}
                         icon={<MessageSquare className="h-5 w-5" />}
                         metaTopRight={<TierMeter tier={s.tier} />}
+                        seasonGlyph={inSeason ? <SeasonGlyph season={season} /> : undefined}
+                        inSeason={inSeason}
                         title={s.title}
                         teaser={s.teaser}
                         outcome={latestOutcome.get(s.id)}
                         artifactChip={chipFor(s.id)}
                         unreadThread={unread.has(s.id)}
+
                         coldStamp={best !== null ? `COLD CLEARED · ${formatDrillTime(best)}` : undefined}
                         coldAction={
                           coldOk && isUnlocked
