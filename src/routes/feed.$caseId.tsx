@@ -772,7 +772,7 @@ function Debrief({
         playerResult={
           outcome.result === "correct"
             ? "correct"
-            : outcome.result === "missed_fake" || outcome.result === "missed_scam"
+            : outcome.result === "missed_fake"
               ? "missed_scam"
               : "false_alarm"
         }
