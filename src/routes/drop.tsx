@@ -251,6 +251,8 @@ function DropPage() {
           )}
         </section>
 
+        <Spool />
+
         <Leaderboards />
       </main>
     </div>
