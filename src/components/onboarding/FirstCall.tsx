@@ -235,7 +235,7 @@ function DrillBeat({
       {current?.meter !== undefined && (
         <div className="mb-3">
           <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-white/60">
-            <span>COMPOSURE</span>
+            <span>THE LINE</span>
             <span>{current.meter}</span>
           </div>
           <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
