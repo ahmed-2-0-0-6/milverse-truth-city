@@ -169,6 +169,11 @@ export function TopBar() {
             <BookOpen className="h-3.5 w-3.5" />
             <span className="hidden lg:inline">MANUAL</span>
           </Link>
+          {isGameSurface(pathname) && (
+            <div className="hidden md:flex">
+              <GameBar />
+            </div>
+          )}
           {showRankChip && <RankChip />}
           {showInbox && <InboxTray />}
           <VisualQualityToggle />
