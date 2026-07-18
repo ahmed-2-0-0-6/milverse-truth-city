@@ -429,3 +429,45 @@ function CaseFiles() {
     </div>
   );
 }
+
+/* ─────────────────────────── The Double beacon ─────────────────────────── */
+
+function DoubleBeacon({ casesPlayed }: { casesPlayed: number }) {
+  const unlocked = casesPlayed >= 3;
+  if (!unlocked) {
+    return (
+      <div className="mt-3 mb-4 rounded-lg border border-dashed border-amber-500/30 bg-amber-500/5 p-4">
+        <div className="font-mono text-[10px] tracking-[0.3em] text-amber-400/70">
+          SPECIAL FILE — THE DOUBLE · LOCKED
+        </div>
+        <div className="mt-2 text-sm text-foreground/70">
+          The city teaches you to defend yourself first. Three cases, then this file opens.
+        </div>
+      </div>
+    );
+  }
+  return (
+    <Link
+      to="/double"
+      className="mt-3 mb-4 block rounded-lg border border-amber-500/60 bg-gradient-to-r from-amber-500/10 via-black to-black p-4 transition hover:border-amber-400"
+    >
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <div className="font-mono text-[10px] tracking-[0.3em] text-amber-400">
+            SPECIAL FILE — THE DOUBLE
+          </div>
+          <div className="mt-1 text-lg font-black">
+            Someone's running your name on your khala.
+          </div>
+          <div className="mt-1 text-xs text-foreground/60">
+            She's texting you screenshots. Pick up.
+          </div>
+        </div>
+        <div className="font-mono text-[11px] tracking-widest text-amber-400">
+          TAKE THE CALL →
+        </div>
+      </div>
+    </Link>
+  );
+}
+
