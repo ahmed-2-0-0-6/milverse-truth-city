@@ -524,6 +524,8 @@ function VerdictScreen({
   setFinalReply,
   conclusion,
   setConclusion,
+  loadBearing,
+  setLoadBearing,
   onConfirm,
 }: {
   scenario: FeedScenario;
@@ -534,6 +536,8 @@ function VerdictScreen({
   setFinalReply: (s: string) => void;
   conclusion: string;
   setConclusion: (s: string) => void;
+  loadBearing: string[];
+  setLoadBearing: React.Dispatch<React.SetStateAction<string[]>>;
   onConfirm: () => void;
 }) {
   const tone = classifyTone(finalReply);
@@ -543,11 +547,44 @@ function VerdictScreen({
       : tone === "respectful"
         ? "text-primary"
         : "text-muted-foreground";
-  const usedActions = scenario.actions.filter((a) => state.actionsUsed.includes(a.id));
+  const usedActions = state.actionsUsed
+    .map((id) => scenario.actions.find((a) => a.id === id))
+    .filter((a): a is NonNullable<typeof a> => Boolean(a));
+  const [srMsg, setSrMsg] = useState("");
+  function toggleLoadBearing(id: string, label: string) {
+    setLoadBearing((prev) => {
+      if (prev.includes(id)) {
+        setSrMsg(`${label} unmarked`);
+        return prev.filter((x) => x !== id);
+      }
+      if (prev.length >= 2) {
+        setSrMsg("Two marks maximum");
+        const el = document.getElementById(`lb-${id}`);
+        if (el) {
+          el.animate(
+            [
+              { transform: "translateX(0)" },
+              { transform: "translateX(-4px)" },
+              { transform: "translateX(4px)" },
+              { transform: "translateX(0)" },
+            ],
+            { duration: 220, easing: "ease-out" },
+          );
+        }
+        return prev;
+      }
+      setSrMsg(`${label} marked as load-bearing`);
+      return [...prev, id];
+    });
+  }
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
       <div className="font-mono text-xs tracking-[0.3em] text-caution">INVESTIGATION BOARD</div>
       <h1 className="mt-2 text-2xl font-semibold">Assemble the case. Deliver the verdict.</h1>
+
+      <span className="sr-only" aria-live="polite" role="status">
+        {srMsg}
+      </span>
 
       <section className="mt-5 rounded-xl border border-border bg-card p-4 space-y-3">
         <div className="font-mono text-[10px] tracking-widest text-muted-foreground">
@@ -557,23 +594,61 @@ function VerdictScreen({
           <div className="font-mono text-[10px] tracking-widest text-primary mb-1.5">THE CLAIM</div>
           <p className="text-xs italic border-l-2 border-primary/40 pl-2.5">"{scenario.opener}"</p>
         </div>
-        <div>
+        <div
+          aria-description="Mark at most two evidence cards as load-bearing."
+        >
           <div className="font-mono text-[10px] tracking-widest text-caution mb-1.5">
             VERIFICATION STEPS USED · {usedActions.length}/{scenario.actions.length}
           </div>
           {usedActions.length === 0 ? (
-            <p className="text-xs text-muted-foreground">
-              No toolkit actions used — you're calling this cold.
-            </p>
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p>No toolkit actions used — you're calling this cold.</p>
+              <p>Cold calls are how MISLEADING wins.</p>
+            </div>
           ) : (
-            <ul className="text-xs text-muted-foreground space-y-1">
-              {usedActions.map((a) => (
-                <li key={a.id}>· {a.label}</li>
-              ))}
+            <ul className="space-y-2">
+              {usedActions.map((a) => {
+                const marked = loadBearing.includes(a.id);
+                return (
+                  <li
+                    key={a.id}
+                    className={`rounded-md border p-3 transition ${
+                      marked ? "border-primary bg-primary/5" : "border-border bg-background/40"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-mono text-[10px] tracking-widest text-primary">
+                          {a.label}
+                        </div>
+                        <p className="mt-1.5 text-xs italic border-l-2 border-primary/30 pl-2.5 text-foreground/90">
+                          "{a.result}"
+                        </p>
+                      </div>
+                      <button
+                        id={`lb-${a.id}`}
+                        type="button"
+                        aria-pressed={marked}
+                        aria-label={`Mark ${a.label} as load-bearing evidence`}
+                        onClick={() => toggleLoadBearing(a.id, a.label)}
+                        className={`shrink-0 inline-flex items-center gap-1 rounded-sm border px-2 py-1 font-mono text-[9px] tracking-widest transition ${
+                          marked
+                            ? "border-primary bg-primary/15 text-primary"
+                            : "border-border text-muted-foreground hover:border-primary/50 hover:text-primary"
+                        }`}
+                      >
+                        <span aria-hidden>{marked ? "◆" : "◇"}</span>
+                        LOAD-BEARING
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
       </section>
+
 
       <p className="mt-6 text-sm text-muted-foreground">
         MISLEADING = the core is true but the framing (photo, date, context) is not. That's the most
