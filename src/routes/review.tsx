@@ -23,6 +23,7 @@ import {
 import { fetchAssessmentGroup, setGroupPhase } from "@/lib/assessment.functions";
 import type { ItemResponse, Metrics } from "@/lib/assessment/scoring";
 import { rollupCohort, headlineSentence, type CohortAttempt } from "@/lib/assessment/scoring";
+import { interpretCohort } from "@/lib/assessment/interpret";
 import { FORMS, type FormId } from "@/lib/assessment/items";
 
 export const Route = createFileRoute("/review")({
@@ -474,6 +475,9 @@ function AssessmentTab({ passcode }: { passcode: string }) {
               </p>
             </div>
           )}
+
+          <PlainReading rollup={rollup} days={daysSpan} />
+
 
           {rollup.nPaired < 5 ? (
             <div className="mt-4 rounded-sm border border-caution/40 bg-caution/5 p-4 text-sm">
@@ -930,5 +934,41 @@ function SubmissionCard({
         </div>
       )}
     </article>
+  );
+}
+
+function PlainReading({ rollup, days }: { rollup: ReturnType<typeof rollupCohort>; days: number }) {
+  const interp = interpretCohort(rollup, days);
+  return (
+    <div className="mt-4 rounded-sm border border-border bg-card p-5">
+      <div className="stencil text-[10px] text-muted-foreground">THE PLAIN READING</div>
+      {interp ? (
+        <>
+          <div className="mt-3 space-y-3">
+            {interp.paragraphs.map((p, i) => (
+              <p key={i} className="text-sm leading-relaxed text-foreground">{p}</p>
+            ))}
+          </div>
+          {interp.cautions.length > 0 && (
+            <div className="mt-4">
+              <div className="text-sm font-semibold text-foreground">Read with care:</div>
+              <ul className="mt-2 list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                {interp.cautions.map((c, i) => (
+                  <li key={i}>{c}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
+      ) : (
+        <p className="mt-3 text-sm text-muted-foreground">
+          Fewer than five students have completed both measurements. Individual-scale readings would
+          be noise dressed as signal — the narrative unlocks at five.
+        </p>
+      )}
+      <p className="mt-4 font-mono text-[10px] text-muted-foreground">
+        Generated from the same numbers shown above. Nothing here is hand-entered.
+      </p>
+    </div>
   );
 }
