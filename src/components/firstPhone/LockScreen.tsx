@@ -34,7 +34,11 @@ export function LockScreen({
   }, []);
   const hh = now.getHours().toString().padStart(2, "0");
   const mm = now.getMinutes().toString().padStart(2, "0");
-  const day = now.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
+  const day = now.toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
   const fg = wp.fg === "light" ? "text-white" : "text-neutral-900";
 
   return (
@@ -59,11 +63,11 @@ export function LockScreen({
 
       <div className="relative flex-1 flex flex-col items-center px-4 pt-8">
         <div className="text-center drop-shadow-md">
-          <div className="text-[10px] font-mono tracking-[0.3em] opacity-80">{day.toUpperCase()}</div>
+          <div className="text-[10px] font-mono tracking-[0.3em] opacity-80">
+            {day.toUpperCase()}
+          </div>
           <div className="mt-2 text-6xl font-thin tabular-nums leading-none">{`${hh}:${mm}`}</div>
-          {cityName && (
-            <div className="mt-4 text-sm font-medium opacity-90">Hey {cityName}.</div>
-          )}
+          {cityName && <div className="mt-4 text-sm font-medium opacity-90">Hey {cityName}.</div>}
           {hint && <div className="mt-1 text-[11px] opacity-70">{hint}</div>}
         </div>
 

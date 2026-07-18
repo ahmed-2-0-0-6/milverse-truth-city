@@ -126,8 +126,7 @@ function systemPromptFor(surface: z.infer<typeof InputSchema>["surface"]) {
       "React to today's Daily Drop. Reference streak and stake only when they matter. One or two sentences. Never celebrate — observe.",
     "leaderboard-nudge":
       "Reference the player's percentile. One sentence. Rank as a state, not a trophy.",
-    "psych-eval":
-      "Weekly evaluation. Two short sentences: what shifted, one goal for the week.",
+    "psych-eval": "Weekly evaluation. Two short sentences: what shifted, one goal for the week.",
   };
 
   return `${bible}\n\nTASK: ${surfaceInstr[surface]}`;

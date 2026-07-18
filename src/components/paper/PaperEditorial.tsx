@@ -75,7 +75,6 @@ export function PaperEditorial({
       <div className="paper-mono text-[10px] tracking-[0.25em] mt-3 text-center text-[color:var(--paper-muted)]">
         — {editorial.signoff}
       </div>
-
     </section>
   );
 }

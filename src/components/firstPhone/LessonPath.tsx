@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react";
 import { LESSONS } from "@/lib/firstPhone/lessons";
-import {
-  loadFirstPhone,
-  markLessonComplete,
-  type FirstPhoneState,
-} from "@/lib/firstPhone/profile";
+import { loadFirstPhone, markLessonComplete, type FirstPhoneState } from "@/lib/firstPhone/profile";
 import { logPilotEntry } from "@/lib/pilot";
 import { LicenseCard } from "./LicenseCard";
 import { HomeScreen } from "./HomeScreen";
@@ -95,9 +91,7 @@ export function LessonPath() {
           variant="junior"
           header={
             <div className="flex items-center justify-between px-3 py-2.5 border-b border-white/10 bg-neutral-900/70">
-              <div className="font-mono text-[10px] tracking-[0.25em] text-primary">
-                GRADUATION
-              </div>
+              <div className="font-mono text-[10px] tracking-[0.25em] text-primary">GRADUATION</div>
               <button
                 onClick={() => {
                   setGraduated(false);

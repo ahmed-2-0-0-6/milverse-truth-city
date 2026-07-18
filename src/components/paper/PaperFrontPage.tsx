@@ -210,7 +210,6 @@ function PlayFlow({
               </button>
             ))}
           </div>
-
         </>
       )}
       {stage === "wager" && verdict && (
@@ -245,7 +244,6 @@ function PlayFlow({
             <button onClick={commit} className="paper-btn-primary">
               SLAM THE STAMP
             </button>
-
           </div>
         </div>
       )}

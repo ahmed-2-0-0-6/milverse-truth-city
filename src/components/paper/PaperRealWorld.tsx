@@ -20,5 +20,4 @@ export function PaperRealWorld({ realWorld }: { realWorld: EditionRealWorld }) {
       </a>
     </section>
   );
-
 }

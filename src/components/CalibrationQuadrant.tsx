@@ -125,13 +125,7 @@ export function CalibrationQuadrant({ profile, compact = false, caption }: Props
           {/* Operator dot (or origin ghost for recruits) */}
           {total > 0 ? (
             <g>
-              <circle
-                cx={cx}
-                cy={cy}
-                r="4.5"
-                fill={DOT_FILL[tone]}
-                opacity="0.25"
-              />
+              <circle cx={cx} cy={cy} r="4.5" fill={DOT_FILL[tone]} opacity="0.25" />
               <circle cx={cx} cy={cy} r="2" fill={DOT_FILL[tone]} />
             </g>
           ) : (
@@ -162,9 +156,7 @@ export function CalibrationQuadrant({ profile, compact = false, caption }: Props
           >
             <div>
               MISS ·{" "}
-              <span className="text-foreground tabular-nums">
-                {(missRate * 100).toFixed(0)}%
-              </span>
+              <span className="text-foreground tabular-nums">{(missRate * 100).toFixed(0)}%</span>
             </div>
             <div>
               F-ALARM ·{" "}

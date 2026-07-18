@@ -34,8 +34,7 @@ export const CHAT_SKINS: Record<ChatPlatform, ChatSkin> = {
     bodyClass: "",
     bodyStyle: {
       backgroundColor: "#0b141a",
-      backgroundImage:
-        "radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1.2px)",
+      backgroundImage: "radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1.2px)",
       backgroundSize: "22px 22px",
     },
     inBubble: "bg-[#202c33] text-white rounded-lg rounded-tl-none",

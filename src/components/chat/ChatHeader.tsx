@@ -62,7 +62,9 @@ export function ChatHeader({
             <ChevronLeft className="h-5 w-5" />
           </button>
         )}
-        <div className={`relative shrink-0 ${avatarRing ? "rounded-full p-[2px] bg-gradient-to-tr from-amber-400 via-pink-500 to-purple-500" : ""}`}>
+        <div
+          className={`relative shrink-0 ${avatarRing ? "rounded-full p-[2px] bg-gradient-to-tr from-amber-400 via-pink-500 to-purple-500" : ""}`}
+        >
           <div
             className={`flex h-9 w-9 items-center justify-center rounded-full border font-mono text-xs font-semibold shadow-sm ${accentBg} ${avatarRing ? "border-black bg-neutral-900" : ""}`}
           >

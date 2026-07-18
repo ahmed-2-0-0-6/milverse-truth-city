@@ -24,7 +24,7 @@ type Tone = "default" | "citizen";
 function fileNo(seed: string): string {
   let h = 0;
   for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-  return `${String(h % 90 + 10)}-${String(h % 900 + 100)}`;
+  return `${String((h % 90) + 10)}-${String((h % 900) + 100)}`;
 }
 
 interface CardShellProps {

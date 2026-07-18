@@ -79,7 +79,10 @@ export function DistrictHero({
       <div className="relative mx-auto max-w-6xl px-4 sm:px-8 py-14 sm:py-20 md:py-24">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
-            <div className="stencil text-[10px] sm:text-[11px] mb-3" style={{ color: `rgb(${glow})` }}>
+            <div
+              className="stencil text-[10px] sm:text-[11px] mb-3"
+              style={{ color: `rgb(${glow})` }}
+            >
               {kicker}
             </div>
             <h1

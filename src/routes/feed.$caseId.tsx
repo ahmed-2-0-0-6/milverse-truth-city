@@ -454,7 +454,10 @@ function FeedRow({ m, read }: { m: FeedMessage; read?: boolean }) {
   const stamp = new Date(m.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   return (
     <div className={`msg-in flex ${isPlayer ? "justify-end" : "justify-start"}`}>
-      <div className={`flex flex-col gap-0.5 ${isPlayer ? "items-end" : "items-start"}`} style={{ maxWidth: "80%" }}>
+      <div
+        className={`flex flex-col gap-0.5 ${isPlayer ? "items-end" : "items-start"}`}
+        style={{ maxWidth: "80%" }}
+      >
         <div
           className={`rounded-2xl px-3 py-2 text-sm ${
             isPlayer
@@ -677,7 +680,6 @@ function Debrief({
 
       <CalibrationQuadrant profile={profileSnap} compact caption="CALIBRATION · AFTER THIS CASE" />
 
-
       <section className="rounded-xl border border-border bg-card p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="font-mono text-xs tracking-widest text-muted-foreground">
@@ -729,8 +731,6 @@ function Debrief({
           </p>
         </div>
       )}
-
-
 
       <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between text-sm">
         <span className="text-muted-foreground">Actions used</span>

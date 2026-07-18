@@ -890,12 +890,7 @@ function Beat5Departure() {
       </div>
 
       <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <ExitDoor
-          to="/"
-          label="PLAY THE FULL CITY"
-          hint="all of it, live"
-          primary
-        />
+        <ExitDoor to="/" label="PLAY THE FULL CITY" hint="all of it, live" primary />
         <ExitDoor to="/educators" label="FOR EDUCATORS" hint="curriculum + pilot notes" />
         <ExitDoor to="/charter" label="THE CHARTER" hint="what we promise the player" />
         <ExitDoor to="/review" label="THE PILOT DATA" hint="live during pilot" />

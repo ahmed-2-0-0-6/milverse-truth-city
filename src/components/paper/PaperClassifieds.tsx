@@ -164,7 +164,6 @@ function FlagFinder({
             <button onClick={onClose} className="paper-btn-primary">
               CLOSE
             </button>
-
           )}
         </div>
         {revealed && (

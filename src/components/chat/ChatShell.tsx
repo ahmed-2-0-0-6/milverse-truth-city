@@ -33,7 +33,9 @@ export function ChatShell({
   style,
 }: Props) {
   const isJunior = variant === "junior";
-  const outer = isJunior ? "chat-shell-backdrop chat-shell-backdrop--junior" : "chat-shell-backdrop";
+  const outer = isJunior
+    ? "chat-shell-backdrop chat-shell-backdrop--junior"
+    : "chat-shell-backdrop";
   const frame = isJunior
     ? "bg-neutral-900 text-white sm:rounded-[40px] sm:ring-1 sm:ring-white/10"
     : "bg-black text-white sm:rounded-[36px] sm:ring-1 sm:ring-white/5";
@@ -61,4 +63,3 @@ export function ChatShell({
     </div>
   );
 }
-

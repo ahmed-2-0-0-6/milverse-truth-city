@@ -73,16 +73,21 @@ export function JuniorLesson({ lesson, state, onBackHome, onComplete }: Props) {
   useEffect(() => {
     if (phase !== "adult") return;
     let cancelled = false;
-    setAdultBubbles([{ role: "out", text: "Hi — something feels off. Can you help?", ts: Date.now() }]);
+    setAdultBubbles([
+      { role: "out", text: "Hi — something feels off. Can you help?", ts: Date.now() },
+    ]);
     const t1 = setTimeout(() => !cancelled && setAdultTyping(true), reduced ? 100 : 800);
-    const t2 = setTimeout(() => {
-      if (cancelled) return;
-      setAdultTyping(false);
-      setAdultBubbles((prev) => [
-        ...prev,
-        { role: "in", text: c.adultScene.line, ts: Date.now() },
-      ]);
-    }, reduced ? 400 : 2200);
+    const t2 = setTimeout(
+      () => {
+        if (cancelled) return;
+        setAdultTyping(false);
+        setAdultBubbles((prev) => [
+          ...prev,
+          { role: "in", text: c.adultScene.line, ts: Date.now() },
+        ]);
+      },
+      reduced ? 400 : 2200,
+    );
     return () => {
       cancelled = true;
       clearTimeout(t1);

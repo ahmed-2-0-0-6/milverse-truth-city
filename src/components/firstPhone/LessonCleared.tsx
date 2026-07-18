@@ -88,7 +88,11 @@ export function LessonCleared({ lessonN, totalDone, totalLessons, onDone }: Prop
       <div className="mt-5 text-2xl font-semibold text-white">Lesson {lessonN} cleared.</div>
       <div className="mt-1.5 text-sm text-white/70">
         {totalDone} of {totalLessons} done.{" "}
-        {left === 0 ? "The phone's yours." : left === 1 ? "One more to the license." : `${left} more to the license.`}
+        {left === 0
+          ? "The phone's yours."
+          : left === 1
+            ? "One more to the license."
+            : `${left} more to the license.`}
       </div>
 
       {/* progress dots */}

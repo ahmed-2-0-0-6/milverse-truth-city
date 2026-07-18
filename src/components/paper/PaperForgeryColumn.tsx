@@ -55,7 +55,6 @@ export function PaperForgeryColumn({
               ENGINE-MADE
             </button>
           </div>
-
         ) : (
           <div className="mt-4">
             <div

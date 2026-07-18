@@ -459,8 +459,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                   className={`h-full transition-all duration-500 ${meterColor} ${state.meter <= 30 ? "animate-pulse" : ""}`}
                   style={{
                     width: `${state.meter}%`,
-                    boxShadow:
-                      state.meter <= 30 ? "0 0 10px oklch(0.55 0.2 25 / 0.8)" : undefined,
+                    boxShadow: state.meter <= 30 ? "0 0 10px oklch(0.55 0.2 25 / 0.8)" : undefined,
                   }}
                 />
               </div>
@@ -525,9 +524,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
-                placeholder={
-                  ended ? "Chat ended — make your call." : skin.placeholder
-                }
+                placeholder={ended ? "Chat ended — make your call." : skin.placeholder}
                 disabled={ended || typing}
                 className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-sm text-white outline-none focus:border-primary disabled:opacity-50"
               />
@@ -568,10 +565,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                   onPin={m.role === "contact" ? () => togglePin(i) : undefined}
                   speakerName={scenario.claimedIdentity}
                   speakerVoiceDesc={scenario.persona.voice}
-                  read={
-                    typing ||
-                    messages.some((later, j) => j > i && later.role === "contact")
-                  }
+                  read={typing || messages.some((later, j) => j > i && later.role === "contact")}
                   skin={skin}
                 />
               ))}
