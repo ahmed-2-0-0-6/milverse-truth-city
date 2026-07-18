@@ -21,6 +21,10 @@ import { loadMaskStamps, saveMaskStamp, stampsByCode, armMask } from "@/lib/mask
 
 
 export const Route = createFileRoute("/studio")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    mode: search.mode === "mask" ? ("mask" as const) : undefined,
+    handoff: typeof search.handoff === "string" ? (search.handoff as string) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "The Studio — Design a Case — MILVERSE" },
@@ -29,6 +33,7 @@ export const Route = createFileRoute("/studio")({
   }),
   component: Studio,
 });
+
 
 type Tone = "warm" | "urgent" | "official" | "emotional";
 type Lang = "english" | "roman-urdu" | "mixed";
