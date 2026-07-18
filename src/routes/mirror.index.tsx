@@ -36,6 +36,9 @@ import { InboxManager } from "@/components/inbox/InboxManager";
 import { IncomingToast } from "@/components/inbox/IncomingToast";
 import { IncomingCall } from "@/components/inbox/IncomingCall";
 import { loadInbox } from "@/lib/inbox/profile";
+import { SeasonAdvisory, SeasonGlyph, useSeason } from "@/components/season/SeasonAdvisory";
+import { tacticForMirror } from "@/lib/mirror/tactics";
+
 
 export const Route = createFileRoute("/mirror/")({
   head: () => ({
