@@ -40,6 +40,7 @@ function FeedIndex() {
     <div className="min-h-screen grain">
       <InboxManager />
       <IncomingToast />
+      <IncomingCall />
       <TopBar />
       <DistrictHero
         art={feedArt}
