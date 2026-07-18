@@ -2337,6 +2337,25 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           {result.points} pts
         </div>
         {(() => {
+          // LINE HELD — plain "CALL TIME" wording for real cases; steal-time
+          // framing reserved for imposter runs to keep register honest.
+          const held = caseSeconds(sim?.messages ?? []);
+          if (held == null) return null;
+          const label = scenario.truth === "IMPOSTER" ? "LINE HELD" : "CALL TIME";
+          const sub =
+            scenario.truth === "IMPOSTER"
+              ? "Time stolen from a real victim."
+              : "Time on the line.";
+          return (
+            <div className="mt-3 flex items-baseline gap-3 font-mono text-xs tracking-[0.2em] opacity-90">
+              <span>{label}</span>
+              <span className="text-lg font-semibold tabular-nums">{formatMS(held)}</span>
+              <span className="text-[10px] opacity-70">· {sub}</span>
+            </div>
+          );
+        })()}
+
+        {(() => {
           const line = debriefLineFor(result.correctVerdict, verdictRaw.confidence);
           const rep = computeConviction(profileSnap.history);
           return (
