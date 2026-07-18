@@ -276,6 +276,39 @@ function WallPage() {
     });
   }, [cards, districts, outcomes]);
 
+  const tapeIndex = useMemo(() => {
+    const m = new Map<string, StoredTape>();
+    for (const t of tapes) m.set(`${t.caseId}:${t.ts}`, t);
+    return m;
+  }, [tapes]);
+
+  const tapeForCard = (c: WallCard): StoredTape | null => {
+    if (c.district !== "MIRROR") return null;
+    // WallCard.key for Mirror is `mirror:{caseId}:{ts}`; tape keys on the raw caseId+ts.
+    const caseId = c.key.split(":").slice(1, -1).join(":");
+    return tapeIndex.get(`${caseId}:${c.ts}`) ?? null;
+  };
+
+  const armedTimeoutMs = 4000;
+  const armBurn = () => {
+    setBurnArmed(true);
+    if (burnTimerRef.current) window.clearTimeout(burnTimerRef.current);
+    burnTimerRef.current = window.setTimeout(() => setBurnArmed(false), armedTimeoutMs);
+  };
+  const doBurn = () => {
+    if (burnTimerRef.current) window.clearTimeout(burnTimerRef.current);
+    clearTapes();
+    setTapes([]);
+    setBurnArmed(false);
+    setOpenTape(null);
+  };
+  useEffect(
+    () => () => {
+      if (burnTimerRef.current) window.clearTimeout(burnTimerRef.current);
+    },
+    [],
+  );
+
   useEffect(() => {
     if (districts.size === 0 && outcomes.size === 0) {
       setAnnounce("");
