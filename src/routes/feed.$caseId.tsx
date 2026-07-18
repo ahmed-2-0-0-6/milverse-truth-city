@@ -124,6 +124,7 @@ function FeedPlay() {
             setOutcome(oc);
             // feed the ONE chart in City Hall
             const p = loadProfile();
+            const xpBefore = computeXp(p, loadUnlocked().size, p.publishedCount ?? 0);
             p.casesPlayed += 1;
             p.points += oc.points;
             if (oc.result === "correct") p.correctVerdicts += 1;
@@ -147,6 +148,8 @@ function FeedPlay() {
               ts: Date.now(),
             });
             saveProfile(p);
+            const xpAfter = computeXp(p, loadUnlocked().size, p.publishedCount ?? 0);
+            writeXpDelta(xpBefore, xpAfter);
             logPilotEntry({
               wing: "feed",
               caseId: scenario.id,
