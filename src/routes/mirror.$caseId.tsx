@@ -57,6 +57,13 @@ import { aftermathFor } from "@/lib/mirror/aftermath";
 import { saveTape } from "@/lib/mirror/tapes";
 import { TapeReview } from "@/components/mirror/TapeReview";
 import { factRefsFor, findRef, GUT_REF, type FactRef } from "@/lib/mirror/factRefs";
+import {
+  loadSeen as loadCraftSeen,
+  markSeen as markCraftSeen,
+  whyFor as craftWhyFor,
+  type Grade as CraftGrade,
+} from "@/lib/mirror/craftMarks";
+import { CraftMark } from "@/components/mirror/CraftMark";
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
