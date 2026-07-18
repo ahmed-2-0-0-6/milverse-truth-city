@@ -1406,9 +1406,23 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
         </div>
       </section>
 
-      <div className="mt-6 grid grid-cols-2 gap-3">
+      <div
+        className="mt-6 grid grid-cols-2 gap-3"
+        role="radiogroup"
+        aria-label="Your verdict"
+      >
         <button
+          role="radio"
+          type="button"
+          aria-checked={verdict === "REAL"}
+          tabIndex={verdict === "REAL" || (!verdict) ? 0 : -1}
           onClick={() => setVerdict("REAL")}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+              e.preventDefault();
+              setVerdict("FAKE");
+            }
+          }}
           className={`rounded-xl border-2 p-6 text-center font-mono tracking-widest transition ${
             verdict === "REAL"
               ? "border-primary bg-primary/10 text-primary"
@@ -1419,7 +1433,17 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
           <div className="mt-1 text-[10px] text-muted-foreground">This is who they claim</div>
         </button>
         <button
+          role="radio"
+          type="button"
+          aria-checked={verdict === "FAKE"}
+          tabIndex={verdict === "FAKE" ? 0 : -1}
           onClick={() => setVerdict("FAKE")}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+              e.preventDefault();
+              setVerdict("REAL");
+            }
+          }}
           className={`rounded-xl border-2 p-6 text-center font-mono tracking-widest transition ${
             verdict === "FAKE"
               ? "border-destructive bg-destructive/10 text-destructive"
@@ -1430,6 +1454,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
           <div className="mt-1 text-[10px] text-muted-foreground">This is an imposter</div>
         </button>
       </div>
+
 
       {/* HOW SURE? — conviction pick, radio group. Locks are gated on this. */}
       {verdict && (
