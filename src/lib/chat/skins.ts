@@ -85,7 +85,6 @@ const CASE_PLATFORM: Record<string, ChatPlatform> = {
   "t3-fraud-dept": "sms",
   "t3-real-bank": "sms",
   "survivor-bankfraud": "sms",
-  "boss-the-chorus": "sms",
   // DM lane
   "classmate-danish": "instagram",
   "t4-ghost-friend": "instagram",

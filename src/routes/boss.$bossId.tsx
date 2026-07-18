@@ -38,6 +38,7 @@ import { CallScreen } from "@/components/chat/CallScreen";
 import { BankConfirmSheet } from "@/components/chat/BankConfirmSheet";
 import { NotificationBanner, type NotificationPayload } from "@/components/chat/NotificationBanner";
 import { detectAmount, type SavedContact } from "@/lib/chat/contacts";
+import { CHAT_SKINS } from "@/lib/chat/skins";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 import { TacticStamp } from "@/components/TacticStamp";
 import type { TacticId } from "@/lib/manual/entries";
@@ -333,6 +334,7 @@ function BossPlay() {
             isSaved={false}
             subtitle={`PHASE · ${phaseLine.phase}`}
             accent="destructive"
+            chrome={CHAT_SKINS.whatsapp.headerClass}
             onBack={() => navigate({ to: "/boss" })}
             onContacts={() => setContactsOpen(true)}
           />
@@ -453,8 +455,17 @@ function BossPlay() {
           </div>
         }
       >
-        {/* Chat log body */}
-        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2.5">
+        {/* Chat log body — boss fights arrive over the messenger (skin is
+            presentation only; outcome logic lives in the engine). */}
+        <div
+          className="flex-1 overflow-y-auto px-3 py-3 space-y-2.5"
+          style={CHAT_SKINS.whatsapp.bodyStyle}
+        >
+          <div className="flex justify-center">
+            <div className="max-w-[85%] rounded-md bg-black/40 border border-white/10 px-3 py-1.5 text-center text-[10px] leading-relaxed text-amber-200/80">
+              🔒 {CHAT_SKINS.whatsapp.systemNote}
+            </div>
+          </div>
           {log.map((m, i) => {
             if (m.kind === "boss")
               return (
@@ -464,7 +475,9 @@ function BossPlay() {
                       {m.meta}
                     </div>
                   )}
-                  <div className="inline-block bg-white/[0.06] border border-white/10 rounded-2xl rounded-bl-sm px-3.5 py-2 text-sm text-white">
+                  <div
+                    className={`inline-block px-3.5 py-2 text-sm shadow-sm ${CHAT_SKINS.whatsapp.inBubble}`}
+                  >
                     {m.text}
                   </div>
                 </div>
