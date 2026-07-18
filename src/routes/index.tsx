@@ -234,44 +234,6 @@ function CityMap() {
   );
 }
 
-function Intro({ onDone }: { onDone: () => void }) {
-  const slides = [
-    "Lies come in two sizes: aimed at millions — and aimed at just you.",
-    "Both die the same way. Verification.",
-    "MILVERSE is a city built for that reflex. Time to fly in.",
-  ];
-  const [i, setI] = useState(0);
-  return (
-    <div className="fixed inset-0 z-[150] bg-black flex flex-col items-center justify-center px-6 text-center">
-      <div className="stencil text-[10px] text-cyan-300 mb-8 hud-blink">// EDITORIAL BRIEFING</div>
-      <div className="max-w-2xl">
-        <div
-          key={i}
-          className="msg-in text-2xl sm:text-4xl md:text-5xl font-semibold text-white leading-tight"
-          style={{ fontFamily: '"Bebas Neue", sans-serif' }}
-        >
-          {slides[i]}
-        </div>
-      </div>
-      <div className="mt-12 flex gap-2">
-        {slides.map((_, n) => (
-          <div key={n} className={`h-1 w-10 ${n <= i ? "bg-cyan-300" : "bg-white/15"}`} />
-        ))}
-      </div>
-      <div className="absolute bottom-8 flex gap-6 stencil text-[10px]">
-        <button onClick={onDone} className="text-white/50 hover:text-white">
-          SKIP
-        </button>
-        <button
-          onClick={() => {
-            if (i + 1 < slides.length) setI(i + 1);
-            else onDone();
-          }}
-          className="rounded-sm bg-primary px-6 py-2.5 text-primary-foreground border-2 border-primary shadow-[0_4px_20px_oklch(0.82_0.14_195/0.35)]"
-        >
-          {i + 1 < slides.length ? "NEXT →" : "ENTER THE CITY →"}
-        </button>
-      </div>
-    </div>
-  );
-}
+// The old three-slide Intro was replaced by <FirstCall />
+// (src/components/onboarding/FirstCall.tsx) — verb-first onboarding.
+
