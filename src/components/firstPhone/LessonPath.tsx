@@ -75,6 +75,21 @@ export function LessonPath() {
     }
   }
 
+  // SPOT IT mini-game
+  if (openSpotIt) {
+    return (
+      <div className="mt-4">
+        <SpotIt
+          onBackHome={() => setOpenSpotIt(false)}
+          onGoToLesson1={() => {
+            setOpenSpotIt(false);
+            setOpenLesson(1);
+          }}
+        />
+      </div>
+    );
+  }
+
   // License "app"
   if (showLicense) {
     return (
