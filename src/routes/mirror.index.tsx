@@ -19,6 +19,8 @@ import {
   type Scenario,
 } from "@/lib/mirror/scenarios";
 import { loadProfile, unlockedMaxTier, tierWins, type TrustProfile } from "@/lib/mirror/profile";
+import { armColdRead, bestClearedSeconds, formatDrillTime, isColdEligible } from "@/lib/mirror/coldreads";
+
 import { fetchCitizenCase } from "@/lib/citizen.functions";
 import { RecommendedStrip } from "@/components/RecommendedStrip";
 import { ReopenedStrip } from "@/components/mirror/ReopenedStrip";
@@ -302,6 +304,8 @@ function CaseFiles() {
                     const done = profile?.history.some(
                       (h) => h.caseId === s.id && h.result === "correct",
                     );
+                    const coldOk = !!profile && isColdEligible(profile, s.id);
+                    const best = coldOk ? bestClearedSeconds(s.id) : null;
                     return (
                       <CaseCard
                         key={s.id}
@@ -315,6 +319,19 @@ function CaseFiles() {
                         outcome={latestOutcome.get(s.id)}
                         artifactChip={chipFor(s.id)}
                         unreadThread={unread.has(s.id)}
+                        coldStamp={best !== null ? `COLD CLEARED · ${formatDrillTime(best)}` : undefined}
+                        coldAction={
+                          coldOk && isUnlocked
+                            ? {
+                                label: "COLD READ →",
+                                ariaLabel: `Run ${s.title} cold — a blind four-minute drill`,
+                                onClick: () => {
+                                  armColdRead(s.id);
+                                  navigate({ to: "/mirror/$caseId", params: { caseId: s.id } });
+                                },
+                              }
+                            : undefined
+                        }
                         badges={
                           <>
                             {s.isSurvivorStory && (
@@ -337,6 +354,7 @@ function CaseFiles() {
                       />
                     );
                   })}
+
                 </div>
               )}
             </section>
