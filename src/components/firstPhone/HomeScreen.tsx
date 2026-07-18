@@ -75,7 +75,7 @@ export function HomeScreen({ state, onOpenLesson, onOpenLicense }: Props) {
             const unlocked = isLessonUnlocked(state, l.n);
             const isCurrent = unlocked && !complete;
             return (
-              <li key={l.n}>
+              <li key={l.n} data-tour={l.n === 1 ? "lesson1" : undefined}>
                 <button
                   onClick={() => unlocked && onOpenLesson(l.n)}
                   disabled={!unlocked}
