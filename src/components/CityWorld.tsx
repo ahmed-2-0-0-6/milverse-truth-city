@@ -31,6 +31,10 @@ import {
 } from "@/lib/city/world-data";
 import { loadProfile, type TrustProfile } from "@/lib/mirror/profile";
 import { getMirrorRecommendations } from "@/lib/recommendations";
+import { useVisualMode } from "@/lib/visual-quality";
+import { SignalBeacons, BEACON_ANCHORS } from "@/components/city/SignalBeacons";
+import { AmbientLife } from "@/components/city/AmbientLife";
+import type { CitySignal } from "@/lib/city/signals";
 import {
   Dialog,
   DialogContent,
