@@ -77,9 +77,13 @@ function CityMap() {
       {!booted && <BootScreen onDone={() => setBooted(true)} />}
       <TopBar />
       {intro && booted && (
-        <Intro
+        <FirstCall
           onDone={() => {
-            localStorage.setItem(INTRO_KEY, "1");
+            try {
+              localStorage.setItem(INTRO_KEY, "1");
+            } catch {
+              /* localStorage unavailable */
+            }
             setIntro(false);
           }}
         />
