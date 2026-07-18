@@ -209,6 +209,9 @@ interface CaseCardProps<TParams extends Record<string, string>> {
   tone?: Tone;
   locked?: boolean;
   cta?: string;
+  outcome?: CaseCardOutcome;
+  artifactChip?: ArtifactChip;
+  unreadThread?: boolean;
 }
 
 export function CaseCard<TParams extends Record<string, string>>({
@@ -222,6 +225,9 @@ export function CaseCard<TParams extends Record<string, string>>({
   tone,
   locked,
   cta = "OPEN CASE →",
+  outcome,
+  artifactChip,
+  unreadThread,
 }: CaseCardProps<TParams>) {
   const footer = !locked ? (
     <div className="mt-5 font-mono text-xs tracking-widest text-primary opacity-0 transition-opacity group-hover:opacity-100">
@@ -239,14 +245,23 @@ export function CaseCard<TParams extends Record<string, string>>({
       footer={footer}
       tone={tone}
       locked={locked}
+      outcome={outcome}
+      artifactChip={artifactChip}
+      unreadThread={unreadThread}
     />
   );
 
   if (locked) return shell;
+
+  const ariaParts: string[] = [title];
+  if (outcome) ariaParts.push(OUTCOME_STAMP[outcome].aria);
+  if (unreadThread) ariaParts.push("new arrival");
+  const ariaLabel = ariaParts.join(", ");
+
   // Typed at call site with TanStack Link's overloads.
   return (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    <Link to={to as any} params={params as any} className="block">
+    <Link to={to as any} params={params as any} className="block" aria-label={ariaLabel}>
       {shell}
     </Link>
   );
