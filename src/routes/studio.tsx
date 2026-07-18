@@ -376,6 +376,26 @@ function Studio() {
       />
 
       <main className="mx-auto max-w-2xl px-4 py-8">
+        {/* THE MODE — the same forge, two jobs. */}
+        <div className="mb-6 flex rounded-md border border-border overflow-hidden text-xs font-mono tracking-widest">
+          <Link
+            to="/studio"
+            className={`flex-1 py-2 text-center ${mode === "city" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:bg-accent"}`}
+          >
+            CASE FOR THE CITY
+          </Link>
+          <Link
+            to="/studio"
+            search={{ mode: "mask" } as never}
+            className={`flex-1 py-2 text-center ${mode === "mask" ? "bg-caution text-background" : "bg-card text-muted-foreground hover:bg-accent"}`}
+          >
+            MASK FOR A FRIEND
+          </Link>
+        </div>
+
+        {mode === "mask" && <MaskModePanel onArm={(s) => navigate({ to: "/studio", search: { mode: "mask", handoff: s } as never })} />}
+
+
         <header className="mb-8 border-b border-border pb-4">
           <div className="flex items-center justify-between gap-3">
             <Link
