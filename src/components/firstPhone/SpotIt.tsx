@@ -1,7 +1,7 @@
 // MILVERSE — SPOT IT: junior speed-recognition drill.
 // Pure presentation over hand-authored JuniorCases. AI-free, loss-free.
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { ChevronLeft, Check, Target } from "lucide-react";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { LessonCleared } from "./LessonCleared";
