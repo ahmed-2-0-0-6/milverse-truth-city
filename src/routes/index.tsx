@@ -21,8 +21,10 @@ import { IncomingToast } from "@/components/inbox/IncomingToast";
 import { IncomingCall } from "@/components/inbox/IncomingCall";
 import { FirstCall } from "@/components/onboarding/FirstCall";
 import { CitizenDesk } from "@/components/landing/CitizenDesk";
+import { LiveBait, hasSeenLiveBait } from "@/components/landing/LiveBait";
 import { isReturningCitizen } from "@/lib/city/returning";
 import { currentShift, isNightRegister, type Shift } from "@/lib/city/shift";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
