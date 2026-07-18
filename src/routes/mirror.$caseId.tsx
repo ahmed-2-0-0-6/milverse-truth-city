@@ -424,7 +424,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
           <>
             <ChatHeader
               name={scenario.claimedIdentity}
-              number={`+92 3xx ${String(((scenario.id.length * 137) % 900) + 100)} ${String(((scenario.id.length * 41) % 9000) + 1000)}`}
+              number={fakeNumberForCase(scenario.id)}
               isSaved={false}
               subtitle={
                 skin.presenceLine ??
