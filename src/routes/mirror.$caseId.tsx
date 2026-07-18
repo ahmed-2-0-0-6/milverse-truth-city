@@ -42,6 +42,8 @@ import { ChatHeader } from "@/components/chat/ChatHeader";
 import { skinForCase, receiptFor, type ChatSkin } from "@/lib/chat/skins";
 import { ContactsSheet } from "@/components/chat/ContactsSheet";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
+import { clockFor } from "@/lib/mirror/clocks";
+import { ClockChip } from "@/components/mirror/ClockChip";
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
