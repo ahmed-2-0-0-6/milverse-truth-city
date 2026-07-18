@@ -10,7 +10,7 @@ import { getDeviceId } from "@/lib/pilot";
 import { incrementPublishedCount, loadProfile } from "@/lib/mirror/profile";
 import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp } from "@/lib/ranks";
-import { DistrictIntro } from "@/components/DistrictIntro";
+import { DistrictHero } from "@/components/DistrictHero";
 import studioArt from "@/assets/district-studio.jpg";
 import { Clapperboard, ChevronLeft, ChevronRight, Sparkles, ArrowLeft } from "lucide-react";
 
@@ -317,19 +317,24 @@ function Studio() {
   return (
     <div className="min-h-screen grain">
       <TopBar />
-      <main className="mx-auto max-w-2xl px-4 py-10">
-        <DistrictIntro
-          id="studio"
-          chapter="CHAPTER 05"
-          title="THE STUDIO"
-          art={studioArt}
-          district="studio"
-          lines={[
-            "Enough training. Someone's cousin is about to answer a message like this next week.",
-            "Write the case they'll rehearse against. The city's next cases are written by players like you.",
-          ]}
-        />
-        <header className="mt-6 mb-8 border-b border-border pb-4">
+
+      <DistrictHero
+        art={studioArt}
+        district="studio"
+        glow="245,185,66"
+        kicker="CHAPTER 05 · THE STUDIO · CASE DESIGNER"
+        title="Write the attack."
+        thesis={
+          <>
+            Enough training. Someone's cousin is about to answer a message like this next week.{" "}
+            <strong className="text-white">Write the case they'll rehearse against.</strong> The
+            city's next cases are written by players like you.
+          </>
+        }
+      />
+
+      <main className="mx-auto max-w-2xl px-4 py-8">
+        <header className="mb-8 border-b border-border pb-4">
           <div className="flex items-center justify-between gap-3">
             <Link
               to="/"
@@ -342,13 +347,8 @@ function Studio() {
             </div>
           </div>
           <div className="mt-4 flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-primary">
-            <Clapperboard className="h-4 w-4" /> THE STUDIO · CASE DESIGNER
+            <Clapperboard className="h-4 w-4" /> LEARN → PLAY → DESIGN · PUBLISH AND SHARE
           </div>
-          <h1 className="mt-2 text-3xl font-semibold leading-tight">Design a case</h1>
-          <p className="mt-2 text-muted-foreground max-w-xl">
-            The city's next cases are written by players like you. 5 steps. LEARN → PLAY → DESIGN.
-            Publish and share.
-          </p>
           <div className="mt-4 flex gap-1" aria-label={`Progress: step ${step} of 5`}>
             {[1, 2, 3, 4, 5].map((n) => (
               <div
