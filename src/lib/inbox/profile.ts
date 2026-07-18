@@ -11,10 +11,12 @@ export interface InboxProfile {
   opened: string[];
   /** caseIds for which "The Missed Call" ring already fired today. */
   firedCalls: string[];
+  /** Edition id the player last opened via a Morning Edition delivery. */
+  paperRead: string | null;
 }
 
 function fresh(dateKey = dropDateKey()): InboxProfile {
-  return { dateKey, arrived: [], opened: [], firedCalls: [] };
+  return { dateKey, arrived: [], opened: [], firedCalls: [], paperRead: null };
 }
 
 export function loadInbox(): InboxProfile {
