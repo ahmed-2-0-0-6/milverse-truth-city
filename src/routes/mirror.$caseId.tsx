@@ -79,7 +79,7 @@ import {
   saveColdRead,
 } from "@/lib/mirror/coldreads";
 import { fetchPinnedLines, type PinnedLine } from "@/lib/mirror/pinned.functions";
-import { consumeStandoffArm, clearPendingStandoff } from "@/lib/standoff/rules";
+import { consumeStandoffArm } from "@/lib/standoff/rules";
 
 /**
  * THE MOST SUSPECTED LINE — hash architecture.
