@@ -328,5 +328,3 @@ function AnswerBtn({
   );
 }
 
-// Ensure named import stays used even if tree-shaking is aggressive.
-useEffect;
