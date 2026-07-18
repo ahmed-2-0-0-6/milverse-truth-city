@@ -397,3 +397,80 @@ function StatBox({ label, value, tone }: { label: string; value: string; tone?: 
     </div>
   );
 }
+
+function DinnerBriefs({ doneSet }: { doneSet: Set<number> }) {
+  return (
+    <div className="mt-6 border-t border-border pt-6">
+      <h2 className="text-lg font-semibold text-foreground">
+        What each lesson practices
+      </h2>
+      <p className="mt-2 text-sm text-muted-foreground leading-relaxed max-w-2xl">
+        These cards describe the curriculum — the same for every child. What
+        your child said inside a lesson stays on their device. What's worth
+        talking about is below.
+      </p>
+      <div className="mt-3 rounded-md border border-border bg-background/40 px-4 py-3 text-sm text-muted-foreground">
+        {STANDING_RULE}
+      </div>
+
+      <ul className="mt-4 space-y-2">
+        {PARENT_BRIEFS.map((brief) => {
+          const lesson = LESSONS.find((l) => l.n === brief.n);
+          const title = lesson?.title ?? `Lesson ${brief.n}`;
+          const done = doneSet.has(brief.n);
+          const summaryLabel = `Lesson ${brief.n}, ${title}${done ? ", completed" : ""}`;
+          return (
+            <li key={brief.n}>
+              <details className="group rounded-lg border border-border bg-background/40 open:bg-background/60">
+                <summary
+                  aria-label={summaryLabel}
+                  className="flex cursor-pointer list-none items-center gap-3 px-4 py-3 text-sm marker:hidden [&::-webkit-details-marker]:hidden"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] ${
+                      done
+                        ? "bg-primary text-primary-foreground"
+                        : "border border-border text-muted-foreground"
+                    }`}
+                  >
+                    {done ? "✓" : brief.n}
+                  </span>
+                  <span className="flex-1 font-medium text-foreground">
+                    {title}
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="text-xs text-muted-foreground transition-transform group-open:rotate-90"
+                  >
+                    ›
+                  </span>
+                </summary>
+                <div className="space-y-3 border-t border-border px-4 py-4 text-sm leading-relaxed">
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      What they practiced
+                    </div>
+                    <p className="mt-1 text-foreground">{brief.practiced}</p>
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Why it matters
+                    </div>
+                    <p className="mt-1 text-foreground">{brief.why}</p>
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Worth asking
+                    </div>
+                    <p className="mt-1 text-foreground">{brief.dinnerQuestion}</p>
+                  </div>
+                </div>
+              </details>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
