@@ -133,10 +133,24 @@ function drawReceipt(canvas: HTMLCanvasElement, d: ReceiptData) {
   ctx.font = "bold 96px 'Impact', sans-serif";
   ctx.fillText(String(d.streak), cardX + 40, bandY + 670);
 
-  // City-sharper
-  ctx.fillStyle = "#22d3ee";
-  ctx.font = "bold 28px 'Courier New', monospace";
-  ctx.fillText(`SHARPER THAN ${d.sharpness}% OF THE CITY`, cardX + 40, bandY + 740);
+  // City-sharper (optional — spool omits for past days it can still reconstruct,
+  // but the field can be undefined for rebuilt receipts that predate the metric)
+  if (typeof d.sharpness === "number") {
+    ctx.fillStyle = "#22d3ee";
+    ctx.font = "bold 28px 'Courier New', monospace";
+    ctx.fillText(`SHARPER THAN ${d.sharpness}% OF THE CITY`, cardX + 40, bandY + 740);
+  }
+
+  // City split stamp (only present when today's aggregate cleared n>=5)
+  if (d.citySplit) {
+    ctx.fillStyle = "#f5b942";
+    ctx.font = "bold 24px 'Courier New', monospace";
+    ctx.fillText(
+      `CITY SPLIT · ${d.citySplit.pct}% CALLED IT RIGHT · ${d.citySplit.total} REPORTED`,
+      cardX + 40,
+      bandY + 782,
+    );
+  }
 
   // Footer
   ctx.fillStyle = "#8a8a8a";
