@@ -269,34 +269,8 @@ function ProfilePage() {
 
         <WeeklyEval />
 
-        <section className="mt-6">
-          <div className="stencil text-[10px] tracking-widest text-muted-foreground mb-2">
-            RANK LADDER
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {RANKS.map((r) => {
-              const cur = r.id === rankInfo.current.id;
-              const reached = xp >= r.minXp;
-              return (
-                <div
-                  key={r.id}
-                  className={`rounded-md border p-3 ${cur ? "border-primary bg-primary/10" : reached ? "border-border bg-card" : "border-dashed border-border bg-muted/10 opacity-70"}`}
-                >
-                  <div className="stencil text-[9px] tracking-widest text-muted-foreground">
-                    {r.code} · {r.minXp}xp
-                  </div>
-                  <div
-                    className="mt-1 font-black text-lg tracking-tight"
-                    style={{ fontFamily: '"Bebas Neue", sans-serif' }}
-                  >
-                    {r.name}
-                  </div>
-                  <div className="text-[11px] text-muted-foreground italic">{r.tagline}</div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+        {/* Rank ladder now lives at the top as <TheRoad />. */}
+
       </main>
     </div>
   );
