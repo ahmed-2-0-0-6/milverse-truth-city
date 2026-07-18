@@ -1,9 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { TopBar } from "@/components/TopBar";
-import { saveCitizenCase } from "@/lib/mirror/scenarios";
+import { saveCitizenCase, loadCitizenCases } from "@/lib/mirror/scenarios";
 import type { Scenario, EvidenceChip } from "@/lib/mirror/scenarios";
 import { publishCitizenCase } from "@/lib/citizen.functions";
 import { getDeviceId } from "@/lib/pilot";
@@ -12,10 +12,19 @@ import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp } from "@/lib/ranks";
 import { DistrictHero } from "@/components/DistrictHero";
 import studioArt from "@/assets/district-studio.jpg";
-import { Clapperboard, ChevronLeft, ChevronRight, Sparkles, ArrowLeft } from "lucide-react";
+import { Clapperboard, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Share2, Zap } from "lucide-react";
 import { deskReview, deskScore } from "@/lib/studio/editorsDesk";
+import { screenPersonaName, fairnessGate } from "@/lib/mask/safety";
+import { RACK, cloneRack } from "@/lib/mask/rack";
+import { decodeToken } from "@/lib/mask/tokens";
+import { loadMaskStamps, saveMaskStamp, stampsByCode, armMask } from "@/lib/mask/plays";
+
 
 export const Route = createFileRoute("/studio")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    mode: search.mode === "mask" ? ("mask" as const) : undefined,
+    handoff: typeof search.handoff === "string" ? (search.handoff as string) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "The Studio — Design a Case — MILVERSE" },
@@ -24,6 +33,7 @@ export const Route = createFileRoute("/studio")({
   }),
   component: Studio,
 });
+
 
 type Tone = "warm" | "urgent" | "official" | "emotional";
 type Lang = "english" | "roman-urdu" | "mixed";
@@ -66,8 +76,11 @@ const URL_RE = /(https?:\/\/|www\.)[\w./?=&%-]+/i;
 function validate(d: Draft): string | null {
   if (!d.personaName.trim()) return "Persona name is required.";
   if (d.personaName.trim().length < 2) return "Persona name is too short.";
+  const nameErr = screenPersonaName(d.personaName, d.relationship);
+  if (nameErr) return nameErr;
   if (!d.relationship.trim()) return "Describe the relationship to the target.";
   if (!d.opener.trim()) return "Opening message is required.";
+
   if (d.opener.trim().length < 20)
     return "Opening message should be at least 20 characters — set the scene.";
   const filled = d.facts.filter((f) => f.text.trim().length >= 6);
@@ -248,6 +261,9 @@ function buildScenario(d: Draft): Scenario {
 
 function Studio() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
+  const mode: "city" | "mask" = (search as { mode?: string }).mode === "mask" ? "mask" : "city";
+  const handoffCode = (search as { handoff?: string }).handoff ?? "";
   const [step, setStep] = useState(1);
   const [draft, setDraft] = useState<Draft>(BLANK);
   const [error, setError] = useState<string | null>(null);
@@ -257,6 +273,10 @@ function Studio() {
   const desk = deskScore(deskNotes);
   const advisories = deskNotes.filter((n) => n.status === "advise").length;
 
+  // Mask handoff view (post-publish): show code + share button, skip form.
+  if (mode === "mask" && handoffCode) {
+    return <MaskHandoff code={handoffCode} onDone={() => navigate({ to: "/studio", search: { mode: "mask" } as never })} />;
+  }
 
   async function publish(lane: "private" | "community") {
     const err = validate(draft);
@@ -265,9 +285,21 @@ function Studio() {
       toast.error("Fix it before publishing.", { description: err });
       return;
     }
+    // MASK MODE — fairness gate + always private lane.
+    if (mode === "mask") {
+      const gateErr = fairnessGate(draft);
+      if (gateErr) {
+        setError(gateErr);
+        toast.error("A mask nobody can beat proves nothing.", { description: gateErr });
+        return;
+      }
+      lane = "private";
+    }
+
     setPublishing(true);
     setError(null);
     const s = buildScenario(draft);
+    if (mode === "mask") s.isMask = true;
     const code = (s as Scenario & { shareCode: string }).shareCode;
 
     // Tag with the designer's current noir rank at publish time.
@@ -286,8 +318,12 @@ function Studio() {
           lane,
         } as never,
       })) as { lane: "private" | "community"; aiChecked: boolean };
-      // Successful publish → increment XP-layer counter (feeds ranks + prestige).
       incrementPublishedCount();
+      if (mode === "mask") {
+        setPublishing(false);
+        navigate({ to: "/studio", search: { mode: "mask", handoff: code } as never });
+        return;
+      }
       if (res.lane === "community") {
         toast.success("Submitted to the library.", {
           description: `Queued for human review · share code ${code}${res.aiChecked ? " · AI safety check passed" : " · manual review pending"}${advisories > 0 ? ` · ${advisories} desk note${advisories === 1 ? "" : "s"} traveled with it.` : ""}`,
@@ -319,6 +355,7 @@ function Studio() {
     navigate({ to: "/mirror/$caseId", params: { caseId: s.id } });
   }
 
+
   return (
     <div className="min-h-screen grain">
       <TopBar />
@@ -339,6 +376,26 @@ function Studio() {
       />
 
       <main className="mx-auto max-w-2xl px-4 py-8">
+        {/* THE MODE — the same forge, two jobs. */}
+        <div className="mb-6 flex rounded-md border border-border overflow-hidden text-xs font-mono tracking-widest">
+          <Link
+            to="/studio"
+            className={`flex-1 py-2 text-center ${mode === "city" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:bg-accent"}`}
+          >
+            CASE FOR THE CITY
+          </Link>
+          <Link
+            to="/studio"
+            search={{ mode: "mask" } as never}
+            className={`flex-1 py-2 text-center ${mode === "mask" ? "bg-caution text-background" : "bg-card text-muted-foreground hover:bg-accent"}`}
+          >
+            MASK FOR A FRIEND
+          </Link>
+        </div>
+
+        {mode === "mask" && <MaskModePanel onArm={(s) => navigate({ to: "/studio", search: { mode: "mask", handoff: s } as never })} />}
+
+
         <header className="mb-8 border-b border-border pb-4">
           <div className="flex items-center justify-between gap-3">
             <Link
@@ -386,7 +443,7 @@ function Studio() {
         )}
 
         {step === 2 && (
-          <Section title="THE TRUTH" hint="Real or imposter?">
+          <Section title="THE TRUTH" hint={mode === "mask" ? "The mind game. Bet on their paranoia — or their trust." : "Real or imposter?"}>
             <div className="grid grid-cols-2 gap-3">
               {(["REAL", "IMPOSTER"] as const).map((t) => (
                 <button
@@ -395,8 +452,14 @@ function Studio() {
                   className={`rounded-lg border-2 p-4 font-mono text-sm tracking-widest transition ${draft.truth === t ? "border-primary bg-primary/10 text-primary" : "border-border"}`}
                 >
                   {t}
+                  {mode === "mask" && (
+                    <div className="mt-1 text-[9px] opacity-70">
+                      {t === "REAL" ? "bet on their paranoia" : "bet on their trust"}
+                    </div>
+                  )}
                 </button>
               ))}
+
             </div>
             {draft.truth === "IMPOSTER" && (
               <>
@@ -587,41 +650,48 @@ function Studio() {
             <div className="-mt-2 text-center font-mono text-[9px] tracking-widest text-muted-foreground">
               THE ONLY REVIEW THAT COUNTS.
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className={mode === "mask" ? "grid grid-cols-1 gap-3" : "grid grid-cols-1 sm:grid-cols-2 gap-3"}>
               <button
                 onClick={() => void publish("private")}
                 disabled={publishing}
                 className="rounded-md border-2 border-primary/60 bg-card py-4 px-4 text-left disabled:opacity-50 hover:border-primary transition"
               >
                 <div className="font-mono text-[10px] tracking-widest text-primary">
-                  PRIVATE CASE
+                  {mode === "mask" ? "FORGE THE MASK" : "PRIVATE CASE"}
                 </div>
-                <div className="mt-1 text-sm font-semibold">Share by code only</div>
+                <div className="mt-1 text-sm font-semibold">
+                  {mode === "mask" ? "Get a code, text it to a friend" : "Share by code only"}
+                </div>
                 <div className="mt-1 text-xs text-muted-foreground">
-                  Playable by anyone with the code. Never appears on any public shelf.
+                  {mode === "mask"
+                    ? "Four minutes on the clock. Every fact you wrote, every dodge you planned — aimed at them."
+                    : "Playable by anyone with the code. Never appears on any public shelf."}
                 </div>
                 <div className="mt-3 font-mono text-[10px] tracking-widest text-primary">
-                  {publishing ? "…" : "PUBLISH PRIVATELY →"}
+                  {publishing ? "…" : mode === "mask" ? "FORGE →" : "PUBLISH PRIVATELY →"}
                 </div>
               </button>
-              <button
-                onClick={() => void publish("community")}
-                disabled={publishing}
-                className="rounded-md border-2 border-caution/60 bg-card py-4 px-4 text-left disabled:opacity-50 hover:border-caution transition"
-              >
-                <div className="font-mono text-[10px] tracking-widest text-caution">
-                  SUBMIT TO COMMUNITY LIBRARY
-                </div>
-                <div className="mt-1 text-sm font-semibold">Human review, then public</div>
-                <div className="mt-1 text-xs text-muted-foreground">
-                  Sent to the moderation queue. Only human-approved cases appear on the Community
-                  shelf, marked "Human-reviewed ✓".
-                </div>
-                <div className="mt-3 font-mono text-[10px] tracking-widest text-caution">
-                  {publishing ? "…" : "SUBMIT FOR REVIEW →"}
-                </div>
-              </button>
+              {mode === "city" && (
+                <button
+                  onClick={() => void publish("community")}
+                  disabled={publishing}
+                  className="rounded-md border-2 border-caution/60 bg-card py-4 px-4 text-left disabled:opacity-50 hover:border-caution transition"
+                >
+                  <div className="font-mono text-[10px] tracking-widest text-caution">
+                    SUBMIT TO COMMUNITY LIBRARY
+                  </div>
+                  <div className="mt-1 text-sm font-semibold">Human review, then public</div>
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    Sent to the moderation queue. Only human-approved cases appear on the Community
+                    shelf, marked "Human-reviewed ✓".
+                  </div>
+                  <div className="mt-3 font-mono text-[10px] tracking-widest text-caution">
+                    {publishing ? "…" : "SUBMIT FOR REVIEW →"}
+                  </div>
+                </button>
+              )}
             </div>
+
             <p className="text-[10px] font-mono tracking-widest text-muted-foreground text-center">
               AI SAFETY GATE · NO HATE · NO REAL PEOPLE · NO PII · NO POLITICAL ATTACKS
             </p>
@@ -690,4 +760,198 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       {children}
     </div>
   );
+}
+
+/* ────────────────────────────── THE MASK — Studio panels ────────────────────────────── */
+
+function MaskModePanel({ onArm }: { onArm: (code: string) => void }) {
+  const [tokenInput, setTokenInput] = useState("");
+  const [tokenErr, setTokenErr] = useState<string | null>(null);
+  const [ledgerTick, setLedgerTick] = useState(0);
+  const stamps = useMemo(() => stampsByCode(), [ledgerTick]);
+
+  // My masks — private lane citizen cases with isMask = true.
+  const myMasks = useMemo(() => {
+    return loadCitizenCases().filter((s) => s.isMask);
+  }, [ledgerTick]);
+
+  const outCount = myMasks.length;
+  const fooledCount = Array.from(stamps.values()).filter((s) => s.verdict === "F" || s.verdict === "T").length;
+  const caughtCount = Array.from(stamps.values()).filter((s) => s.verdict === "C").length;
+
+  function pickRack(kind: "real" | "urgent-money" | "cousin-otp") {
+    const s = cloneRack(kind);
+    saveCitizenCase(s);
+    setLedgerTick((t) => t + 1);
+    onArm(s.shareCode!);
+  }
+
+  function verify() {
+    setTokenErr(null);
+    const dec = decodeToken(tokenInput.trim().toUpperCase());
+    if (!dec) {
+      setTokenErr("That token doesn't parse.");
+      return;
+    }
+    // Only stamp if this shareCode is one of ours.
+    if (!myMasks.some((s) => (s.shareCode ?? "").toUpperCase() === dec.shareCode.toUpperCase())) {
+      setTokenErr("No mask on your ledger with that code.");
+      return;
+    }
+    saveMaskStamp({ shareCode: dec.shareCode, verdict: dec.verdict, seconds: dec.seconds, ts: Date.now() });
+    setTokenInput("");
+    setLedgerTick((t) => t + 1);
+    toast.success("Stamped.", { description: `${dec.shareCode} · ${dec.verdict === "C" ? "THEY CAUGHT IT" : dec.verdict === "F" ? "FOOLED THEM" : "TRUTH TOOK THEM"}` });
+  }
+
+  return (
+    <section className="mb-8 space-y-6">
+      {/* Off the rack */}
+      <div className="rounded-xl border-2 border-caution/40 bg-caution/5 p-4">
+        <div className="font-mono text-[10px] tracking-[0.3em] text-caution">OFF THE RACK</div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Pick one. Thirty seconds from here to a code in a friend's WhatsApp.
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {RACK.map((r) => (
+            <button
+              key={r.kind}
+              onClick={() => pickRack(r.kind)}
+              className="rounded-lg border border-border bg-card p-3 text-left hover:border-caution transition"
+            >
+              <div className="font-semibold text-sm">{r.title}</div>
+              <div className="mt-1 font-mono text-[10px] tracking-widest text-muted-foreground">
+                {r.blurb}
+              </div>
+              <div className="mt-3 font-mono text-[10px] tracking-widest text-caution">
+                <Zap className="inline h-3 w-3 mr-1" />FORGE →
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* My masks + ledger */}
+      <div className="rounded-xl border border-border p-4">
+        <div className="flex items-center justify-between">
+          <div className="font-mono text-[10px] tracking-[0.3em] text-primary">MY MASKS</div>
+          <div className="font-mono text-[10px] tracking-widest text-muted-foreground tabular-nums">
+            OUT {outCount} · FOOLED {fooledCount} · CAUGHT {caughtCount}
+          </div>
+        </div>
+        {myMasks.length === 0 ? (
+          <p className="mt-3 text-sm text-muted-foreground">No masks out yet. Forge one — off the rack or below.</p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {myMasks.slice(-8).reverse().map((m) => {
+              const st = stamps.get((m.shareCode ?? "").toUpperCase());
+              const label = st
+                ? st.verdict === "C"
+                  ? `THEY CAUGHT IT · ${formatSecs(st.seconds)}`
+                  : st.verdict === "F"
+                    ? `FOOLED THEM · ${formatSecs(st.seconds)}`
+                    : `TRUTH TOOK THEM · ${formatSecs(st.seconds)}`
+                : "WAITING";
+              return (
+                <li key={m.id} className="flex items-center justify-between gap-3 rounded-md border border-border/60 bg-card px-3 py-2">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium">{m.title}</div>
+                    <div className="font-mono text-[10px] tracking-widest text-muted-foreground">
+                      CODE {m.shareCode} · {m.truth}
+                    </div>
+                  </div>
+                  <div className={`font-mono text-[10px] tracking-widest ${st ? (st.verdict === "C" ? "text-caution" : "text-primary") : "text-muted-foreground"}`}>
+                    {label}
+                  </div>
+                  <button
+                    onClick={() => { if (m.shareCode) { armMask(m.id, m.shareCode); onArm(m.shareCode); } }}
+                    className="rounded border border-border px-2 py-1 font-mono text-[10px] tracking-widest text-muted-foreground hover:bg-accent"
+                  >
+                    HANDOFF
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+
+        <div className="mt-4 border-t border-border pt-3">
+          <div className="font-mono text-[10px] tracking-widest text-muted-foreground">VERIFY A RESULT</div>
+          <div className="mt-2 flex gap-2">
+            <input
+              value={tokenInput}
+              onChange={(e) => setTokenInput(e.target.value)}
+              placeholder="Paste the token from their result card"
+              className={inputCls}
+            />
+            <button
+              onClick={verify}
+              className="rounded-md bg-primary px-3 py-2 font-mono text-[10px] tracking-widest text-primary-foreground"
+            >
+              STAMP
+            </button>
+          </div>
+          {tokenErr && <div className="mt-1 text-xs text-destructive">{tokenErr}</div>}
+        </div>
+      </div>
+
+      <div className="border-t border-border pt-4 font-mono text-[10px] tracking-widest text-muted-foreground">
+        OR FORGE FROM SCRATCH BELOW ↓
+      </div>
+    </section>
+  );
+}
+
+function MaskHandoff({ code, onDone }: { code: string; onDone: () => void }) {
+  const siteUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const shareText = `The desk routed you a live one. 4 minutes to call it — real or a mask. Code: ${code} · ${siteUrl}`;
+
+  async function share() {
+    try {
+      if (typeof navigator !== "undefined" && "share" in navigator) {
+        await (navigator as Navigator & { share: (d: ShareData) => Promise<void> }).share({ text: shareText });
+        return;
+      }
+    } catch { /* fallthrough */ }
+    try {
+      await navigator.clipboard.writeText(shareText);
+      toast.success("Copied. Paste it anywhere.");
+    } catch {
+      toast.error("Copy failed.");
+    }
+  }
+
+  return (
+    <div className="min-h-screen grain">
+      <TopBar />
+      <main className="mx-auto max-w-xl px-4 py-16 space-y-8">
+        <div className="rounded-xl border-2 border-caution/50 bg-caution/5 p-8 text-center">
+          <div className="font-mono text-[10px] tracking-[0.3em] text-caution">THE HANDOFF</div>
+          <div className="mt-4 font-mono text-[9px] tracking-widest text-muted-foreground">SHARE CODE</div>
+          <div className="mt-2 text-6xl sm:text-7xl font-bold tracking-widest tabular-nums">{code}</div>
+          <p className="mt-6 text-sm text-muted-foreground">
+            Text the code to your friend. They enter it at the counter and get four minutes.
+          </p>
+        </div>
+        <button
+          onClick={share}
+          className="w-full min-h-[52px] rounded-md bg-caution py-3 font-mono text-sm tracking-widest text-background hover:opacity-90"
+        >
+          <Share2 className="inline h-4 w-4 mr-2" />SEND THE CODE
+        </button>
+        <button
+          onClick={onDone}
+          className="w-full rounded-md border border-border py-3 font-mono text-[11px] tracking-widest text-muted-foreground hover:bg-accent"
+        >
+          BACK TO THE DESK
+        </button>
+      </main>
+    </div>
+  );
+}
+
+function formatSecs(s: number): string {
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return `${m}:${r.toString().padStart(2, "0")}`;
 }

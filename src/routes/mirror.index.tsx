@@ -75,7 +75,9 @@ function CaseFiles() {
   const fetchByCode = useServerFn(fetchCitizenCase);
   useEffect(() => {
     setProfile(loadProfile());
-    setCitizen(loadCitizenCases());
+    // THE MASK — private challenge cases never appear on the citizen shelf.
+    setCitizen(loadCitizenCases().filter((s) => !s.isMask));
+
     const on = () => setProfile(loadProfile());
     window.addEventListener("milverse:profile", on);
     return () => window.removeEventListener("milverse:profile", on);
@@ -85,10 +87,21 @@ function CaseFiles() {
     const c = code.trim().toUpperCase();
     if (!c) return;
     setCodeErr(null);
+    const { isBurned, armMask } = await import("@/lib/mask/plays");
+    if (isBurned(c)) {
+      setCodeErr("Mask burned. The desk has it.");
+      return;
+    }
+    const openScenario = (scenario: Scenario) => {
+      if (scenario.isMask) {
+        armMask(scenario.id, scenario.shareCode ?? c);
+      }
+      navigate({ to: "/mirror/$caseId", params: { caseId: scenario.id } });
+    };
     // 1) local match by shareCode field
     const localByShare = citizen.find((s) => s.shareCode === c);
     if (localByShare) {
-      navigate({ to: "/mirror/$caseId", params: { caseId: localByShare.id } });
+      openScenario(localByShare);
       return;
     }
     // 2) legacy local match by id prefix (older cases pre-shareCode)
@@ -96,7 +109,7 @@ function CaseFiles() {
       s.id.replace("citizen-", "").toUpperCase().startsWith(c.slice(0, 6)),
     );
     if (legacyLocal) {
-      navigate({ to: "/mirror/$caseId", params: { caseId: legacyLocal.id } });
+      openScenario(legacyLocal);
       return;
     }
     // 3) backend fetch
@@ -115,12 +128,13 @@ function CaseFiles() {
       }
       const scenario = JSON.parse(json) as Scenario;
       saveCitizenCase(scenario);
-      navigate({ to: "/mirror/$caseId", params: { caseId: scenario.id } });
+      openScenario(scenario);
     } catch {
       setCodeErr("The case service is dark. Try again in a moment.");
     }
     setCodeBusy(false);
   }
+
 
   const maxTier = profile ? unlockedMaxTier(profile) : 2;
   const tiers: TierId[] = [1, 2, 3, 4, 5];
@@ -249,6 +263,10 @@ function CaseFiles() {
             {codeBusy ? "LOOKING UP…" : "OPEN CASE"}
           </button>
           {codeErr && <span className="text-xs text-destructive">{codeErr}</span>}
+          <div className="basis-full font-mono text-[10px] tracking-widest text-muted-foreground">
+            Got a code from a friend? It goes here.
+          </div>
+
         </div>
 
         <ReopenedStrip />

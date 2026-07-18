@@ -110,7 +110,27 @@ function ArenaRoute() {
             START A STANDOFF →
           </Link>
         </div>
+
+        {/* THE MASK — asynchronous, human-vs-human by WhatsApp. */}
+        <div className="mt-4 rounded-lg border border-primary/60 bg-primary/[0.06] p-5">
+          <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.3em] text-primary">
+            <Users className="h-3.5 w-3.5" />
+            THE ARENA · EXHIBIT — ASYNC
+          </div>
+          <h2 className="mt-2 text-xl font-semibold">THE MASK</h2>
+          <p className="mt-2 text-sm leading-relaxed text-foreground/80">
+            Forge one, text the code, count the bodies. Fool your friends. Or catch them trying.
+          </p>
+          <Link
+            to="/studio"
+            search={{ mode: "mask" } as never}
+            className="mt-4 inline-flex min-h-[44px] items-center rounded-md bg-primary px-4 py-2 font-mono text-xs tracking-widest text-primary-foreground hover:brightness-110"
+          >
+            FORGE A MASK →
+          </Link>
+        </div>
       </div>
+
 
 
       <DistrictBlueprint

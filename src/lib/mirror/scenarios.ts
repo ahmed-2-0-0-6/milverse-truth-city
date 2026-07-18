@@ -32,9 +32,12 @@ export interface Scenario {
   id: string;
   /** 6-char share code for citizen-designed cases (opt-in). */
   shareCode?: string;
+  /** THE MASK — human-vs-human challenge case forged for a friend. Additive flag; existing cases unaffected. */
+  isMask?: boolean;
   /** Designer rank at time of publish — powers CITY DESIGNER prestige on citizen cases. */
   designerRank?: string;
   title: string;
+
   teaser: string;
   /** Primary manipulation tactic, matches manual/entries.ts TacticId. Powers debrief stamp + telemetry. */
   tactic: TacticId;
