@@ -117,11 +117,13 @@ function CharterPage() {
           Engraved on the plaque outside City Hall.
         </p>
 
-        <section className="mt-10 rounded-3xl border-4 border-primary/40 bg-gradient-to-b from-neutral-900 to-neutral-950 p-8 sm:p-12 shadow-inner">
-          <ol className="space-y-8">
+        <section className="mt-10 rounded-3xl border-4 border-primary/40 bg-gradient-to-b from-neutral-900 to-neutral-950 p-8 sm:p-12 shadow-inner relative overflow-hidden">
+          <div className="dossier-texture absolute inset-0 pointer-events-none" aria-hidden />
+          <ol className="relative space-y-8">
             {ARTICLES.map((a) => (
-              <li
+              <EngravedReveal
                 key={a.roman}
+                as="li"
                 className="grid grid-cols-[auto_1fr] gap-5 sm:gap-8 items-start border-l-2 border-primary/40 pl-5"
               >
                 <div
@@ -130,7 +132,7 @@ function CharterPage() {
                 >
                   {a.roman}.
                 </div>
-                <div>
+                <Marginalia note={a.note as string} side={a.side}>
                   <div
                     className="text-xl sm:text-2xl font-semibold tracking-wide text-foreground"
                     style={{
@@ -148,12 +150,12 @@ function CharterPage() {
                       {a.sub}
                     </p>
                   )}
-                </div>
-              </li>
+                </Marginalia>
+              </EngravedReveal>
             ))}
           </ol>
 
-          <div className="mt-10 border-t border-primary/30 pt-5 text-center">
+          <div className="relative mt-10 border-t border-primary/30 pt-5 text-center">
             <div className="font-mono text-[10px] tracking-widest text-primary">
               CITY SEAL · MILVERSE
             </div>
@@ -161,12 +163,17 @@ function CharterPage() {
               Signed and struck in the Department of Digital Trust.
             </div>
           </div>
+
+          <div className="relative">
+            <Countersign />
+          </div>
         </section>
 
         <p className="mt-8 text-xs text-muted-foreground text-center max-w-xl mx-auto">
           MILVERSE aligns with UNESCO's vision of media and information literacy — and stands as a
           city in the MILtiverse.
         </p>
+
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link to="/educators" className="rounded-md border border-border px-4 py-2 text-sm">
