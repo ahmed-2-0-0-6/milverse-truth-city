@@ -308,6 +308,51 @@ function Divider({ label }: { label: string }) {
   );
 }
 
+function SupplementBanner() {
+  const [unread, setUnread] = useState(false);
+  const week = useMemo(() => supplementWeek(new Date()), []);
+
+  useEffect(() => {
+    const check = () => setUnread(readLastSeenWeek() !== week.weekKey);
+    check();
+    const on = () => check();
+    window.addEventListener("milverse:supplement-seen", on);
+    window.addEventListener("storage", on);
+    return () => {
+      window.removeEventListener("milverse:supplement-seen", on);
+      window.removeEventListener("storage", on);
+    };
+  }, [week.weekKey]);
+
+  return (
+    <div className="no-print mb-6">
+      <Link
+        to="/paper/supplement"
+        className="group flex items-center justify-between gap-3 border-2 border-current/50 px-4 py-3 rounded-sm hover:bg-black/5 transition-colors"
+        style={{ borderColor: "var(--paper-rule)" }}
+      >
+        <div>
+          <div className="paper-mono text-[10px] tracking-[0.25em] text-[color:var(--paper-muted)]">
+            CITIZEN SUPPLEMENT
+          </div>
+          <div className="paper-serif text-base sm:text-lg mt-0.5" style={{ fontWeight: 800 }}>
+            Week {week.isoWeek} is in. Read your week
+            <span className="paper-mono text-xs ml-2">→</span>
+          </div>
+        </div>
+        {unread && (
+          <span
+            aria-label="Unread supplement"
+            className="supp-unread-dot inline-block h-2.5 w-2.5 rounded-full"
+            style={{ background: "var(--paper-ink)" }}
+          />
+        )}
+      </Link>
+    </div>
+  );
+}
+
+
 function YesterdaysPapers({
   currentNumber,
   pulling,
