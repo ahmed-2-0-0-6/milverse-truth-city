@@ -1,6 +1,6 @@
 // MILVERSE — /pressroom  THE DAILY MIRAGE editor. Passcode-gated.
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { TopBar } from "@/components/TopBar";
 import { Lock, Save, Send, Eye } from "lucide-react";
