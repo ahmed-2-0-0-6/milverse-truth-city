@@ -1999,7 +1999,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
   // never reach this effect.
   const pinnedSentRef = useRef(false);
   const [cityLine, setCityLine] = useState<
-    | { text: string; pins: number; playerPinned: boolean }
+    | { text: string; pins: number; playerPinned: boolean; wasTell: boolean }
     | { fallback: true }
     | null
   >(null);
