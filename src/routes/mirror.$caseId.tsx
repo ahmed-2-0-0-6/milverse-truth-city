@@ -325,7 +325,15 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
   // Sound design: tick on meter change; tension cue when critical (<30).
   const [meterDelta, setMeterDelta] = useState<number | null>(null);
   const [sendTick, setSendTick] = useState(0);
-  const showBandOnMount = useRef(loadProfile().casesPlayed === 0).current;
+  const showBandOnMount = useRef(
+    typeof window !== "undefined" && !localStorage.getItem("milverse.mirror.bandSeen"),
+  ).current;
+  useEffect(() => {
+    if (showBandOnMount && typeof window !== "undefined") {
+      localStorage.setItem("milverse.mirror.bandSeen", "1");
+    }
+  }, [showBandOnMount]);
+
   const currentBand = bandFor(state.meter);
 
   useEffect(() => {
