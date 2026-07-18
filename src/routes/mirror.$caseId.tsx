@@ -1248,6 +1248,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       result: result.resultKind,
       points: result.points,
       usedVob: result.usedVob,
+      confidence: verdictRaw.confidence,
       ts: nowTs,
     });
     saveProfile(p);
