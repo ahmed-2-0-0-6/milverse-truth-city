@@ -53,6 +53,7 @@ export function StreakBeat({ streak, onDone }: Props) {
       }
       return;
     }
+    streakLick(streak);
     const t = window.setTimeout(
       () => {
         if (!doneRef.current) {
