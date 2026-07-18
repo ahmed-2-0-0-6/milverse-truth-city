@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+
 import { useServerFn } from "@tanstack/react-start";
 import { TopBar } from "@/components/TopBar";
 import { VoiceNote } from "@/components/VoiceNote";
@@ -69,6 +70,26 @@ import {
   type Grade as CraftGrade,
 } from "@/lib/mirror/craftMarks";
 import { CraftMark } from "@/components/mirror/CraftMark";
+import { DrillClock, DRILL_SECONDS } from "@/components/mirror/DrillClock";
+import {
+  bestClearedSeconds,
+  consumeColdArm,
+  formatDrillTime,
+  isColdEligible,
+  saveColdRead,
+} from "@/lib/mirror/coldreads";
+
+/**
+ * COLD READ MODE — the drill law.
+ * Threaded via context so every phase reads the same flag. Cold mode is
+ * presentation-only: the engine is untouched, the scoring path is skipped
+ * entirely in Debrief, and nothing writes to profile / history / points.
+ * On reload mid-drill the arm key is already consumed, so the case falls
+ * back to normal mode — acceptable, and simplest.
+ */
+const ColdReadContext = createContext<boolean>(false);
+const COLD_START_KEY = "milverse.coldread.startTs";
+
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
@@ -88,6 +109,24 @@ function CasePlay() {
   const { scenario } = Route.useLoaderData();
   const [phase, setPhase] = useState<Phase>("dossier");
 
+  // COLD READ arm — lazy-init so the first paint already knows which mode we're in.
+  // Consuming the arm here clears it; reload => normal case (spec).
+  const [coldMode] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    const armed = consumeColdArm();
+    if (!armed || armed !== scenario.id) return false;
+    try {
+      const p = loadProfile();
+      if (!isColdEligible(p, scenario.id)) return false;
+      sessionStorage.setItem(COLD_START_KEY, String(Date.now()));
+      sessionStorage.removeItem(SIM_KEY);
+      sessionStorage.removeItem(VERDICT_KEY);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+
   // Focus follows the phase (skip the initial mount — the dossier's default
   // top-of-page focus order is correct on first paint).
   const isInitialPhase = useRef(true);
@@ -104,26 +143,42 @@ function CasePlay() {
   }, [phase]);
 
   // In the "sim" phase, ChatShell owns the whole viewport (phone frame).
-  // Every other phase keeps the normal MILVERSE app chrome.
   if (phase === "sim") {
-    return <Simulation scenario={scenario} onEnd={() => setPhase("verdict")} />;
+    return (
+      <ColdReadContext.Provider value={coldMode}>
+        <Simulation scenario={scenario} onEnd={() => setPhase("verdict")} />
+      </ColdReadContext.Provider>
+    );
   }
 
   return (
-    <div className="min-h-screen grain">
-      <TopBar />
-      <div className="mx-auto max-w-3xl px-4 pt-4">
-        <RookieIntro />
+    <ColdReadContext.Provider value={coldMode}>
+      <div className="min-h-screen grain">
+        <TopBar />
+        {!coldMode && (
+          <div className="mx-auto max-w-3xl px-4 pt-4">
+            <RookieIntro />
+          </div>
+        )}
+        {phase === "dossier" && (
+          coldMode
+            ? <ColdInterstitial scenario={scenario} onStart={() => setPhase("sim")} />
+            : <Dossier scenario={scenario} onStart={() => setPhase("sim")} />
+        )}
+        {phase === "verdict" && <Verdict scenario={scenario} coldMode={coldMode} onDone={() => setPhase("reveal")} />}
+        {phase === "reveal" && (
+          <VerdictReveal scenario={scenario} onDone={() => setPhase("debrief")} />
+        )}
+        {phase === "debrief" && (
+          coldMode
+            ? <ColdDebrief scenario={scenario} />
+            : <Debrief scenario={scenario} />
+        )}
       </div>
-      {phase === "dossier" && <Dossier scenario={scenario} onStart={() => setPhase("sim")} />}
-      {phase === "verdict" && <Verdict scenario={scenario} onDone={() => setPhase("reveal")} />}
-      {phase === "reveal" && (
-        <VerdictReveal scenario={scenario} onDone={() => setPhase("debrief")} />
-      )}
-      {phase === "debrief" && <Debrief scenario={scenario} />}
-    </div>
+    </ColdReadContext.Provider>
   );
 }
+
 
 
 function VerdictReveal({ scenario, onDone }: { scenario: Scenario; onDone: () => void }) {
@@ -277,12 +332,15 @@ interface StoredSim {
 }
 
 function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void }) {
-  const isCleanRoom = scenario.tier === 5;
+  const coldMode = useContext(ColdReadContext);
+  const isCleanRoom = scenario.tier === 5 && !coldMode;
   const { mode } = useVisualMode();
   const cinematic = mode === "cinematic";
   const skin = isCleanRoom ? CLEAN_ROOM_SKIN : skinForCase(scenario.id);
   const useRitual = isCleanRoom && cinematic;
   const [airlockOn, setAirlockOn] = useState<boolean>(isCleanRoom && cinematic);
+  const [drillExpired, setDrillExpired] = useState<boolean>(false);
+
 
   const refs = useMemo(() => factRefsFor(scenario), [scenario]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -643,51 +701,61 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               presenceDot={skin.id === "instagram"}
               onContacts={() => setContactsOpen(true)}
             />
-            {/* meter + tabs */}
+            {/* meter + tabs — cold mode strips the needle, the number, the bar, the note. */}
             <div className="px-3 py-2 bg-neutral-950/80 border-b border-white/10 relative">
-              <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-white/50">
-                <span
-                  className={state.meter <= 30 ? "text-destructive hud-blink" : ""}
-                  aria-label={`The Line, ${currentBand.label}, ${Math.round(state.meter)}`}
-                >
-                  THE LINE · {currentBand.label}
-                </span>
-
-                <span className="flex items-center gap-1.5 tabular-nums">
-                  {meterDelta !== null && (
+              {coldMode ? (
+                <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-white/50">
+                  <span>BLIND · NO NEEDLE</span>
+                  <DrillClock onExpire={() => setDrillExpired(true)} />
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-white/50">
                     <span
-                      key={meterDelta}
-                      className={`msg-in font-bold ${meterDelta < 0 ? "text-destructive" : "text-primary"}`}
-                      aria-hidden
+                      className={state.meter <= 30 ? "text-destructive hud-blink" : ""}
+                      aria-label={`The Line, ${currentBand.label}, ${Math.round(state.meter)}`}
                     >
-                      {meterDelta > 0 ? `+${meterDelta}` : meterDelta}
+                      THE LINE · {currentBand.label}
                     </span>
-                  )}
-                  {Math.round(state.meter)}
-                  {claimedClock && (
-                    <ClockChip clock={claimedClock} onExpire={handleClockExpire} />
-                  )}
-                </span>
-              </div>
-              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-                <div
-                  className={`h-full transition-all duration-500 ${meterColor} ${state.meter <= 30 ? "animate-pulse" : ""}`}
-                  style={{
-                    width: `${state.meter}%`,
-                    boxShadow: state.meter <= 30 ? "0 0 10px oklch(0.55 0.2 25 / 0.8)" : undefined,
-                  }}
-                />
-              </div>
-              <MeterNote
-                bandKey={currentBand.key}
-                label={currentBand.label}
-                note={currentBand.note}
-                sendTick={sendTick}
-                showOnMount={showBandOnMount}
-              />
 
-              <div className="mt-2 flex gap-1" role="tablist" aria-label="Chat and notes">
-                {(["chat", "notes"] as const).map((t, i, arr) => (
+                    <span className="flex items-center gap-1.5 tabular-nums">
+                      {meterDelta !== null && (
+                        <span
+                          key={meterDelta}
+                          className={`msg-in font-bold ${meterDelta < 0 ? "text-destructive" : "text-primary"}`}
+                          aria-hidden
+                        >
+                          {meterDelta > 0 ? `+${meterDelta}` : meterDelta}
+                        </span>
+                      )}
+                      {Math.round(state.meter)}
+                      {claimedClock && (
+                        <ClockChip clock={claimedClock} onExpire={handleClockExpire} />
+                      )}
+                    </span>
+                  </div>
+                  <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                    <div
+                      className={`h-full transition-all duration-500 ${meterColor} ${state.meter <= 30 ? "animate-pulse" : ""}`}
+                      style={{
+                        width: `${state.meter}%`,
+                        boxShadow: state.meter <= 30 ? "0 0 10px oklch(0.55 0.2 25 / 0.8)" : undefined,
+                      }}
+                    />
+                  </div>
+                  <MeterNote
+                    bandKey={currentBand.key}
+                    label={currentBand.label}
+                    note={currentBand.note}
+                    sendTick={sendTick}
+                    showOnMount={showBandOnMount}
+                  />
+                </>
+              )}
+
+
+              <div className="mt-2 flex gap-1" role="tablist" aria-label={coldMode ? "Chat" : "Chat and notes"}>
+                {((coldMode ? (["chat"] as const) : (["chat", "notes"] as const)) as readonly ("chat" | "notes")[]).map((t, i, arr) => (
                   <button
                     key={t}
                     id={`mirror-tab-${t}`}
@@ -712,6 +780,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                     {t === "chat" ? "CHAT" : `NOTES · ${pins.length}/5`}
                   </button>
                 ))}
+
 
                 <div className="flex-1" />
                 {/* Desktop-only: VERIFY / CALL IT live in the meter row.
@@ -760,10 +829,21 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 </Link>
               </div>
             )}
-            {tab === "chat" && (
+            {tab === "chat" && !coldMode && (
               <QuickBrief refs={refs} openRef={openRef} onToggle={(r) => setOpenRef((cur) => (cur === r ? null : r))} />
             )}
-            {/* Mobile-only thumb-reach cluster for the two most consequential controls. */}
+            {coldMode && drillExpired && (
+              <div
+                className="mb-2 rounded-md border border-caution/50 bg-caution/10 p-2 text-center font-mono text-[11px] tracking-widest text-caution"
+                role="status"
+                aria-live="polite"
+              >
+                Time. Call it.
+              </div>
+            )}
+            {/* Mobile-only thumb-reach cluster for the two most consequential controls.
+                Cold mode: VERIFY is dropped (the doors stay — spec — but VERIFY is
+                the training-wheel door for tiered play; CALL IT is the discipline). */}
             <div className="mb-2 flex justify-end gap-2 sm:hidden">
               <button
                 onClick={() => setShowVob(true)}
@@ -772,9 +852,11 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               >
                 <ShieldCheck className="inline h-3.5 w-3.5 mr-1" /> VERIFY
               </button>
+
               <button
                 onClick={onEnd}
                 disabled={messages.length < 2}
+                autoFocus={coldMode && drillExpired}
                 className="touch-manipulation inline-flex min-h-[44px] items-center rounded-full border border-destructive/50 bg-destructive/10 px-4 text-[11px] font-mono tracking-widest text-destructive active:bg-destructive/20 disabled:opacity-40"
               >
                 <Phone className="inline h-3.5 w-3.5 mr-1" /> CALL IT
@@ -786,20 +868,27 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
-                placeholder={ended ? "Chat ended — make your call." : skin.placeholder}
-                disabled={ended || typing}
+                placeholder={
+                  coldMode && drillExpired
+                    ? "Time. Call it."
+                    : ended
+                      ? "Chat ended — make your call."
+                      : skin.placeholder
+                }
+                disabled={ended || typing || (coldMode && drillExpired)}
                 aria-label="Type your reply"
                 className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-base sm:text-sm text-white outline-none focus:border-primary disabled:opacity-50 min-h-[44px] sm:min-h-0"
               />
 
               <button
                 onClick={send}
-                disabled={ended || typing || !input.trim()}
+                disabled={ended || typing || !input.trim() || (coldMode && drillExpired)}
                 aria-label="Send message"
                 className="touch-manipulation rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
               >
                 <Send className="h-4 w-4" aria-hidden="true" />
               </button>
+
 
             </div>
             <div className="mt-1.5 flex items-center justify-between font-mono text-[9px] tracking-widest text-white/40">
@@ -862,12 +951,13 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                     read={typing || hasReply}
                     skin={skin}
                     hasReply={hasReply}
-                    grade={grade}
-                    why={grade ? craftWhyFor(scenario, m.text, grade) : undefined}
+                    grade={coldMode ? undefined : grade}
+                    why={coldMode || !grade ? undefined : craftWhyFor(scenario, m.text, grade)}
                     markOpen={openMarkIdx === i}
-                    autoOpenMark={autoOpen}
+                    autoOpenMark={!coldMode && autoOpen}
                     onOpenMark={() => setOpenMarkIdx(i)}
                     onCloseMark={() => setOpenMarkIdx((cur) => (cur === i ? null : cur))}
+
                   />
                 );
               })}
@@ -1393,7 +1483,7 @@ function loadSim(): StoredSim | null {
   }
 }
 
-function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void }) {
+function Verdict({ scenario, coldMode = false, onDone }: { scenario: Scenario; coldMode?: boolean; onDone: () => void }) {
   const [verdict, setVerdict] = useState<"REAL" | "FAKE" | null>(null);
   const [confidence, setConfidence] = useState<60 | 75 | 90 | null>(null);
   const [picked, setPicked] = useState<string[]>([]);
@@ -1615,46 +1705,50 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
         </div>
       )}
 
-      <div className="mt-8">
-        <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
-          EVIDENCE — TAG WHAT YOU OBSERVED
+      {!coldMode && (
+        <div className="mt-8">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
+            EVIDENCE — TAG WHAT YOU OBSERVED
+          </div>
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Evidence tags">
+            {scenario.evidenceChips.map((c: EvidenceChip) => (
+              <button
+                key={c.id}
+                type="button"
+                aria-pressed={picked.includes(c.id)}
+                onClick={() => toggle(c.id)}
+                className={`rounded-full border px-3 py-2.5 text-xs transition touch-manipulation min-h-[44px] sm:min-h-0 sm:py-1.5 ${
+                  picked.includes(c.id)
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                }`}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Evidence tags">
-          {scenario.evidenceChips.map((c: EvidenceChip) => (
-            <button
-              key={c.id}
-              type="button"
-              aria-pressed={picked.includes(c.id)}
-              onClick={() => toggle(c.id)}
-              className={`rounded-full border px-3 py-2.5 text-xs transition touch-manipulation min-h-[44px] sm:min-h-0 sm:py-1.5 ${
-                picked.includes(c.id)
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
-              }`}
-            >
-              {c.label}
-            </button>
-          ))}
-        </div>
+      )}
 
-      </div>
+      {/* Investigator's conclusion — the dossier-leaning field is dropped in cold mode. */}
+      {!coldMode && (
+        <div className="mt-8">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">
+            INVESTIGATOR'S CONCLUSION · OPTIONAL
+          </div>
+          <textarea
+            value={conclusion}
+            onChange={(e) => setConclusion(e.target.value.slice(0, 300))}
+            placeholder="In one line: why do you believe this? (max 300 chars)"
+            rows={3}
+            className="w-full rounded-md border border-border bg-background p-3 text-base placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none sm:text-sm"
+          />
+          <div className="mt-1 text-right font-mono text-[10px] text-muted-foreground">
+            {conclusion.length}/300
+          </div>
+        </div>
+      )}
 
-      {/* Investigator's conclusion */}
-      <div className="mt-8">
-        <div className="font-mono text-xs tracking-widest text-muted-foreground mb-2">
-          INVESTIGATOR'S CONCLUSION · OPTIONAL
-        </div>
-        <textarea
-          value={conclusion}
-          onChange={(e) => setConclusion(e.target.value.slice(0, 300))}
-          placeholder="In one line: why do you believe this? (max 300 chars)"
-          rows={3}
-          className="w-full rounded-md border border-border bg-background p-3 text-base placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none sm:text-sm"
-        />
-        <div className="mt-1 text-right font-mono text-[10px] text-muted-foreground">
-          {conclusion.length}/300
-        </div>
-      </div>
 
       <button
         onClick={submit}
@@ -2496,5 +2590,202 @@ function CinematicResult({
         that made it click.
       </p>
     </div>
+  );
+}
+
+/* ─────────────────────── COLD READ · INTERSTITIAL ─────────────────────── */
+
+function ColdInterstitial({ scenario, onStart }: { scenario: Scenario; onStart: () => void }) {
+  return (
+    <main className="mx-auto max-w-2xl px-4 py-10">
+      <Link
+        to="/mirror"
+        className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
+      >
+        ← CASE FILES
+      </Link>
+      <div className="mt-6 rounded-xl border border-white/20 bg-black/40 p-6">
+        <div className="font-mono text-xs tracking-[0.3em] text-white/60">
+          COLD READ · {scenario.title}
+        </div>
+        <p
+          data-phase-anchor="mirror"
+          tabIndex={-1}
+          className="mt-6 text-lg leading-relaxed text-foreground outline-none"
+        >
+          You've beaten this one warm. Now blind: no file, no notes, no needle. Four minutes. The
+          contact hasn't changed — you have. Prove it.
+        </p>
+        <div className="mt-6 font-mono text-[10px] tracking-[0.3em] text-white/50">
+          DRILL — NOTHING HERE TOUCHES YOUR RECORD.
+        </div>
+      </div>
+      <button
+        onClick={onStart}
+        className="mt-6 w-full rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground transition-transform hover:scale-[1.01]"
+      >
+        START THE DRILL
+      </button>
+    </main>
+  );
+}
+
+/* ────────────────────────── COLD READ · DEBRIEF ────────────────────────── */
+
+function ColdDebrief({ scenario }: { scenario: Scenario }) {
+  const navigate = useNavigate();
+  const sim = useMemo(() => loadSim(), []);
+  const verdictRaw = useMemo(() => {
+    try {
+      const raw = sessionStorage.getItem(VERDICT_KEY);
+      return raw ? (JSON.parse(raw) as { verdict: "REAL" | "FAKE" }) : null;
+    } catch {
+      return null;
+    }
+  }, []);
+  const startTs = useMemo(() => {
+    try {
+      const raw = sessionStorage.getItem(COLD_START_KEY);
+      return raw ? Number(raw) : null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const truthLabel: "REAL" | "FAKE" = scenario.truth === "REAL" ? "REAL" : "FAKE";
+  const cleared = verdictRaw?.verdict === truthLabel;
+  const elapsedRaw = startTs ? Math.round((Date.now() - startTs) / 1000) : DRILL_SECONDS;
+  const elapsedSeconds = Math.min(elapsedRaw, DRILL_SECONDS);
+  const expired = elapsedSeconds >= DRILL_SECONDS;
+
+  // Warm baseline: latest CORRECT entry for this case.
+  const warm = useMemo(() => {
+    const p = loadProfile();
+    const warmEntries = p.history
+      .filter((h) => h.caseId === scenario.id && h.result === "correct")
+      .sort((a, b) => a.ts - b.ts);
+    return warmEntries[warmEntries.length - 1] ?? null;
+  }, [scenario.id]);
+
+  // Log ONCE. Never touches profile/points/xp/history/pilot (drill law).
+  const savedRef = useRef(false);
+  useEffect(() => {
+    if (savedRef.current || !verdictRaw) return;
+    savedRef.current = true;
+    saveColdRead({
+      caseId: scenario.id,
+      ts: Date.now(),
+      cleared,
+      seconds: elapsedSeconds,
+    });
+    try { sessionStorage.removeItem(COLD_START_KEY); } catch { /* noop */ }
+  }, [cleared, elapsedSeconds, scenario.id, verdictRaw]);
+
+  if (!verdictRaw || !sim) {
+    return (
+      <main className="mx-auto max-w-2xl px-4 py-10 text-muted-foreground">
+        No drill on record.{" "}
+        <Link to="/mirror" className="text-primary underline">Back to case files</Link>
+      </main>
+    );
+  }
+
+  const warmDate = warm
+    ? new Date(warm.ts).toLocaleDateString(undefined, { month: "short", day: "numeric" })
+    : null;
+
+  let outcomeLine: string;
+  if (cleared && elapsedSeconds < 120) {
+    outcomeLine = "Faster and blinder than the first time. That's the habit forming.";
+  } else if (cleared) {
+    outcomeLine = "Slower without the file — as it should be. But you got there on instinct and craft.";
+  } else if (expired) {
+    outcomeLine = "The clock did what the scammer couldn't. Time pressure is a tactic too — it just wore a stopwatch this time.";
+  } else {
+    outcomeLine = "Warm you beat it; cold it beat you. The file was doing more work than you thought. That's worth knowing.";
+  }
+
+  const pinIdxs: number[] = (sim.state as EngineState & { pins?: number[] })?.pins ?? [];
+  const pinMsgs = pinIdxs.map((i) => sim.messages[i]).filter((m): m is Message => !!m);
+
+  return (
+    <main className="mx-auto max-w-2xl px-4 py-8 space-y-6">
+      <div
+        className={`rounded-xl border-2 p-6 ${cleared ? "border-primary/40 bg-primary/5 text-primary" : "border-destructive/40 bg-destructive/5 text-destructive"}`}
+      >
+        <div className="font-mono text-xs tracking-[0.3em] opacity-80">
+          COLD READ · {cleared ? "CLEARED" : "MISSED"}
+        </div>
+        <h1
+          data-phase-anchor="mirror"
+          tabIndex={-1}
+          className="mt-2 text-2xl font-semibold outline-none"
+        >
+          {cleared ? "You cleared it blind." : "The drill beat you."}
+        </h1>
+        <p className="mt-3 font-mono text-[11px] tracking-widest opacity-90">
+          WARM RUN: {warm ? `${warm.result.replace("_", " ").toUpperCase()}, ${warmDate}` : "—"}
+          {"  ·  "}
+          COLD RUN: {cleared ? "CLEARED" : "MISSED"} in{" "}
+          {expired ? "time expired" : formatDrillTime(elapsedSeconds)}
+        </p>
+        <p className="mt-4 text-sm leading-relaxed opacity-95">{outcomeLine}</p>
+      </div>
+
+      {pinMsgs.length > 0 && (
+        <section className="rounded-xl border border-border bg-card p-6">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
+            YOUR PINS · GRADED
+          </div>
+          <ul className="space-y-2">
+            {pinIdxs.map((idx, i) => {
+              const m = sim.messages[idx];
+              if (!m || m.role !== "contact") return null;
+              const wasTell = m.isTell === true;
+              const statusTone = wasTell
+                ? "border-caution text-caution bg-caution/10"
+                : "border-border text-muted-foreground bg-muted/20";
+              return (
+                <li key={i} className="rounded-md border border-border bg-background/30 p-3">
+                  <span
+                    className={`inline-block rounded-sm border px-1 py-0.5 font-mono text-[9px] tracking-widest ${statusTone}`}
+                  >
+                    {wasTell ? "TELL" : "CLEAN"}
+                  </span>
+                  <div className="mt-1.5 text-sm italic">
+                    "{(m.text || "[voice note]").slice(0, 160)}"
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+
+      <div className="flex gap-3">
+        <button
+          onClick={() => {
+            // Re-arm and re-enter — same case, fresh drill.
+            try {
+              sessionStorage.setItem("milverse.coldread.arm", scenario.id);
+            } catch { /* noop */ }
+            // Force a full remount by navigating to /mirror first, then back.
+            navigate({ to: "/mirror" });
+            setTimeout(() => {
+              navigate({ to: "/mirror/$caseId", params: { caseId: scenario.id } });
+            }, 0);
+          }}
+          className="flex-1 rounded-md border border-caution/50 bg-caution/10 py-3 font-mono text-xs tracking-widest text-caution hover:bg-caution/20"
+        >
+          AGAIN →
+        </button>
+        <Link
+          to="/mirror"
+          className="flex-1 rounded-md border border-border py-3 text-center font-mono text-xs tracking-widest hover:bg-accent"
+        >
+          BACK TO THE SHELF →
+        </Link>
+      </div>
+    </main>
   );
 }

@@ -212,6 +212,10 @@ interface CaseCardProps<TParams extends Record<string, string>> {
   outcome?: CaseCardOutcome;
   artifactChip?: ArtifactChip;
   unreadThread?: boolean;
+  /** Small mono badge under the stamp — e.g. "COLD CLEARED · 1:42". */
+  coldStamp?: string;
+  /** Small footer affordance — e.g. "COLD READ →". Stops link propagation. */
+  coldAction?: { label: string; onClick: () => void; ariaLabel?: string };
 }
 
 export function CaseCard<TParams extends Record<string, string>>({
@@ -228,12 +232,41 @@ export function CaseCard<TParams extends Record<string, string>>({
   outcome,
   artifactChip,
   unreadThread,
+  coldStamp,
+  coldAction,
 }: CaseCardProps<TParams>) {
   const footer = !locked ? (
-    <div className="mt-5 font-mono text-xs tracking-widest text-primary opacity-0 transition-opacity group-hover:opacity-100">
-      {cta}
+    <div className="mt-5 flex items-center justify-between gap-3">
+      <span className="font-mono text-xs tracking-widest text-primary opacity-0 transition-opacity group-hover:opacity-100">
+        {cta}
+      </span>
+      {coldAction && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            coldAction.onClick();
+          }}
+          aria-label={coldAction.ariaLabel ?? coldAction.label}
+          className="rounded-sm border border-white/25 bg-black/30 px-2 py-1 font-mono text-[10px] tracking-widest text-white/70 transition hover:border-caution/60 hover:text-caution"
+        >
+          {coldAction.label}
+        </button>
+      )}
     </div>
   ) : null;
+
+  const badgesWithCold = (badges || coldStamp) ? (
+    <>
+      {badges}
+      {coldStamp && (
+        <span className="inline-flex items-center rounded-sm border border-white/20 bg-black/30 px-2 py-1 font-mono text-[10px] tracking-widest text-white/70">
+          {coldStamp}
+        </span>
+      )}
+    </>
+  ) : undefined;
 
   const shell = (
     <CardShell
@@ -241,7 +274,7 @@ export function CaseCard<TParams extends Record<string, string>>({
       metaTopRight={metaTopRight}
       title={title}
       teaser={teaser}
-      badges={badges}
+      badges={badgesWithCold}
       footer={footer}
       tone={tone}
       locked={locked}
@@ -266,3 +299,4 @@ export function CaseCard<TParams extends Record<string, string>>({
     </Link>
   );
 }
+
