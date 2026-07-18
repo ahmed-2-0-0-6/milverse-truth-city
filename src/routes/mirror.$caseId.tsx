@@ -1511,10 +1511,12 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
         <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
           EVIDENCE — TAG WHAT YOU OBSERVED
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Evidence tags">
           {scenario.evidenceChips.map((c: EvidenceChip) => (
             <button
               key={c.id}
+              type="button"
+              aria-pressed={picked.includes(c.id)}
               onClick={() => toggle(c.id)}
               className={`rounded-full border px-3 py-1.5 text-xs transition ${
                 picked.includes(c.id)
@@ -1526,6 +1528,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
             </button>
           ))}
         </div>
+
       </div>
 
       {/* Investigator's conclusion */}
