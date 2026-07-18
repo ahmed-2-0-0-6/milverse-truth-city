@@ -78,6 +78,28 @@ import {
   isColdEligible,
   saveColdRead,
 } from "@/lib/mirror/coldreads";
+import { fetchPinnedLines, type PinnedLine } from "@/lib/mirror/pinned.functions";
+
+/**
+ * THE MOST SUSPECTED LINE — hash architecture.
+ * Message bodies never leave the device. We hash the NORMALIZED text
+ * (lowercase, collapsed whitespace) with SHA-256 and keep only the
+ * first 12 hex chars. Player-typed text is NEVER hashed or sent — the
+ * pin UI is gated to `role === "contact"` in Chat.onPin (search for
+ * `onPin` in this file). Contact lines are engine-composed authored
+ * strings, so hashes are stable across devices.
+ */
+function normalizeLine(text: string): string {
+  return text.trim().toLowerCase().replace(/\s+/g, " ");
+}
+async function hashLine12(text: string): Promise<string> {
+  const buf = new TextEncoder().encode(normalizeLine(text));
+  const digest = await crypto.subtle.digest("SHA-256", buf);
+  const bytes = new Uint8Array(digest);
+  let hex = "";
+  for (let i = 0; i < 6; i++) hex += bytes[i].toString(16).padStart(2, "0");
+  return hex;
+}
 
 /**
  * COLD READ MODE — the drill law.
