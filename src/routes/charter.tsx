@@ -40,32 +40,55 @@ export const Route = createFileRoute("/charter")({
   component: CharterPage,
 });
 
-const ARTICLES: { roman: string; title: string; line: string; sub?: string }[] = [
+interface Article {
+  roman: string;
+  title: string;
+  line: string;
+  sub?: string;
+  side: "left" | "right";
+  note: ReactNode;
+}
+
+const ARTICLES: Article[] = [
   {
     roman: "I",
     title: "VERIFICATION, NOT CENSORSHIP",
     line: "The city never tells you what to think. It trains you to check.",
+    side: "right",
+    note: "Censors tell you the answer. We teach you the question.",
   },
   {
     roman: "II",
     title: "EVERY CITIZEN",
     line: "Any phone. Any budget. Any ability. Truth is not a premium feature.",
     sub: "LITE mode · transcripts · keyboard play · screen readers · printable Field Kit · First Phone",
+    side: "left",
+    note: "LITE mode isn't the small version. It's the same city with the lights on.",
   },
   {
     roman: "III",
     title: "DIGNITY",
     line: "We hunt tactics, not people. Getting fooled is the human condition; staying fooled is optional.",
+    side: "right",
+    note: (
+      <>
+        You'll get <RedactedLine>fooled</RedactedLine> in here. That's the point of a gym.
+      </>
+    ),
   },
   {
     roman: "IV",
     title: "EVERY VOICE",
     line: "A city that only hears one voice is easy to fool.",
+    side: "left",
+    note: "One-source cities fall for one-source lies.",
   },
   {
     roman: "V",
     title: "PEACE",
     line: "Misinformation turns neighbors into enemies. An informed city is a peaceful one.",
+    side: "right",
+    note: "Half the fights you've seen started with a forward.",
   },
 ];
 
