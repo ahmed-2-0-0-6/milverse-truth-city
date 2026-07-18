@@ -20,12 +20,46 @@ import { type ReactNode } from "react";
 
 type Tone = "default" | "citizen";
 
+export type CaseCardOutcome = "closed" | "transacted" | "false_alarm";
+export type ArtifactChipTone = "sms" | "dm" | "wa" | "video" | "image" | "news";
+export interface ArtifactChip {
+  label: string;
+  tone: ArtifactChipTone;
+}
+
 /** Deterministic in-world file number from the case title (stable per case). */
 function fileNo(seed: string): string {
   let h = 0;
   for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
   return `${String((h % 90) + 10)}-${String((h % 900) + 100)}`;
 }
+
+const OUTCOME_STAMP: Record<CaseCardOutcome, { label: string; cls: string; aria: string }> = {
+  closed: {
+    label: "CASE CLOSED",
+    cls: "border-primary text-primary",
+    aria: "case closed",
+  },
+  transacted: {
+    label: "TRANSACTED",
+    cls: "border-destructive text-destructive",
+    aria: "transacted — missed scam",
+  },
+  false_alarm: {
+    label: "FALSE ALARM",
+    cls: "border-caution text-caution",
+    aria: "false alarm",
+  },
+};
+
+const CHIP_TONE: Record<ArtifactChipTone, string> = {
+  sms: "border-[#0a84ff] text-[#4aa3ff]",
+  dm: "chip-dm-insta",
+  wa: "border-[#005c4b] text-[#25d366]",
+  video: "border-muted-foreground/40 text-muted-foreground",
+  image: "border-muted-foreground/40 text-muted-foreground",
+  news: "border-muted-foreground/40 text-muted-foreground",
+};
 
 interface CardShellProps {
   icon: ReactNode;
@@ -36,6 +70,9 @@ interface CardShellProps {
   footer?: ReactNode;
   tone?: Tone;
   locked?: boolean;
+  outcome?: CaseCardOutcome;
+  artifactChip?: ArtifactChip;
+  unreadThread?: boolean;
 }
 
 function CardShell({
@@ -47,10 +84,18 @@ function CardShell({
   footer,
   tone = "default",
   locked = false,
+  outcome,
+  artifactChip,
+  unreadThread,
 }: CardShellProps) {
   const no = fileNo(title);
+  const stamp = outcome ? OUTCOME_STAMP[outcome] : null;
+  const dim = outcome === "closed";
   return (
-    <div className={`dossier group relative ${locked ? "dossier-locked" : "dossier-live"}`}>
+    <div
+      className={`dossier group relative ${locked ? "dossier-locked" : "dossier-live"}`}
+      data-outcome={outcome ?? undefined}
+    >
       {/* Folder tab row — sits above the folder body */}
       <div className="flex items-end">
         <div
@@ -58,6 +103,12 @@ function CardShell({
             tone === "citizen" ? "dossier-tab-citizen" : ""
           }`}
         >
+          {unreadThread && !locked && (
+            <span
+              aria-hidden="true"
+              className="thread-dot h-1.5 w-1.5 rounded-full bg-primary"
+            />
+          )}
           <span className="dossier-tab-icon">{icon}</span>
           <span className="font-mono text-[9px] tracking-[0.25em]">
             {locked ? "SEALED" : `FILE ${no}`}
@@ -78,7 +129,7 @@ function CardShell({
             : tone === "citizen"
               ? "border-primary/30 group-hover:border-primary/60"
               : "border-border group-hover:border-primary/50"
-        }`}
+        } ${dim ? "opacity-85" : ""}`}
       >
         {/* evidence texture + torch sweep on hover (CSS only) */}
         <div className="dossier-texture absolute inset-0 pointer-events-none" aria-hidden="true" />
@@ -86,10 +137,32 @@ function CardShell({
           <div className="dossier-sweep absolute inset-0 pointer-events-none" aria-hidden="true" />
         )}
 
+        {/* Outcome rubber-stamp — top-right, rotated. Aria-hidden; announced via card name. */}
+        {stamp && (
+          <div
+            aria-hidden="true"
+            className="absolute right-3 top-3 z-[2] pointer-events-none opacity-70"
+          >
+            <span
+              className={`inline-block border-double border-4 px-2 py-0.5 stencil text-[9px] tracking-[0.22em] rotate-[-12deg] bg-background/40 ${stamp.cls}`}
+            >
+              {stamp.label}
+            </span>
+          </div>
+        )}
+
         <div className="relative">
-          {metaTopRight && (
+          {(metaTopRight || artifactChip) && (
             <div className="flex flex-col items-end gap-1 min-w-0 float-right ml-3">
               {metaTopRight}
+              {artifactChip && (
+                <span
+                  className={`inline-flex items-center rounded-sm border bg-background/50 px-1.5 py-0.5 font-mono text-[9px] tracking-widest ${CHIP_TONE[artifactChip.tone]}`}
+                  aria-label={`Arrives as ${artifactChip.label}`}
+                >
+                  {artifactChip.label}
+                </span>
+              )}
             </div>
           )}
           <h3 className="text-lg font-semibold leading-snug">{title}</h3>
@@ -136,6 +209,9 @@ interface CaseCardProps<TParams extends Record<string, string>> {
   tone?: Tone;
   locked?: boolean;
   cta?: string;
+  outcome?: CaseCardOutcome;
+  artifactChip?: ArtifactChip;
+  unreadThread?: boolean;
 }
 
 export function CaseCard<TParams extends Record<string, string>>({
@@ -149,6 +225,9 @@ export function CaseCard<TParams extends Record<string, string>>({
   tone,
   locked,
   cta = "OPEN CASE →",
+  outcome,
+  artifactChip,
+  unreadThread,
 }: CaseCardProps<TParams>) {
   const footer = !locked ? (
     <div className="mt-5 font-mono text-xs tracking-widest text-primary opacity-0 transition-opacity group-hover:opacity-100">
@@ -166,14 +245,23 @@ export function CaseCard<TParams extends Record<string, string>>({
       footer={footer}
       tone={tone}
       locked={locked}
+      outcome={outcome}
+      artifactChip={artifactChip}
+      unreadThread={unreadThread}
     />
   );
 
   if (locked) return shell;
+
+  const ariaParts: string[] = [title];
+  if (outcome) ariaParts.push(OUTCOME_STAMP[outcome].aria);
+  if (unreadThread) ariaParts.push("new arrival");
+  const ariaLabel = ariaParts.join(", ");
+
   // Typed at call site with TanStack Link's overloads.
   return (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    <Link to={to as any} params={params as any} className="block">
+    <Link to={to as any} params={params as any} className="block" aria-label={ariaLabel}>
       {shell}
     </Link>
   );

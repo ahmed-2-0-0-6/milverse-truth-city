@@ -2391,3 +2391,34 @@ html[data-force-reduce-motion="on"] .cold-cursor {
   animation: none !important;
   opacity: 1 !important;
 }
+
+/* MILVERSE — Shelf Remembers: rail pulse + thread dot */
+@keyframes railPulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.55); }
+  50%      { box-shadow: 0 0 0 4px hsl(var(--primary) / 0); }
+}
+.rail-pulse {
+  animation: railPulse 2.4s ease-out infinite;
+}
+@keyframes threadDot {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.25); }
+}
+.thread-dot {
+  animation: threadDot 1.8s ease-in-out infinite;
+}
+/* Insta gradient border for DM chip */
+.chip-dm-insta {
+  border-color: transparent;
+  border-image: linear-gradient(90deg, #f58529, #dd2a7b, #8134af, #515bd4) 1;
+  color: #dd2a7b;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rail-pulse, .thread-dot { animation: none !important; }
+}
+html[data-high-legibility="on"] .rail-pulse,
+html[data-high-legibility="on"] .thread-dot,
+html[data-force-reduce-motion="on"] .rail-pulse,
+html[data-force-reduce-motion="on"] .thread-dot {
+  animation: none !important;
+}

@@ -23,13 +23,16 @@ import { fetchCitizenCase } from "@/lib/citizen.functions";
 import { RecommendedStrip } from "@/components/RecommendedStrip";
 import { DistrictIntro } from "@/components/DistrictIntro";
 import { DistrictHero } from "@/components/DistrictHero";
-import { CaseCard, TierMeter } from "@/components/CaseCard";
+import { CaseCard, TierMeter, type CaseCardOutcome, type ArtifactChip } from "@/components/CaseCard";
+import { TierRail } from "@/components/hub/TierRail";
+import { platformForCase } from "@/lib/chat/skins";
 import mirrorArt from "@/assets/district-mirror.jpg";
 import mirrorVideo from "@/assets/mirror.mp4.asset.json";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 import { InboxManager } from "@/components/inbox/InboxManager";
 import { IncomingToast } from "@/components/inbox/IncomingToast";
 import { IncomingCall } from "@/components/inbox/IncomingCall";
+import { loadInbox } from "@/lib/inbox/profile";
 
 export const Route = createFileRoute("/mirror/")({
   head: () => ({
@@ -111,6 +114,61 @@ function CaseFiles() {
 
   const maxTier = profile ? unlockedMaxTier(profile) : 2;
   const tiers: TierId[] = [1, 2, 3, 4, 5];
+
+  // Latest outcome per caseId (loss-stays-loud rule handled by taking the LATEST entry).
+  const latestOutcome = new Map<string, CaseCardOutcome>();
+  if (profile) {
+    const sorted = [...profile.history].sort((a, b) => a.ts - b.ts);
+    for (const h of sorted) {
+      const oc: CaseCardOutcome | null =
+        h.result === "correct" || h.result === "lucky_guess"
+          ? "closed"
+          : h.result === "missed_scam"
+            ? "transacted"
+            : h.result === "false_alarm"
+              ? "false_alarm"
+              : null;
+      if (oc) latestOutcome.set(h.caseId, oc);
+    }
+  }
+
+  const solvedCount = [...latestOutcome.values()].filter((o) => o === "closed").length;
+  const lossCount = [...latestOutcome.values()].filter((o) => o !== "closed").length;
+  const totalCases = SCENARIOS.length;
+  const shelfLine =
+    latestOutcome.size === 0
+      ? "SHELF: UNTOUCHED. EVERY FILE IS WAITING."
+      : `SHELF: ${solvedCount}/${totalCases} FILES CLOSED · ${lossCount} STILL OPEN ON YOUR RECORD`;
+
+  // Unread arrivals from today's inbox (client-only read).
+  const [unread, setUnread] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    const read = () => {
+      const p = loadInbox();
+      const opened = new Set(p.opened);
+      setUnread(new Set(p.arrived.filter((id) => !opened.has(id))));
+    };
+    read();
+    window.addEventListener("milverse:inbox", read);
+    return () => window.removeEventListener("milverse:inbox", read);
+  }, []);
+
+  const chipFor = (caseId: string): ArtifactChip => {
+    const p = platformForCase(caseId);
+    if (p === "sms") return { label: "SMS", tone: "sms" };
+    if (p === "instagram") return { label: "DM", tone: "dm" };
+    return { label: "CHAT", tone: "wa" };
+  };
+
+  const railNodes = tiers.map((t) => ({
+    tier: t,
+    label: `T${t}`,
+    unlocked: t <= maxTier,
+    wins: profile ? tierWins(profile, t) : 0,
+    required: 2,
+    targetId: `tier-${t}`,
+  }));
+  const frontierTier = maxTier;
 
   return (
     <div className="min-h-screen grain">
@@ -196,12 +254,19 @@ function CaseFiles() {
           </div>
         </Link>
 
+        <div className="mt-6 mb-3 font-mono text-[10px] tracking-widest text-muted-foreground">
+          {shelfLine}
+        </div>
+
+        <div className="flex gap-6">
+          <TierRail nodes={railNodes} frontierTier={frontierTier} />
+          <div className="min-w-0 flex-1">
         {tiers.map((tier) => {
           const cases = SCENARIOS.filter((s) => s.tier === tier);
           const isUnlocked = tier <= maxTier;
           const wins = profile ? tierWins(profile, tier) : 0;
           return (
-            <section key={tier} className="mb-10">
+            <section key={tier} id={`tier-${tier}`} className="mb-10 scroll-mt-24">
               <div className="mb-3 flex flex-wrap items-baseline gap-x-3">
                 <div className="font-mono text-[11px] tracking-widest text-primary">
                   TIER {tier} · {TIER_NAMES[tier]}
@@ -239,6 +304,9 @@ function CaseFiles() {
                         metaTopRight={<TierMeter tier={s.tier} />}
                         title={s.title}
                         teaser={s.teaser}
+                        outcome={latestOutcome.get(s.id)}
+                        artifactChip={chipFor(s.id)}
+                        unreadThread={unread.has(s.id)}
                         badges={
                           <>
                             {s.isSurvivorStory && (
@@ -266,6 +334,9 @@ function CaseFiles() {
             </section>
           );
         })}
+          </div>
+        </div>
+
 
         {/* Citizen Cases shelf */}
         <section className="mt-4 mb-10">

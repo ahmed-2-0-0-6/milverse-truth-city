@@ -1,10 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import { FEED_SCENARIOS } from "@/lib/feed/scenarios";
 import { FormatBadge } from "@/components/feed/FormatFrame";
 import { DistrictIntro } from "@/components/DistrictIntro";
 import { DistrictHero } from "@/components/DistrictHero";
-import { CaseCard } from "@/components/CaseCard";
+import { CaseCard, type CaseCardOutcome, type ArtifactChip } from "@/components/CaseCard";
+import { TierRail } from "@/components/hub/TierRail";
+import { loadFeedWall } from "@/lib/feed/wall";
+import { loadInbox } from "@/lib/inbox/profile";
 import feedArt from "@/assets/district-feed.jpg";
 import { Newspaper, Share2 } from "lucide-react";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
@@ -36,6 +40,84 @@ const TIER_NAMES: Record<1 | 2 | 3, string> = {
 };
 
 function FeedIndex() {
+  const [outcomes, setOutcomes] = useState<Map<string, CaseCardOutcome>>(new Map());
+  const [unread, setUnread] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const readOutcomes = () => {
+      const sorted = [...loadFeedWall()].sort((a, b) => a.ts - b.ts);
+      const map = new Map<string, CaseCardOutcome>();
+      for (const e of sorted) {
+        const oc: CaseCardOutcome | null =
+          e.result === "correct"
+            ? "closed"
+            : e.result === "missed_scam"
+              ? "transacted"
+              : e.result === "false_alarm"
+                ? "false_alarm"
+                : e.result === "pyrrhic"
+                  ? "closed"
+                  : null;
+        if (oc) map.set(e.caseId, oc);
+      }
+      setOutcomes(map);
+    };
+    const readInbox = () => {
+      const p = loadInbox();
+      const opened = new Set(p.opened);
+      setUnread(new Set(p.arrived.filter((id) => !opened.has(id))));
+    };
+    readOutcomes();
+    readInbox();
+    window.addEventListener("milverse:inbox", readInbox);
+    return () => window.removeEventListener("milverse:inbox", readInbox);
+  }, []);
+
+  const solvedCount = [...outcomes.values()].filter((o) => o === "closed").length;
+  const lossCount = [...outcomes.values()].filter((o) => o !== "closed").length;
+  const totalCases = FEED_SCENARIOS.length;
+  const shelfLine =
+    outcomes.size === 0
+      ? "SHELF: UNTOUCHED. EVERY FILE IS WAITING."
+      : `SHELF: ${solvedCount}/${totalCases} FILES CLOSED · ${lossCount} STILL OPEN ON YOUR RECORD`;
+
+  const chipFor = (fmt: string | undefined): ArtifactChip => {
+    switch (fmt) {
+      case "video":
+        return { label: "CLIP", tone: "video" };
+      case "image":
+        return { label: "PHOTO", tone: "image" };
+      case "news":
+        return { label: "SCREENSHOT", tone: "news" };
+      case "instagram":
+        return { label: "POST", tone: "dm" };
+      case "whatsapp":
+      default:
+        return { label: "FORWARD", tone: "wa" };
+    }
+  };
+
+  // Tier unlock rule for Feed: T1 always open; higher tiers unlock as prior tier has 2 wins.
+  const tierWins = (t: number) =>
+    [...outcomes.entries()].filter(
+      ([id, oc]) =>
+        oc === "closed" && FEED_SCENARIOS.find((s) => s.id === id && s.tier === t),
+    ).length;
+  const highestUnlocked = (() => {
+    let m = 1;
+    for (const t of [1, 2] as const) if (tierWins(t) >= 2) m = t + 1;
+    return Math.min(3, m);
+  })();
+
+  const railNodes = ([1, 2, 3] as const).map((t) => ({
+    tier: t,
+    label: `T${t}`,
+    unlocked: t <= highestUnlocked,
+    wins: tierWins(t),
+    required: 2,
+    targetId: `feed-tier-${t}`,
+  }));
+
   return (
     <div className="min-h-screen grain">
       <InboxManager />
@@ -75,11 +157,18 @@ function FeedIndex() {
           ← CITY
         </Link>
 
+        <div className="mt-6 mb-3 font-mono text-[10px] tracking-widest text-muted-foreground">
+          {shelfLine}
+        </div>
+
+        <div className="flex gap-6">
+          <TierRail nodes={railNodes} frontierTier={highestUnlocked} />
+          <div className="min-w-0 flex-1">
         {[1, 2, 3].map((tier) => {
           const cases = FEED_SCENARIOS.filter((s) => s.tier === tier);
           if (cases.length === 0) return null;
           return (
-            <section key={tier} className="mt-10">
+            <section key={tier} id={`feed-tier-${tier}`} className="mt-10 scroll-mt-24">
               <div className="mb-3 font-mono text-[11px] tracking-widest text-primary">
                 TIER {tier} · {TIER_NAMES[tier as 1 | 2 | 3]}
               </div>
@@ -100,12 +189,17 @@ function FeedIndex() {
                     }
                     title={s.title}
                     teaser={s.teaser}
+                    outcome={outcomes.get(s.id)}
+                    artifactChip={chipFor(s.format)}
+                    unreadThread={unread.has(s.id)}
                   />
                 ))}
               </div>
             </section>
           );
         })}
+          </div>
+        </div>
       </main>
     </div>
   );
