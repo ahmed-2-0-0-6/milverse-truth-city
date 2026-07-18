@@ -267,10 +267,8 @@ function PunchOut({ shift }: { shift: FinishedShift }) {
   const best = bestForSeed(shift.seed);
   const isNewBest = shift.score >= best && shift.score > 0;
   const dailyUnplayed = useMemo(() => {
-    // Non-invasive check; the daily module owns this. Reading it inline here
-    // avoids threading another effect for a one-line advisory.
+    if (typeof window === "undefined") return false;
     try {
-      const { readDailyStatus } = require("@/lib/daily/profile") as typeof import("@/lib/daily/profile");
       return !readDailyStatus().playedToday;
     } catch {
       return false;
