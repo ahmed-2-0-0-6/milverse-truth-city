@@ -84,10 +84,18 @@ function CardShell({
   footer,
   tone = "default",
   locked = false,
+  outcome,
+  artifactChip,
+  unreadThread,
 }: CardShellProps) {
   const no = fileNo(title);
+  const stamp = outcome ? OUTCOME_STAMP[outcome] : null;
+  const dim = outcome === "closed";
   return (
-    <div className={`dossier group relative ${locked ? "dossier-locked" : "dossier-live"}`}>
+    <div
+      className={`dossier group relative ${locked ? "dossier-locked" : "dossier-live"}`}
+      data-outcome={outcome ?? undefined}
+    >
       {/* Folder tab row — sits above the folder body */}
       <div className="flex items-end">
         <div
@@ -95,6 +103,12 @@ function CardShell({
             tone === "citizen" ? "dossier-tab-citizen" : ""
           }`}
         >
+          {unreadThread && !locked && (
+            <span
+              aria-hidden="true"
+              className="thread-dot h-1.5 w-1.5 rounded-full bg-primary"
+            />
+          )}
           <span className="dossier-tab-icon">{icon}</span>
           <span className="font-mono text-[9px] tracking-[0.25em]">
             {locked ? "SEALED" : `FILE ${no}`}
@@ -115,7 +129,7 @@ function CardShell({
             : tone === "citizen"
               ? "border-primary/30 group-hover:border-primary/60"
               : "border-border group-hover:border-primary/50"
-        }`}
+        } ${dim ? "opacity-85" : ""}`}
       >
         {/* evidence texture + torch sweep on hover (CSS only) */}
         <div className="dossier-texture absolute inset-0 pointer-events-none" aria-hidden="true" />
@@ -123,10 +137,32 @@ function CardShell({
           <div className="dossier-sweep absolute inset-0 pointer-events-none" aria-hidden="true" />
         )}
 
+        {/* Outcome rubber-stamp — top-right, rotated. Aria-hidden; announced via card name. */}
+        {stamp && (
+          <div
+            aria-hidden="true"
+            className="absolute right-3 top-3 z-[2] pointer-events-none opacity-70"
+          >
+            <span
+              className={`inline-block border-double border-4 px-2 py-0.5 stencil text-[9px] tracking-[0.22em] rotate-[-12deg] bg-background/40 ${stamp.cls}`}
+            >
+              {stamp.label}
+            </span>
+          </div>
+        )}
+
         <div className="relative">
-          {metaTopRight && (
+          {(metaTopRight || artifactChip) && (
             <div className="flex flex-col items-end gap-1 min-w-0 float-right ml-3">
               {metaTopRight}
+              {artifactChip && (
+                <span
+                  className={`inline-flex items-center rounded-sm border bg-background/50 px-1.5 py-0.5 font-mono text-[9px] tracking-widest ${CHIP_TONE[artifactChip.tone]}`}
+                  aria-label={`Arrives as ${artifactChip.label}`}
+                >
+                  {artifactChip.label}
+                </span>
+              )}
             </div>
           )}
           <h3 className="text-lg font-semibold leading-snug">{title}</h3>
