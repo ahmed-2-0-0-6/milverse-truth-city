@@ -16,6 +16,8 @@ export interface SendOffStats {
   dailyStreak: number;
   /** last few results, most-recent last — "correct" | "missed_scam" | "false_alarm" | "lucky_guess" */
   recentResults: string[];
+  /** Conviction ledger flag: player is OVERSURE this week (gap >= +12). */
+  oversure?: boolean;
 }
 
 const POOLS = {
