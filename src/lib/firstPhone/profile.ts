@@ -66,29 +66,42 @@ export function markTourSeen() {
   saveFirstPhone(s);
 }
 
-export function loadFirstPhone(): FirstPhoneState {
-  if (typeof window === "undefined") return fresh();
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return fresh();
-    const parsed = JSON.parse(raw) as Partial<FirstPhoneState>;
-    const merged: FirstPhoneState = { ...fresh(), ...parsed };
-    // Silent migration: pre-existing profile with any lesson progress
-    // never sees the tour (feature shipped after their first boot).
-    if (parsed.tourSeen === undefined && (merged.lessonsCompleted?.length ?? 0) > 0) {
-      merged.tourSeen = true;
-    }
-    return merged;
-  } catch {
-    return fresh();
-  }
+function isFirstPhoneShape(v: unknown): v is Partial<FirstPhoneState> {
+  if (!v || typeof v !== "object") return false;
+  const o = v as Record<string, unknown>;
+  if (o.lessonsCompleted !== undefined && !Array.isArray(o.lessonsCompleted)) return false;
+  return true;
 }
 
-export function saveFirstPhone(s: FirstPhoneState) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(KEY, JSON.stringify(s));
-  window.dispatchEvent(new Event("milverse:firstphone"));
+function mergeFirstPhone(parsed: Partial<FirstPhoneState>): FirstPhoneState {
+  const merged: FirstPhoneState = { ...fresh(), ...parsed };
+  // Silent migration: pre-existing profile with any lesson progress
+  // never sees the tour (feature shipped after their first boot).
+  if (parsed.tourSeen === undefined && (merged.lessonsCompleted?.length ?? 0) > 0) {
+    merged.tourSeen = true;
+  }
+  return merged;
 }
+
+export function loadFirstPhone(): FirstPhoneState {
+  if (typeof window === "undefined") return fresh();
+  const read = readStore<Partial<FirstPhoneState>>(KEY, isFirstPhoneShape);
+  if (read === "corrupt") {
+    const rec = recoverStore<Partial<FirstPhoneState>>(KEY, isFirstPhoneShape);
+    if (rec) return mergeFirstPhone(rec);
+    return fresh();
+  }
+  if (read === null) return fresh();
+  return mergeFirstPhone(read);
+}
+
+export function saveFirstPhone(s: FirstPhoneState): boolean {
+  if (typeof window === "undefined") return false;
+  const ok = writeStore(KEY, s);
+  window.dispatchEvent(new Event("milverse:firstphone"));
+  return ok;
+}
+
 
 export function setActive(active: boolean, kidCityName?: string) {
   const s = loadFirstPhone();
