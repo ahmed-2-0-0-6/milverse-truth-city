@@ -48,6 +48,7 @@ import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 import { clockFor } from "@/lib/mirror/clocks";
 import { ClockChip } from "@/components/mirror/ClockChip";
 import { pendingRetestForCase, scheduleRetest, resolveRetest, type RetestResolution } from "@/lib/mirror/retests";
+import { CONVICTION_CHIPS, computeConviction, debriefLineFor } from "@/lib/mirror/conviction";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 
 export const Route = createFileRoute("/mirror/$caseId")({
@@ -885,6 +886,7 @@ function loadSim(): StoredSim | null {
 
 function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void }) {
   const [verdict, setVerdict] = useState<"REAL" | "FAKE" | null>(null);
+  const [confidence, setConfidence] = useState<60 | 75 | 90 | null>(null);
   const [picked, setPicked] = useState<string[]>([]);
   const [conclusion, setConclusion] = useState("");
 
@@ -900,13 +902,14 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
   }
 
   function submit() {
-    if (!verdict) return;
+    if (!verdict || !confidence) return;
     sessionStorage.setItem(
       VERDICT_KEY,
-      JSON.stringify({ verdict, picked, conclusion: conclusion.trim().slice(0, 300) }),
+      JSON.stringify({ verdict, confidence, picked, conclusion: conclusion.trim().slice(0, 300) }),
     );
     onDone();
   }
+
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
@@ -1002,6 +1005,57 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
         </button>
       </div>
 
+      {/* HOW SURE? — conviction pick, radio group. Locks are gated on this. */}
+      {verdict && (
+        <div className="mt-6">
+          <div
+            id="how-sure-label"
+            className="font-mono text-xs tracking-widest text-muted-foreground mb-2"
+          >
+            HOW SURE?
+          </div>
+          <div
+            role="radiogroup"
+            aria-labelledby="how-sure-label"
+            className="flex flex-wrap gap-2"
+          >
+            {CONVICTION_CHIPS.map((chip) => {
+              const selected = confidence === chip.value;
+              return (
+                <button
+                  key={chip.value}
+                  role="radio"
+                  aria-checked={selected}
+                  tabIndex={selected || (confidence == null && chip.value === 60) ? 0 : -1}
+                  onClick={() => setConfidence(chip.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+                      e.preventDefault();
+                      const idx = CONVICTION_CHIPS.findIndex((c) => c.value === chip.value);
+                      const next = CONVICTION_CHIPS[(idx + 1) % CONVICTION_CHIPS.length];
+                      setConfidence(next.value);
+                    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+                      e.preventDefault();
+                      const idx = CONVICTION_CHIPS.findIndex((c) => c.value === chip.value);
+                      const prev =
+                        CONVICTION_CHIPS[(idx - 1 + CONVICTION_CHIPS.length) % CONVICTION_CHIPS.length];
+                      setConfidence(prev.value);
+                    }
+                  }}
+                  className={`rounded-full border px-3 py-1.5 font-mono text-xs tracking-widest transition ${
+                    selected
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                  }`}
+                >
+                  {chip.label} · {chip.value}%
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="mt-8">
         <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
           EVIDENCE — TAG WHAT YOU OBSERVED
@@ -1042,7 +1096,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
 
       <button
         onClick={submit}
-        disabled={!verdict}
+        disabled={!verdict || !confidence}
         className="mt-6 w-full rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground disabled:opacity-40"
       >
         SUBMIT VERDICT
@@ -1066,7 +1120,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     try {
       const raw = sessionStorage.getItem(VERDICT_KEY);
       return raw
-        ? (JSON.parse(raw) as { verdict: "REAL" | "FAKE"; picked: string[]; conclusion?: string })
+        ? (JSON.parse(raw) as { verdict: "REAL" | "FAKE"; confidence?: number; picked: string[]; conclusion?: string })
         : null;
     } catch {
       return null;
@@ -1194,6 +1248,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       result: result.resultKind,
       points: result.points,
       usedVob: result.usedVob,
+      confidence: verdictRaw.confidence,
       ts: nowTs,
     });
     saveProfile(p);
@@ -1300,6 +1355,25 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           {result.points >= 0 ? "+" : ""}
           {result.points} pts
         </div>
+        {(() => {
+          const line = debriefLineFor(result.correctVerdict, verdictRaw.confidence);
+          const rep = computeConviction(profileSnap.history);
+          return (
+            <>
+              {line && (
+                <p className="mt-3 font-mono text-[11px] tracking-wide opacity-90 border-t border-current/20 pt-3">
+                  {line}
+                </p>
+              )}
+              {rep.status === "ok" && (
+                <p className="mt-1 font-mono text-[10px] tracking-widest opacity-70">
+                  CONVICTION LEDGER: {rep.headline} · gap {rep.gap >= 0 ? "+" : ""}
+                  {rep.gap}
+                </p>
+              )}
+            </>
+          );
+        })()}
         {scenario.tier === 5 && !result.usedVob && result.correctVerdict && (
           <p className="mt-3 text-xs opacity-90 border-t border-current/20 pt-3">
             Correct — but at Tier 5, in-band tells are unreliable. Verifying out-of-band would have

@@ -13,6 +13,7 @@ import { operatorCallsign, type TrustProfile } from "@/lib/mirror/profile";
 import { rankFromXp } from "@/lib/ranks";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 import { getActiveGroup } from "@/lib/pilot";
+import { computeConviction } from "@/lib/mirror/conviction";
 
 interface Props {
   open: boolean;
@@ -115,6 +116,44 @@ export function CitizenFile({ open, onOpenChange, profile, xp, manualUnlocks }: 
           <p className="mt-3 text-[11px] text-muted-foreground italic">
             Both columns lose. Gullibility and paranoia are the same bill.
           </p>
+
+          {/* CONVICTION — parallel measurement (does not affect points/XP). */}
+          {(() => {
+            const rep = computeConviction(profile?.history ?? []);
+            return (
+              <div className="mt-4 border-t border-border/60 pt-3">
+                <div className="stencil text-[10px] text-muted-foreground mb-2">CONVICTION</div>
+                {rep.status === "insufficient" ? (
+                  <p className="font-mono text-[11px] text-muted-foreground">
+                    {rep.labelLine}
+                  </p>
+                ) : (
+                  <>
+                    <div className="flex items-baseline gap-4 font-mono text-xs">
+                      <div>
+                        <span className="text-muted-foreground">mean</span>{" "}
+                        <span className="tabular-nums text-foreground">{rep.meanConfidence}%</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">record</span>{" "}
+                        <span className="tabular-nums text-foreground">{rep.accuracyPct}%</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">gap</span>{" "}
+                        <span className="tabular-nums text-foreground">
+                          {rep.gap >= 0 ? "+" : ""}
+                          {rep.gap}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="mt-2 font-mono text-[11px] text-foreground/90">
+                      {rep.labelLine}
+                    </p>
+                  </>
+                )}
+              </div>
+            );
+          })()}
           <Link
             to="/wall"
             onClick={() => onOpenChange(false)}
