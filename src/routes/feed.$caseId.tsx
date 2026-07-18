@@ -20,6 +20,9 @@ import { XpDeltaLine } from "@/components/rank/XpDeltaLine";
 import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
 import { appendFeedWall } from "@/lib/feed/wall";
+import { dignityBandFor } from "@/lib/mirror/meterBands";
+import { MeterNote } from "@/components/chat/MeterNote";
+
 import { Send, Search, Heart, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
 import { NextCaseCard } from "@/components/NextCaseCard";
@@ -303,6 +306,17 @@ function Sim({
   const [tacticFlash, setTacticFlash] = useState<typeof scenario.tacticId | null>(null);
   const tacticFlashed = useRef(false);
   const scroller = useRef<HTMLDivElement>(null);
+  const [sendTick, setSendTick] = useState(0);
+  const showBandOnMount = useRef(
+    typeof window !== "undefined" && !localStorage.getItem("milverse.feed.bandSeen"),
+  ).current;
+  useEffect(() => {
+    if (showBandOnMount && typeof window !== "undefined") {
+      localStorage.setItem("milverse.feed.bandSeen", "1");
+    }
+  }, [showBandOnMount]);
+  const currentBand = dignityBandFor(state.dignity);
+
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
@@ -313,6 +327,8 @@ function Sim({
     if (!t) return;
     const next = { ...state, actionsUsed: [...state.actionsUsed] };
     setMessages((prev) => [...prev, { role: "player", text: t, ts: Date.now() }]);
+    setSendTick((n) => n + 1);
+
     setInput("");
     const react = senderReact(scenario, next, t);
     setState(next);
@@ -358,7 +374,11 @@ function Sim({
             />
             <div className="px-3 py-2 bg-neutral-950/80 border-b border-white/10">
               <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-white/50">
-                <span>DIGNITY · {scenario.sender.name.split(" ")[0]}</span>
+                <span
+                  aria-label={`Dignity, ${currentBand.label}, ${Math.round(state.dignity)}`}
+                >
+                  DIGNITY · {scenario.sender.name.split(" ")[0]} · {currentBand.label}
+                </span>
                 <span>{Math.round(state.dignity)}</span>
               </div>
               <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
@@ -367,6 +387,14 @@ function Sim({
                   style={{ width: `${state.dignity}%` }}
                 />
               </div>
+              <MeterNote
+                bandKey={currentBand.key}
+                label={currentBand.label}
+                note={currentBand.note}
+                sendTick={sendTick}
+                showOnMount={showBandOnMount}
+              />
+
               <div className="mt-2 flex gap-1">
                 {(["chat", "toolkit"] as const).map((t) => (
                   <button

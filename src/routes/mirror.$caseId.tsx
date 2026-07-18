@@ -48,6 +48,9 @@ import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 import { clockFor } from "@/lib/mirror/clocks";
 import { ClockChip } from "@/components/mirror/ClockChip";
 import { pendingRetestForCase, scheduleRetest, resolveRetest, type RetestResolution } from "@/lib/mirror/retests";
+import { bandFor } from "@/lib/mirror/meterBands";
+import { MeterNote } from "@/components/chat/MeterNote";
+
 import { CONVICTION_CHIPS, computeConviction, debriefLineFor } from "@/lib/mirror/conviction";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 import { aftermathFor } from "@/lib/mirror/aftermath";
@@ -321,6 +324,18 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
 
   // Sound design: tick on meter change; tension cue when critical (<30).
   const [meterDelta, setMeterDelta] = useState<number | null>(null);
+  const [sendTick, setSendTick] = useState(0);
+  const showBandOnMount = useRef(
+    typeof window !== "undefined" && !localStorage.getItem("milverse.mirror.bandSeen"),
+  ).current;
+  useEffect(() => {
+    if (showBandOnMount && typeof window !== "undefined") {
+      localStorage.setItem("milverse.mirror.bandSeen", "1");
+    }
+  }, [showBandOnMount]);
+
+  const currentBand = bandFor(state.meter);
+
   useEffect(() => {
     let t: number | undefined;
     if (state.meter !== prevMeter.current) {
@@ -381,6 +396,8 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
       probeQuality: grade,
     };
     setMessages((prev) => [...prev, playerMsg]);
+    setSendTick((t) => t + 1);
+
     setInput("");
     setTyping(true);
     if (grade === "strong" && !tacticFlashed.current) {
@@ -536,9 +553,13 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
             {/* meter + tabs */}
             <div className="px-3 py-2 bg-neutral-950/80 border-b border-white/10 relative">
               <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-white/50">
-                <span className={state.meter <= 30 ? "text-destructive hud-blink" : ""}>
-                  {state.meterType === "composure" ? "COMPOSURE" : "PATIENCE"}
+                <span
+                  className={state.meter <= 30 ? "text-destructive hud-blink" : ""}
+                  aria-label={`The Line, ${currentBand.label}, ${Math.round(state.meter)}`}
+                >
+                  THE LINE · {currentBand.label}
                 </span>
+
                 <span className="flex items-center gap-1.5 tabular-nums">
                   {meterDelta !== null && (
                     <span
@@ -564,6 +585,14 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                   }}
                 />
               </div>
+              <MeterNote
+                bandKey={currentBand.key}
+                label={currentBand.label}
+                note={currentBand.note}
+                sendTick={sendTick}
+                showOnMount={showBandOnMount}
+              />
+
               <div className="mt-2 flex gap-1">
                 {(["chat", "notes"] as const).map((t) => (
                   <button
