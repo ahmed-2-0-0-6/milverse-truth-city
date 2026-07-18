@@ -540,12 +540,53 @@ function Studio() {
                 {error}
               </div>
             )}
+
+            <div className="rounded-lg border border-border bg-card p-4">
+              <div className="flex items-center justify-between">
+                <div className="font-mono text-[11px] tracking-[0.3em] text-primary">
+                  THE EDITOR'S DESK
+                </div>
+                <div className="font-mono text-[10px] tracking-widest text-muted-foreground tabular-nums">
+                  {desk.passed}/{desk.total}
+                </div>
+              </div>
+              <ul className="mt-3 space-y-2.5">
+                {deskNotes.map((n) => (
+                  <li key={n.id} className="flex gap-2.5">
+                    <span
+                      aria-label={n.status === "pass" ? "Pass" : "Advisory"}
+                      className={`mt-0.5 font-mono text-sm leading-none ${n.status === "pass" ? "text-primary/70" : "text-caution"}`}
+                    >
+                      {n.status === "pass" ? "✓" : "✎"}
+                    </span>
+                    <div className="flex-1">
+                      <div className="font-mono text-[10px] tracking-widest text-muted-foreground">
+                        {n.title}
+                      </div>
+                      <div className="mt-0.5 text-sm text-foreground">{n.note}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <div
+                aria-live="polite"
+                className="mt-3 border-t border-border pt-3 font-mono text-[11px] tracking-wide text-muted-foreground"
+              >
+                {advisories === 0
+                  ? "The desk signs off. Playtest it — the desk has been wrong before."
+                  : `${advisories} note${advisories === 1 ? "" : "s"} on your desk. Advice, not law — playtest and see.`}
+              </div>
+            </div>
+
             <button
               onClick={playtest}
               className="w-full rounded-md border border-primary/50 bg-primary/10 py-3 font-mono text-xs tracking-widest text-primary hover:bg-primary/20"
             >
               <Sparkles className="inline h-3.5 w-3.5 mr-1.5" /> PLAY-TEST ONCE
             </button>
+            <div className="-mt-2 text-center font-mono text-[9px] tracking-widest text-muted-foreground">
+              THE ONLY REVIEW THAT COUNTS.
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 onClick={() => void publish("private")}
