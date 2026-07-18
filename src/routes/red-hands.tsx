@@ -109,7 +109,7 @@ function RedHandsRoute() {
 
     // Apply trust deltas — including any challenge penalty riding on this turn.
     let delta = chip.trust;
-    if (challengePending && chip.family !== "FOLD") {
+    if (challengePending) {
       delta -= 12;
     }
     const nextTrust = Math.max(0, Math.min(100, trust + delta));
