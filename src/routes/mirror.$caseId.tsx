@@ -622,7 +622,10 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
   return (
     <>
       <TacticFlash tacticId={tacticFlash} onDone={() => setTacticFlash(null)} />
+      {airlockOn && <Airlock onDone={() => setAirlockOn(false)} />}
+      <div className={showVob && useRitual ? "ritual-recede" : ""}>
       <ChatShell
+
         logRegion={false}
 
         header={
