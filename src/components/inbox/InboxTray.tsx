@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Bell, Phone } from "lucide-react";
+import { Bell, Phone, Newspaper } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -10,7 +10,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { loadInbox, markOpened } from "@/lib/inbox/profile";
+import { loadInbox, markOpened, markPaperRead } from "@/lib/inbox/profile";
 import { todaysArrivals, type InboxItem } from "@/lib/inbox/scheduler";
 import { platformStyle } from "./platform-style";
 import { VoicemailSheet } from "./VoicemailSheet";
