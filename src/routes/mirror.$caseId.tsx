@@ -84,6 +84,9 @@ import {
 import { fetchPinnedLines, type PinnedLine } from "@/lib/mirror/pinned.functions";
 import { consumeStandoffArm } from "@/lib/standoff/rules";
 import { buildHand, toHandScenario, type HandChip } from "@/lib/mirror/hand";
+import { consumeMaskArm, saveMaskPlay, MASK_START_KEY } from "@/lib/mask/plays";
+import { encodeToken, type TokenVerdict } from "@/lib/mask/tokens";
+
 
 /**
  * THE MOST SUSPECTED LINE — hash architecture.
