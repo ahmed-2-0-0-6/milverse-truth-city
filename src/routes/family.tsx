@@ -13,6 +13,7 @@ import { LESSONS, TOTAL_LESSONS, type JuniorTactic } from "@/lib/firstPhone/less
 import { loadFirstPhone, joinFamily } from "@/lib/firstPhone/profile";
 import { manualDisplayForTactics } from "@/lib/firstPhone/tacticMap";
 import { JUNIOR_COPY } from "@/lib/firstPhone/copy";
+import { PARENT_BRIEFS, STANDING_RULE } from "@/lib/firstPhone/parentBriefs";
 import { Users, Copy, Check, ShieldCheck, RefreshCw } from "lucide-react";
 
 /** Threshold below which aggregated metrics are suppressed (k-anonymity). */
