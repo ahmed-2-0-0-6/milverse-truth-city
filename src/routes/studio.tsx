@@ -289,18 +289,18 @@ function Studio() {
       // Successful publish → increment XP-layer counter (feeds ranks + prestige).
       incrementPublishedCount();
       if (res.lane === "community") {
-        toast.success("Submitted to the Community Library", {
+        toast.success("Submitted to the library.", {
           description: `Queued for human review · share code ${code}${res.aiChecked ? " · AI safety check passed" : " · manual review pending"}${advisories > 0 ? ` · ${advisories} desk note${advisories === 1 ? "" : "s"} traveled with it.` : ""}`,
         });
       } else {
-        toast.success("Published as a private case", {
+        toast.success("Published as private.", {
           description: `Share code ${code}${res.aiChecked ? " · AI safety check passed" : ""}`,
         });
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Cloud sync failed.";
       setError(msg);
-      toast.error("Publish failed", { description: msg });
+      toast.error("Publish failed.", { description: msg });
       setPublishing(false);
       return;
     }
