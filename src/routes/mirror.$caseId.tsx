@@ -746,10 +746,12 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               <button
                 onClick={send}
                 disabled={ended || typing || !input.trim()}
+                aria-label="Send message"
                 className="rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40"
               >
-                <Send className="h-4 w-4" />
+                <Send className="h-4 w-4" aria-hidden="true" />
               </button>
+
             </div>
             <div className="mt-1.5 flex items-center justify-between font-mono text-[9px] tracking-widest text-white/40">
               <span>ASK FOR A "VOICE NOTE" · TAP PIN TO FLAG</span>
