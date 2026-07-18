@@ -16,6 +16,8 @@ export interface FirstPhoneState {
   handoverSeen: boolean;
   /** ADDITIVE: once-per-child guided phone tour played (or skipped)? */
   tourSeen: boolean;
+  /** ADDITIVE: best consecutive-correct streak in the SPOT IT mini-game. */
+  spotItBest: number;
 }
 
 function fresh(): FirstPhoneState {
