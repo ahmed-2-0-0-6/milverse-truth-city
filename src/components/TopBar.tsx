@@ -286,6 +286,11 @@ export function TopBar() {
           </Sheet>
         </div>
       </div>
+      {isGameSurface(pathname) && (
+        <div className="md:hidden border-t border-primary/20 bg-background/85 overflow-x-auto">
+          <GameBar compact />
+        </div>
+      )}
       <SoundIntroChip />
     </header>
   );
