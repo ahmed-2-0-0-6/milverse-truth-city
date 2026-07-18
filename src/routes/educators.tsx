@@ -151,6 +151,12 @@ function EducatorsPage() {
             >
               PRINTABLE FIELD KIT →
             </Link>
+            <Link
+              to="/family"
+              className="stencil text-[11px] tracking-widest text-muted-foreground hover:text-foreground"
+            >
+              DINNER TABLE BRIEF →
+            </Link>
           </div>
         </section>
 
