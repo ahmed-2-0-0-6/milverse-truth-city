@@ -2078,7 +2078,20 @@ html[data-force-reduce-motion="on"] .marquee-track {
   .animate-\[heartbeat_1\.6s_ease-in-out_infinite\] {
     animation: none !important;
   }
+  .road-fill {
+    transition: none !important;
+  }
 }
+
+html[data-high-legibility="on"] .road-fill,
+html[data-motion="reduce"] .road-fill {
+  transition: none !important;
+}
+
+.road-fill {
+  transition: height 500ms cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
 
 /* ── PASS-1 · ACCESS LAYER ─────────────────────────────────────────
    Universal focus ring, text-size scale, high-legibility mode,

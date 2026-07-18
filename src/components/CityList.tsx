@@ -26,6 +26,8 @@ import {
 } from "@/lib/city/world-data";
 import { loadProfile, type TrustProfile } from "@/lib/mirror/profile";
 import { getMirrorRecommendations } from "@/lib/recommendations";
+import { SIGNAGE } from "@/lib/city/signage";
+
 
 export function CityList({ onSwitchToMap }: { onSwitchToMap: () => void }) {
   const [profile, setProfile] = useState<TrustProfile | null>(null);
@@ -67,37 +69,36 @@ export function CityList({ onSwitchToMap }: { onSwitchToMap: () => void }) {
       </div>
 
       {/* Landmark districts */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 p-2 border-b border-border">
-        <LandmarkTile
-          to="/paper"
-          Icon={NotebookPen}
-          label="Newsstand · The Daily Mirage"
-          badge="TODAY"
-        />
-        <LandmarkTile to="/city-hall" Icon={LandmarkIcon} label="City Hall" />
-        <LandmarkTile to="/studio" Icon={Clapperboard} label="Studio" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 p-2 border-b border-border">
+        <LandmarkTile to="/paper" Icon={NotebookPen} label="The Paper" sub={SIGNAGE.paper.sub} badge="TODAY" />
+        <LandmarkTile to="/drop" Icon={Play} label="Daily Drop" sub={SIGNAGE.drop.sub} />
+        <LandmarkTile to="/shift" Icon={Swords} label="The Shift" sub={SIGNAGE.shift.sub} />
+        <LandmarkTile to="/boss" Icon={Swords} label="Boss Fights" sub={SIGNAGE.boss.sub} />
+        <LandmarkTile to="/city-hall" Icon={LandmarkIcon} label="City Hall" sub={SIGNAGE["city-hall"].sub} />
+        <LandmarkTile to="/studio" Icon={Clapperboard} label="The Studio" sub={SIGNAGE.studio.sub} />
         <LandmarkTile
           to="/archive"
           Icon={Library}
-          label="Archive · City Library"
+          label="The Archive"
+          sub={SIGNAGE.archive.sub}
           badge={
             profile?.history?.length
               ? `${new Set(profile.history.map((h) => h.caseId)).size} ON SHELF`
               : undefined
           }
         />
-        <LandmarkTile to="/manual" Icon={BookOpen} label="Field Manual" badge="MIL" />
-        <LandmarkTile to="/profile" Icon={IdCard} label="Operator Profile" />
-        <LandmarkTile to="/educators" Icon={GraduationCap} label="For Educators" />
-        <LandmarkTile to="/market" Icon={Store} label="Market · Blueprint" muted />
-        <LandmarkTile to="/arena" Icon={Swords} label="Arena · Blueprint" muted />
+        <LandmarkTile to="/manual" Icon={BookOpen} label="Field Manual" sub={SIGNAGE.manual.sub} badge="MIL" />
+        <LandmarkTile to="/profile" Icon={IdCard} label="Operator Profile" sub={SIGNAGE.profile.sub} />
+        <LandmarkTile to="/educators" Icon={GraduationCap} label="For Educators" sub="Classroom kit and lesson plans" />
+        <LandmarkTile to="/arena" Icon={Swords} label="The Arena" sub={SIGNAGE.arena.sub} />
+        <LandmarkTile to="/market" Icon={Store} label="The Market" sub={SIGNAGE.market.sub} muted />
       </div>
 
       <DistrictSection
         color={MIRROR_COLOR}
         Icon={Eye}
         title="The Mirror"
-        subtitle="Judge messages aimed at you — real family, or someone wearing them?"
+        subtitle={SIGNAGE.mirror.sub}
         done={mirrorDone}
         total={mirror.length}
         stations={mirror}
@@ -109,7 +110,7 @@ export function CityList({ onSwitchToMap }: { onSwitchToMap: () => void }) {
         color={FEED_COLOR}
         Icon={Newspaper}
         title="The Feed"
-        subtitle="Judge real-world posts — true, false, or misleading?"
+        subtitle={SIGNAGE.feed.sub}
         done={feedDone}
         total={feed.length}
         stations={feed}
@@ -121,30 +122,42 @@ export function CityList({ onSwitchToMap }: { onSwitchToMap: () => void }) {
   );
 }
 
+
 function LandmarkTile({
   to,
   Icon,
   label,
+  sub,
   muted,
   badge,
 }: {
   to: string;
   Icon: typeof Eye;
   label: string;
+  sub?: string;
   muted?: boolean;
   badge?: string;
 }) {
   return (
     <Link
       to={to as "/city-hall"}
-      className={`flex items-center gap-2 rounded-sm border p-2 text-sm ${muted ? "border-dashed border-primary/30 text-muted-foreground" : "border-border hover:border-primary"}`}
+      className={`flex items-start gap-2 rounded-sm border p-2 text-sm ${muted ? "border-dashed border-primary/30 text-muted-foreground" : "border-border hover:border-primary"}`}
+      aria-label={sub ? `${label}, ${sub}` : label}
     >
-      <Icon className="h-4 w-4 text-primary" />
-      <span className="flex-1 truncate">{label}</span>
-      {badge && <span className="stencil text-[9px] text-primary shrink-0">{badge}</span>}
+      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+      <span className="flex-1 min-w-0">
+        <span className="block truncate font-medium">{label}</span>
+        {sub && (
+          <span className="block text-[11px] text-muted-foreground/90 leading-snug mt-0.5">
+            {sub}
+          </span>
+        )}
+      </span>
+      {badge && <span className="stencil text-[9px] text-primary shrink-0 mt-0.5">{badge}</span>}
     </Link>
   );
 }
+
 
 function DistrictSection({
   color,

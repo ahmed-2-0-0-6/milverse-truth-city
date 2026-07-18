@@ -109,11 +109,13 @@ export function GameBar({ compact = false }: { compact?: boolean }) {
       {/* LEVEL CHIP */}
       <Link
         to="/profile"
+        hash="the-road"
         className="stencil text-[10px] tracking-widest rounded border border-border px-2 py-1 text-foreground/90 hover:bg-accent hover:text-primary min-h-[36px] inline-flex items-center whitespace-nowrap"
-        aria-label={`Rank: Level ${snap.levelIdx + 1}, ${snap.rankName}. Open profile.`}
+        aria-label={`Rank: Level ${snap.levelIdx + 1}, ${snap.rankName}. Open the road.`}
       >
         LVL {snap.levelIdx + 1} · {snap.rankName}
       </Link>
+
 
       {/* XP BAR */}
       <div className="flex items-center gap-2 min-w-0">

@@ -5,12 +5,14 @@
 // (rank still saved so it never re-fires).
 
 import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { loadProfile } from "@/lib/mirror/profile";
 import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp, RANKS, type RankInfo } from "@/lib/ranks";
 import { useVisualMode } from "@/lib/visual-quality";
 import { rankRise } from "@/lib/mirror/audio";
 import { ShieldCheck, Eye, Search, Compass, FileText, Building2 } from "lucide-react";
+
 
 const KEY = "milverse.rank.v1";
 
@@ -128,6 +130,15 @@ export function RankUpBeat() {
             {rankUp.code} · {rankUp.tagline}
           </div>
         </div>
+        <Link
+          to="/profile"
+          hash="the-road"
+          onClick={() => setRankUp(null)}
+          className="pointer-events-auto stencil text-[10px] tracking-widest text-primary/90 hover:text-primary underline underline-offset-4"
+        >
+          SEE THE ROAD →
+        </Link>
+
       </div>
     </div>
   );
