@@ -8,7 +8,9 @@ export type HandlerSurface =
   | "assignment-reaction"
   | "drop-line"
   | "leaderboard-nudge"
-  | "psych-eval";
+  | "psych-eval"
+  | "send-off"
+  | "loss-debrief";
 
 const KEY = "milverse.handler.cache.v1";
 
