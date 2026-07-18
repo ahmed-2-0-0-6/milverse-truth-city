@@ -38,6 +38,7 @@ export function LessonPath() {
   const [showLicense, setShowLicense] = useState(false);
   const [graduated, setGraduated] = useState(false);
   const [cleared, setCleared] = useState<number | null>(null);
+  const [openSpotIt, setOpenSpotIt] = useState(false);
   const homeHostRef = useRef<HTMLDivElement>(null);
   const [tourHost, setTourHost] = useState<HTMLElement | null>(null);
 
