@@ -1115,6 +1115,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
   const navigate = useNavigate();
   const sim = useMemo(() => loadSim(), []);
   const [profileSnap, setProfileSnap] = useState(() => loadProfile());
+  const [tapeOpen, setTapeOpen] = useState(false);
   useEffect(() => {
     const on = () => setProfileSnap(loadProfile());
     window.addEventListener("milverse:profile", on);
