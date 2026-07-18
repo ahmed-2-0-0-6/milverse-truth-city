@@ -9,7 +9,7 @@ import {
 } from "@/lib/mirror/profile";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 import { loadUnlocked } from "@/lib/manual/state";
-import { computeXp, rankFromXp, RANKS } from "@/lib/ranks";
+import { computeXp, rankFromXp } from "@/lib/ranks";
 import { HandlersReading } from "@/components/handler/HandlersReading";
 import { WeeklyEval } from "@/components/handler/WeeklyEval";
 import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
