@@ -1280,7 +1280,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
       <div className="font-mono text-xs tracking-[0.3em] text-caution">INVESTIGATION BOARD</div>
-      <h1 className="mt-2 text-2xl font-semibold">Pin the evidence. Make the call.</h1>
+      <h1 data-phase-anchor="mirror" tabIndex={-1} className="mt-2 text-2xl font-semibold outline-none">Pin the evidence. Make the call.</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         Everything you flagged during the chat is here. Now assemble the picture.
       </p>
