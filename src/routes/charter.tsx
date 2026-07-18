@@ -1,5 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { TopBar } from "@/components/TopBar";
+import { EngravedReveal } from "@/components/civic/EngravedReveal";
+import { Marginalia } from "@/components/civic/Marginalia";
+import { RedactedLine } from "@/components/civic/RedactedLine";
+import { Countersign } from "@/components/civic/Countersign";
+import type { ReactNode } from "react";
 
 export const Route = createFileRoute("/charter")({
   head: () => ({
