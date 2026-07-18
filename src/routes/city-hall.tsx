@@ -35,6 +35,7 @@ export const Route = createFileRoute("/city-hall")({
 function CityHall() {
   const [p, setP] = useState<TrustProfile | null>(null);
   const [earned, setEarned] = useState<string[]>([]);
+  const [census, setCensus] = useState<CensusState>({ kind: "loading" });
   useEffect(() => {
     setP(loadProfile());
     setEarned(loadEarnedBadges());
@@ -47,6 +48,23 @@ function CityHall() {
     return () => {
       window.removeEventListener("milverse:profile", on);
       window.removeEventListener("milverse:badge", on);
+    };
+  }, []);
+
+  // Fetch once on mount. No polling. Quiet failure: cloud unreachable → offline line.
+  useEffect(() => {
+    let alive = true;
+    fetchCityCensus()
+      .then((res) => {
+        if (!alive) return;
+        if (res.row) setCensus({ kind: "loaded", row: res.row });
+        else setCensus({ kind: "sealed" });
+      })
+      .catch(() => {
+        if (alive) setCensus({ kind: "offline" });
+      });
+    return () => {
+      alive = false;
     };
   }, []);
 
