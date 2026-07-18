@@ -473,6 +473,9 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                     </span>
                   )}
                   {Math.round(state.meter)}
+                  {claimedClock && (
+                    <ClockChip clock={claimedClock} onExpire={handleClockExpire} />
+                  )}
                 </span>
               </div>
               <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
