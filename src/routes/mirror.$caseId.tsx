@@ -625,8 +625,8 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
 
   const aiReply = useServerFn(generateContactReply);
 
-  async function send() {
-    const text = input.trim();
+  async function send(override?: string) {
+    const text = (override ?? input).trim();
     if (!text || ended || typing) return;
     lastActivity.current = Date.now();
     nudged.current = false;
