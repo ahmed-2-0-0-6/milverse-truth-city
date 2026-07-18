@@ -41,7 +41,7 @@ export function PageHeader({
   );
 }
 
-export function LoadingState({ label = "Loading…", rows = 3 }: { label?: string; rows?: number }) {
+export function LoadingState({ label = "Loading", rows = 3 }: { label?: string; rows?: number }) {
   return (
     <div role="status" aria-live="polite" aria-busy="true" className="space-y-3 py-8">
       <span className="sr-only">{label}</span>
