@@ -226,7 +226,7 @@ function SlotChip({
 }: {
   ref: SlotRef;
   index: number;
-  played: import("@/lib/shift/state").SlotResult | null;
+  played: SlotResult | null;
   isNext?: boolean;
 }) {
   const Icon = ref.kind === "feed" ? Newspaper : MessageSquare;
