@@ -22,6 +22,7 @@ import { logPilotEntry } from "@/lib/pilot";
 import { appendFeedWall } from "@/lib/feed/wall";
 import { dignityBandFor } from "@/lib/mirror/meterBands";
 import { MeterNote } from "@/components/chat/MeterNote";
+import { ShiftBanner } from "@/components/shift/ShiftBanner";
 
 import { Send, Search, Heart, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
