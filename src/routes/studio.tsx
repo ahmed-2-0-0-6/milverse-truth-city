@@ -92,7 +92,7 @@ function validate(d: Draft): string | null {
   if (URL_RE.test(all)) return "No real URLs in any field.";
   const bad = ["fuck", "shit", "bitch", "randi", "chutiya", "gandu", "haramkhor"];
   const low = all.toLowerCase();
-  if (bad.some((w) => low.includes(w))) return "Please keep content civil — profanity not allowed.";
+  if (bad.some((w) => low.includes(w))) return "Keep it civil. No profanity.";
   const realNames = [
     "imran khan",
     "shehbaz sharif",
