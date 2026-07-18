@@ -1004,6 +1004,57 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
         </button>
       </div>
 
+      {/* HOW SURE? — conviction pick, radio group. Locks are gated on this. */}
+      {verdict && (
+        <div className="mt-6">
+          <div
+            id="how-sure-label"
+            className="font-mono text-xs tracking-widest text-muted-foreground mb-2"
+          >
+            HOW SURE?
+          </div>
+          <div
+            role="radiogroup"
+            aria-labelledby="how-sure-label"
+            className="flex flex-wrap gap-2"
+          >
+            {CONVICTION_CHIPS.map((chip) => {
+              const selected = confidence === chip.value;
+              return (
+                <button
+                  key={chip.value}
+                  role="radio"
+                  aria-checked={selected}
+                  tabIndex={selected || (confidence == null && chip.value === 60) ? 0 : -1}
+                  onClick={() => setConfidence(chip.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+                      e.preventDefault();
+                      const idx = CONVICTION_CHIPS.findIndex((c) => c.value === chip.value);
+                      const next = CONVICTION_CHIPS[(idx + 1) % CONVICTION_CHIPS.length];
+                      setConfidence(next.value);
+                    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+                      e.preventDefault();
+                      const idx = CONVICTION_CHIPS.findIndex((c) => c.value === chip.value);
+                      const prev =
+                        CONVICTION_CHIPS[(idx - 1 + CONVICTION_CHIPS.length) % CONVICTION_CHIPS.length];
+                      setConfidence(prev.value);
+                    }
+                  }}
+                  className={`rounded-full border px-3 py-1.5 font-mono text-xs tracking-widest transition ${
+                    selected
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                  }`}
+                >
+                  {chip.label} · {chip.value}%
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="mt-8">
         <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
           EVIDENCE — TAG WHAT YOU OBSERVED
