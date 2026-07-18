@@ -69,6 +69,10 @@ export function TopBar() {
     !junior.active &&
     !pathname.startsWith("/visit") &&
     !pathname.startsWith("/first-phone");
+  const showRankChip =
+    !pathname.startsWith("/visit") &&
+    !pathname.startsWith("/first-phone") &&
+    !pathname.startsWith("/family");
 
   useEffect(() => {
     setProfile(loadProfile());
