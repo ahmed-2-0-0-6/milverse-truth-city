@@ -600,7 +600,9 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
           >
             LIST
           </button>
+          <MapLegend />
         </div>
+
         <div className="pointer-events-auto flex items-center gap-2">
           <button
             onClick={() => flyTo(WORLD_W / 2, WORLD_H / 2, ZOOM_LEVELS[0], 500)}
