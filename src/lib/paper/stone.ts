@@ -73,7 +73,7 @@ function voiceHits(text: string): { hits: string[] } {
   return { hits };
 }
 
-export function stoneCheck(c: EditionContent, today: string = ""): StoneNote[] {
+export function stoneCheck(c: EditionContent, _today: string = ""): StoneNote[] {
   const out: StoneNote[] = [];
 
   // 1 · STOP — case-ref
