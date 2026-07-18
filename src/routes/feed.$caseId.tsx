@@ -257,7 +257,7 @@ function Brief({ scenario, onStart }: { scenario: FeedScenario; onStart: () => v
         <div className="flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-caution">
           <ShieldAlert className="h-4 w-4" /> INCOMING FORWARD · TIER {scenario.tier}
         </div>
-        <h1 className="mt-4 text-2xl font-semibold">{scenario.title}</h1>
+        <h1 data-phase-anchor="feed" tabIndex={-1} className="mt-4 text-2xl font-semibold outline-none">{scenario.title}</h1>
         <section className="mt-6">
           <div className="font-mono text-[11px] tracking-widest text-muted-foreground">
             WHO SENT IT
