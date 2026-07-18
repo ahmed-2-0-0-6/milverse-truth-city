@@ -543,9 +543,13 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
             {/* meter + tabs */}
             <div className="px-3 py-2 bg-neutral-950/80 border-b border-white/10 relative">
               <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-white/50">
-                <span className={state.meter <= 30 ? "text-destructive hud-blink" : ""}>
-                  {state.meterType === "composure" ? "COMPOSURE" : "PATIENCE"}
+                <span
+                  className={state.meter <= 30 ? "text-destructive hud-blink" : ""}
+                  aria-label={`The Line, ${currentBand.label}, ${Math.round(state.meter)}`}
+                >
+                  THE LINE · {currentBand.label}
                 </span>
+
                 <span className="flex items-center gap-1.5 tabular-nums">
                   {meterDelta !== null && (
                     <span
