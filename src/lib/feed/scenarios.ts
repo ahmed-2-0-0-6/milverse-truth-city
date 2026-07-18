@@ -5,7 +5,6 @@
 import type { InspiredByCase } from "@/lib/mirror/inspired";
 import type { CastAfterword } from "@/lib/cast";
 
-
 export type FeedTier = 1 | 2 | 3;
 export type FeedVerdict = "TRUE" | "FALSE" | "MISLEADING" | "UNVERIFIED";
 export type FeedFormat = "whatsapp" | "instagram" | "news" | "image" | "video";
@@ -74,7 +73,6 @@ export interface FeedScenario {
   /** Optional in-character aside from the recurring cast — colour only. */
   castAfterword?: CastAfterword;
 }
-
 
 export const FEED_SCENARIOS: FeedScenario[] = [
   /* ── T1 FALSE — the bank rumor ─────────────────────────────── */
@@ -157,7 +155,6 @@ export const FEED_SCENARIOS: FeedScenario[] = [
       line: "Nani ne aik nazar dekha aur bola: 'Yeh wohi purana rumour hai. Har election se pehle ghoomta hai. ATM par mat jao, chai banao.'",
     },
   },
-
 
   /* ── T2 MISLEADING — the flood photo ───────────────────────── */
   {
@@ -439,7 +436,6 @@ export const FEED_SCENARIOS: FeedScenario[] = [
     },
   },
 
-
   /* ── T2 FALSE — kidnap-van rumor ───────────────────────────── */
   {
     id: "kidnap-van",
@@ -518,7 +514,6 @@ export const FEED_SCENARIOS: FeedScenario[] = [
       line: "Nani ne voice note suna, phir mujhe sunaya: 'Yehi awaaz thi jab tumhari ammi choti thi. Naya sirf yeh WhatsApp hai. Iss aunty ko phone karo aur bolo bhejna band karein — kisi aur ke baap ko na maar dein log iss ke chakkar mein.'",
     },
   },
-
 
   /* ── T2 MISLEADING — the miracle doctor clip ──────────────── */
   {
@@ -2220,7 +2215,8 @@ const BALANCE_CASES: FeedScenario[] = [
   {
     id: "missing-person-forward",
     title: "The missing person forward",
-    teaser: "A photo of a lost child, a phone number, and 'share fast'. No way to confirm any of it.",
+    teaser:
+      "A photo of a lost child, a phone number, and 'share fast'. No way to confirm any of it.",
     tier: 2,
     verdict: "UNVERIFIED",
     format: "image",
@@ -2351,7 +2347,8 @@ const BALANCE_CASES: FeedScenario[] = [
   {
     id: "voice-note-incident",
     title: "The neighborhood voice note",
-    teaser: "A breathless voice note about an incident 'two streets over'. Nobody else has heard a thing.",
+    teaser:
+      "A breathless voice note about an incident 'two streets over'. Nobody else has heard a thing.",
     tier: 3,
     verdict: "UNVERIFIED",
     format: "whatsapp",
@@ -2410,7 +2407,8 @@ const BALANCE_CASES: FeedScenario[] = [
   {
     id: "real-stat-wrong-story",
     title: "The real number, wrong story",
-    teaser: "A genuine statistic from a genuine report — captioned to say the opposite of what the report says.",
+    teaser:
+      "A genuine statistic from a genuine report — captioned to say the opposite of what the report says.",
     tier: 3,
     verdict: "MISLEADING",
     format: "instagram",
@@ -2455,7 +2453,8 @@ const BALANCE_CASES: FeedScenario[] = [
         id: "check-date",
         label: "Check the report's date",
         tool: "check_date",
-        result: "Report is current-year. The number isn't stale — it's real. The story around it is the forgery.",
+        result:
+          "Report is current-year. The number isn't stale — it's real. The story around it is the forgery.",
       },
     ],
     truthNote:

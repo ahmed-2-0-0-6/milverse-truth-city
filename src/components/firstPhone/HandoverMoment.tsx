@@ -33,10 +33,10 @@ export function HandoverMoment({ cityName, onDone }: Props) {
 
   useEffect(() => {
     if (reduced) return;
-    const t1 = setTimeout(() => setPhase(1), 900);   // gift slides up
-    const t2 = setTimeout(() => setPhase(2), 2100);  // unwraps
-    const t3 = setTimeout(() => setPhase(3), 3600);  // boot glow
-    const t4 = setTimeout(() => setPhase(4), 5400);  // wallpaper picker
+    const t1 = setTimeout(() => setPhase(1), 900); // gift slides up
+    const t2 = setTimeout(() => setPhase(2), 2100); // unwraps
+    const t3 = setTimeout(() => setPhase(3), 3600); // boot glow
+    const t4 = setTimeout(() => setPhase(4), 5400); // wallpaper picker
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -104,9 +104,7 @@ export function HandoverMoment({ cityName, onDone }: Props) {
               </>
             )}
             {/* Boot glow */}
-            {phase === 2 && (
-              <div className="absolute inset-0 bg-white/90 animate-pulse" />
-            )}
+            {phase === 2 && <div className="absolute inset-0 bg-white/90 animate-pulse" />}
             {/* Lock screen preview */}
             {phase >= 3 && (
               <div className="absolute inset-0 flex flex-col items-center justify-center text-white drop-shadow">

@@ -190,7 +190,6 @@ function PressroomPage() {
           </p>
         </header>
 
-
         <div className="mt-4 grid md:grid-cols-[240px_minmax(0,1fr)] gap-6">
           {/* editions list */}
           <div className="space-y-1">

@@ -131,7 +131,8 @@ function PaperPage() {
               className="paper-mono text-xs inline-flex items-center gap-1 border border-current/50 px-2 py-1 rounded-sm hover:bg-black/5"
               style={{ borderColor: "var(--paper-rule)" }}
             >
-              <Printer className="h-3 w-3" /> {viewing ? "PRINT THIS EDITION" : "PRINT TODAY'S EDITION"}
+              <Printer className="h-3 w-3" />{" "}
+              {viewing ? "PRINT THIS EDITION" : "PRINT TODAY'S EDITION"}
             </button>
             {viewing ? (
               <button

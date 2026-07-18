@@ -236,7 +236,6 @@ export function TopBar() {
                               </Link>
                             </SheetClose>
                           </li>
-
                         );
                       })}
                     </ul>

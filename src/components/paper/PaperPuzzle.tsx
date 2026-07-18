@@ -76,7 +76,6 @@ export function PaperPuzzle({
         “{puzzle.clickbait}”
       </blockquote>
 
-
       <div
         className="mt-4 border border-current/40 p-3 min-h-16 rounded-sm flex flex-wrap gap-2"
         style={{ borderColor: "var(--paper-rule)" }}
@@ -116,18 +115,16 @@ export function PaperPuzzle({
       <div className="mt-4 flex items-center gap-3">
         {!revealed ? (
           <>
-            <button
-              onClick={reveal}
-              disabled={chosen.length === 0}
-              className="paper-btn-primary"
-            >
+            <button onClick={reveal} disabled={chosen.length === 0} className="paper-btn-primary">
               REVEAL HONEST HEADLINE
             </button>
-            <button onClick={reset} className="paper-mono text-[10px] tracking-[0.2em] underline decoration-dotted text-[color:var(--paper-muted)]">
+            <button
+              onClick={reset}
+              className="paper-mono text-[10px] tracking-[0.2em] underline decoration-dotted text-[color:var(--paper-muted)]"
+            >
               RESET
             </button>
           </>
-
         ) : (
           <div>
             <div

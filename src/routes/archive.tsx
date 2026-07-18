@@ -138,7 +138,6 @@ function ArchivePage() {
       />
 
       <main className="mx-auto max-w-6xl px-4 py-8">
-
         {/* SHELF TABS */}
         <div className="mb-4 flex flex-wrap gap-1 rounded-sm border border-border bg-card p-1 w-fit">
           <TabBtn

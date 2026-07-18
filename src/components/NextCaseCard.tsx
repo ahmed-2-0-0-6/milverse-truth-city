@@ -44,13 +44,7 @@ function pickNext(wing: "mirror" | "feed", currentId: string): NextCase | null {
   return n ? { wing, id: n.id, title: n.title, tier: n.tier, teaser: n.teaser } : null;
 }
 
-export function NextCaseCard({
-  wing,
-  currentId,
-}: {
-  wing: "mirror" | "feed";
-  currentId: string;
-}) {
+export function NextCaseCard({ wing, currentId }: { wing: "mirror" | "feed"; currentId: string }) {
   // Debrief renders client-side only (post-play state), so profile reads are safe.
   const next = useMemo(() => pickNext(wing, currentId), [wing, currentId]);
   if (!next) return null;

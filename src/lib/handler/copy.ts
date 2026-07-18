@@ -86,14 +86,14 @@ export function fallbackDropLine(input: {
   }
   if (correct && stake < 15)
     return pick(
-      [
-        "Right call, small bet. Back the read next time.",
-        "You knew. Next time, put weight on it.",
-      ],
+      ["Right call, small bet. Back the read next time.", "You knew. Next time, put weight on it."],
       seed,
     );
   if (correct)
-    return pick(["Clean read. On to the next.", "Called it. Move.", "Right. Log it and move."], seed);
+    return pick(
+      ["Clean read. On to the next.", "Called it. Move.", "Right. Log it and move."],
+      seed,
+    );
   if (!correct && stake >= 30)
     return pick(
       [
@@ -118,7 +118,8 @@ export function fallbackLeaderboardNudge(input: {
   seed?: number;
 }): string {
   const { percentile, seed = Date.now() } = input;
-  if (percentile == null) return "Board's still empty for you. File a few and we'll see where you stand.";
+  if (percentile == null)
+    return "Board's still empty for you. File a few and we'll see where you stand.";
   if (percentile >= 80)
     return pick(
       [

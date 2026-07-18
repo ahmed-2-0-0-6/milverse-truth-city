@@ -14,13 +14,7 @@
 // debrief, keep the sentence in the character's register. Do NOT invent
 // facts through them — cast lines are colour, not evidence.
 
-export type CastId =
-  | "baba"
-  | "ammi"
-  | "nani"
-  | "cousin-zohaib"
-  | "uncle-farooq"
-  | "uncle-tariq";
+export type CastId = "baba" | "ammi" | "nani" | "cousin-zohaib" | "uncle-farooq" | "uncle-tariq";
 
 export interface CastMember {
   id: CastId;

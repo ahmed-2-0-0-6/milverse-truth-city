@@ -624,7 +624,6 @@ function BossPlay() {
             )}
 
             <div className="border-t border-white/10 pt-4 mt-6">
-
               <div className="text-[10px] tracking-[0.4em] text-white/50 mb-2">THE DOCTRINE</div>
               <ul className="space-y-1 text-sm">
                 {DOCTRINE_RULES.map((r) => (

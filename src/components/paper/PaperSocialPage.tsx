@@ -71,7 +71,6 @@ export function PaperSocialPage({
               </button>
             ))}
           </div>
-
         ) : (
           <div className="mt-4">
             <div

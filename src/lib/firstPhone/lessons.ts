@@ -241,7 +241,8 @@ export const LESSONS: Lesson[] = [
             id: "send",
             label: "Send the code — Ali needs help",
             correct: false,
-            feedback: "That code unlocks YOUR account, not theirs. Codes never help someone else in.",
+            feedback:
+              "That code unlocks YOUR account, not theirs. Codes never help someone else in.",
           },
           {
             id: "call",
@@ -298,7 +299,8 @@ export const LESSONS: Lesson[] = [
           who: "Ammi",
           line: "Coordinator's on my speed dial. Give me five minutes before you send anything.",
         },
-        truthNote: "Outrage-first stories often turn out to be nothing — or something else entirely.",
+        truthNote:
+          "Outrage-first stories often turn out to be nothing — or something else entirely.",
       },
     ],
   },

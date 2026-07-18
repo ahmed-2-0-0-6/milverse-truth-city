@@ -359,7 +359,6 @@ function Studio() {
           </div>
         </header>
 
-
         {step === 1 && (
           <Section title="THE MASK" hint="Who is the contact pretending to be?">
             <Field label="Persona name">
