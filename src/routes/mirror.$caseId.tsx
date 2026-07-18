@@ -1163,6 +1163,10 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     };
   }, [scenario, sim, verdictRaw]);
 
+  // Capture BEFORE resolve so we can render the reveal in past tense.
+  const pendingBefore = useMemo(() => pendingRetestForCase(scenario.id), [scenario.id]);
+  const [retestResolution, setRetestResolution] = useState<RetestResolution>({ kind: "none" });
+
   const savedRef = useRef(false);
   useEffect(() => {
     if (!result || !verdictRaw || savedRef.current) return;
@@ -1181,6 +1185,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     }
     if (result.resultKind === "missed_scam") p.missedScams += 1;
     if (result.resultKind === "false_alarm") p.falseAlarms += 1;
+    const nowTs = Date.now();
     p.history.push({
       caseId: scenario.id,
       tier: scenario.tier,
@@ -1189,7 +1194,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       result: result.resultKind,
       points: result.points,
       usedVob: result.usedVob,
-      ts: Date.now(),
+      ts: nowTs,
     });
     saveProfile(p);
     const xpAfter = computeXp(p, loadUnlocked().size, p.publishedCount ?? 0);
@@ -1201,7 +1206,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       result: result.resultKind,
       points: result.points,
       probeStats: { strong: result.strong, weak: result.weak, wasted: result.wasted },
-      ts: Date.now(),
+      ts: nowTs,
     });
     // Anonymous telemetry — includes tactic tag for aggregate learning analytics.
     // Wrapped so a failed track never touches the case-completion path.
@@ -1221,7 +1226,25 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     }
     window.dispatchEvent(new Event("milverse:profile"));
     checkAndAwardBadges(p);
-  }, [result, scenario.id, scenario.tier, scenario.truth, scenario.tactic, verdictRaw]);
+
+    // "The City Checks Back" — spaced retests.
+    // 1) Resolve any pending retest that this caseId satisfies.
+    const resolution = resolveRetest(scenario.id, result.resultKind, nowTs);
+    // Only reveal if the retest was actually DUE at play-time (spec: silent
+    // close when player organically solves it before it surfaces).
+    if (
+      resolution.kind !== "none" &&
+      pendingBefore &&
+      pendingBefore.dueTs <= nowTs
+    ) {
+      setRetestResolution(resolution);
+    }
+    // 2) A fresh loss schedules its own retest (uses post-save profile so
+    //    unlockedMaxTier + latest-history are current).
+    if (result.resultKind === "missed_scam" || result.resultKind === "false_alarm") {
+      scheduleRetest(scenario.id, loadProfile(), nowTs);
+    }
+  }, [result, scenario.id, scenario.tier, scenario.truth, scenario.tactic, verdictRaw, pendingBefore]);
 
   if (!result || !verdictRaw) {
     return (
