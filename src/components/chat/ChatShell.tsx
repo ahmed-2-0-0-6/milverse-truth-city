@@ -72,7 +72,14 @@ export function ChatShell({
           {children}
         </div>
 
-        {composer && <div className={`border-t border-white/10 ${composerBg}`}>{composer}</div>}
+        {composer && (
+          <div
+            className={`border-t border-white/10 ${composerBg} sm:pb-0`}
+            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+          >
+            {composer}
+          </div>
+        )}
         {overlay}
       </div>
     </div>
