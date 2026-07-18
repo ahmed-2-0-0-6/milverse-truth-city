@@ -13,7 +13,6 @@ import { Route as WallRouteImport } from './routes/wall'
 import { Route as VisitRouteImport } from './routes/visit'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as ReviewRouteImport } from './routes/review'
-import { Route as RedHandsRouteImport } from './routes/red-hands'
 import { Route as QuickTourRouteImport } from './routes/quick-tour'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PressroomRouteImport } from './routes/pressroom'
@@ -65,11 +64,6 @@ const StudioRoute = StudioRouteImport.update({
 const ReviewRoute = ReviewRouteImport.update({
   id: '/review',
   path: '/review',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RedHandsRoute = RedHandsRouteImport.update({
-  id: '/red-hands',
-  path: '/red-hands',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QuickTourRoute = QuickTourRouteImport.update({
@@ -254,7 +248,6 @@ export interface FileRoutesByFullPath {
   '/pressroom': typeof PressroomRoute
   '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
-  '/red-hands': typeof RedHandsRoute
   '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
   '/visit': typeof VisitRoute
@@ -293,7 +286,6 @@ export interface FileRoutesByTo {
   '/pressroom': typeof PressroomRoute
   '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
-  '/red-hands': typeof RedHandsRoute
   '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
   '/visit': typeof VisitRoute
@@ -333,7 +325,6 @@ export interface FileRoutesById {
   '/pressroom': typeof PressroomRoute
   '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
-  '/red-hands': typeof RedHandsRoute
   '/review': typeof ReviewRoute
   '/studio': typeof StudioRoute
   '/visit': typeof VisitRoute
@@ -374,7 +365,6 @@ export interface FileRouteTypes {
     | '/pressroom'
     | '/profile'
     | '/quick-tour'
-    | '/red-hands'
     | '/review'
     | '/studio'
     | '/visit'
@@ -413,7 +403,6 @@ export interface FileRouteTypes {
     | '/pressroom'
     | '/profile'
     | '/quick-tour'
-    | '/red-hands'
     | '/review'
     | '/studio'
     | '/visit'
@@ -452,7 +441,6 @@ export interface FileRouteTypes {
     | '/pressroom'
     | '/profile'
     | '/quick-tour'
-    | '/red-hands'
     | '/review'
     | '/studio'
     | '/visit'
@@ -492,7 +480,6 @@ export interface RootRouteChildren {
   PressroomRoute: typeof PressroomRoute
   ProfileRoute: typeof ProfileRoute
   QuickTourRoute: typeof QuickTourRoute
-  RedHandsRoute: typeof RedHandsRoute
   ReviewRoute: typeof ReviewRoute
   StudioRoute: typeof StudioRoute
   VisitRoute: typeof VisitRoute
@@ -537,13 +524,6 @@ declare module '@tanstack/react-router' {
       path: '/review'
       fullPath: '/review'
       preLoaderRoute: typeof ReviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/red-hands': {
-      id: '/red-hands'
-      path: '/red-hands'
-      fullPath: '/red-hands'
-      preLoaderRoute: typeof RedHandsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/quick-tour': {
@@ -815,7 +795,6 @@ const rootRouteChildren: RootRouteChildren = {
   PressroomRoute: PressroomRoute,
   ProfileRoute: ProfileRoute,
   QuickTourRoute: QuickTourRoute,
-  RedHandsRoute: RedHandsRoute,
   ReviewRoute: ReviewRoute,
   StudioRoute: StudioRoute,
   VisitRoute: VisitRoute,
