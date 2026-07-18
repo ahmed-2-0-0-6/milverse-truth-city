@@ -47,25 +47,29 @@ export function HomeScreen({ state, onOpenLesson, onOpenLicense }: Props) {
   const done = state.lessonsCompleted.length;
 
   return (
-    <div className="relative flex-1 min-h-0 flex flex-col text-white" style={{ background: wp.bg }}>
+    <div
+      data-tour="wallpaper"
+      className="relative flex-1 min-h-0 flex flex-col text-white"
+      style={{ background: wp.bg }}
+    >
       <div className="absolute inset-0 bg-black/25 pointer-events-none" aria-hidden="true" />
       <div className="relative flex-1 overflow-y-auto px-4 py-5">
         <div className="mb-4 flex items-center justify-between text-white drop-shadow">
-          <div>
+          <div data-tour="path">
             <div className="font-mono text-[10px] tracking-[0.25em] opacity-80">THE PATH</div>
             <div className="text-lg font-semibold">
               {done} / {LESSONS.length} lessons
             </div>
           </div>
           {state.kidCityName && (
-            <div className="text-right">
+            <div className="text-right" data-tour="name">
               <div className="font-mono text-[10px] tracking-[0.25em] opacity-80">CITIZEN</div>
               <div className="text-sm font-medium">{state.kidCityName}</div>
             </div>
           )}
         </div>
 
-        <ul className="grid grid-cols-4 gap-3" aria-label="First Phone lessons">
+        <ul data-tour="adult" className="grid grid-cols-4 gap-3" aria-label="First Phone lessons">
           {LESSONS.map((l) => {
             const complete = state.lessonsCompleted.includes(l.n);
             const unlocked = isLessonUnlocked(state, l.n);
