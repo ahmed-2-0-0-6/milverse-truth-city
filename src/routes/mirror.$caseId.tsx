@@ -907,13 +907,15 @@ function MessageRow({
       {!isPlayer && onPin && (
         <button
           onClick={onPin}
+          aria-pressed={pinned}
+          aria-label={pinned ? "Unpin evidence" : "Pin as suspicious"}
           className={`self-end mb-1 rounded p-1 transition ${
             pinned ? "bg-caution/20 text-caution" : "text-muted-foreground hover:text-caution"
           }`}
-          aria-label="Pin as suspicious"
         >
-          <Pin className={`h-3.5 w-3.5 ${pinned ? "fill-current" : ""}`} />
+          <Pin aria-hidden="true" className={`h-3.5 w-3.5 ${pinned ? "fill-current" : ""}`} />
         </button>
+
       )}
 
       {m.kind === "voice" && m.voice ? (
