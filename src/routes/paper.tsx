@@ -23,6 +23,20 @@ import {
   readLastSeenWeek,
 } from "@/lib/paper/supplement";
 import { Newspaper, Printer, ArrowLeft } from "lucide-react";
+import { useSeason } from "@/components/season/SeasonAdvisory";
+
+/** WEATHER — one-line advisory that only prints when a season is live. */
+function PaperWeatherBox() {
+  const season = useSeason();
+  if (!season) return null;
+  return (
+    <div className="border-y-2 border-double border-black/70 my-3 px-3 py-2 flex items-baseline gap-3">
+      <span className="paper-mono text-[10px] tracking-[0.25em]">WEATHER</span>
+      <span className="paper-serif italic text-sm">{season.paperBox}</span>
+    </div>
+  );
+}
+
 
 export const Route = createFileRoute("/paper")({
   head: () => ({
