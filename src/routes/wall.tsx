@@ -3,7 +3,7 @@
 // all four district profiles. Presentation only.
 
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import { CaseStampCard, type WallCard } from "@/components/wall/CaseStampCard";
 import { loadProfile, type HistoryEntry, type DailyPlayEntry } from "@/lib/mirror/profile";
