@@ -464,8 +464,22 @@ function Sim({
           </div>
         }
       >
+        <a
+          href="#feed-composer"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-primary focus:px-3 focus:py-1 focus:text-xs focus:text-primary-foreground"
+        >
+          Skip to reply
+        </a>
         {tab === "chat" ? (
-          <div ref={scroller} className="flex-1 overflow-y-auto p-3 space-y-3">
+          <div
+            ref={scroller}
+            role="log"
+            aria-live="polite"
+            aria-relevant="additions text"
+            aria-label="Conversation messages"
+            className="flex-1 overflow-y-auto p-3 space-y-3"
+          >
+
             <FormatFrame
               format={scenario.format ?? "whatsapp"}
               senderName={scenario.sender.name}
