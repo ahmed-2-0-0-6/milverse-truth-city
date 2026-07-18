@@ -815,7 +815,10 @@ function Debrief({
         </div>
       </section>
 
+      <BoardGraded scenario={scenario} state={state} loadBearing={loadBearing} />
+
       {scenario.tacticId && <TacticStamp tacticId={scenario.tacticId} />}
+
 
       {conclusion.trim() && (
         <div className="rounded-xl border border-border bg-card p-6">
