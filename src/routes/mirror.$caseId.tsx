@@ -165,7 +165,7 @@ function CasePlay() {
             ? <ColdInterstitial scenario={scenario} onStart={() => setPhase("sim")} />
             : <Dossier scenario={scenario} onStart={() => setPhase("sim")} />
         )}
-        {phase === "verdict" && <Verdict scenario={scenario} onDone={() => setPhase("reveal")} />}
+        {phase === "verdict" && <Verdict scenario={scenario} coldMode={coldMode} onDone={() => setPhase("reveal")} />}
         {phase === "reveal" && (
           <VerdictReveal scenario={scenario} onDone={() => setPhase("debrief")} />
         )}
