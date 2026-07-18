@@ -127,12 +127,17 @@ function CityMap() {
             // never renders as an empty black void.
             <>
               <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "radial-gradient(ellipse at 50% 15%, rgba(34,211,238,0.14), transparent 55%), radial-gradient(ellipse at 20% 90%, rgba(245,185,66,0.10), transparent 60%), linear-gradient(180deg, #05080d 0%, #02040a 100%)",
-                }}
+                className={`absolute inset-0 ${night ? "city-night-lite-bg" : ""}`}
+                style={
+                  night
+                    ? undefined
+                    : {
+                        background:
+                          "radial-gradient(ellipse at 50% 15%, rgba(34,211,238,0.14), transparent 55%), radial-gradient(ellipse at 20% 90%, rgba(245,185,66,0.10), transparent 60%), linear-gradient(180deg, #05080d 0%, #02040a 100%)",
+                      }
+                }
               />
+
               <div
                 className="absolute inset-0 opacity-[0.06]"
                 style={{
