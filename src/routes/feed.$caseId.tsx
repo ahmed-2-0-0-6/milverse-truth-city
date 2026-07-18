@@ -377,6 +377,8 @@ function Sim({
     <>
       <TacticFlash tacticId={tacticFlash ?? null} onDone={() => setTacticFlash(null)} />
       <ChatShell
+        logRegion={false}
+
         header={
           <>
             <ChatHeader
