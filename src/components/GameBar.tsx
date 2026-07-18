@@ -6,11 +6,12 @@
 
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Flame } from "lucide-react";
+import { Flame, Heart } from "lucide-react";
 import { loadProfile } from "@/lib/mirror/profile";
 import { loadUnlocked } from "@/lib/manual/state";
 import { readDailyStatus } from "@/lib/daily/profile";
 import { computeXp, rankFromXp, RANKS } from "@/lib/ranks";
+import { getActiveShift, playedToday, type ActiveShift } from "@/lib/shift/state";
 
 interface Snapshot {
   xp: number;
