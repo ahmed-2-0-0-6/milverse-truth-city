@@ -132,7 +132,7 @@ function CharterPage() {
                 >
                   {a.roman}.
                 </div>
-                <Marginalia note={a.note as string} side={a.side}>
+                <Marginalia note={a.note} side={a.side}>
                   <div
                     className="text-xl sm:text-2xl font-semibold tracking-wide text-foreground"
                     style={{
