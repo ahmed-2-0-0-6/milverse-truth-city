@@ -64,6 +64,8 @@ function FeedPlay() {
   const [verdict, setVerdict] = useState<FeedVerdict | null>(null);
   const [finalReply, setFinalReply] = useState("");
   const [conclusion, setConclusion] = useState("");
+  const [loadBearing, setLoadBearing] = useState<string[]>([]);
+
 
   useEffect(() => {
     track("case_start", {
