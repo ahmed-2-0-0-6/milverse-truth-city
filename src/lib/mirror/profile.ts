@@ -81,30 +81,54 @@ function newProfile(): TrustProfile {
 
 export function loadProfile(): TrustProfile {
   if (typeof window === "undefined") return newProfile();
-  try {
-    let raw = localStorage.getItem(KEY);
-    if (!raw) raw = localStorage.getItem(OLD_KEY);
-    if (!raw) {
-      const p = newProfile();
-      localStorage.setItem(KEY, JSON.stringify(p));
-      return p;
-    }
-    const parsed = JSON.parse(raw) as Partial<TrustProfile>;
-    return {
-      ...newProfile(),
-      ...parsed,
-      history: parsed.history ?? [],
-      dailyPlays: parsed.dailyPlays ?? [],
-    };
-  } catch {
-    return newProfile();
-  }
+// Minimal shape check: what the merge below already assumes.
+function isTrustProfileShape(v: unknown): v is Partial<TrustProfile> {
+  if (!v || typeof v !== "object") return false;
+  const o = v as Record<string, unknown>;
+  if (o.history !== undefined && !Array.isArray(o.history)) return false;
+  if (o.dailyPlays !== undefined && !Array.isArray(o.dailyPlays)) return false;
+  return true;
 }
 
-export function saveProfile(p: TrustProfile) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(KEY, JSON.stringify(p));
+function mergeParsed(parsed: Partial<TrustProfile>): TrustProfile {
+  return {
+    ...newProfile(),
+    ...parsed,
+    history: parsed.history ?? [],
+    dailyPlays: parsed.dailyPlays ?? [],
+  };
 }
+
+export function loadProfile(): TrustProfile {
+  if (typeof window === "undefined") return newProfile();
+  let read = readStore<Partial<TrustProfile>>(KEY, isTrustProfileShape);
+  if (read === null) {
+    // Fall back to v1 if v2 is truly missing.
+    read = readStore<Partial<TrustProfile>>(OLD_KEY, isTrustProfileShape);
+  }
+  if (read === "corrupt") {
+    // Try to recover from quarantine — a partial write may still be intact.
+    const rec = recoverStore<Partial<TrustProfile>>(KEY, isTrustProfileShape);
+    if (rec) return mergeParsed(rec);
+    // Fall back to a fresh in-memory profile. Do NOT eagerly overwrite —
+    // the quarantine copy remains on disk for manual recovery, and the
+    // fresh object only reaches storage on the next natural save.
+    return newProfile();
+  }
+  if (read === null) {
+    // Truly missing (never written). Eager write preserves prior behavior.
+    const p = newProfile();
+    writeStore(KEY, p);
+    return p;
+  }
+  return mergeParsed(read);
+}
+
+export function saveProfile(p: TrustProfile): boolean {
+  if (typeof window === "undefined") return false;
+  return writeStore(KEY, p);
+}
+
 
 /** Additive XP-layer helper — increments Studio publish counter and pings listeners. */
 export function incrementPublishedCount(): number {
