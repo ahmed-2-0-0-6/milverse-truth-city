@@ -733,13 +733,16 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
             )}
             <div className="flex gap-2">
               <input
+                id="mirror-composer"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
                 placeholder={ended ? "Chat ended — make your call." : skin.placeholder}
                 disabled={ended || typing}
+                aria-label="Type your reply"
                 className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-sm text-white outline-none focus:border-primary disabled:opacity-50"
               />
+
               <button
                 onClick={send}
                 disabled={ended || typing || !input.trim()}
