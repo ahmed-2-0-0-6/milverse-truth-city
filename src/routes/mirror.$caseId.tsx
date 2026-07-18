@@ -3212,3 +3212,174 @@ function ColdDebrief({ scenario }: { scenario: Scenario }) {
     </main>
   );
 }
+
+/* ────────────────────────────── THE MASK ────────────────────────────── */
+
+function MaskInterstitial({ scenario, onStart }: { scenario: Scenario; onStart: () => void }) {
+  return (
+    <main className="mx-auto max-w-2xl px-4 py-10">
+      <div className="rounded-xl border-2 border-primary/40 bg-primary/5 p-6">
+        <div className="font-mono text-[10px] tracking-[0.3em] text-primary">
+          THE MASK · CHALLENGE
+        </div>
+        <h1
+          data-phase-anchor="mirror"
+          tabIndex={-1}
+          className="mt-3 text-2xl font-semibold outline-none"
+        >
+          Someone forged this for you.
+        </h1>
+        <p className="mt-3 text-sm leading-relaxed text-foreground/90">
+          Four minutes. Every fact they wrote, every dodge they planned — aimed at you. Call it:
+          real or mask.
+        </p>
+        <div className="mt-4 font-mono text-[10px] tracking-[0.3em] text-muted-foreground">
+          CHALLENGE — SCORED ON ITS OWN CARD, NOT YOUR RECORD.
+        </div>
+      </div>
+      <button
+        onClick={onStart}
+        className="mt-6 w-full min-h-[48px] rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground transition-transform hover:scale-[1.01]"
+      >
+        PICK UP THE LINE
+      </button>
+    </main>
+  );
+}
+
+function MaskDebrief({ scenario, shareCode }: { scenario: Scenario; shareCode: string }) {
+  const verdictRaw = useMemo(() => {
+    try {
+      const raw = sessionStorage.getItem(VERDICT_KEY);
+      return raw ? (JSON.parse(raw) as { verdict: "REAL" | "FAKE" }) : null;
+    } catch { return null; }
+  }, []);
+  const startTs = useMemo(() => {
+    try {
+      const raw = sessionStorage.getItem(MASK_START_KEY);
+      return raw ? Number(raw) : null;
+    } catch { return null; }
+  }, []);
+  const truthLabel: "REAL" | "FAKE" = scenario.truth === "REAL" ? "REAL" : "FAKE";
+  const cleared = verdictRaw?.verdict === truthLabel;
+  const elapsedRaw = startTs ? Math.round((Date.now() - startTs) / 1000) : DRILL_SECONDS;
+  const elapsedSeconds = Math.min(elapsedRaw, DRILL_SECONDS);
+
+  // Log ONCE. Drill fence: only writes milverse.mask.plays.v1.
+  const savedRef = useRef(false);
+  useEffect(() => {
+    if (savedRef.current || !verdictRaw) return;
+    savedRef.current = true;
+    saveMaskPlay({
+      caseId: scenario.id,
+      shareCode,
+      verdict: verdictRaw.verdict,
+      correct: cleared,
+      seconds: elapsedSeconds,
+      ts: Date.now(),
+    });
+    try { sessionStorage.removeItem(MASK_START_KEY); } catch { /* noop */ }
+  }, [cleared, elapsedSeconds, scenario.id, shareCode, verdictRaw]);
+
+  if (!verdictRaw) {
+    return (
+      <main className="mx-auto max-w-2xl px-4 py-10 text-muted-foreground">
+        No verdict on record.{" "}
+        <Link to="/mirror" className="text-primary underline">Back to the desk</Link>
+      </main>
+    );
+  }
+
+  // Result classification.
+  let title: string;
+  let sub: string;
+  let tokenVerdict: TokenVerdict;
+  if (cleared) {
+    title = `MASK TORN OFF · ${formatDrillTime(elapsedSeconds)}`;
+    sub = "THE MARK READ IT COLD.";
+    tokenVerdict = "C";
+  } else if (scenario.truth === "IMPOSTER") {
+    title = `FOOLED · ${formatDrillTime(elapsedSeconds)}`;
+    sub = "THE DESIGNER TOOK THE ROUND.";
+    tokenVerdict = "F";
+  } else {
+    title = `PLAYED BY THE TRUTH · ${formatDrillTime(elapsedSeconds)}`;
+    sub = "It was all real. Paranoia was the trap.";
+    tokenVerdict = "T";
+  }
+  const token = encodeToken(shareCode, tokenVerdict, elapsedSeconds);
+  const siteUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const shareText = `${title} · your move: ${siteUrl} · ${token}`;
+
+  async function share() {
+    try {
+      if (typeof navigator !== "undefined" && "share" in navigator) {
+        await (navigator as Navigator & { share: (d: ShareData) => Promise<void> }).share({ text: shareText });
+        return;
+      }
+    } catch { /* fallthrough to clipboard */ }
+    try {
+      await navigator.clipboard.writeText(shareText);
+      alert("Copied. Paste it anywhere.");
+    } catch {
+      // final fallback: no-op
+    }
+  }
+
+  async function reportMask() {
+    try {
+      const mod = await import("@/lib/mask/plays");
+      mod.burnMask(shareCode);
+      alert("Mask burned. The desk has it.");
+    } catch { /* noop */ }
+  }
+
+  return (
+    <main className="mx-auto max-w-2xl px-4 py-8 space-y-6">
+      <div
+        role="img"
+        aria-label={`${title}. ${sub} Code ${shareCode}.`}
+        className={`rounded-xl border-2 p-6 ${cleared ? "border-primary/50 bg-primary/5 text-primary" : "border-destructive/50 bg-destructive/5 text-destructive"}`}
+      >
+        <div className="font-mono text-[10px] tracking-[0.3em] opacity-80">
+          THE MASK · RESULT CARD
+        </div>
+        <h1 className="mt-3 text-3xl font-bold">{title}</h1>
+        <p className="mt-3 text-lg">{sub}</p>
+        <div className="mt-6 font-mono text-[10px] tracking-widest opacity-70">
+          CODE {shareCode}
+        </div>
+      </div>
+
+      <button
+        onClick={share}
+        className="w-full min-h-[48px] rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground hover:opacity-90"
+      >
+        SEND THE CARD →
+      </button>
+
+      <Link
+        to="/studio"
+        search={{ mode: "mask" } as never}
+        className="block w-full min-h-[56px] rounded-md border-2 border-caution/60 bg-caution/10 py-4 text-center font-mono text-base tracking-widest text-caution hover:bg-caution/20"
+      >
+        FORGE YOUR REVENGE →
+      </Link>
+
+      <div className="flex gap-3 pt-2">
+        <Link
+          to="/mirror"
+          className="flex-1 rounded-md border border-border py-3 text-center font-mono text-[11px] tracking-widest text-muted-foreground hover:bg-accent"
+        >
+          BACK TO THE DESK
+        </Link>
+        <button
+          onClick={reportMask}
+          className="flex-1 rounded-md border border-border py-3 font-mono text-[11px] tracking-widest text-muted-foreground hover:bg-accent"
+        >
+          REPORT THIS MASK
+        </button>
+      </div>
+    </main>
+  );
+}
