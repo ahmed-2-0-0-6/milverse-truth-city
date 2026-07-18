@@ -359,6 +359,9 @@ function PostPlayState({
       <div>
         <div className="stencil text-[10px] tracking-widest text-primary mb-2">THE RECEIPT</div>
         <ReceiptCard data={receipt} />
+        <div className="mt-3">
+          <XpDeltaLine />
+        </div>
       </div>
 
       <button
