@@ -164,24 +164,71 @@ function TourChrome({
 
 function Beat0Arrival({ onNext }: { onNext: () => void }) {
   return (
-    <section className="mt-10 rounded-lg border border-white/10 bg-neutral-950 p-6 text-center sm:mt-16 sm:p-10">
-      <div className="stencil text-[10px] tracking-[0.4em] text-primary">MILVERSE</div>
-      <h1 className="mt-3 text-2xl font-semibold sm:text-4xl">A city that trains trust.</h1>
-      <p className="mx-auto mt-4 max-w-md text-sm text-white/70 sm:text-base">
-        You have 3 minutes. Five beats. Real interaction — you'll play, not watch.
-        <br />
-        <span className="text-primary">Let's get you scammed.</span>
-      </p>
-      <div className="mt-6 flex items-center justify-center gap-2 stencil text-[10px] tracking-[0.25em] text-white/40">
-        <Keyboard className="h-3.5 w-3.5" /> KEYBOARD OK · ESC LEAVES · SKIP ANY TIME
+    <section className="relative mt-10 overflow-hidden rounded-lg border border-white/10 text-center sm:mt-16">
+      {/* night-arrival backdrop: runway glow + skyline bars, pure CSS */}
+      <div
+        className="absolute inset-0"
+        aria-hidden
+        style={{
+          background:
+            "radial-gradient(70% 100% at 50% 115%, oklch(0.82 0.14 195 / 0.22), transparent 60%)," +
+            "radial-gradient(40% 60% at 85% -10%, oklch(0.8 0.14 80 / 0.1), transparent 70%)," +
+            "linear-gradient(180deg, #05070c 0%, #02040a 100%)",
+        }}
+      />
+      {/* skyline silhouette — repeating vertical bars along the bottom */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-24 opacity-60 pointer-events-none"
+        aria-hidden
+        style={{
+          background:
+            "repeating-linear-gradient(90deg, oklch(0.1 0.02 255) 0 22px, transparent 22px 30px, oklch(0.12 0.02 255) 30px 58px, transparent 58px 66px)",
+          maskImage: "linear-gradient(0deg, black 55%, transparent 100%)",
+        }}
+      />
+      {/* lit windows */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-20 opacity-30 pointer-events-none"
+        aria-hidden
+        style={{
+          backgroundImage:
+            "radial-gradient(oklch(0.82 0.14 195 / 0.8) 1px, transparent 1px), radial-gradient(oklch(0.8 0.14 80 / 0.7) 1px, transparent 1px)",
+          backgroundSize: "23px 17px, 37px 23px",
+          backgroundPosition: "3px 5px, 14px 11px",
+          maskImage: "linear-gradient(0deg, black 45%, transparent 95%)",
+        }}
+      />
+      <div className="scan-sweep absolute inset-0 pointer-events-none" aria-hidden />
+
+      <div className="relative p-6 sm:p-12">
+        <div className="stencil text-[10px] tracking-[0.4em] text-primary hud-blink">
+          MILVERSE · NOW ARRIVING
+        </div>
+        <h1
+          className="mt-3 text-4xl sm:text-6xl font-black tracking-tight leading-[0.9]"
+          style={{
+            fontFamily: '"Bebas Neue", "Space Grotesk", sans-serif',
+            textShadow: "0 0 28px oklch(0.82 0.14 195 / 0.45)",
+          }}
+        >
+          A CITY THAT TRAINS TRUST.
+        </h1>
+        <p className="mx-auto mt-4 max-w-md text-sm text-white/70 sm:text-base">
+          You have 3 minutes. Five beats. Real interaction — you'll play, not watch.
+          <br />
+          <span className="text-primary">Let's get you scammed.</span>
+        </p>
+        <div className="mt-6 flex items-center justify-center gap-2 stencil text-[10px] tracking-[0.25em] text-white/40">
+          <Keyboard className="h-3.5 w-3.5" /> KEYBOARD OK · ESC LEAVES · SKIP ANY TIME
+        </div>
+        <button
+          autoFocus
+          onClick={onNext}
+          className="cta-glow mt-8 rounded-md bg-primary px-6 py-3 stencil text-xs tracking-[0.3em] text-primary-foreground hover:opacity-90"
+        >
+          BEGIN THE VISIT <ArrowRight className="ml-1 inline h-3.5 w-3.5" />
+        </button>
       </div>
-      <button
-        autoFocus
-        onClick={onNext}
-        className="mt-8 rounded-md bg-primary px-6 py-3 stencil text-xs tracking-[0.3em] text-primary-foreground hover:opacity-90"
-      >
-        BEGIN THE VISIT <ArrowRight className="ml-1 inline h-3.5 w-3.5" />
-      </button>
     </section>
   );
 }
