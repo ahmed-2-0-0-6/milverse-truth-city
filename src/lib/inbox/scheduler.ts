@@ -28,6 +28,14 @@ export interface InboxItem {
   voicemailText?: string;
   /** Present on "call" items — passed through to VoiceNote for TTS voice. */
   speakerVoiceDesc?: string;
+  /** Present on "paper" items — the edition's stable id. */
+  editionId?: string;
+  /** Present on "paper" items — issue number for the date line. */
+  editionNumber?: number;
+  /** Present on "paper" items — YYYY-MM-DD from the edition. */
+  editionDate?: string;
+  /** Present on "paper" items — front-page headline for masthead cards. */
+  headline?: string;
 }
 
 /** Stagger, in seconds, from page-load until each arrival fires. */
