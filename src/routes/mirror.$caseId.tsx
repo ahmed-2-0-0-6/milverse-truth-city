@@ -480,10 +480,22 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
 
   function togglePin(idx: number) {
     setPins((prev) => {
-      if (prev.includes(idx)) return prev.filter((i) => i !== idx);
+      if (prev.includes(idx)) {
+        setPinTags((tags) => {
+          if (!(idx in tags)) return tags;
+          const next = { ...tags };
+          delete next[idx];
+          return next;
+        });
+        return prev.filter((i) => i !== idx);
+      }
       if (prev.length >= 5) return prev;
       return [...prev, idx];
     });
+  }
+
+  function setPinTag(idx: number, ref: string) {
+    setPinTags((prev) => ({ ...prev, [idx]: ref }));
   }
 
   function useVob(method: VobMethod) {
