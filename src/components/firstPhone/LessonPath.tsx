@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LESSONS } from "@/lib/firstPhone/lessons";
 import { loadFirstPhone, markLessonComplete, type FirstPhoneState } from "@/lib/firstPhone/profile";
 import { logPilotEntry } from "@/lib/pilot";
@@ -7,6 +7,7 @@ import { HomeScreen } from "./HomeScreen";
 import { JuniorLesson } from "./JuniorLesson";
 import { LessonCleared } from "./LessonCleared";
 import { LockScreen } from "./LockScreen";
+import { FirstBoot } from "./FirstBoot";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChevronLeft } from "lucide-react";
 
