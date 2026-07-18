@@ -1347,3 +1347,52 @@ function StationDialog({ station, onClose }: { station: Station | null; onClose:
     </Dialog>
   );
 }
+
+/* ── WHAT IS ALL THIS? — plain-register legend of every public door. */
+function MapLegend() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="px-2 py-1 rounded-sm text-muted-foreground hover:text-foreground"
+        aria-label="What is all this? Open district legend"
+      >
+        WHAT IS THIS?
+      </button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="stencil tracking-widest">WHAT IS ALL THIS?</DialogTitle>
+            <DialogDescription>
+              Every district in one glance. Tap a row to walk in.
+            </DialogDescription>
+          </DialogHeader>
+          <ul className="mt-2 divide-y divide-border" role="list">
+            {SIGN_ORDER.map((id) => {
+              const s = SIGNAGE[id];
+              if (!s?.to) return null;
+              return (
+                <li key={id}>
+                  <Link
+                    to={s.to as "/mirror"}
+                    onClick={() => setOpen(false)}
+                    className="flex items-baseline justify-between gap-3 py-2.5 hover:bg-primary/5 px-1 rounded-sm"
+                    aria-label={`${s.label ?? id}, ${s.sub}`}
+                  >
+                    <span className="stencil text-[11px] tracking-widest text-foreground min-w-[7.5rem]">
+                      {(s.label ?? id).toUpperCase()}
+                    </span>
+                    <span className="flex-1 text-[12px] text-muted-foreground text-right">
+                      {s.sub}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
