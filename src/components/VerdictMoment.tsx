@@ -186,30 +186,34 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone, 
           {(stage === "stamp" || stage === "reveal" || stage === "trail") && (
             <>
               <div
-                className="verdict-stamp absolute right-6 bottom-6 rotate-[-8deg] border-[3px] px-5 py-2 tracking-[0.14em] text-3xl font-black"
+                className={`${quiet ? "stamp-quiet" : "verdict-stamp"} absolute right-6 bottom-6 rotate-[-8deg] border-[3px] px-5 py-2 tracking-[0.14em] text-3xl font-black`}
                 style={{
                   color: `rgb(${grade.rgb})`,
                   borderColor: `rgb(${grade.rgb})`,
                   fontFamily: '"Bebas Neue", sans-serif',
-                  textShadow: `0 0 18px rgba(${grade.rgb},0.55)`,
-                  boxShadow: `inset 0 0 0 1px rgba(${grade.rgb},0.15), 0 12px 40px -8px rgba(${grade.rgb},0.35)`,
+                  textShadow: quiet ? "none" : `0 0 18px rgba(${grade.rgb},0.55)`,
+                  boxShadow: quiet
+                    ? `inset 0 0 0 1px rgba(${grade.rgb},0.15)`
+                    : `inset 0 0 0 1px rgba(${grade.rgb},0.15), 0 12px 40px -8px rgba(${grade.rgb},0.35)`,
                 }}
               >
                 {stampLabel}
               </div>
-              {/* Ink spread */}
-              <div
-                className="ink-spread absolute right-6 bottom-6 h-24 w-24 rounded-full pointer-events-none"
-                aria-hidden
-                style={{
-                  background: `radial-gradient(circle, rgba(${grade.rgb},0.55), transparent 70%)`,
-                }}
-              />
+              {/* Ink spread — standard register only */}
+              {!quiet && (
+                <div
+                  className="ink-spread absolute right-6 bottom-6 h-24 w-24 rounded-full pointer-events-none"
+                  aria-hidden
+                  style={{
+                    background: `radial-gradient(circle, rgba(${grade.rgb},0.55), transparent 70%)`,
+                  }}
+                />
+              )}
             </>
           )}
 
-          {/* Paper dust */}
-          {(stage === "stamp" || stage === "reveal") &&
+          {/* Paper dust — standard register only */}
+          {!quiet && (stage === "stamp" || stage === "reveal") &&
             dust.map((p, i) => (
               <span
                 key={i}
