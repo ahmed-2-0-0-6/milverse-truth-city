@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { Bell, Phone, Newspaper } from "lucide-react";
 import {
   Sheet,
@@ -11,7 +12,9 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { loadInbox, markOpened, markPaperRead } from "@/lib/inbox/profile";
-import { todaysArrivals, type InboxItem } from "@/lib/inbox/scheduler";
+import { todaysArrivals, morningEdition, type InboxItem } from "@/lib/inbox/scheduler";
+import { getLatestEdition } from "@/lib/paper.functions";
+import type { Edition } from "@/lib/paper/types";
 import { platformStyle } from "./platform-style";
 import { VoicemailSheet } from "./VoicemailSheet";
 
@@ -19,8 +22,10 @@ export function InboxTray() {
   const [open, setOpen] = useState(false);
   const [tick, setTick] = useState(0);
   const [allItems, setAllItems] = useState<InboxItem[]>([]);
+  const [edition, setEdition] = useState<Edition | null>(null);
   const [voicemail, setVoicemail] = useState<InboxItem | null>(null);
   const navigate = useNavigate();
+  const fetchEdition = useServerFn(getLatestEdition);
 
   useEffect(() => {
     setAllItems(todaysArrivals());
@@ -36,19 +41,39 @@ export function InboxTray() {
     };
   }, []);
 
+  useEffect(() => {
+    let alive = true;
+    fetchEdition()
+      .then((row) => {
+        if (alive) setEdition((row as unknown as Edition | null) ?? null);
+      })
+      .catch(() => {
+        /* No edition → paper row simply won't appear. */
+      });
+    return () => {
+      alive = false;
+    };
+  }, [fetchEdition]);
+
   const { rows, unread } = useMemo(() => {
     // Reference tick so this recomputes when inbox events fire.
     void tick;
     const p = loadInbox();
     const arrived = new Set(p.arrived);
     const opened = new Set(p.opened);
-    const rows = allItems
+    const paper = morningEdition(new Date(), edition);
+    const merged = paper ? [...allItems.filter((x) => x.type !== "paper"), paper] : allItems;
+    const rows = merged
       .filter((it) => arrived.has(it.id))
-      .map((it) => ({ ...it, read: opened.has(it.id) }))
+      .map((it) => ({
+        ...it,
+        // Paper "read" state is bound to paperRead, not the generic opened set.
+        read: it.type === "paper" ? p.paperRead === it.editionId : opened.has(it.id),
+      }))
       .reverse();
     const unread = rows.filter((r) => !r.read).length;
     return { rows, unread };
-  }, [allItems, tick]);
+  }, [allItems, edition, tick]);
 
   const badge = unread > 9 ? "9+" : String(unread);
 
@@ -57,6 +82,13 @@ export function InboxTray() {
       markOpened(it.id);
       setOpen(false);
       setVoicemail(it);
+      return;
+    }
+    if (it.type === "paper" && it.editionId) {
+      markOpened(it.id);
+      markPaperRead(it.editionId);
+      setOpen(false);
+      navigate({ to: "/paper" });
       return;
     }
     markOpened(it.id);
