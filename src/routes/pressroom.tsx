@@ -111,11 +111,22 @@ function PressroomPage() {
       const r = await listFn({ data: { passcode } });
       setRows((r as { rows: Row[] }).rows);
       setStatus("published");
-      alert("Published. It's the live paper now.");
+      const tail = advisories > 0 ? ` · ${advisories} notes rode along.` : "";
+      alert(`Published. It's the live paper now.${tail}`);
     } catch (e) {
       setErr((e as Error).message);
     }
   }
+
+  // THE STONE — deterministic pre-flight lint. Recomputed on content/date change.
+  const today = new Date().toISOString().slice(0, 10);
+  const stone: StoneNote[] = useMemo(
+    () => (content ? stoneCheckWithDate(content, date, today) : []),
+    [content, date, today],
+  );
+  const stops = countStops(stone);
+  const advisories = countAdvisories(stone);
+
 
   if (!authed) {
     return (
