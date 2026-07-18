@@ -848,7 +848,7 @@ function Debrief({
           {outcome.result.replace("_", " ").toUpperCase()} · {outcome.points > 0 ? "+" : ""}
           {outcome.points}
         </div>
-        <div className="mt-1 text-xl font-semibold">{outcome.headline}</div>
+        <h1 data-phase-anchor="feed" tabIndex={-1} className="mt-1 text-xl font-semibold outline-none">{outcome.headline}</h1>
         <p className="mt-2 text-sm">{outcome.detail}</p>
         <div className="mt-3">
           <XpDeltaLine />
