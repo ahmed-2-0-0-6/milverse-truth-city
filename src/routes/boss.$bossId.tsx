@@ -382,7 +382,7 @@ function BossPlay() {
           </>
         }
         composer={
-          <div className="p-3 space-y-3 max-h-[45%] overflow-y-auto">
+          <div className="p-3 space-y-3">
             {/* Fact-check chips */}
             <div>
               <div className="text-[10px] tracking-[0.3em] text-white/40 mb-1.5 font-mono">
