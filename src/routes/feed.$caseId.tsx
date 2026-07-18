@@ -790,7 +790,7 @@ function VerdictScreen({
           onChange={(e) => setConclusion(e.target.value.slice(0, 300))}
           rows={2}
           placeholder="In one line: why this verdict? (max 300 chars)"
-          className="w-full rounded-md border border-input bg-background p-3 text-sm outline-none focus:border-primary"
+          className="w-full rounded-md border border-input bg-background p-3 text-base outline-none focus:border-primary sm:text-sm"
         />
         <div className="mt-1 text-right font-mono text-[10px] text-muted-foreground">
           {conclusion.length}/300
