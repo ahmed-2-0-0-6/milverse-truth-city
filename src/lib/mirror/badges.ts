@@ -1,6 +1,8 @@
 // MILVERSE — Badges. Awarded from City Hall / debrief; surfaced via a toast event.
 
 import type { TrustProfile } from "./profile";
+import { readStore, recoverStore, writeStore } from "@/lib/storage";
+
 
 export interface BadgeDef {
   id: string;
