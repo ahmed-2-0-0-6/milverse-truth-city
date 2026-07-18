@@ -23,8 +23,9 @@ export const SIGNAGE: Record<string, SignEntry> = {
   mirror: {
     label: "The Mirror",
     to: "/mirror",
-    sub: "Catch the scammer sliding into your DMs",
+    sub: "Counter-scam desk. Pick up, play them, burn them",
   },
+
   feed: {
     label: "The Feed",
     to: "/feed",

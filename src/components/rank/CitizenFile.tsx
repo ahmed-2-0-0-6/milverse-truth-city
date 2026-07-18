@@ -14,6 +14,8 @@ import { rankFromXp } from "@/lib/ranks";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 import { getActiveGroup } from "@/lib/pilot";
 import { computeConviction } from "@/lib/mirror/conviction";
+import { lifetimeStolenSeconds, formatHM } from "@/lib/mirror/timeStolen";
+
 
 interface Props {
   open: boolean;
@@ -44,6 +46,8 @@ export function CitizenFile({ open, onOpenChange, profile, xp, manualUnlocks }: 
   const missed = profile?.missedScams ?? 0;
   const falseAlarms = profile?.falseAlarms ?? 0;
   const streak = profile?.dailyStreak ?? 0;
+  const timeStolen = lifetimeStolenSeconds(profile?.history);
+
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -104,14 +108,16 @@ export function CitizenFile({ open, onOpenChange, profile, xp, manualUnlocks }: 
           <div className="stencil text-[10px] text-muted-foreground mb-3">THE LEDGER</div>
           <dl className="space-y-1.5 font-mono text-xs">
             <Row label="Cases played" value={casesPlayed} />
-            <Row label="Correct verdicts" value={correct} />
+            <Row label="Takedowns" value={correct} />
             <Row label="Missed scams" value={missed} />
             <Row label="False alarms" value={falseAlarms} />
             <Row label="Daily streak" value={streak} />
+            <Row label="Time stolen from scammers" value={formatHM(timeStolen)} />
             <Row
               label="Manual entries"
               value={`${manualUnlocks} / ${MANUAL_ENTRIES.length}`}
             />
+
           </dl>
           <p className="mt-3 text-[11px] text-muted-foreground italic">
             Both columns lose. Gullibility and paranoia are the same bill.

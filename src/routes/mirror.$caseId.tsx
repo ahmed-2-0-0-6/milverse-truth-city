@@ -20,6 +20,8 @@ import { generateContactReply } from "@/lib/mirror/ai.functions";
 import { ARTIFACT_LABEL } from "@/lib/mirror/voice";
 import { fakeNumberForCase } from "@/lib/chat/fakeNumber";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
+import { caseSeconds, formatMS } from "@/lib/mirror/timeStolen";
+
 import { computeXp } from "@/lib/ranks";
 import { loadUnlocked } from "@/lib/manual/state";
 import { writeXpDelta } from "@/lib/rank/xpSnapshot";
@@ -299,17 +301,21 @@ function VerdictReveal({ scenario, onDone }: { scenario: Scenario; onDone: () =>
     : scenario.truth === "IMPOSTER"
       ? "missed_scam"
       : "false_alarm";
+  // TAKEDOWN — imposter caught cleanly gets the ceremony stamp.
+  const stampLabel =
+    correct && scenario.truth === "IMPOSTER" ? "TAKEDOWN" : (raw?.verdict ?? "UNVERIFIED");
   return (
     <VerdictMoment
       caseTitle={scenario.title || `Case ${scenario.id}`}
       caseId={scenario.id}
-      stampLabel={raw?.verdict ?? "UNVERIFIED"}
+      stampLabel={stampLabel}
       outcome={outcome}
       onDone={onDone}
       register={scenario.isSurvivorStory ? "quiet" : "standard"}
     />
   );
 }
+
 
 /* ─────────────────────────── DOSSIER ─────────────────────────── */
 
@@ -325,9 +331,12 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
 
       <div className="mt-6 rounded-xl border border-caution/30 bg-caution/5 p-6">
         <div className="flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-caution">
-          <FileText className="h-4 w-4" /> CASE DOSSIER · TIER {scenario.tier}
+          <FileText className="h-4 w-4" /> ASSIGNMENT · TIER {scenario.tier}
         </div>
         <h1 data-phase-anchor="mirror" tabIndex={-1} className="mt-4 text-2xl font-semibold outline-none">{scenario.title}</h1>
+        <p className="mt-3 font-mono text-[11px] tracking-wide text-muted-foreground italic">
+          This number's been working the district. The desk routed it to you.
+        </p>
 
         {/* THE CLAIM — bordered claim card. */}
         <section className="mt-6">
@@ -341,6 +350,7 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
             <p className="text-sm leading-relaxed">{scenario.dossier.contactClaim}</p>
           </div>
         </section>
+
 
         {/* KNOWN — numbered reference cards (K1..). */}
         <section className="mt-6">
@@ -1098,7 +1108,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               >
                 {handMode === "hand" ? "TYPE INSTEAD ⌨" : "SHOW THE HAND ▤"}
               </button>
-              <span>{messages.filter((m) => m.role === "player").length} SENT</span>
+              <span title="Every minute they burn on you is a minute stolen from a real victim.">{messages.filter((m) => m.role === "player").length} SENT · LINE HELD</span>
             </div>
 
           </div>
@@ -2103,6 +2113,8 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     if (result.resultKind === "missed_scam") p.missedScams += 1;
     if (result.resultKind === "false_alarm") p.falseAlarms += 1;
     const nowTs = Date.now();
+    // Time held on the line — derived from message ts range; clamped to 30m in helper.
+    const heldSecs = caseSeconds(sim?.messages ?? []);
     p.history.push({
       caseId: scenario.id,
       tier: scenario.tier,
@@ -2112,8 +2124,10 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       points: result.points,
       usedVob: result.usedVob,
       confidence: verdictRaw.confidence,
+      timeHeld: heldSecs ?? undefined,
       ts: nowTs,
     });
+
     saveProfile(p);
     // The Tape — local-only annotated transcript, keyed to the same ts the
     // wall row uses so /wall can attach a "TAPE ON FILE →" affordance.
@@ -2327,6 +2341,25 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           {result.points} pts
         </div>
         {(() => {
+          // LINE HELD — plain "CALL TIME" wording for real cases; steal-time
+          // framing reserved for imposter runs to keep register honest.
+          const held = caseSeconds(sim?.messages ?? []);
+          if (held == null) return null;
+          const label = scenario.truth === "IMPOSTER" ? "LINE HELD" : "CALL TIME";
+          const sub =
+            scenario.truth === "IMPOSTER"
+              ? "Time stolen from a real victim."
+              : "Time on the line.";
+          return (
+            <div className="mt-3 flex items-baseline gap-3 font-mono text-xs tracking-[0.2em] opacity-90">
+              <span>{label}</span>
+              <span className="text-lg font-semibold tabular-nums">{formatMS(held)}</span>
+              <span className="text-[10px] opacity-70">· {sub}</span>
+            </div>
+          );
+        })()}
+
+        {(() => {
           const line = debriefLineFor(result.correctVerdict, verdictRaw.confidence);
           const rep = computeConviction(profileSnap.history);
           return (
@@ -2470,8 +2503,11 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       {result.tells.length > 0 && (
         <section className="rounded-xl border border-border bg-card p-6">
           <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
-            WHAT THEY SAID · TELLS FROM YOUR CHAT
+            {scenario.truth === "IMPOSTER"
+              ? `INTEL EXTRACTED · ${result.tells.length} TELL${result.tells.length === 1 ? "" : "S"}`
+              : "WHAT THEY SAID · TELLS FROM YOUR CHAT"}
           </div>
+
           <ul className="space-y-3">
             {result.tells.map((t, i) => (
               <li key={i} className="rounded-md border-l-2 border-caution bg-caution/5 pl-3 py-2">
@@ -2872,7 +2908,7 @@ function CinematicResult({
   if (kind === "missed_scam") {
     return (
       <div className="msg-in rounded-2xl border-2 border-destructive/50 bg-destructive/10 p-8 text-center">
-        <div className="font-mono text-[10px] tracking-[0.4em] text-destructive">MISSED SCAM</div>
+        <div className="font-mono text-[10px] tracking-[0.4em] text-destructive">HE PLAYED THE BAITER</div>
         <div className="mt-4 text-4xl sm:text-5xl font-semibold text-destructive">
           ₨15,000 gone.
         </div>
@@ -2885,8 +2921,8 @@ function CinematicResult({
           </div>
         )}
         <p className="mt-4 text-sm text-muted-foreground max-w-md mx-auto">
-          Once money leaves — especially via gift cards, wallet, or crypto — it doesn't come back.
-          Verification, not spotting, is the only defence.
+          He played you like you were the victim. Next line, run <b>him</b>. Verification, not
+          spotting, is how the desk works.
         </p>
       </div>
     );
@@ -2894,36 +2930,40 @@ function CinematicResult({
   if (kind === "false_alarm") {
     return (
       <div className="msg-in rounded-2xl border-2 border-caution/50 bg-caution/10 p-8 text-center">
-        <div className="font-mono text-[10px] tracking-[0.4em] text-caution">FALSE ALARM</div>
+        <div className="font-mono text-[10px] tracking-[0.4em] text-caution">DISCIPLINE BREAK</div>
         <div className="mt-4 text-3xl sm:text-4xl font-semibold text-caution leading-tight">
           {truth === "REAL" ? "She was really your cousin." : "That was really them."}
         </div>
         <p className="mt-3 text-sm">
           {truth === "REAL"
-            ? "She waited at the stop for 40 minutes. Then walked home in the cold."
-            : "You just accused a real person of being an imposter."}
+            ? "You burned a real citizen. The desk logs both kinds of miss."
+            : "You called it before you had it. The desk logs both kinds of miss."}
         </p>
         <p className="mt-4 text-xs text-muted-foreground max-w-md mx-auto">
-          Wrongly accusing a real person costs the relationship — that IS a loss. The skill is
-          calibration, not suspicion.
+          A baiter without discipline is just noise on the line. Verify, then call it.
         </p>
       </div>
     );
   }
   if (kind === "correct") {
+    const takedown = truth === "IMPOSTER";
     return (
       <div className="msg-in rounded-2xl border-2 border-primary/50 bg-primary/10 p-8 text-center">
-        <div className="font-mono text-[10px] tracking-[0.4em] text-primary">CALIBRATED WIN</div>
+        <div className="font-mono text-[10px] tracking-[0.4em] text-primary">
+          {takedown ? "TAKEDOWN · CASE CLOSED" : "CLEAN CALL · CITIZEN CLEARED"}
+        </div>
         <div className="mt-4 text-3xl sm:text-4xl font-semibold text-primary leading-tight">
-          You verified without insulting.
+          {takedown ? "Number burned citywide." : "You verified without insulting."}
         </div>
         <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto">
-          That's the skill. Caught the imposter OR trusted the real person — with reasoning, not
-          luck.
+          {takedown
+            ? "Your intel is in the file. Every minute you held him was a minute stolen from a real victim."
+            : "That's the skill. Trusted the real person — with reasoning, not luck."}
         </p>
       </div>
     );
   }
+
   return (
     <div className="msg-in rounded-2xl border-2 border-caution/50 bg-caution/10 p-8 text-center">
       <div className="font-mono text-[10px] tracking-[0.4em] text-caution">LUCKY GUESS</div>
