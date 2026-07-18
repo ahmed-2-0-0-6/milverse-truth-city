@@ -25,13 +25,16 @@ const SIZE_LABEL: Record<TextSize, string> = {
 export function AccessPanel() {
   const { prefs, set, reset } = useAccess();
   const [muted, setLocalMuted] = useState(false);
+  const [quarantined, setQuarantined] = useState<string[]>([]);
 
   useEffect(() => {
     setLocalMuted(isMuted());
+    setQuarantined(storageHealth().quarantined);
     const onMute = () => setLocalMuted(isMuted());
     window.addEventListener("milverse:mute", onMute);
     return () => window.removeEventListener("milverse:mute", onMute);
   }, []);
+
 
   return (
     <Sheet>
