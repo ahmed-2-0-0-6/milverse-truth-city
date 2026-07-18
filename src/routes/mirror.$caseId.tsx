@@ -1135,23 +1135,46 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
           CASE FILE · AUTO-COLLECTED
         </div>
 
-        {pinnedMsgs.length > 0 && (
-          <div>
-            <div className="font-mono text-[10px] tracking-widest text-caution mb-1.5">
-              PINNED MESSAGES · {pinnedMsgs.length}
-            </div>
-            <ul className="space-y-1.5">
-              {pinnedMsgs.map((m, i) => (
-                <li
-                  key={i}
-                  className="rounded-md border-l-2 border-caution bg-caution/5 pl-2.5 py-1.5 text-xs italic"
-                >
-                  "{m.text || "[voice note]"}"
-                </li>
-              ))}
-            </ul>
+        <div>
+          <div className="font-mono text-[10px] tracking-widest text-caution mb-1.5">
+            WHAT YOU FLAGGED LIVE · {pinnedMsgs.length}
           </div>
-        )}
+          {pinnedMsgs.length === 0 ? (
+            <p className="text-xs italic text-muted-foreground">
+              You flagged nothing live. Verdict from memory.
+            </p>
+          ) : (
+            <ul className="space-y-1.5">
+              {pinIdxs.map((idx, i) => {
+                const m = sim?.messages[idx];
+                if (!m) return null;
+                const tagRef = pinTags[idx];
+                const tag = findRef(refs, tagRef);
+                const snippet = (m.text || "[voice note]").slice(0, 80);
+                const badgeTone =
+                  tag.kind === "known"
+                    ? "border-primary/50 text-primary bg-primary/10"
+                    : tag.kind === "public"
+                      ? "border-border text-muted-foreground bg-muted/30"
+                      : "border-caution/40 text-caution bg-caution/10";
+                return (
+                  <li
+                    key={i}
+                    className="flex items-start gap-2 rounded-md border-l-2 border-caution bg-caution/5 pl-2.5 py-1.5 text-xs"
+                  >
+                    <span
+                      className={`shrink-0 rounded-sm border px-1 py-0.5 font-mono text-[9px] tracking-widest ${badgeTone}`}
+                    >
+                      {tag.ref}
+                    </span>
+                    <span className="italic">"{snippet}"</span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+
 
         {voiceMsg && (
           <div>
