@@ -225,6 +225,9 @@ interface CaseCardProps<TParams extends Record<string, string>> {
   coldStamp?: string;
   /** Small footer affordance — e.g. "COLD READ →". Stops link propagation. */
   coldAction?: { label: string; onClick: () => void; ariaLabel?: string };
+  /** Seasonal-circulation glyph (⛆). Appends ", in seasonal circulation" to aria. */
+  seasonGlyph?: ReactNode;
+  inSeason?: boolean;
 }
 
 export function CaseCard<TParams extends Record<string, string>>({
@@ -243,6 +246,8 @@ export function CaseCard<TParams extends Record<string, string>>({
   unreadThread,
   coldStamp,
   coldAction,
+  seasonGlyph,
+  inSeason,
 }: CaseCardProps<TParams>) {
   const footer = !locked ? (
     <div className="mt-5 flex items-center justify-between gap-3">
@@ -290,15 +295,18 @@ export function CaseCard<TParams extends Record<string, string>>({
       outcome={outcome}
       artifactChip={artifactChip}
       unreadThread={unreadThread}
+      seasonGlyph={seasonGlyph}
     />
   );
 
   if (locked) return shell;
 
   const ariaParts: string[] = [title];
+  if (inSeason) ariaParts.push("in seasonal circulation");
   if (outcome) ariaParts.push(OUTCOME_STAMP[outcome].aria);
   if (unreadThread) ariaParts.push("new arrival");
   const ariaLabel = ariaParts.join(", ");
+
 
   // Typed at call site with TanStack Link's overloads.
   return (
