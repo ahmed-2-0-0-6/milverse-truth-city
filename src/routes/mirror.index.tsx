@@ -63,6 +63,8 @@ const TIER_NAMES: Record<TierId, string> = {
 
 function CaseFiles() {
   const navigate = useNavigate();
+  const season = useSeason();
+
   const [profile, setProfile] = useState<TrustProfile | null>(null);
   const [citizen, setCitizen] = useState<Scenario[]>([]);
   const [code, setCode] = useState("");
