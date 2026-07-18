@@ -540,7 +540,12 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
               else if (l.to) setTimeout(() => nav({ to: l.to! }), 700);
             }}
             prefersReduced={!!prefersReduced}
+            ambient={ambient}
+            hour={clock.hour}
+            minuteOfDay={clock.minuteOfDay}
+            onBeacon={onBeacon}
           />
+
         </div>
       </div>
 
