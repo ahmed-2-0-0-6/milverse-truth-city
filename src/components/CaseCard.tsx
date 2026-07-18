@@ -157,9 +157,12 @@ function CardShell({
         )}
 
         <div className="relative">
-          {(metaTopRight || artifactChip) && (
+          {(metaTopRight || artifactChip || seasonGlyph) && (
             <div className="flex flex-col items-end gap-1 min-w-0 float-right ml-3">
-              {metaTopRight}
+              <div className="flex items-center gap-1.5">
+                {seasonGlyph}
+                {metaTopRight}
+              </div>
               {artifactChip && (
                 <span
                   className={`inline-flex items-center rounded-sm border bg-background/50 px-1.5 py-0.5 font-mono text-[9px] tracking-widest ${CHIP_TONE[artifactChip.tone]}`}
@@ -170,6 +173,7 @@ function CardShell({
               )}
             </div>
           )}
+
           <h3 className="text-lg font-semibold leading-snug">{title}</h3>
           <p className="mt-1.5 text-sm text-muted-foreground line-clamp-2 clear-none">{teaser}</p>
           {badges && <div className="mt-4 flex flex-wrap items-center gap-2">{badges}</div>}
