@@ -32,6 +32,7 @@ export function loadInbox(): InboxProfile {
       arrived: Array.isArray(p.arrived) ? p.arrived : [],
       opened: Array.isArray(p.opened) ? p.opened : [],
       firedCalls: Array.isArray(p.firedCalls) ? p.firedCalls : [],
+      paperRead: typeof p.paperRead === "string" ? p.paperRead : null,
     };
   } catch {
     return fresh();
