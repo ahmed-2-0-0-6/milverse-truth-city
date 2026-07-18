@@ -1953,7 +1953,18 @@ function Debrief({ scenario }: { scenario: Scenario }) {
             been the safer read. <b>Spotting is dying. Verifying is forever.</b>
           </p>
         )}
+        {scenario.tier === 5 && (() => {
+          const note = roomNoteFor(scenario.id);
+          if (!note) return null;
+          return (
+            <div className="mt-4 border-t border-current/20 pt-3">
+              <div className="stencil text-[11px] tracking-[0.3em] opacity-80">THE ROOM</div>
+              <p className="mt-2 text-sm leading-relaxed opacity-95">{note}</p>
+            </div>
+          );
+        })()}
       </div>
+
 
       <RetestReveal resolution={retestResolution} />
 
