@@ -161,12 +161,12 @@ function PilotPage() {
   function create() {
     const c = generateGroupCode();
     setActiveGroup(c);
-    toast.success("Pilot group created", { description: `Share code ${c} with your class.` });
+    toast.success("Pilot group created.", { description: `Share code ${c} with your class.` });
   }
   function join() {
     const c = code.trim().toUpperCase();
     if (c.length < 4) {
-      toast.error("Enter a 4-6 character code");
+      toast.error("Enter a 4–6 character code.");
       return;
     }
     setActiveGroup(c);
@@ -175,14 +175,14 @@ function PilotPage() {
   }
   function leave() {
     setActiveGroup(null);
-    toast("Left the pilot group");
+    toast("Left the pilot group.");
   }
   function copy() {
     if (!active) return;
     navigator.clipboard?.writeText(active);
     setCopied(true);
     setTimeout(() => setCopied(false), 1200);
-    toast.success("Code copied to clipboard");
+    toast.success("Code copied.");
   }
 
   const effectiveCloud = sample ? SAMPLE_ENTRIES : cloud;
@@ -252,7 +252,7 @@ function PilotPage() {
 
   function exportCsv() {
     if (!cloud.length) {
-      toast.error("Nothing in the cloud to export");
+      toast.error("Nothing in the cloud to export.");
       return;
     }
     const rows = [

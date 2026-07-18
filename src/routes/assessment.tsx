@@ -133,7 +133,7 @@ function AssessmentPage() {
         </Link>
 
         {stage === "loading" && (
-          <div className="mt-8 text-sm text-muted-foreground">Loading baseline…</div>
+          <div className="mt-8 stencil text-[11px] text-muted-foreground">// LOADING BASELINE…</div>
         )}
 
         {stage === "no-group" && (

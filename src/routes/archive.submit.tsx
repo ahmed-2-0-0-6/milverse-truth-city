@@ -60,9 +60,9 @@ function SubmitStory() {
     setErr(null);
     const pii = localPiiCheck(what, wanted, tell, pattern);
     if (pii) {
-      const msg = `Please rewrite without the ${pii}. We only publish tactics — never real identities.`;
+      const msg = `Rewrite without the ${pii}. We publish tactics — never real identities.`;
       setErr(msg);
-      toast.error("Contains identifying info", { description: msg });
+      toast.error("Contains identifying info.", { description: msg });
       return;
     }
     setBusy(true);
@@ -81,15 +81,15 @@ function SubmitStory() {
           deviceId: getDeviceId(),
         } as never,
       });
-      toast.success("Story received", {
+      toast.success("Story received.", {
         description:
           "A human reviewer will read it and, if approved, turn it into a training mission.",
       });
       setDone(true);
     } catch (e) {
-      const msg = (e as Error).message ?? "Submission failed. Try again.";
+      const msg = (e as Error).message ?? "Submission failed. Try again in a moment.";
       setErr(msg);
-      toast.error("Submission failed", { description: msg });
+      toast.error("Submission failed.", { description: msg });
     }
     setBusy(false);
   }

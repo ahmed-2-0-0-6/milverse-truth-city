@@ -39,7 +39,7 @@ export function VoiceNote({ voice, fromPlayer = false, speakerName, speakerVoice
       return;
     }
     if (!audioAvailable()) {
-      toast("Audio blocked by browser — tap again or read the transcript.", {
+      toast("Audio blocked. Tap again, or read the transcript.", {
         description: "Some browsers require a second tap to enable sound.",
       });
       setShowTranscript(true);
@@ -60,7 +60,7 @@ export function VoiceNote({ voice, fromPlayer = false, speakerName, speakerVoice
       });
     } catch {
       setPlaying(false);
-      toast("Audio blocked by browser — tap again or read the transcript.");
+      toast("Audio blocked. Tap again, or read the transcript.");
       setShowTranscript(true);
     }
   }

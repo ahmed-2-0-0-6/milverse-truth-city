@@ -78,11 +78,11 @@ function ReviewPage() {
       const res = await listFn({ data: { passcode } as never });
       setRows((res as { rows: StoryRow[] }).rows);
       setAuthed(true);
-      toast.success("Signed in to review console");
+      toast.success("Signed in.");
     } catch (e) {
       const msg = (e as Error).message;
       setErr(msg);
-      toast.error("Authentication failed", { description: msg });
+      toast.error("Sign-in failed.", { description: msg });
     }
     setBusy(false);
   }
@@ -91,11 +91,11 @@ function ReviewPage() {
     try {
       const res = await listFn({ data: { passcode } as never });
       setRows((res as { rows: StoryRow[] }).rows);
-      toast("Queue refreshed");
+      toast("Queue refreshed.");
     } catch (e) {
       const msg = (e as Error).message;
       setErr(msg);
-      toast.error("Refresh failed", { description: msg });
+      toast.error("Refresh failed.", { description: msg });
     }
   }
 
@@ -253,7 +253,7 @@ function AssessmentTab({ passcode }: { passcode: string }) {
     } catch (e) {
       const msg = (e as Error).message;
       setErr(msg);
-      toast.error("Couldn't load group", { description: msg });
+      toast.error("Couldn't load group.", { description: msg });
     }
     setBusy(false);
   }
@@ -269,7 +269,7 @@ function AssessmentTab({ passcode }: { passcode: string }) {
     } catch (e) {
       const msg = (e as Error).message;
       setErr(msg);
-      toast.error("Couldn't change phase", { description: msg });
+      toast.error("Couldn't change phase.", { description: msg });
     }
     setBusy(false);
   }
@@ -316,7 +316,7 @@ function AssessmentTab({ passcode }: { passcode: string }) {
   function exportCsv() {
     if (!loadedCode) return;
     if (!rows.length) {
-      toast.error("Nothing to export");
+      toast.error("Nothing to export.");
       return;
     }
     const header = [
@@ -762,10 +762,10 @@ function SubmissionCard({
     };
     try {
       await onApprove(scenario as unknown as Record<string, unknown>);
-      toast.success("Submission approved and published");
+      toast.success("Approved and published.");
     } catch (e) {
       const msg = (e as Error).message;
-      toast.error("Approve failed", { description: msg });
+      toast.error("Approve failed.", { description: msg });
     }
     setBusy(false);
   }

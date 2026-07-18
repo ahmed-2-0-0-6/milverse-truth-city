@@ -100,7 +100,7 @@ function CaseFiles() {
       const res = await fetchByCode({ data: { shareCode: c } as never });
       const json = (res as { scenarioJson: string | null }).scenarioJson;
       if (!json) {
-        setCodeErr("No case with that code — check the code and try again.");
+        setCodeErr("No case with that code. Check the code and try again.");
         setCodeBusy(false);
         return;
       }
@@ -108,7 +108,7 @@ function CaseFiles() {
       saveCitizenCase(scenario);
       navigate({ to: "/mirror/$caseId", params: { caseId: scenario.id } });
     } catch {
-      setCodeErr("Couldn't reach the case service. Try again in a moment.");
+      setCodeErr("The case service is dark. Try again in a moment.");
     }
     setCodeBusy(false);
   }

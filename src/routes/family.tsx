@@ -101,11 +101,11 @@ function FamilyPage() {
       await registerFn({ data: { code: c } });
       localStorage.setItem(CODE_KEY, c);
       setParentCode(c);
-      toast.success("Family code created", { description: `Share ${c} with your kid.` });
+      toast.success("Family code created.", { description: `Share ${c} with your kid.` });
     } catch (e) {
       const msg = (e as Error).message;
       setErr(msg);
-      toast.error("Couldn't create code", { description: msg });
+      toast.error("Couldn't create code.", { description: msg });
     }
     setBusy(false);
   }
@@ -120,11 +120,11 @@ function FamilyPage() {
       localStorage.setItem(CODE_KEY, c);
       setParentCode(c);
       setEntries([]);
-      toast.success("New family code issued", { description: `Old code retired. New code: ${c}.` });
+      toast.success("New family code issued.", { description: `Old code retired. New code: ${c}.` });
     } catch (e) {
       const msg = (e as Error).message;
       setErr(msg);
-      toast.error("Couldn't regenerate code", { description: msg });
+      toast.error("Couldn't regenerate code.", { description: msg });
     }
     setBusy(false);
   }
@@ -132,7 +132,7 @@ function FamilyPage() {
   async function joinAsKid() {
     const code = kidJoinCode.trim().toUpperCase();
     if (!/^[A-Z0-9]{4,6}$/.test(code)) {
-      toast.error("Enter a 4-6 character code");
+      toast.error("Enter a 4–6 character code.");
       return;
     }
     setErr(null);
@@ -144,7 +144,7 @@ function FamilyPage() {
     } catch (e) {
       const msg = (e as Error).message;
       setErr(msg);
-      toast.error("Couldn't join family", { description: msg });
+      toast.error("Couldn't join family.", { description: msg });
     }
   }
 
