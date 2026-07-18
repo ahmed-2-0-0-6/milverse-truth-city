@@ -232,9 +232,16 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
   }, [messages, typing]);
 
   // Sound design: tick on meter change; tension cue when critical (<30).
+  const [meterDelta, setMeterDelta] = useState<number | null>(null);
   useEffect(() => {
+    let t: number | undefined;
     if (state.meter !== prevMeter.current) {
       tick();
+      const d = Math.round(state.meter - prevMeter.current);
+      if (d !== 0) {
+        setMeterDelta(d);
+        t = window.setTimeout(() => setMeterDelta(null), 1400);
+      }
       prevMeter.current = state.meter;
     }
     if (state.meter < 30 && !criticalCued.current) {
@@ -243,6 +250,9 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
     } else if (state.meter >= 50) {
       criticalCued.current = false;
     }
+    return () => {
+      if (t) clearTimeout(t);
+    };
   }, [state.meter]);
 
   // Case timer (Tier 3+): after 25s idle, contact nudges.
@@ -418,15 +428,32 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               onContacts={() => setContactsOpen(true)}
             />
             {/* meter + tabs */}
-            <div className="px-3 py-2 bg-neutral-950/80 border-b border-white/10">
+            <div className="px-3 py-2 bg-neutral-950/80 border-b border-white/10 relative">
               <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-white/50">
-                <span>{state.meterType === "composure" ? "COMPOSURE" : "PATIENCE"}</span>
-                <span>{Math.round(state.meter)}</span>
+                <span className={state.meter <= 30 ? "text-destructive hud-blink" : ""}>
+                  {state.meterType === "composure" ? "COMPOSURE" : "PATIENCE"}
+                </span>
+                <span className="flex items-center gap-1.5 tabular-nums">
+                  {meterDelta !== null && (
+                    <span
+                      key={meterDelta}
+                      className={`msg-in font-bold ${meterDelta < 0 ? "text-destructive" : "text-primary"}`}
+                      aria-hidden
+                    >
+                      {meterDelta > 0 ? `+${meterDelta}` : meterDelta}
+                    </span>
+                  )}
+                  {Math.round(state.meter)}
+                </span>
               </div>
               <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
                 <div
-                  className={`h-full transition-all duration-500 ${meterColor}`}
-                  style={{ width: `${state.meter}%` }}
+                  className={`h-full transition-all duration-500 ${meterColor} ${state.meter <= 30 ? "animate-pulse" : ""}`}
+                  style={{
+                    width: `${state.meter}%`,
+                    boxShadow:
+                      state.meter <= 30 ? "0 0 10px oklch(0.55 0.2 25 / 0.8)" : undefined,
+                  }}
                 />
               </div>
               <div className="mt-2 flex gap-1">
