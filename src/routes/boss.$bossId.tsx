@@ -465,19 +465,19 @@ function BossPlay() {
               <div className="grid grid-cols-3 gap-1.5">
                 <button
                   onClick={handleComply}
-                  className="text-[10px] py-2 rounded border border-white/20 hover:bg-white/5"
+                  className="touch-manipulation text-[10px] py-2 rounded border border-white/20 hover:bg-white/5 min-h-[44px] sm:min-h-0"
                 >
                   <HandCoins className="w-3 h-3 inline mr-1" /> COMPLY
                 </button>
                 <button
                   onClick={() => commit("REFUSE_REPORT")}
-                  className="text-[10px] py-2 rounded border border-white/20 hover:bg-white/5"
+                  className="touch-manipulation text-[10px] py-2 rounded border border-white/20 hover:bg-white/5 min-h-[44px] sm:min-h-0"
                 >
                   <ShieldOff className="w-3 h-3 inline mr-1" /> REFUSE
                 </button>
                 <button
                   onClick={() => commit("HOLD_UNVERIFIED")}
-                  className="text-[10px] py-2 rounded border border-red-500/50 bg-red-950/30 hover:bg-red-950/60 font-bold"
+                  className="touch-manipulation text-[10px] py-2 rounded border border-red-500/50 bg-red-950/30 hover:bg-red-950/60 font-bold min-h-[44px] sm:min-h-0"
                 >
                   <ShieldCheck className="w-3 h-3 inline mr-1" /> HOLD
                 </button>
