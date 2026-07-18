@@ -184,6 +184,10 @@ function PaperPage() {
           </div>
         </header>
 
+        <PaperWeatherBox />
+
+
+
         {showArchive ? (
           <YesterdaysPapers
             currentNumber={edition.edition_number}
