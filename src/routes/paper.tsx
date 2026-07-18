@@ -18,6 +18,7 @@ import { getLatestEdition, listArchive, getEdition } from "@/lib/paper.functions
 import type { Edition, EditionContent } from "@/lib/paper/types";
 import { dropDateKey } from "@/lib/daily/rotation";
 import { readEditionRecord } from "@/lib/paper/profile";
+import { currentShift, isNightRegister } from "@/lib/city/shift";
 import {
   supplementWeek,
   readLastSeenWeek,
@@ -125,12 +126,19 @@ function PaperPage() {
   const today = dropDateKey();
   const shown = viewing ?? edition; // older edition off the shelf, or today's
   const isToday = shown.edition_date === today && !viewing;
-  const dateLabel = new Date(shown.edition_date + "T00:00:00Z").toLocaleDateString("en-GB", {
+  const dateLabelRaw = new Date(shown.edition_date + "T00:00:00Z").toLocaleDateString("en-GB", {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric",
   });
+  // THE NIGHT SHIFT — for the LATEST edition only, append the night desk
+  // tag when the reader is on their after-dark shift. Archived editions
+  // print with their historical dateline unchanged.
+  const dateLabel =
+    isToday && isNightRegister(currentShift().band)
+      ? `${dateLabelRaw} · NIGHT DESK`
+      : dateLabelRaw;
 
   return (
     <div className="paper min-h-screen">

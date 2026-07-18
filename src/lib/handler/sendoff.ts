@@ -10,6 +10,7 @@
 import type { LeanReading } from "./profile";
 import type { TacticStat } from "./profile";
 import { labelForTactic } from "./profile";
+import { currentShift, isNightRegister, type ShiftBand } from "@/lib/city/shift";
 
 export interface SendOffStats {
   weakest: TacticStat | null;
@@ -18,7 +19,17 @@ export interface SendOffStats {
   recentResults: string[];
   /** Conviction ledger flag: player is OVERSURE this week (gap >= +12). */
   oversure?: boolean;
+  /** Optional band override for testing; defaults to `currentShift(new Date()).band`. */
+  band?: ShiftBand;
 }
+
+// THE NIGHT SHIFT — verbatim send-offs used only when the band is night/smallHours.
+// Rotated deterministically by the same seed as the day pools.
+const NIGHT_POOL = [
+  "Late window. Their scripts prefer tired eyes. Slow the read.",
+  "Graveyard desk. Nothing has to be answered right now.",
+] as const;
+
 
 const POOLS = {
   rookie: [
@@ -82,6 +93,14 @@ export function buildSendOff(
   if (stats.oversure) {
     return "You've been certain and wrong this week. Certainty is a claim. Verify yours.";
   }
+
+  // THE NIGHT SHIFT — night/smallHours pool trumps history-neutral lines,
+  // but sits below OVERSURE (which is a stronger, personalized signal).
+  const band = stats.band ?? currentShift(new Date()).band;
+  if (isNightRegister(band)) {
+    return pick(NIGHT_POOL, seed);
+  }
+
 
   // Streak-honoring nudge for calibrated players on hot streaks.
   if (reading.id === "calibrated" && stats.dailyStreak >= 5) {

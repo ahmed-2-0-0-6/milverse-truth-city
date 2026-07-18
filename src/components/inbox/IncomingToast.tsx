@@ -9,6 +9,7 @@ import { markOpened } from "@/lib/inbox/profile";
 import { shouldReduceMotion } from "@/lib/access";
 import { arrivalTap } from "@/lib/mirror/audio";
 import { platformStyle } from "./platform-style";
+import { currentShift, isNightRegister } from "@/lib/city/shift";
 
 const AUTO_HIDE_MS = 6000;
 
@@ -100,7 +101,7 @@ export function IncomingToast() {
                     <span className="ml-auto stencil text-[9px] text-muted-foreground">now</span>
                   </span>
                   <span className="mt-0.5 block truncate text-xs text-muted-foreground">
-                    {it.preview}
+                    {isNightRegister(currentShift().band) ? `LATE · ${it.preview}` : it.preview}
                   </span>
                 </span>
                 <span className="stencil text-[10px] text-primary self-center pl-1">OPEN</span>

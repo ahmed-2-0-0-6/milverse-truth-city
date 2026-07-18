@@ -1,10 +1,27 @@
 // LAYER-4 — Live-feeling ticker. Pure CSS marquee, pauses on hover.
 // Seasonal marquee lines are spliced in at the front when a season is live;
 // off-season, the base list is byte-identical to pre-Season chrome.
+// The Night Shift prepends its own two lines AFTER the season splice, so
+// season-first + shift-second is the deterministic composition order.
+
+import { useEffect, useState } from "react";
 import { useSeason } from "@/components/season/SeasonAdvisory";
+import { currentShift, isNightRegister } from "@/lib/city/shift";
+
+const NIGHT_LINES = [
+  "NIGHT SHIFT · THE CITY RUNS ON SKELETON CREW",
+  "ADVISORY · LATE HOURS ARE THE SCRIPT'S FAVORITE HOURS",
+] as const;
 
 export function Marquee() {
   const season = useSeason();
+  // Computed per-mount; the marquee is a landing surface which ticks the
+  // parent already. Stale band on a long-open page is acceptable per spec.
+  const [shift, setShift] = useState(() => currentShift());
+  useEffect(() => {
+    setShift(currentShift());
+  }, []);
+
   const base = [
     "CASE #47 · CLOSED",
     "312 VERIFICATIONS THIS WEEK",
@@ -15,7 +32,10 @@ export function Marquee() {
     "PILOT COHORT 12 · CALIBRATING",
     "STUDIO · 6 CASES SUBMITTED",
   ];
-  const items = season ? [...season.marquee, ...base] : base;
+  const seasonPart = season ? season.marquee : [];
+  const shiftPart = isNightRegister(shift.band) ? NIGHT_LINES : [];
+  const items = [...seasonPart, ...shiftPart, ...base];
+
   return (
     <div
       className="relative overflow-hidden border-y border-primary/30 bg-black/40 backdrop-blur-sm"

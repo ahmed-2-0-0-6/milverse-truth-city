@@ -16,6 +16,7 @@ import { InboxManager } from "@/components/inbox/InboxManager";
 import { IncomingToast } from "@/components/inbox/IncomingToast";
 import { IncomingCall } from "@/components/inbox/IncomingCall";
 import { SeasonAdvisory, SeasonGlyph, useSeason } from "@/components/season/SeasonAdvisory";
+import { NightShiftAdvisory } from "@/components/hub/NightShiftAdvisory";
 
 
 export const Route = createFileRoute("/feed/")({
@@ -161,6 +162,7 @@ function FeedIndex() {
           ← CITY
         </Link>
         <SeasonAdvisory season={season} />
+        <NightShiftAdvisory />
 
         <div className="mt-6 mb-3 font-mono text-[10px] tracking-widest text-muted-foreground">
           {shelfLine}

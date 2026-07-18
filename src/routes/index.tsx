@@ -17,6 +17,7 @@ import { IncomingCall } from "@/components/inbox/IncomingCall";
 import { FirstCall } from "@/components/onboarding/FirstCall";
 import { CitizenDesk } from "@/components/landing/CitizenDesk";
 import { isReturningCitizen } from "@/lib/city/returning";
+import { currentShift, isNightRegister, type Shift } from "@/lib/city/shift";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -57,11 +58,17 @@ function CityMap() {
   // mount when localStorage is readable. Wrapped in a stable-height
   // container to avoid layout shift on either path.
   const [returning, setReturning] = useState(false);
+  // THE NIGHT SHIFT — landing recomputes its band every 60s so a session
+  // left open across a boundary catches up. Elsewhere band is per-mount.
+  const [shift, setShift] = useState<Shift>(() => currentShift());
 
   useEffect(() => {
     setView(preferredDefaultView());
     setReturning(isReturningCitizen());
     if (typeof window !== "undefined" && !localStorage.getItem(INTRO_KEY)) setIntro(true);
+    setShift(currentShift());
+    const tick = window.setInterval(() => setShift(currentShift()), 60_000);
+    return () => window.clearInterval(tick);
   }, []);
 
   useEffect(() => {
@@ -77,8 +84,19 @@ function CityMap() {
     }
   };
 
+  const night = isNightRegister(shift.band);
+  const kicker =
+    shift.band === "evening"
+      ? "// MILVERSE · THE EVENING EDITION"
+      : shift.band === "night"
+        ? "// MILVERSE · THE NIGHT SHIFT"
+        : shift.band === "smallHours"
+          ? "// MILVERSE · THE SMALL HOURS · THE DESK NEVER CLOSES"
+          : "// MILVERSE · CITY OF VERIFICATION";
+
+
   return (
-    <div className="noir-landing min-h-screen relative overflow-x-hidden">
+    <div className={`noir-landing min-h-screen relative overflow-x-hidden ${night ? "city-night" : ""}`}>
       <InboxManager />
       <IncomingToast />
       <IncomingCall />
@@ -109,12 +127,17 @@ function CityMap() {
             // never renders as an empty black void.
             <>
               <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "radial-gradient(ellipse at 50% 15%, rgba(34,211,238,0.14), transparent 55%), radial-gradient(ellipse at 20% 90%, rgba(245,185,66,0.10), transparent 60%), linear-gradient(180deg, #05080d 0%, #02040a 100%)",
-                }}
+                className={`absolute inset-0 ${night ? "city-night-lite-bg" : ""}`}
+                style={
+                  night
+                    ? undefined
+                    : {
+                        background:
+                          "radial-gradient(ellipse at 50% 15%, rgba(34,211,238,0.14), transparent 55%), radial-gradient(ellipse at 20% 90%, rgba(245,185,66,0.10), transparent 60%), linear-gradient(180deg, #05080d 0%, #02040a 100%)",
+                      }
+                }
               />
+
               <div
                 className="absolute inset-0 opacity-[0.06]"
                 style={{
@@ -141,15 +164,16 @@ function CityMap() {
             existing setView pattern above. */}
         <div className="w-full flex flex-col items-center min-h-[420px] sm:min-h-[460px]">
           {returning ? (
-            <CitizenDesk />
+            <CitizenDesk shift={shift} />
           ) : (
             <>
               <div className="stencil text-[10px] text-cyan-300/80 mb-4 hud-blink">
-                // MILVERSE · CITY OF VERIFICATION
+                {kicker}
               </div>
               <HeroType />
               <p className="mt-4 max-w-xl text-center text-white/70 text-sm sm:text-base">
                 A city that trains your trust — play today's forward.
+
               </p>
               <p className="mt-2 max-w-xl text-center text-white/50 text-xs sm:text-sm">
                 Fakes beat eyes. They don't beat verification.

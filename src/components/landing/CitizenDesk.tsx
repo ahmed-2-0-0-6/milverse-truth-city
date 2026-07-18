@@ -9,6 +9,7 @@ import { useMemo } from "react";
 import { deskReport, type DeskItem, type DeskUrgency } from "@/lib/city/returning";
 import { loadProfile } from "@/lib/mirror/profile";
 import { rankFromXp, computeXp } from "@/lib/ranks";
+import { currentShift, type Shift } from "@/lib/city/shift";
 
 function urgencyGlyph(u: DeskUrgency): string {
   if (u === "dying") return "▲";
@@ -57,10 +58,19 @@ function weekdayLabel(now: Date): string {
   }
 }
 
-export function CitizenDesk({ now = new Date() }: { now?: Date }) {
+export function CitizenDesk({
+  now = new Date(),
+  shift,
+}: {
+  now?: Date;
+  /** Optional band from the parent's tick; falls back to a per-mount read. */
+  shift?: Shift;
+}) {
   const items: DeskItem[] = useMemo(() => deskReport(now), [now]);
   const name = useMemo(() => rankTitle(), []);
   const day = useMemo(() => weekdayLabel(now), [now]);
+  const band = shift ?? currentShift(now);
+  const smallHours = band.band === "smallHours";
 
   return (
     <section
@@ -68,16 +78,22 @@ export function CitizenDesk({ now = new Date() }: { now?: Date }) {
       className="w-full max-w-xl mt-2"
     >
       <div className="stencil text-[10px] text-cyan-300/80 mb-3 text-center">
-        // THE DESK · {day}
+        // {band.label} · {day}
       </div>
       <div className="text-center mb-4">
         <div
           className="text-2xl sm:text-3xl font-black text-white leading-none tracking-tight"
           style={{ fontFamily: '"Bebas Neue", sans-serif' }}
         >
-          BACK ON SHIFT, {name}.
+          {smallHours ? `THE DESK IS STILL LIT, ${name}.` : `BACK ON SHIFT, ${name}.`}
         </div>
+        {smallHours && (
+          <div className="mt-2 stencil text-[10px] text-white/60">
+            THE SCRIPTS WORK NIGHTS. THAT'S WHY YOU DO TOO.
+          </div>
+        )}
       </div>
+
 
       <div className="hud-frame p-3 sm:p-4 bg-black/40 backdrop-blur-sm">
         <ul className="divide-y divide-white/10">

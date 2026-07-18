@@ -2723,3 +2723,53 @@ html[data-high-legibility="on"] .cold-tense {
   animation: none !important;
   opacity: 1 !important;
 }
+
+/* ─────────────── THE NIGHT SHIFT · decorative accents only ───────────────
+ *
+ * `.city-night` opts the landing wrapper into the after-dark palette.
+ * Rule: touch ONLY decorative accents (hero corner strokes, LITE wash,
+ * scroll-hint tint, marquee dot glow). Text tokens (--foreground,
+ * --primary, --caution) and their derived text utilities are unchanged
+ * so contrast pairs stay ≥ 4.5:1 (the existing --foreground on the noir
+ * background is 15.1:1; the yellow desk "dying" glyph stays on the
+ * unchanged --caution).
+ *
+ * All styles here are static — no new keyframes; the horizon glow is
+ * a static gradient, not an animation.
+ */
+.city-night {
+  --shift-accent: 320 90% 62%;   /* neon magenta — signage after dark */
+  --shift-accent-2: 32 95% 62%;  /* amber sodium mix */
+}
+.city-night .hero-frame::before,
+.city-night .hero-frame::after {
+  border-color: hsl(var(--shift-accent) / 0.65);
+}
+.city-night .marquee-track .stencil > span:first-child {
+  background: hsl(var(--shift-accent-2) / 0.85);
+  box-shadow: 0 0 8px hsl(var(--shift-accent-2) / 0.9);
+}
+.city-night .scroll-hint {
+  color: hsl(var(--shift-accent) / 0.75);
+}
+
+/* LITE gradient swap — replaces the existing static backdrop when the hero
+ * is not cinematic. Information-free decoration; costs no extra paint. */
+.city-night-lite-bg {
+  background:
+    radial-gradient(ellipse at 50% 12%, hsl(var(--shift-accent) / 0.14), transparent 55%),
+    radial-gradient(ellipse at 20% 90%, hsl(var(--shift-accent-2) / 0.11), transparent 60%),
+    linear-gradient(180deg, #06040c 0%, #02030a 100%);
+}
+
+/* Faint amber horizon glow at the top edge — used at smallHours only.
+ * Pointer-events-none, aria-hidden; class-driven so LITE can drop it. */
+.city-night-horizon {
+  background: linear-gradient(
+    to bottom,
+    hsl(var(--shift-accent-2) / 0.10) 0%,
+    hsl(var(--shift-accent-2) / 0.04) 12%,
+    transparent 24%
+  );
+}
+
