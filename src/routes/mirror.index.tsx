@@ -113,6 +113,8 @@ function CaseFiles() {
 
   return (
     <div className="min-h-screen grain">
+      <InboxManager />
+      <IncomingToast />
       <TopBar />
       <DistrictHero
         art={mirrorArt}
