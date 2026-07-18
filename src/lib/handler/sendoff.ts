@@ -36,33 +36,40 @@ const POOLS = {
     "Read it twice. Type what you'd actually type. I'm watching.",
     "No script. Ask what you'd ask. The city teaches fast.",
     "File's thin. Play it slow, and I'll write more of it down.",
+    "Desk routed him to you. Keep him talking — the longer he's on you, the less he's on someone's grandmother.",
   ],
   "drifting-trusting": [
     "You've been saying yes too easily this week. Make them earn it.",
     "Your last three calls trusted fast. Slow hands today.",
     "You lean in a shade early. Sit back before you agree.",
+    "Run him. Don't get run.",
   ],
   "soft-target": [
     "The file says you trust the loudest voice in the room. Don't.",
     "Scams have been walking past you. Slow the whole read down.",
     "You've been saying yes too easily this week. Make them earn it.",
+    "You're the baiter this desk needs. Stop reading like a mark.",
   ],
   jumpy: [
     "You've been calling wolf. Remember — refusing everything is also losing.",
     "Three false alarms on your sheet. Paranoia pays the same bill as gullibility.",
     "You're flagging clean traffic. Prove REAL as hard as you prove FAKE.",
+    "Baiters need discipline. Verify before you burn the number.",
   ],
   "fortress-mind": [
     "Wall's too high on your file. Real people are getting turned away.",
     "You've been calling wolf. Remember — refusing everything is also losing.",
     "Nothing gets through your read lately. That has a cost. Ease it.",
+    "A baiter without discipline is just noise on the line. Hold the read.",
   ],
   calibrated: [
     "Your sheet's clean lately. Keep the streak honest.",
     "Balanced week. Don't get comfortable.",
     "Reads are landing. Push into a tactic you haven't drilled.",
+    "Desk trusts your line. Keep him talking. The city's counting minutes.",
   ],
 } as const;
+
 
 // Optional pool: names a HISTORICAL weakness (the player's file, not this case).
 const TACTIC_MEMORY_POOLS = [
