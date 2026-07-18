@@ -1588,7 +1588,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
               type="button"
               aria-pressed={picked.includes(c.id)}
               onClick={() => toggle(c.id)}
-              className={`rounded-full border px-3 py-1.5 text-xs transition ${
+              className={`rounded-full border px-3 py-2.5 text-xs transition touch-manipulation min-h-[44px] sm:min-h-0 sm:py-1.5 ${
                 picked.includes(c.id)
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
