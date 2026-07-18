@@ -2,7 +2,7 @@ import { LESSONS } from "@/lib/firstPhone/lessons";
 import { getWallpaper } from "./wallpapers";
 import type { FirstPhoneState } from "@/lib/firstPhone/profile";
 import { isLessonUnlocked } from "@/lib/firstPhone/profile";
-import { Lock, Check, ShieldCheck } from "lucide-react";
+import { Lock, Check, ShieldCheck, Target } from "lucide-react";
 
 // Domain-specific mini glyphs per lesson tactic — one per lesson.
 const APP_ICONS: Record<number, string> = {
