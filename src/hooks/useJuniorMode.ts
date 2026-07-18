@@ -19,6 +19,7 @@ function fresh(): FirstPhoneState {
     licenseNumber: null,
     wallpaper: 0,
     handoverSeen: false,
+    tourSeen: false,
   };
 }
 

@@ -14,6 +14,8 @@ export interface FirstPhoneState {
   wallpaper: number;
   /** ADDITIVE: once-per-child handover beat played? */
   handoverSeen: boolean;
+  /** ADDITIVE: once-per-child guided phone tour played (or skipped)? */
+  tourSeen: boolean;
 }
 
 function fresh(): FirstPhoneState {
@@ -26,6 +28,7 @@ function fresh(): FirstPhoneState {
     licenseNumber: null,
     wallpaper: 0,
     handoverSeen: false,
+    tourSeen: false,
   };
 }
 
@@ -41,12 +44,25 @@ export function markHandoverSeen() {
   saveFirstPhone(s);
 }
 
+export function markTourSeen() {
+  const s = loadFirstPhone();
+  s.tourSeen = true;
+  saveFirstPhone(s);
+}
+
 export function loadFirstPhone(): FirstPhoneState {
   if (typeof window === "undefined") return fresh();
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return fresh();
-    return { ...fresh(), ...(JSON.parse(raw) as Partial<FirstPhoneState>) };
+    const parsed = JSON.parse(raw) as Partial<FirstPhoneState>;
+    const merged: FirstPhoneState = { ...fresh(), ...parsed };
+    // Silent migration: pre-existing profile with any lesson progress
+    // never sees the tour (feature shipped after their first boot).
+    if (parsed.tourSeen === undefined && (merged.lessonsCompleted?.length ?? 0) > 0) {
+      merged.tourSeen = true;
+    }
+    return merged;
   } catch {
     return fresh();
   }
