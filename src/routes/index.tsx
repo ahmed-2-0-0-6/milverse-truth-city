@@ -178,7 +178,14 @@ function CityMap() {
             layout shift on either path — hydration idiom follows the
             existing setView pattern above. */}
         <div className="w-full flex flex-col items-center min-h-[420px] sm:min-h-[460px]">
-          {returning ? (
+          {showBait ? (
+            <div className="w-full">
+              <div className="stencil text-[10px] text-destructive/90 mb-4 hud-blink text-center">
+                // INCOMING · UNKNOWN NUMBER · CALL IT
+              </div>
+              <LiveBait onDismiss={() => setShowBait(false)} />
+            </div>
+          ) : returning ? (
             <CitizenDesk shift={shift} />
           ) : (
             <>
@@ -202,6 +209,7 @@ function CityMap() {
             </>
           )}
         </div>
+
 
 
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 scroll-hint">
