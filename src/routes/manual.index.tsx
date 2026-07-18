@@ -33,20 +33,36 @@ export const Route = createFileRoute("/manual/")({
 function ManualIndex() {
   const [unlocked, setUnlocked] = useState<Set<string>>(new Set());
   const [bossDeclassified, setBossDeclassified] = useState<string[]>([]);
+  const [profileTick, setProfileTick] = useState(0);
   useEffect(() => {
     setUnlocked(loadUnlocked());
     setBossDeclassified(loadBossProfile().declassified);
     const on = () => setUnlocked(loadUnlocked());
     const onBoss = () => setBossDeclassified(loadBossProfile().declassified);
+    const onProfile = () => setProfileTick((n) => n + 1);
     window.addEventListener("milverse:manual", on);
     window.addEventListener("milverse:boss", onBoss);
+    window.addEventListener("milverse:profile", onProfile);
     return () => {
       window.removeEventListener("milverse:manual", on);
       window.removeEventListener("milverse:boss", onBoss);
+      window.removeEventListener("milverse:profile", onProfile);
     };
   }, []);
 
+  const record = useMemo(() => {
+    const p = typeof window === "undefined" ? null : loadProfile();
+    const out = new Map<TacticId, { met: number; losses: number }>();
+    for (const e of MANUAL_ENTRIES) {
+      const r = encountersFor(e.id, p);
+      if (r.met > 0) out.set(e.id, { met: r.met, losses: r.losses });
+    }
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profileTick]);
+
   const unlockedCount = MANUAL_ENTRIES.filter((e) => unlocked.has(e.id)).length;
+
   const pct = Math.round((unlockedCount / MANUAL_ENTRIES.length) * 100);
 
   return (
