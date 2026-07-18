@@ -339,3 +339,98 @@ function Quadrant({
     </div>
   );
 }
+
+function StateOfTheCity({ census }: { census: CensusState }) {
+  const today = new Date().toISOString().slice(0, 10);
+  return (
+    <section className="mb-8 hud-frame border border-primary/30 bg-card/60 rounded-sm p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="stencil text-[10px] text-primary">
+          // STATE OF THE CITY · CENSUS
+        </div>
+        <div className="h-px flex-1 bg-primary/20" />
+        <div className="stencil text-[10px] text-muted-foreground">{today}</div>
+      </div>
+
+      {census.kind === "loading" && (
+        <div className="stencil text-[10px] text-muted-foreground">
+          // READING THE CENSUS…
+        </div>
+      )}
+
+      {census.kind === "sealed" && (
+        <div className="font-mono text-xs text-muted-foreground">
+          THE CENSUS STAYS SEALED UNTIL FIVE WATCHERS ARE ON RECORD. A CITY OF FOUR IS A LINEUP.
+        </div>
+      )}
+
+      {census.kind === "offline" && (
+        <div className="font-mono text-xs text-muted-foreground">
+          CENSUS OFFICE UNREACHABLE. THE CITY KEEPS ITS OWN BOOKS — YOURS ARE BELOW.
+        </div>
+      )}
+
+      {census.kind === "loaded" && (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Stat label="CALLS LOGGED" value={census.row.drops_total} />
+            <Stat label="CALLED RIGHT" value={`${census.row.drops_correct_pct}%`} accent />
+            <Stat label="THIS WEEK" value={census.row.drops_last7} />
+            <Stat label="WATCHERS ON RECORD" value={census.row.watchers} />
+          </div>
+          {(census.row.designer_cases >= 1 || census.row.hardest_case_id) && (
+            <div className="mt-4 space-y-1 font-mono text-[11px] text-muted-foreground">
+              {census.row.designer_cases >= 1 && (
+                <div>
+                  CITIZEN-DESIGNED CASES IN CIRCULATION: {census.row.designer_cases}.
+                </div>
+              )}
+              {census.row.hardest_case_id && census.row.hardest_fooled_pct != null && (
+                // Deliberate restraint: we do NOT print the case id. An id invites
+                // targeting the case; the number is the story.
+                <div>
+                  HARDEST FILE ON THE STREET: a citizen design that fooled{" "}
+                  {census.row.hardest_fooled_pct}% of everyone who touched it.
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      <div className="mt-6 pt-5 border-t border-primary/15">
+        <div className="stencil text-[10px] text-primary mb-3">
+          // WHAT THE CITY DOES NOT COUNT
+        </div>
+        <ul className="space-y-1.5 font-mono text-[11px] text-muted-foreground">
+          <li>— Names. There is no field for them.</li>
+          <li>— Message bodies. What you typed in a case never leaves your device.</li>
+          <li>
+            — Individual children. Family dashboards show skills, in groups of five or more, never
+            conversations.
+          </li>
+          <li>
+            — Faces or voices. The city records no user audio, video, or images — the microphone is
+            never asked for.
+          </li>
+          <li>
+            — Small groups. Any count under five people is suppressed at the database, not the
+            screen.
+          </li>
+        </ul>
+        <div className="mt-3 italic text-[11px] text-muted-foreground/80">
+          A census that counted more would know less about trust.
+        </div>
+        <div className="mt-3">
+          <Link
+            to="/charter"
+            className="stencil text-[10px] text-muted-foreground hover:text-primary transition"
+          >
+            THE FULL RULES → /charter
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
