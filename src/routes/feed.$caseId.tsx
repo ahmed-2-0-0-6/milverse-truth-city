@@ -19,6 +19,7 @@ import { writeXpDelta } from "@/lib/rank/xpSnapshot";
 import { XpDeltaLine } from "@/components/rank/XpDeltaLine";
 import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
+import { appendFeedWall } from "@/lib/feed/wall";
 import { Send, Search, Heart, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
 import { NextCaseCard } from "@/components/NextCaseCard";
@@ -150,6 +151,7 @@ function FeedPlay() {
             saveProfile(p);
             const xpAfter = computeXp(p, loadUnlocked().size, p.publishedCount ?? 0);
             writeXpDelta(xpBefore, xpAfter);
+            const nowTs = Date.now();
             logPilotEntry({
               wing: "feed",
               caseId: scenario.id,
@@ -164,7 +166,20 @@ function FeedPlay() {
                         ? "pyrrhic"
                         : "false_alarm",
               points: oc.points,
-              ts: Date.now(),
+              ts: nowTs,
+            });
+            appendFeedWall({
+              caseId: scenario.id,
+              verdict: verdict as "TRUE" | "FALSE" | "MISLEADING",
+              result:
+                oc.result === "correct"
+                  ? "correct"
+                  : oc.result === "missed_fake"
+                    ? "missed_scam"
+                    : oc.result === "false_alarm"
+                      ? "false_alarm"
+                      : "pyrrhic",
+              ts: nowTs,
             });
             window.dispatchEvent(new Event("milverse:profile"));
             checkAndAwardBadges(p);
