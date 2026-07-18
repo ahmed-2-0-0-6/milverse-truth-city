@@ -64,6 +64,8 @@ function FeedPlay() {
   const [verdict, setVerdict] = useState<FeedVerdict | null>(null);
   const [finalReply, setFinalReply] = useState("");
   const [conclusion, setConclusion] = useState("");
+  const [loadBearing, setLoadBearing] = useState<string[]>([]);
+
 
   useEffect(() => {
     track("case_start", {
@@ -123,7 +125,10 @@ function FeedPlay() {
           setVerdict={setVerdict}
           conclusion={conclusion}
           setConclusion={setConclusion}
+          loadBearing={loadBearing}
+          setLoadBearing={setLoadBearing}
           onConfirm={() => {
+
             if (!verdict) return;
             const oc = gradeVerdict(scenario, state, verdict, finalReply);
             setOutcome(oc);
@@ -214,7 +219,9 @@ function FeedPlay() {
           verdict={verdict}
           conclusion={conclusion}
           finalReply={finalReply}
+          loadBearing={loadBearing}
         />
+
       )}
     </div>
   );
@@ -517,6 +524,8 @@ function VerdictScreen({
   setFinalReply,
   conclusion,
   setConclusion,
+  loadBearing,
+  setLoadBearing,
   onConfirm,
 }: {
   scenario: FeedScenario;
@@ -527,6 +536,8 @@ function VerdictScreen({
   setFinalReply: (s: string) => void;
   conclusion: string;
   setConclusion: (s: string) => void;
+  loadBearing: string[];
+  setLoadBearing: React.Dispatch<React.SetStateAction<string[]>>;
   onConfirm: () => void;
 }) {
   const tone = classifyTone(finalReply);
@@ -536,11 +547,44 @@ function VerdictScreen({
       : tone === "respectful"
         ? "text-primary"
         : "text-muted-foreground";
-  const usedActions = scenario.actions.filter((a) => state.actionsUsed.includes(a.id));
+  const usedActions = state.actionsUsed
+    .map((id) => scenario.actions.find((a) => a.id === id))
+    .filter((a): a is NonNullable<typeof a> => Boolean(a));
+  const [srMsg, setSrMsg] = useState("");
+  function toggleLoadBearing(id: string, label: string) {
+    setLoadBearing((prev) => {
+      if (prev.includes(id)) {
+        setSrMsg(`${label} unmarked`);
+        return prev.filter((x) => x !== id);
+      }
+      if (prev.length >= 2) {
+        setSrMsg("Two marks maximum");
+        const el = document.getElementById(`lb-${id}`);
+        if (el) {
+          el.animate(
+            [
+              { transform: "translateX(0)" },
+              { transform: "translateX(-4px)" },
+              { transform: "translateX(4px)" },
+              { transform: "translateX(0)" },
+            ],
+            { duration: 220, easing: "ease-out" },
+          );
+        }
+        return prev;
+      }
+      setSrMsg(`${label} marked as load-bearing`);
+      return [...prev, id];
+    });
+  }
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
       <div className="font-mono text-xs tracking-[0.3em] text-caution">INVESTIGATION BOARD</div>
       <h1 className="mt-2 text-2xl font-semibold">Assemble the case. Deliver the verdict.</h1>
+
+      <span className="sr-only" aria-live="polite" role="status">
+        {srMsg}
+      </span>
 
       <section className="mt-5 rounded-xl border border-border bg-card p-4 space-y-3">
         <div className="font-mono text-[10px] tracking-widest text-muted-foreground">
@@ -550,28 +594,71 @@ function VerdictScreen({
           <div className="font-mono text-[10px] tracking-widest text-primary mb-1.5">THE CLAIM</div>
           <p className="text-xs italic border-l-2 border-primary/40 pl-2.5">"{scenario.opener}"</p>
         </div>
-        <div>
+        <div
+          aria-description="Mark at most two evidence cards as load-bearing."
+        >
           <div className="font-mono text-[10px] tracking-widest text-caution mb-1.5">
             VERIFICATION STEPS USED · {usedActions.length}/{scenario.actions.length}
           </div>
           {usedActions.length === 0 ? (
-            <p className="text-xs text-muted-foreground">
-              No toolkit actions used — you're calling this cold.
-            </p>
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p>No toolkit actions used — you're calling this cold.</p>
+              <p>Cold calls are how MISLEADING wins.</p>
+            </div>
           ) : (
-            <ul className="text-xs text-muted-foreground space-y-1">
-              {usedActions.map((a) => (
-                <li key={a.id}>· {a.label}</li>
-              ))}
+            <ul className="space-y-2">
+              {usedActions.map((a) => {
+                const marked = loadBearing.includes(a.id);
+                return (
+                  <li
+                    key={a.id}
+                    className={`rounded-md border p-3 transition ${
+                      marked ? "border-primary bg-primary/5" : "border-border bg-background/40"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-mono text-[10px] tracking-widest text-primary">
+                          {a.label}
+                        </div>
+                        <p className="mt-1.5 text-xs italic border-l-2 border-primary/30 pl-2.5 text-foreground/90">
+                          "{a.result}"
+                        </p>
+                      </div>
+                      <button
+                        id={`lb-${a.id}`}
+                        type="button"
+                        aria-pressed={marked}
+                        aria-label={`Mark ${a.label} as load-bearing evidence`}
+                        onClick={() => toggleLoadBearing(a.id, a.label)}
+                        className={`shrink-0 inline-flex items-center gap-1 rounded-sm border px-2 py-1 font-mono text-[9px] tracking-widest transition ${
+                          marked
+                            ? "border-primary bg-primary/15 text-primary"
+                            : "border-border text-muted-foreground hover:border-primary/50 hover:text-primary"
+                        }`}
+                      >
+                        <span aria-hidden>{marked ? "◆" : "◇"}</span>
+                        LOAD-BEARING
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
       </section>
 
+
       <p className="mt-6 text-sm text-muted-foreground">
         MISLEADING = the core is true but the framing (photo, date, context) is not. That's the most
         common type.
       </p>
+
+      <p className="mt-4 font-mono text-[10px] tracking-widest text-muted-foreground">
+        Verdicts rest on evidence. Mark what's holding yours up.
+      </p>
+
 
       <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2">
         {(["TRUE", "MISLEADING", "FALSE", "UNVERIFIED"] as FeedVerdict[]).map((v) => (
@@ -650,6 +737,7 @@ function Debrief({
   verdict,
   conclusion,
   finalReply,
+  loadBearing,
 }: {
   scenario: FeedScenario;
   outcome: FeedOutcome;
@@ -657,7 +745,9 @@ function Debrief({
   verdict: FeedVerdict | null;
   conclusion: string;
   finalReply: string;
+  loadBearing: string[];
 }) {
+
   const navigate = useNavigate();
   const [profileSnap, setProfileSnap] = useState(() => loadProfile());
   useEffect(() => {
@@ -725,7 +815,10 @@ function Debrief({
         </div>
       </section>
 
+      <BoardGraded scenario={scenario} state={state} loadBearing={loadBearing} />
+
       {scenario.tacticId && <TacticStamp tacticId={scenario.tacticId} />}
+
 
       {conclusion.trim() && (
         <div className="rounded-xl border border-border bg-card p-6">
@@ -824,3 +917,95 @@ function FeedStarAxis({ label, value }: { label: string; value: number }) {
     </div>
   );
 }
+
+/* ─────────── THE BOARD, GRADED ─────────── */
+function BoardGraded({
+  scenario,
+  state,
+  loadBearing,
+}: {
+  scenario: FeedScenario;
+  state: FeedState;
+  loadBearing: string[];
+}) {
+  const used = state.actionsUsed
+    .map((id) => scenario.actions.find((a) => a.id === id))
+    .filter((a): a is NonNullable<typeof a> => Boolean(a));
+  const marked = loadBearing
+    .map((id) => scenario.actions.find((a) => a.id === id))
+    .filter((a): a is NonNullable<typeof a> => Boolean(a));
+  const anyDecisiveUsed = used.some((a) => a.decisive);
+  const markedDecisive = marked.some((a) => a.decisive);
+  const stillInBelt = scenario.actions.filter(
+    (a) => a.decisive && !state.actionsUsed.includes(a.id),
+  );
+
+  let summary = "";
+  if (used.length === 0) {
+    summary = "No evidence, no board, no grade. The toolkit exists because 'it sounds off' is not a method.";
+  } else if (marked.length === 0) {
+    summary = "You checked, then voted from your gut anyway. Marking evidence is how you catch yourself bluffing.";
+  } else if (markedDecisive) {
+    summary = "Your verdict stood on the right evidence. That's the whole method.";
+  } else if (anyDecisiveUsed) {
+    summary = "You had the crack in the case on your board and leaned on something softer. Re-read what you skipped.";
+  } else {
+    summary = "Nothing you ran could settle this one. The tool that could is still in the belt.";
+  }
+
+  const unverifiedNote =
+    scenario.verdict === "UNVERIFIED" && marked.length > 0
+      ? "Some cases have no decisive evidence. Recognizing that IS the verdict."
+      : null;
+
+  return (
+    <section className="rounded-xl border border-border bg-card p-6 space-y-4">
+      <div className="font-mono text-xs tracking-widest text-muted-foreground">
+        THE BOARD, GRADED
+      </div>
+      {marked.length > 0 && (
+        <ul className="space-y-1.5">
+          {marked.map((a) => (
+            <li key={a.id} className="text-xs">
+              <span className="font-mono text-[10px] tracking-widest text-primary">{a.label}</span>
+              <span className="text-muted-foreground"> — </span>
+              {a.decisive ? (
+                <span className="text-primary">
+                  ◈ decisive — this was the crack in the case
+                </span>
+              ) : (
+                <span className="text-muted-foreground">
+                  supporting — real, but it didn't settle anything
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="text-sm text-foreground/90">{summary}</p>
+      {unverifiedNote && (
+        <p className="text-xs italic text-muted-foreground">{unverifiedNote}</p>
+      )}
+      {stillInBelt.length > 0 && (
+        <div className="rounded-md border border-caution/40 bg-caution/5 p-4 space-y-2">
+          <div className="font-mono text-[10px] tracking-widest text-caution">
+            STILL IN THE BELT
+          </div>
+          <ul className="space-y-2">
+            {stillInBelt.map((a) => (
+              <li key={a.id}>
+                <div className="font-mono text-[10px] tracking-widest text-caution">
+                  {a.label}
+                </div>
+                <p className="mt-1 text-xs italic border-l-2 border-caution/40 pl-2.5 text-foreground/90">
+                  "{a.result}"
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+  );
+}
+
