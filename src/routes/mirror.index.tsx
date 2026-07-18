@@ -75,7 +75,9 @@ function CaseFiles() {
   const fetchByCode = useServerFn(fetchCitizenCase);
   useEffect(() => {
     setProfile(loadProfile());
-    setCitizen(loadCitizenCases());
+    // THE MASK — private challenge cases never appear on the citizen shelf.
+    setCitizen(loadCitizenCases().filter((s) => !s.isMask));
+
     const on = () => setProfile(loadProfile());
     window.addEventListener("milverse:profile", on);
     return () => window.removeEventListener("milverse:profile", on);
