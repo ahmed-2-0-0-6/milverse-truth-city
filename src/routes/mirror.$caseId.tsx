@@ -17,6 +17,7 @@ import {
 } from "@/lib/mirror/engine";
 import { generateContactReply } from "@/lib/mirror/ai.functions";
 import { ARTIFACT_LABEL } from "@/lib/mirror/voice";
+import { fakeNumberForCase } from "@/lib/chat/fakeNumber";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
 import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
