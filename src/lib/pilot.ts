@@ -94,21 +94,22 @@ const OUTBOX_KEY = "milverse.pilot.outbox.v1";
 const OUTBOX_CAP = 200;
 const MAX_HEAD_FAILS = 5;
 
+function isOutboxShape(v: unknown): v is OutboxItem[] {
+  return Array.isArray(v);
+}
+
 function loadOutbox(): OutboxItem[] {
-  try {
-    const raw = localStorage.getItem(OUTBOX_KEY);
-    return raw ? (JSON.parse(raw) as OutboxItem[]) : [];
-  } catch {
-    return [];
+  const read = readStore<OutboxItem[]>(OUTBOX_KEY, isOutboxShape);
+  if (read === "corrupt") {
+    const rec = recoverStore<OutboxItem[]>(OUTBOX_KEY, isOutboxShape);
+    return rec ?? [];
   }
+  return read ?? [];
 }
 function saveOutbox(items: OutboxItem[]) {
-  try {
-    localStorage.setItem(OUTBOX_KEY, JSON.stringify(items));
-  } catch {
-    /* quota — nothing we can do */
-  }
+  writeStore(OUTBOX_KEY, items);
 }
+
 
 function enqueueOutbox(item: OutboxItem) {
   const list = loadOutbox();
