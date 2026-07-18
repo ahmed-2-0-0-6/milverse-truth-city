@@ -6,6 +6,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { Flame } from "lucide-react";
 import { useVisualMode } from "@/lib/visual-quality";
+import { streakLick } from "@/lib/mirror/audio";
 
 interface Props {
   streak: number;
