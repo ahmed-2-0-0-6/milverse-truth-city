@@ -2,8 +2,12 @@
 // Fully client-side, localStorage only. Resets on new UTC+5 day key.
 
 import { dropDateKey } from "@/lib/daily/rotation";
+import { readStore, recoverStore, writeStore } from "@/lib/storage";
 
+// Owner: inbox/profile (per-day InboxProfile). Bump the suffix on
+// breaking shape change; readStore validators are the compatibility gate.
 const KEY = "milverse.inbox.v1";
+
 
 export interface InboxProfile {
   dateKey: string;
