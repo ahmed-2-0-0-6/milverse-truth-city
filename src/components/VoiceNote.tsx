@@ -86,7 +86,7 @@ export function VoiceNote({ voice, fromPlayer = false, speakerName, speakerVoice
           {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
         </button>
         <div className="flex-1">
-          <div className="flex items-end gap-[2px] h-8">
+          <div className="flex items-end gap-[2px] h-8" aria-hidden="true">
             {bars.map((h, i) => {
               const active = i / bars.length <= progress;
               return (
@@ -98,6 +98,7 @@ export function VoiceNote({ voice, fromPlayer = false, speakerName, speakerVoice
               );
             })}
           </div>
+
           <div className="mt-1 flex items-center justify-between font-mono text-[10px] tracking-widest opacity-70">
             <span className="flex items-center gap-1">
               <Mic className="h-2.5 w-2.5" /> VOICE NOTE
