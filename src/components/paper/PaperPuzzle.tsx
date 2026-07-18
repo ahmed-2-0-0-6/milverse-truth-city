@@ -1,4 +1,5 @@
 // THE DAILY MIRAGE — Puzzle Corner. HEADLINE AUTOPSY: reorder words into honest form.
+import "@/styles/paper-fonts.css";
 import { useMemo, useState } from "react";
 import type { EditionPuzzle } from "@/lib/paper/types";
 import { markSectionDone } from "@/lib/paper/profile";

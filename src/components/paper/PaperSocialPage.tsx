@@ -1,4 +1,5 @@
 // THE DAILY MIRAGE — The Social Page
+import "@/styles/paper-fonts.css";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import type { EditionSocial } from "@/lib/paper/types";

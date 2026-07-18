@@ -1,4 +1,5 @@
 // MILVERSE — /paper/supplement — THE CITIZEN SUPPLEMENT.
+import "@/styles/paper-fonts.css";
 // A personal, weekly one-page edition composed at read time from local data.
 // Wholly separate from the human-published Daily Mirage editions.
 

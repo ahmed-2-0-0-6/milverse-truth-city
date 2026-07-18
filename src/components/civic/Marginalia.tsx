@@ -1,4 +1,5 @@
 // Civic primitive — the Handler's off-duty margin note.
+import "@/styles/paper-fonts.css";
 // Desktop (xl+): rendered in the outer gutter, rotated -1deg, italic,
 // muted amber, connected by a thin line. Below xl: an indented aside
 // under the block. The note is always in the DOM.

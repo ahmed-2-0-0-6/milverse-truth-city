@@ -1,4 +1,5 @@
 // MILVERSE — Citizen Inbox tray. Bell button + sheet listing today's arrivals.
+import "@/styles/paper-fonts.css";
 
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";

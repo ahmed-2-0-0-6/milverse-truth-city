@@ -44,7 +44,7 @@ export function DistrictHero({
         src={art}
         alt=""
         aria-hidden
-        loading="eager"
+        loading="lazy"
         decoding="async"
         width={1536}
         height={1024}
