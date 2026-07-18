@@ -94,40 +94,72 @@ function DropPage() {
   return (
     <div className="min-h-screen grain">
       <TopBar />
-      <main className="mx-auto max-w-3xl px-4 py-8">
-        <Link
-          to="/"
-          className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
-        >
-          ← CITY
-        </Link>
 
-        <div className="mt-4 flex items-center gap-3">
-          <div className="relative h-8 w-8">
-            {!status.playedToday && (
-              <span className="absolute inset-0 rounded-full bg-primary/40 animate-ping" />
-            )}
-            <span className="absolute inset-1 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-              <Radio className="h-3.5 w-3.5" />
-            </span>
-          </div>
-          <div>
-            <div className="font-mono text-[10px] tracking-[0.3em] text-primary flex items-center gap-2">
-              {friday && (
-                <span className="rounded-sm bg-primary/20 px-1.5 py-0.5">DESIGNER FRIDAY</span>
+      {/* ── Broadcast banner — the day's forward going out over the city ── */}
+      <header className="relative overflow-hidden border-b border-white/10">
+        <div
+          className="absolute inset-0"
+          aria-hidden
+          style={{
+            background:
+              "radial-gradient(70% 130% at 50% -30%, oklch(0.82 0.14 195 / 0.16), transparent 60%)," +
+              "radial-gradient(45% 70% at 90% 110%, oklch(0.8 0.14 80 / 0.1), transparent 70%)," +
+              "linear-gradient(180deg, oklch(0.14 0.03 255) 0%, var(--color-background) 100%)",
+          }}
+        />
+        {/* signal rings radiating from the tower mark */}
+        <div
+          className="absolute -top-24 left-1/2 -translate-x-1/2 h-72 w-72 pointer-events-none opacity-40"
+          aria-hidden
+          style={{
+            background:
+              "repeating-radial-gradient(circle at 50% 50%, transparent 0 26px, oklch(0.82 0.14 195 / 0.14) 26px 27px)",
+            maskImage: "linear-gradient(180deg, transparent 0%, black 40%, transparent 95%)",
+          }}
+        />
+        <div className="scan-sweep absolute inset-0 pointer-events-none" aria-hidden />
+
+        <div className="relative mx-auto max-w-3xl px-4 pt-8 pb-7">
+          <Link
+            to="/"
+            className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
+          >
+            ← CITY
+          </Link>
+
+          <div className="mt-4 flex items-center gap-3">
+            <div className="relative h-9 w-9 shrink-0">
+              {!status.playedToday && (
+                <span className="absolute inset-0 rounded-full bg-primary/40 animate-ping" />
               )}
-              AAJ KA FORWARD · {today.dateKey}
+              <span className="absolute inset-1 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
+                <Radio className="h-3.5 w-3.5" />
+              </span>
             </div>
-            <h1
-              className="mt-0.5 text-4xl sm:text-5xl font-black tracking-tight"
-              style={{ fontFamily: '"Bebas Neue", sans-serif' }}
-            >
-              TODAY'S FORWARD.
-            </h1>
+            <div>
+              <div className="font-mono text-[10px] tracking-[0.3em] text-primary flex items-center gap-2">
+                {friday && (
+                  <span className="rounded-sm bg-primary/20 px-1.5 py-0.5">DESIGNER FRIDAY</span>
+                )}
+                AAJ KA FORWARD · {today.dateKey} ·{" "}
+                {status.playedToday ? "SIGNAL ANSWERED" : "LIVE ON THE WIRE"}
+              </div>
+              <h1
+                className="mt-1 text-5xl sm:text-6xl font-black tracking-tight leading-[0.9]"
+                style={{
+                  fontFamily: '"Bebas Neue", sans-serif',
+                  textShadow: "0 0 26px oklch(0.82 0.14 195 / 0.4)",
+                }}
+              >
+                TODAY'S FORWARD.
+              </h1>
+            </div>
           </div>
         </div>
+      </header>
 
-        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-sm border border-border bg-card px-4 py-3">
+      <main className="mx-auto max-w-3xl px-4 py-6">
+        <div className="flex flex-wrap items-center gap-3 rounded-sm border border-border bg-card px-4 py-3">
           <div className="flex items-center gap-1.5 stencil text-[10px] text-primary">
             <Coins className="h-3.5 w-3.5" /> TRUST{" "}
             <span className="text-foreground tabular-nums">{status.trust}</span>
