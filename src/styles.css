@@ -2290,3 +2290,15 @@ html[data-high-legibility="on"] .tour-move,
 html[data-force-reduce-motion="on"] .tour-move {
   transition: none !important;
 }
+
+/* ---------- SPOT IT (round card slide) ---------- */
+.spot-slide {
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .spot-slide { transition: none !important; }
+}
+html[data-high-legibility="on"] .spot-slide,
+html[data-force-reduce-motion="on"] .spot-slide {
+  transition: none !important;
+}
