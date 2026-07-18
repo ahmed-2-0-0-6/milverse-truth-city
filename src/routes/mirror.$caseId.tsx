@@ -286,9 +286,34 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
       state: { ...state, pins },
       ended,
       endReason: endReason ?? undefined,
+      pinTags,
     };
     sessionStorage.setItem(SIM_KEY, JSON.stringify(stored));
-  }, [messages, state, pins, ended, endReason, scenario.id]);
+  }, [messages, state, pins, pinTags, ended, endReason, scenario.id]);
+
+  // Rehydrate pinTags if the player reloaded mid-case.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(SIM_KEY);
+      if (!raw) return;
+      const prior = JSON.parse(raw) as StoredSim;
+      if (prior.caseId === scenario.id && prior.pinTags) setPinTags(prior.pinTags);
+    } catch {
+      /* noop */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scenario.id]);
+
+  // Escape closes the quick-brief strip.
+  useEffect(() => {
+    if (!openRef) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenRef(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [openRef]);
+
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
