@@ -65,6 +65,7 @@ export function RankUpBeat() {
       const t = window.setTimeout(() => setRankUp(null), 400);
       return () => window.clearTimeout(t);
     }
+    rankRise();
     const t = window.setTimeout(() => setRankUp(null), 3400);
     return () => window.clearTimeout(t);
   }, [rankUp, mode]);
