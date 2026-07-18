@@ -268,13 +268,22 @@ function PressroomPage() {
                   </button>
                   <button
                     onClick={publish}
-                    disabled={status === "published" || status === "locked"}
+                    disabled={status === "published" || status === "locked" || stops > 0}
                     className="rounded-sm bg-primary text-primary-foreground px-3 py-1.5 stencil text-[10px] inline-flex items-center gap-1 disabled:opacity-40"
                   >
                     <Send className="h-3 w-3" /> PUBLISH
                   </button>
                 </div>
+                {stops > 0 && (
+                  <p className="stencil text-[10px] text-destructive mb-2">
+                    {stops} stop{stops === 1 ? "" : "s"} on the stone.
+                  </p>
+                )}
                 {err && <p className="text-destructive text-xs mb-2">{err}</p>}
+
+                <StonePanel notes={stone} stops={stops} advisories={advisories} />
+
+
 
                 {preview ? (
                   <div className="paper rounded-sm border border-border p-6">
