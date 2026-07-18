@@ -161,8 +161,25 @@ function CasePlay() {
   // case (spec). Standoff piggy-backs on the coldMode chrome (drill clock,
   // no assists, hidden meter number) but also raises its own flag so the
   // debrief slot can hand off to /standoff instead of writing to profile.
-  const [{ coldMode, standoffMode }] = useState<{ coldMode: boolean; standoffMode: boolean }>(() => {
-    if (typeof window === "undefined") return { coldMode: false, standoffMode: false };
+  const [{ coldMode, standoffMode, maskMode, maskCode }] = useState<{
+    coldMode: boolean;
+    standoffMode: boolean;
+    maskMode: boolean;
+    maskCode: string;
+  }>(() => {
+    if (typeof window === "undefined")
+      return { coldMode: false, standoffMode: false, maskMode: false, maskCode: "" };
+    // THE MASK — friend-forged challenge play. Highest priority; runs in
+    // drill chrome and never writes to profile/pilot/xp/tape.
+    const maskArm = consumeMaskArm();
+    if (maskArm && maskArm.caseId === scenario.id) {
+      try {
+        sessionStorage.setItem(MASK_START_KEY, String(Date.now()));
+        sessionStorage.removeItem(SIM_KEY);
+        sessionStorage.removeItem(VERDICT_KEY);
+      } catch { /* noop */ }
+      return { coldMode: true, standoffMode: false, maskMode: true, maskCode: maskArm.shareCode };
+    }
     const standoffArm = consumeStandoffArm();
     if (standoffArm === scenario.id) {
       try {
@@ -170,21 +187,24 @@ function CasePlay() {
         sessionStorage.removeItem(SIM_KEY);
         sessionStorage.removeItem(VERDICT_KEY);
       } catch { /* noop */ }
-      return { coldMode: true, standoffMode: true };
+      return { coldMode: true, standoffMode: true, maskMode: false, maskCode: "" };
     }
     const armed = consumeColdArm();
-    if (!armed || armed !== scenario.id) return { coldMode: false, standoffMode: false };
+    if (!armed || armed !== scenario.id)
+      return { coldMode: false, standoffMode: false, maskMode: false, maskCode: "" };
     try {
       const p = loadProfile();
-      if (!isColdEligible(p, scenario.id)) return { coldMode: false, standoffMode: false };
+      if (!isColdEligible(p, scenario.id))
+        return { coldMode: false, standoffMode: false, maskMode: false, maskCode: "" };
       sessionStorage.setItem(COLD_START_KEY, String(Date.now()));
       sessionStorage.removeItem(SIM_KEY);
       sessionStorage.removeItem(VERDICT_KEY);
-      return { coldMode: true, standoffMode: false };
+      return { coldMode: true, standoffMode: false, maskMode: false, maskCode: "" };
     } catch {
-      return { coldMode: false, standoffMode: false };
+      return { coldMode: false, standoffMode: false, maskMode: false, maskCode: "" };
     }
   });
+
 
   // Focus follows the phase (skip the initial mount — the dossier's default
   // top-of-page focus order is correct on first paint).
