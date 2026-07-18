@@ -32,11 +32,11 @@ export function LockScreen({
     const iv = setInterval(() => setNow(new Date()), 15_000);
     return () => clearInterval(iv);
   }, []);
-  const hh = now.getHours().toString().padStart(2, "0");
+  const h12 = ((now.getHours() + 11) % 12) + 1;
   const mm = now.getMinutes().toString().padStart(2, "0");
   const day = now.toLocaleDateString(undefined, {
     weekday: "long",
-    month: "short",
+    month: "long",
     day: "numeric",
   });
   const fg = wp.fg === "light" ? "text-white" : "text-neutral-900";
@@ -45,6 +45,7 @@ export function LockScreen({
     <div
       className={`relative flex-1 min-h-0 flex flex-col ${fg} ${className ?? ""}`}
       style={{ background: wp.bg }}
+      aria-label="Lock screen"
     >
       {/* Subtle glass overlay for readability */}
       <div className="absolute inset-0 bg-black/10 pointer-events-none" aria-hidden="true" />
@@ -63,10 +64,13 @@ export function LockScreen({
 
       <div className="relative flex-1 flex flex-col items-center px-4 pt-8">
         <div className="text-center drop-shadow-md">
-          <div className="text-[10px] font-mono tracking-[0.3em] opacity-80">
-            {day.toUpperCase()}
+          <div
+            className="text-6xl font-thin tabular-nums leading-none"
+            aria-hidden="true"
+          >{`${h12}:${mm}`}</div>
+          <div className="mt-2 text-[13px] font-medium tracking-wide opacity-90" aria-hidden="true">
+            {day}
           </div>
-          <div className="mt-2 text-6xl font-thin tabular-nums leading-none">{`${hh}:${mm}`}</div>
           {cityName && <div className="mt-4 text-sm font-medium opacity-90">Hey {cityName}.</div>}
           {hint && <div className="mt-1 text-[11px] opacity-70">{hint}</div>}
         </div>

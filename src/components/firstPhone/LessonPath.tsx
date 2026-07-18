@@ -9,6 +9,7 @@ import { LessonCleared } from "./LessonCleared";
 import { LockScreen } from "./LockScreen";
 import { FirstBoot } from "./FirstBoot";
 import { ChatShell } from "@/components/chat/ChatShell";
+import { SpotIt } from "./SpotIt";
 import { ChevronLeft } from "lucide-react";
 
 function freshState(): FirstPhoneState {
@@ -22,6 +23,7 @@ function freshState(): FirstPhoneState {
     wallpaper: 0,
     handoverSeen: false,
     tourSeen: false,
+    spotItBest: 0,
   };
 }
 
@@ -36,6 +38,7 @@ export function LessonPath() {
   const [showLicense, setShowLicense] = useState(false);
   const [graduated, setGraduated] = useState(false);
   const [cleared, setCleared] = useState<number | null>(null);
+  const [openSpotIt, setOpenSpotIt] = useState(false);
   const homeHostRef = useRef<HTMLDivElement>(null);
   const [tourHost, setTourHost] = useState<HTMLElement | null>(null);
 
@@ -70,6 +73,21 @@ export function LessonPath() {
       // Small cleared beat before the home screen. Graduation replaces it on L10.
       setCleared(n);
     }
+  }
+
+  // SPOT IT mini-game
+  if (openSpotIt) {
+    return (
+      <div className="mt-4">
+        <SpotIt
+          onBackHome={() => setOpenSpotIt(false)}
+          onGoToLesson1={() => {
+            setOpenSpotIt(false);
+            setOpenLesson(1);
+          }}
+        />
+      </div>
+    );
   }
 
   // License "app"
@@ -168,6 +186,7 @@ export function LessonPath() {
             state={state}
             onOpenLesson={(n) => setOpenLesson(n)}
             onOpenLicense={() => setShowLicense(true)}
+            onOpenSpotIt={() => setOpenSpotIt(true)}
           />
           {state.active &&
             state.handoverSeen &&

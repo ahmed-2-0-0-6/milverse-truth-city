@@ -2,7 +2,7 @@ import { LESSONS } from "@/lib/firstPhone/lessons";
 import { getWallpaper } from "./wallpapers";
 import type { FirstPhoneState } from "@/lib/firstPhone/profile";
 import { isLessonUnlocked } from "@/lib/firstPhone/profile";
-import { Lock, Check, ShieldCheck } from "lucide-react";
+import { Lock, Check, ShieldCheck, Target } from "lucide-react";
 
 // Domain-specific mini glyphs per lesson tactic — one per lesson.
 const APP_ICONS: Record<number, string> = {
@@ -35,16 +35,19 @@ interface Props {
   state: FirstPhoneState;
   onOpenLesson: (n: number) => void;
   onOpenLicense: () => void;
+  onOpenSpotIt: () => void;
 }
 
 /**
  * The First Phone HOME SCREEN — the LessonPath, rendered as apps.
  * Pure DOM/CSS; works everywhere.
  */
-export function HomeScreen({ state, onOpenLesson, onOpenLicense }: Props) {
+export function HomeScreen({ state, onOpenLesson, onOpenLicense, onOpenSpotIt }: Props) {
   const wp = getWallpaper(state.wallpaper);
   const licensed = !!state.licenseIssuedAt;
   const done = state.lessonsCompleted.length;
+  const batteryPct = Math.max(10, Math.min(100, 10 + done * 9));
+  const spotItReady = done > 0;
 
   return (
     <div
@@ -61,12 +64,34 @@ export function HomeScreen({ state, onOpenLesson, onOpenLicense }: Props) {
               {done} / {LESSONS.length} lessons
             </div>
           </div>
-          {state.kidCityName && (
-            <div className="text-right" data-tour="name">
-              <div className="font-mono text-[10px] tracking-[0.25em] opacity-80">CITIZEN</div>
-              <div className="text-sm font-medium">{state.kidCityName}</div>
+          <div className="flex items-center gap-3">
+            {state.kidCityName && (
+              <div className="text-right" data-tour="name">
+                <div className="font-mono text-[10px] tracking-[0.25em] opacity-80">CITIZEN</div>
+                <div className="text-sm font-medium">{state.kidCityName}</div>
+              </div>
+            )}
+            <div
+              className="flex flex-col items-center"
+              title="The phone charges as you learn."
+              aria-label={`Battery ${batteryPct} percent. The phone charges as you learn.`}
+            >
+              <span className="relative block h-3 w-7 rounded-[3px] border border-white/80">
+                <span
+                  className="absolute -right-[3px] top-1/2 -translate-y-1/2 h-1.5 w-[2px] rounded-r bg-white/80"
+                  aria-hidden="true"
+                />
+                <span
+                  className="absolute inset-y-[1px] left-[1px] rounded-[2px] bg-white/80 transition-[width] duration-500"
+                  style={{ width: `calc(${batteryPct}% - 2px)` }}
+                  aria-hidden="true"
+                />
+              </span>
+              <span className="mt-0.5 font-mono text-[9px] tracking-widest opacity-80">
+                {batteryPct}%
+              </span>
             </div>
-          )}
+          </div>
         </div>
 
         <ul data-tour="adult" className="grid grid-cols-4 gap-3" aria-label="First Phone lessons">
@@ -109,6 +134,28 @@ export function HomeScreen({ state, onOpenLesson, onOpenLicense }: Props) {
               </li>
             );
           })}
+
+          <li className="col-span-4 mt-2 border-t border-white/10 pt-3">
+            <button
+              onClick={onOpenSpotIt}
+              aria-label={
+                spotItReady
+                  ? "SPOT IT — practice tricks you've already learned"
+                  : "SPOT IT — locked. Finish Lesson 1 to open."
+              }
+              className={`group inline-flex flex-col items-center gap-1.5 text-white focus-visible:outline-none ${
+                spotItReady ? "" : "opacity-50"
+              }`}
+            >
+              <span className="relative flex h-14 w-14 items-center justify-center rounded-[18px] shadow-lg bg-gradient-to-br from-teal-400 to-teal-600 group-hover:scale-105 group-active:scale-95 transition-all focus-visible:ring-2 focus-visible:ring-white">
+                <Target className="h-7 w-7 text-white" strokeWidth={2} aria-hidden="true" />
+              </span>
+              <span className="text-[10px] text-center leading-tight opacity-95 drop-shadow-sm tracking-wide">
+                SPOT IT
+              </span>
+            </button>
+          </li>
+
 
           {licensed && (
             <li className="col-span-4 mt-4">

@@ -16,6 +16,8 @@ export interface FirstPhoneState {
   handoverSeen: boolean;
   /** ADDITIVE: once-per-child guided phone tour played (or skipped)? */
   tourSeen: boolean;
+  /** ADDITIVE: best consecutive-correct streak in the SPOT IT mini-game. */
+  spotItBest: number;
 }
 
 function fresh(): FirstPhoneState {
@@ -29,7 +31,16 @@ function fresh(): FirstPhoneState {
     wallpaper: 0,
     handoverSeen: false,
     tourSeen: false,
+    spotItBest: 0,
   };
+}
+
+export function setSpotItBest(n: number) {
+  const s = loadFirstPhone();
+  if (n > s.spotItBest) {
+    s.spotItBest = n;
+    saveFirstPhone(s);
+  }
 }
 
 export function setWallpaper(i: number) {
