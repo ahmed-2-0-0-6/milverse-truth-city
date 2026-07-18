@@ -701,48 +701,58 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               presenceDot={skin.id === "instagram"}
               onContacts={() => setContactsOpen(true)}
             />
-            {/* meter + tabs */}
+            {/* meter + tabs — cold mode strips the needle, the number, the bar, the note. */}
             <div className="px-3 py-2 bg-neutral-950/80 border-b border-white/10 relative">
-              <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-white/50">
-                <span
-                  className={state.meter <= 30 ? "text-destructive hud-blink" : ""}
-                  aria-label={`The Line, ${currentBand.label}, ${Math.round(state.meter)}`}
-                >
-                  THE LINE · {currentBand.label}
-                </span>
-
-                <span className="flex items-center gap-1.5 tabular-nums">
-                  {meterDelta !== null && (
+              {coldMode ? (
+                <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-white/50">
+                  <span>BLIND · NO NEEDLE</span>
+                  <DrillClock onExpire={() => setDrillExpired(true)} />
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-white/50">
                     <span
-                      key={meterDelta}
-                      className={`msg-in font-bold ${meterDelta < 0 ? "text-destructive" : "text-primary"}`}
-                      aria-hidden
+                      className={state.meter <= 30 ? "text-destructive hud-blink" : ""}
+                      aria-label={`The Line, ${currentBand.label}, ${Math.round(state.meter)}`}
                     >
-                      {meterDelta > 0 ? `+${meterDelta}` : meterDelta}
+                      THE LINE · {currentBand.label}
                     </span>
-                  )}
-                  {Math.round(state.meter)}
-                  {claimedClock && (
-                    <ClockChip clock={claimedClock} onExpire={handleClockExpire} />
-                  )}
-                </span>
-              </div>
-              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-                <div
-                  className={`h-full transition-all duration-500 ${meterColor} ${state.meter <= 30 ? "animate-pulse" : ""}`}
-                  style={{
-                    width: `${state.meter}%`,
-                    boxShadow: state.meter <= 30 ? "0 0 10px oklch(0.55 0.2 25 / 0.8)" : undefined,
-                  }}
-                />
-              </div>
-              <MeterNote
-                bandKey={currentBand.key}
-                label={currentBand.label}
-                note={currentBand.note}
-                sendTick={sendTick}
-                showOnMount={showBandOnMount}
-              />
+
+                    <span className="flex items-center gap-1.5 tabular-nums">
+                      {meterDelta !== null && (
+                        <span
+                          key={meterDelta}
+                          className={`msg-in font-bold ${meterDelta < 0 ? "text-destructive" : "text-primary"}`}
+                          aria-hidden
+                        >
+                          {meterDelta > 0 ? `+${meterDelta}` : meterDelta}
+                        </span>
+                      )}
+                      {Math.round(state.meter)}
+                      {claimedClock && (
+                        <ClockChip clock={claimedClock} onExpire={handleClockExpire} />
+                      )}
+                    </span>
+                  </div>
+                  <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                    <div
+                      className={`h-full transition-all duration-500 ${meterColor} ${state.meter <= 30 ? "animate-pulse" : ""}`}
+                      style={{
+                        width: `${state.meter}%`,
+                        boxShadow: state.meter <= 30 ? "0 0 10px oklch(0.55 0.2 25 / 0.8)" : undefined,
+                      }}
+                    />
+                  </div>
+                  <MeterNote
+                    bandKey={currentBand.key}
+                    label={currentBand.label}
+                    note={currentBand.note}
+                    sendTick={sendTick}
+                    showOnMount={showBandOnMount}
+                  />
+                </>
+              )}
+
 
               <div className="mt-2 flex gap-1" role="tablist" aria-label="Chat and notes">
                 {(["chat", "notes"] as const).map((t, i, arr) => (
