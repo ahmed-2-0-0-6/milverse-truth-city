@@ -101,7 +101,7 @@ export function IncomingToast() {
                     <span className="ml-auto stencil text-[9px] text-muted-foreground">now</span>
                   </span>
                   <span className="mt-0.5 block truncate text-xs text-muted-foreground">
-                    {it.preview}
+                    {isNightRegister(currentShift().band) ? `LATE · ${it.preview}` : it.preview}
                   </span>
                 </span>
                 <span className="stencil text-[10px] text-primary self-center pl-1">OPEN</span>
