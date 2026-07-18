@@ -2499,8 +2499,11 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       {result.tells.length > 0 && (
         <section className="rounded-xl border border-border bg-card p-6">
           <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
-            WHAT THEY SAID · TELLS FROM YOUR CHAT
+            {scenario.truth === "IMPOSTER"
+              ? `INTEL EXTRACTED · ${result.tells.length} TELL${result.tells.length === 1 ? "" : "S"}`
+              : "WHAT THEY SAID · TELLS FROM YOUR CHAT"}
           </div>
+
           <ul className="space-y-3">
             {result.tells.map((t, i) => (
               <li key={i} className="rounded-md border-l-2 border-caution bg-caution/5 pl-3 py-2">
