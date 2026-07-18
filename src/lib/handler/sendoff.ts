@@ -94,6 +94,14 @@ export function buildSendOff(
     return "You've been certain and wrong this week. Certainty is a claim. Verify yours.";
   }
 
+  // THE NIGHT SHIFT — night/smallHours pool trumps history-neutral lines,
+  // but sits below OVERSURE (which is a stronger, personalized signal).
+  const band = stats.band ?? currentShift(new Date()).band;
+  if (isNightRegister(band)) {
+    return pick(NIGHT_POOL, seed);
+  }
+
+
   // Streak-honoring nudge for calibrated players on hot streaks.
   if (reading.id === "calibrated" && stats.dailyStreak >= 5) {
     return pick(
