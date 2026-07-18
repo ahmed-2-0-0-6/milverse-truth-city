@@ -12,6 +12,7 @@ import {
   SheetDescription,
   SheetClose,
 } from "@/components/ui/sheet";
+import { GameBar, isGameSurface } from "@/components/GameBar";
 import {
   loadProfile,
   calibrationLabel,
