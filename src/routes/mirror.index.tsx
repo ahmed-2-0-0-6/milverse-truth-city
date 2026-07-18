@@ -234,6 +234,7 @@ function CaseFiles() {
           {codeErr && <span className="text-xs text-destructive">{codeErr}</span>}
         </div>
 
+        <ReopenedStrip />
         <RecommendedStrip />
 
         {/* Boss Protocol beacon */}
