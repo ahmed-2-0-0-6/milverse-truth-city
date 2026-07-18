@@ -165,7 +165,7 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
         <div className="flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-caution">
           <FileText className="h-4 w-4" /> CASE DOSSIER · TIER {scenario.tier}
         </div>
-        <h1 className="mt-4 text-2xl font-semibold">{scenario.title}</h1>
+        <h1 data-phase-anchor="mirror" tabIndex={-1} className="mt-4 text-2xl font-semibold outline-none">{scenario.title}</h1>
 
         {/* THE CLAIM — bordered claim card. */}
         <section className="mt-6">
