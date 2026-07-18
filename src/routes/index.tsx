@@ -15,6 +15,8 @@ import { InboxManager } from "@/components/inbox/InboxManager";
 import { IncomingToast } from "@/components/inbox/IncomingToast";
 import { IncomingCall } from "@/components/inbox/IncomingCall";
 import { FirstCall } from "@/components/onboarding/FirstCall";
+import { CitizenDesk } from "@/components/landing/CitizenDesk";
+import { isReturningCitizen } from "@/lib/city/returning";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -50,9 +52,15 @@ function CityMap() {
   const [booted, setBooted] = useState(mode !== "cinematic");
   const [intro, setIntro] = useState(false);
   const [view, setView] = useState<"map" | "list">("map");
+  // Hydration idiom (mirrors the existing setView useEffect below): SSR
+  // renders the poster (isReturning=false); the desk is enabled after
+  // mount when localStorage is readable. Wrapped in a stable-height
+  // container to avoid layout shift on either path.
+  const [returning, setReturning] = useState(false);
 
   useEffect(() => {
     setView(preferredDefaultView());
+    setReturning(isReturningCitizen());
     if (typeof window !== "undefined" && !localStorage.getItem(INTRO_KEY)) setIntro(true);
   }, []);
 
@@ -126,35 +134,49 @@ function CityMap() {
           />
         </div>
 
-        <div className="stencil text-[10px] text-cyan-300/80 mb-4 hud-blink">
-          // MILVERSE · CITY OF VERIFICATION
-        </div>
-        <HeroType />
-        <p className="mt-4 max-w-xl text-center text-white/70 text-sm sm:text-base">
-          A city that trains your trust — play today's forward.
-        </p>
-        <p className="mt-2 max-w-xl text-center text-white/50 text-xs sm:text-sm">
-          Fakes beat eyes. They don't beat verification.
-        </p>
+        {/* Hero copy block. First-time visitors (and SSR / judges without a
+            local profile) see the poster verbatim. Returning citizens land
+            on the desk instead. The stable min-height container prevents
+            layout shift on either path — hydration idiom follows the
+            existing setView pattern above. */}
+        <div className="w-full flex flex-col items-center min-h-[420px] sm:min-h-[460px]">
+          {returning ? (
+            <CitizenDesk />
+          ) : (
+            <>
+              <div className="stencil text-[10px] text-cyan-300/80 mb-4 hud-blink">
+                // MILVERSE · CITY OF VERIFICATION
+              </div>
+              <HeroType />
+              <p className="mt-4 max-w-xl text-center text-white/70 text-sm sm:text-base">
+                A city that trains your trust — play today's forward.
+              </p>
+              <p className="mt-2 max-w-xl text-center text-white/50 text-xs sm:text-sm">
+                Fakes beat eyes. They don't beat verification.
+              </p>
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            to="/drop"
-            className="cta-glow inline-flex items-center gap-2 rounded-sm bg-primary px-6 py-3 text-primary-foreground stencil text-xs"
-          >
-            <Sparkles className="h-3.5 w-3.5" /> PLAY TODAY'S DROP →
-          </Link>
-          <a
-            href="#enter"
-            className="inline-flex items-center gap-2 rounded-sm border border-white/25 px-6 py-3 text-white/80 stencil text-xs hover:border-cyan-300 hover:text-cyan-200 transition"
-          >
-            ENTER THE CITY ↓
-          </a>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <Link
+                  to="/drop"
+                  className="cta-glow inline-flex items-center gap-2 rounded-sm bg-primary px-6 py-3 text-primary-foreground stencil text-xs"
+                >
+                  <Sparkles className="h-3.5 w-3.5" /> PLAY TODAY'S DROP →
+                </Link>
+                <a
+                  href="#enter"
+                  className="inline-flex items-center gap-2 rounded-sm border border-white/25 px-6 py-3 text-white/80 stencil text-xs hover:border-cyan-300 hover:text-cyan-200 transition"
+                >
+                  ENTER THE CITY ↓
+                </a>
+              </div>
+
+              <div className="mt-8 w-full max-w-xl">
+                <DailyBeacon />
+              </div>
+            </>
+          )}
         </div>
 
-        <div className="mt-8 w-full max-w-xl">
-          <DailyBeacon />
-        </div>
 
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 scroll-hint">
           <span className="stencil text-[9px] text-white/50">SCROLL</span>
