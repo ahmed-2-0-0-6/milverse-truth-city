@@ -58,11 +58,17 @@ function CityMap() {
   // mount when localStorage is readable. Wrapped in a stable-height
   // container to avoid layout shift on either path.
   const [returning, setReturning] = useState(false);
+  // THE NIGHT SHIFT — landing recomputes its band every 60s so a session
+  // left open across a boundary catches up. Elsewhere band is per-mount.
+  const [shift, setShift] = useState<Shift>(() => currentShift());
 
   useEffect(() => {
     setView(preferredDefaultView());
     setReturning(isReturningCitizen());
     if (typeof window !== "undefined" && !localStorage.getItem(INTRO_KEY)) setIntro(true);
+    setShift(currentShift());
+    const tick = window.setInterval(() => setShift(currentShift()), 60_000);
+    return () => window.clearInterval(tick);
   }, []);
 
   useEffect(() => {
@@ -77,6 +83,17 @@ function CityMap() {
       /* localStorage unavailable */
     }
   };
+
+  const night = isNightRegister(shift.band);
+  const kicker =
+    shift.band === "evening"
+      ? "// MILVERSE · THE EVENING EDITION"
+      : shift.band === "night"
+        ? "// MILVERSE · THE NIGHT SHIFT"
+        : shift.band === "smallHours"
+          ? "// MILVERSE · THE SMALL HOURS · THE DESK NEVER CLOSES"
+          : "// MILVERSE · CITY OF VERIFICATION";
+
 
   return (
     <div className="noir-landing min-h-screen relative overflow-x-hidden">
