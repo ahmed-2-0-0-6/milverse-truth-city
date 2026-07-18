@@ -1355,6 +1355,25 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           {result.points >= 0 ? "+" : ""}
           {result.points} pts
         </div>
+        {(() => {
+          const line = debriefLineFor(result.correctVerdict, verdictRaw.confidence);
+          const rep = computeConviction(profileSnap.history);
+          return (
+            <>
+              {line && (
+                <p className="mt-3 font-mono text-[11px] tracking-wide opacity-90 border-t border-current/20 pt-3">
+                  {line}
+                </p>
+              )}
+              {rep.status === "ok" && (
+                <p className="mt-1 font-mono text-[10px] tracking-widest opacity-70">
+                  CONVICTION LEDGER: {rep.headline} · gap {rep.gap >= 0 ? "+" : ""}
+                  {rep.gap}
+                </p>
+              )}
+            </>
+          );
+        })()}
         {scenario.tier === 5 && !result.usedVob && result.correctVerdict && (
           <p className="mt-3 text-xs opacity-90 border-t border-current/20 pt-3">
             Correct — but at Tier 5, in-band tells are unreliable. Verifying out-of-band would have
