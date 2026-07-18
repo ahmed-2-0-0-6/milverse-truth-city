@@ -332,12 +332,15 @@ interface StoredSim {
 }
 
 function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void }) {
-  const isCleanRoom = scenario.tier === 5;
+  const coldMode = useContext(ColdReadContext);
+  const isCleanRoom = scenario.tier === 5 && !coldMode;
   const { mode } = useVisualMode();
   const cinematic = mode === "cinematic";
   const skin = isCleanRoom ? CLEAN_ROOM_SKIN : skinForCase(scenario.id);
   const useRitual = isCleanRoom && cinematic;
   const [airlockOn, setAirlockOn] = useState<boolean>(isCleanRoom && cinematic);
+  const [drillExpired, setDrillExpired] = useState<boolean>(false);
+
 
   const refs = useMemo(() => factRefsFor(scenario), [scenario]);
   const [messages, setMessages] = useState<Message[]>([]);
