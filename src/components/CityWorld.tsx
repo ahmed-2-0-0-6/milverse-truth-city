@@ -51,6 +51,8 @@ const DEFAULT_ZOOM_IDX = 1;
 export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
   const nav = useNavigate();
   const prefersReduced = useReducedMotion();
+  const { mode } = useVisualMode();
+  const ambient = mode === "cinematic" && !prefersReduced;
   const [profile, setProfile] = useState<TrustProfile | null>(null);
 
   useEffect(() => {
@@ -59,6 +61,23 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
     window.addEventListener("milverse:profile", on);
     return () => window.removeEventListener("milverse:profile", on);
   }, []);
+
+  // Single 60s clock for ambient life (windows + tint). One interval, cleaned up.
+  const [clock, setClock] = useState(() => {
+    const d = new Date();
+    return { hour: d.getHours(), minuteOfDay: d.getHours() * 60 + d.getMinutes() };
+  });
+  useEffect(() => {
+    if (!ambient) return; // ambient is off — no need to tick
+    const tick = () => {
+      const d = new Date();
+      setClock({ hour: d.getHours(), minuteOfDay: d.getHours() * 60 + d.getMinutes() });
+    };
+    tick();
+    const id = window.setInterval(tick, 60_000);
+    return () => window.clearInterval(id);
+  }, [ambient]);
+
 
   const mirror = useMemo(buildMirrorStations, []);
   const feed = useMemo(buildFeedStations, []);
