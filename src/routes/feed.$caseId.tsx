@@ -13,6 +13,10 @@ import {
   type FeedOutcome,
 } from "@/lib/feed/engine";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
+import { computeXp } from "@/lib/ranks";
+import { loadUnlocked } from "@/lib/manual/state";
+import { writeXpDelta } from "@/lib/rank/xpSnapshot";
+import { XpDeltaLine } from "@/components/rank/XpDeltaLine";
 import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
 import { Send, Search, Heart, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
