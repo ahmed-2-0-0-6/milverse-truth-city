@@ -25,7 +25,10 @@ import {
   type BossState,
   type BossOutcome,
 } from "@/lib/boss/engine";
-import { attemptCount, recordBossAttempt, canRematch } from "@/lib/boss/profile";
+import { attemptCount, recordBossAttempt, canRematch, loadBossProfile } from "@/lib/boss/profile";
+import { ColdOpen } from "@/components/boss/ColdOpen";
+import { useVisualMode } from "@/lib/visual-quality";
+import { shouldReduceMotion } from "@/lib/access";
 import { DOCTRINE_RULES } from "@/lib/boss/doctrine";
 import { logPilotEntry } from "@/lib/pilot";
 import { loadProfile } from "@/lib/mirror/profile";
@@ -90,7 +93,8 @@ function BossPlay() {
   const boss = getBoss(bossId);
   const reducedMotion = useReducedMotion();
 
-  const [stage, setStage] = useState<"intro" | "play" | "cinema" | "debrief">("intro");
+  const [stage, setStage] = useState<"intro" | "cold-open" | "play" | "cinema" | "debrief">("intro");
+  const { mode: visualMode } = useVisualMode();
   const [state, setState] = useState<BossState | null>(null);
   const [log, setLog] = useState<LogItem[]>([]);
   const [outcome, setOutcome] = useState<BossOutcome | null>(null);
@@ -166,6 +170,32 @@ function BossPlay() {
 
   const fxDistrict: DistrictKey = boss.district === "feed" ? "feed" : "mirror";
 
+  // Local record for THIS boss — used by intro card + cold open.
+  const bossAttempts = loadBossProfile().attempts.filter((a) => a.bossId === boss.id);
+  const record = {
+    attempts: bossAttempts.length,
+    wins: bossAttempts.filter((a) => a.outcome === "WIN").length,
+  };
+  const recordRow =
+    record.attempts === 0
+      ? "NO PRIOR CONTACT. YOU ARE THE FIRST CALL."
+      : record.wins === 0
+        ? `PRIOR CONTACTS: ${record.attempts}. SURVIVORS: 0.`
+        : `PRIOR CONTACTS: ${record.attempts}. YOU WALKED AWAY ${record.wins} TIME(S).`;
+
+  function enterBoss() {
+    if (visualMode === "cinematic" && !shouldReduceMotion()) {
+      setStage("cold-open");
+    } else {
+      setStage("play");
+    }
+  }
+
+  /* ── COLD OPEN ───────────────────────────────────────────── */
+  if (stage === "cold-open") {
+    return <ColdOpen boss={boss} record={record} onDone={() => setStage("play")} />;
+  }
+
   /* ── INTRO CINEMATIC ─────────────────────────────────────── */
   if (stage === "intro") {
     return (
@@ -182,6 +212,9 @@ function BossPlay() {
             <div className="text-xs tracking-[0.3em] text-red-400">
               THREAT RATING {boss.threatRating}
             </div>
+            <div className="font-mono text-[11px] tracking-wider text-white/60 border-l-2 border-white/15 pl-3">
+              {recordRow}
+            </div>
             <p className="text-white/80 leading-relaxed">{boss.tagline}</p>
             <div className="border-t border-red-900/40 pt-4 mt-4">
               <div className="inline-block px-3 py-1.5 bg-red-600 text-white text-[10px] font-black tracking-[0.3em] rotate-[-2deg]">
@@ -193,7 +226,7 @@ function BossPlay() {
             </div>
             <div className="flex gap-3 pt-3">
               <button
-                onClick={() => setStage("play")}
+                onClick={enterBoss}
                 className="flex-1 py-3 bg-red-600 hover:bg-red-500 rounded font-bold tracking-wider text-sm"
               >
                 ENTER
