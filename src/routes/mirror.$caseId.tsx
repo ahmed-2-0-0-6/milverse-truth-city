@@ -231,12 +231,27 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
 
       <SendOff />
 
+      {scenario.tier === 5 && (
+        <div className="mt-6 rounded-sm border border-[#1b2430]/40 bg-[#f4f4f0] p-5 text-[#1b2430]">
+          <div className="stencil text-[11px] tracking-[0.3em] text-[#1b2430]/70">
+            TIER 5 · THE CLEAN ROOM
+          </div>
+          <p className="mt-3 text-sm leading-relaxed">
+            Every fact you hold will be answered correctly. Every tell you've learned will be
+            absent. Reading this conversation cannot settle it — in here, a flawless performance
+            and the plain truth look identical. The door out is marked VERIFY. It was always the
+            door.
+          </p>
+        </div>
+      )}
+
       <button
         onClick={onStart}
         className="mt-6 w-full rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground transition-transform hover:scale-[1.01]"
       >
         I'VE MEMORIZED IT — START
       </button>
+
       <p className="mt-3 text-center text-xs text-muted-foreground">
         The brief rides along in NOTES. Pin what smells wrong and tag which fact it breaks.
       </p>
