@@ -683,6 +683,9 @@ function Debrief({
         </div>
         <div className="mt-1 text-xl font-semibold">{outcome.headline}</div>
         <p className="mt-2 text-sm">{outcome.detail}</p>
+        <div className="mt-3">
+          <XpDeltaLine />
+        </div>
       </div>
 
       <CalibrationQuadrant profile={profileSnap} compact caption="CALIBRATION · AFTER THIS CASE" />
