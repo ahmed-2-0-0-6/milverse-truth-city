@@ -813,6 +813,13 @@ function MessageRow({
   speakerVoiceDesc,
   read,
   skin,
+  hasReply,
+  grade,
+  why,
+  markOpen,
+  autoOpenMark,
+  onOpenMark,
+  onCloseMark,
 }: {
   m: Message;
   pinned: boolean;
@@ -822,6 +829,14 @@ function MessageRow({
   /** Player bubbles: has the contact "seen" this yet (replied or typing)? */
   read?: boolean;
   skin: ChatSkin;
+  /** True when a later contact message exists — gates craft marks. */
+  hasReply?: boolean;
+  grade?: CraftGrade;
+  why?: string;
+  markOpen?: boolean;
+  autoOpenMark?: boolean;
+  onOpenMark?: () => void;
+  onCloseMark?: () => void;
 }) {
   if (m.role === "system") {
     return (
@@ -835,6 +850,7 @@ function MessageRow({
   }
 
   const isPlayer = m.role === "player";
+  const showMark = isPlayer && !!grade && !!hasReply && !!why && !!onOpenMark && !!onCloseMark;
   return (
     <div className={`msg-in flex ${isPlayer ? "justify-end" : "justify-start"} gap-2`}>
       {!isPlayer && onPin && (
@@ -881,11 +897,22 @@ function MessageRow({
             {m.text}
           </div>
           <MessageMeta ts={m.ts} isPlayer={isPlayer} read={!!read} skin={skin} />
+          {showMark && (
+            <CraftMark
+              grade={grade!}
+              why={why!}
+              open={!!markOpen}
+              onOpen={onOpenMark!}
+              onClose={onCloseMark!}
+              autoOpen={!!autoOpenMark}
+            />
+          )}
         </div>
       )}
     </div>
   );
 }
+
 
 /** Under-bubble meta line, rendered per the platform skin's receipt language. */
 function MessageMeta({
