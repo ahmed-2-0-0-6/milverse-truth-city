@@ -38,11 +38,13 @@ export function IncomingCall() {
   useEffect(() => {
     if (!call || phase !== "ringing") return;
     const raf = requestAnimationFrame(() => declineRef.current?.focus());
+    ringPulse();
     ringTimer.current = window.setTimeout(() => landVoicemail("timeout"), RING_MS);
     return () => {
       cancelAnimationFrame(raf);
       if (ringTimer.current) window.clearTimeout(ringTimer.current);
       ringTimer.current = null;
+      stopRing();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [call, phase]);
