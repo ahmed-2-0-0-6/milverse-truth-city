@@ -6,6 +6,7 @@ import { loadUnlocked } from "@/lib/manual/state";
 import { BOSSES } from "@/lib/boss/scenarios";
 import { loadBossProfile } from "@/lib/boss/profile";
 import { RedactedTitle } from "@/components/RedactedTitle";
+import { EngravedReveal } from "@/components/civic/EngravedReveal";
 import { FileText, Lock, ExternalLink, Skull } from "lucide-react";
 
 export const Route = createFileRoute("/manual/")({
@@ -147,6 +148,15 @@ function ManualIndex() {
           imposter, or forwarded voice so you can rehearse safely. AI in MILVERSE never tells you
           what is true. Truth verdicts come from the case dossier and from the tools you learn here.
         </div>
+
+        <EngravedReveal className="mt-8 border-l-2 border-amber-300/60 pl-4">
+          <p className="font-mono text-sm sm:text-base text-foreground/85 italic leading-snug">
+            Tactics age. The instinct to check doesn't.
+          </p>
+          <p className="mt-2 font-mono text-[10px] tracking-widest text-muted-foreground">
+            — FIELD MANUAL, FIRST PRINTING
+          </p>
+        </EngravedReveal>
 
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {MANUAL_ENTRIES.map((e) => {
