@@ -31,6 +31,10 @@ import {
 } from "@/lib/city/world-data";
 import { loadProfile, type TrustProfile } from "@/lib/mirror/profile";
 import { getMirrorRecommendations } from "@/lib/recommendations";
+import { useVisualMode } from "@/lib/visual-quality";
+import { SignalBeacons, BEACON_ANCHORS } from "@/components/city/SignalBeacons";
+import { AmbientLife } from "@/components/city/AmbientLife";
+import type { CitySignal } from "@/lib/city/signals";
 import {
   Dialog,
   DialogContent,
@@ -47,6 +51,8 @@ const DEFAULT_ZOOM_IDX = 1;
 export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
   const nav = useNavigate();
   const prefersReduced = useReducedMotion();
+  const { mode } = useVisualMode();
+  const ambient = mode === "cinematic" && !prefersReduced;
   const [profile, setProfile] = useState<TrustProfile | null>(null);
 
   useEffect(() => {
@@ -55,6 +61,23 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
     window.addEventListener("milverse:profile", on);
     return () => window.removeEventListener("milverse:profile", on);
   }, []);
+
+  // Single 60s clock for ambient life (windows + tint). One interval, cleaned up.
+  const [clock, setClock] = useState(() => {
+    const d = new Date();
+    return { hour: d.getHours(), minuteOfDay: d.getHours() * 60 + d.getMinutes() };
+  });
+  useEffect(() => {
+    if (!ambient) return; // ambient is off — no need to tick
+    const tick = () => {
+      const d = new Date();
+      setClock({ hour: d.getHours(), minuteOfDay: d.getHours() * 60 + d.getMinutes() });
+    };
+    tick();
+    const id = window.setInterval(tick, 60_000);
+    return () => window.clearInterval(id);
+  }, [ambient]);
+
 
   const mirror = useMemo(buildMirrorStations, []);
   const feed = useMemo(buildFeedStations, []);
@@ -457,9 +480,22 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
     flyTo(px * WORLD_W, py * WORLD_H, camRef.current.z, 500);
   };
 
+  /* ── beacon activation: reuse the house zoom-then-nav flourish ── */
+  const onBeacon = useCallback(
+    (sig: CitySignal) => {
+      const anchor = BEACON_ANCHORS[sig.district];
+      flyTo(anchor.x, anchor.y, ZOOM_LEVELS[2], 600);
+      if (sig.to && sig.to !== "/") {
+        setTimeout(() => nav({ to: sig.to }), 700);
+      }
+    },
+    [flyTo, nav],
+  );
+
   /* ── render ───────────────────────────────────────────────── */
   const tx = vp.w / 2 - cam.x * cam.z;
   const ty = vp.h / 2 - cam.y * cam.z;
+
 
   return (
     <div className="relative w-full h-[70vh] min-h-[520px] rounded-sm overflow-hidden border border-border/60 bg-[#050914]">
@@ -504,7 +540,12 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
               else if (l.to) setTimeout(() => nav({ to: l.to! }), 700);
             }}
             prefersReduced={!!prefersReduced}
+            ambient={ambient}
+            hour={clock.hour}
+            minuteOfDay={clock.minuteOfDay}
+            onBeacon={onBeacon}
           />
+
         </div>
       </div>
 
@@ -681,6 +722,10 @@ function WorldSvg({
   onStation,
   onLandmark,
   prefersReduced,
+  ambient,
+  hour,
+  minuteOfDay,
+  onBeacon,
 }: {
   mirror: Station[];
   feed: Station[];
@@ -693,6 +738,10 @@ function WorldSvg({
   onStation: (s: Station) => void;
   onLandmark: (l: WorldLandmark) => void;
   prefersReduced: boolean;
+  ambient: boolean;
+  hour: number;
+  minuteOfDay: number;
+  onBeacon: (s: CitySignal) => void;
 }) {
   return (
     <svg
@@ -851,9 +900,27 @@ function WorldSvg({
           />
         );
       })}
+
+      {/* CITY IS AWAKE — ambient decorative life (skip entirely if not ambient) */}
+      {ambient && (
+        <>
+          {/* hidden path the metro rides — reuses mirror line geometry */}
+          <path id="ambient-metro-path" d={mirrorPath} fill="none" stroke="none" />
+          <AmbientLife
+            hour={hour}
+            minuteOfDay={minuteOfDay}
+            metroPathId="ambient-metro-path"
+            animateMetro={!prefersReduced}
+          />
+        </>
+      )}
+
+      {/* CITY IS AWAKE — truthful signal beacons (always render if present) */}
+      <SignalBeacons ambient={ambient} onBeacon={onBeacon} />
     </svg>
   );
 }
+
 
 /* ── flickering city silhouettes (window lights) ─────────────── */
 function CitySilhouettes({ prefersReduced }: { prefersReduced: boolean }) {
