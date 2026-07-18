@@ -56,7 +56,7 @@ export function ChatHeader({
         {onBack && (
           <button
             onClick={onBack}
-            className="p-1.5 -ml-1.5 rounded-md text-white/70 hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors"
+            className="p-3 -ml-1.5 rounded-md text-white/70 sm:p-1.5 touch-manipulation hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors"
             aria-label="Back"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -93,7 +93,7 @@ export function ChatHeader({
         {onCall && (
           <button
             onClick={onCall}
-            className="p-2 rounded-md text-white/70 hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors"
+            className="p-3 sm:p-2 rounded-md text-white/70 touch-manipulation hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors"
             aria-label="Call"
           >
             <Phone className="h-4 w-4" />
@@ -102,14 +102,14 @@ export function ChatHeader({
         {onContacts && (
           <button
             onClick={onContacts}
-            className="p-2 rounded-md text-white/70 hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors"
+            className="p-3 sm:p-2 rounded-md text-white/70 touch-manipulation hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 transition-colors"
             aria-label="Contacts"
           >
             <Users className="h-4 w-4" />
           </button>
         )}
         {right}
-        <button className="p-2 text-white/30 cursor-not-allowed" aria-label="More" disabled>
+        <button className="p-3 sm:p-2 text-white/30 cursor-not-allowed" aria-label="More" disabled>
           <MoreVertical className="h-4 w-4" />
         </button>
       </div>
