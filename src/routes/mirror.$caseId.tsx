@@ -348,7 +348,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
     craftSeenRef.current = loadCraftSeen();
   }, []);
   const [openMarkIdx, setOpenMarkIdx] = useState<number | null>(null);
-  const wastedCaseKey = `milverse.craftmarks.wasted:${caseId}`;
+  const wastedCaseKey = `milverse.craftmarks.wasted:${scenario.id}`;
   const wastedFiredThisCase = () =>
     typeof window !== "undefined" && window.sessionStorage.getItem(wastedCaseKey) === "1";
   const markWastedFired = () => {
