@@ -20,12 +20,46 @@ import { type ReactNode } from "react";
 
 type Tone = "default" | "citizen";
 
+export type CaseCardOutcome = "closed" | "transacted" | "false_alarm";
+export type ArtifactChipTone = "sms" | "dm" | "wa" | "video" | "image" | "news";
+export interface ArtifactChip {
+  label: string;
+  tone: ArtifactChipTone;
+}
+
 /** Deterministic in-world file number from the case title (stable per case). */
 function fileNo(seed: string): string {
   let h = 0;
   for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
   return `${String((h % 90) + 10)}-${String((h % 900) + 100)}`;
 }
+
+const OUTCOME_STAMP: Record<CaseCardOutcome, { label: string; cls: string; aria: string }> = {
+  closed: {
+    label: "CASE CLOSED",
+    cls: "border-primary text-primary",
+    aria: "case closed",
+  },
+  transacted: {
+    label: "TRANSACTED",
+    cls: "border-destructive text-destructive",
+    aria: "transacted — missed scam",
+  },
+  false_alarm: {
+    label: "FALSE ALARM",
+    cls: "border-caution text-caution",
+    aria: "false alarm",
+  },
+};
+
+const CHIP_TONE: Record<ArtifactChipTone, string> = {
+  sms: "border-[#0a84ff] text-[#4aa3ff]",
+  dm: "chip-dm-insta",
+  wa: "border-[#005c4b] text-[#25d366]",
+  video: "border-muted-foreground/40 text-muted-foreground",
+  image: "border-muted-foreground/40 text-muted-foreground",
+  news: "border-muted-foreground/40 text-muted-foreground",
+};
 
 interface CardShellProps {
   icon: ReactNode;
@@ -36,6 +70,9 @@ interface CardShellProps {
   footer?: ReactNode;
   tone?: Tone;
   locked?: boolean;
+  outcome?: CaseCardOutcome;
+  artifactChip?: ArtifactChip;
+  unreadThread?: boolean;
 }
 
 function CardShell({
