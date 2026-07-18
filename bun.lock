@@ -8,6 +8,8 @@
         "@ai-sdk/openai-compatible": "^3.0.7",
         "@fontsource-variable/space-grotesk": "^5.2.10",
         "@fontsource/bebas-neue": "^5.2.7",
+        "@fontsource/playfair-display": "^5.2.8",
+        "@fontsource/unifrakturcook": "^5.2.8",
         "@hookform/resolvers": "^5.2.2",
         "@radix-ui/react-accordion": "^1.2.12",
         "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -230,6 +232,10 @@
     "@fontsource-variable/space-grotesk": ["@fontsource-variable/space-grotesk@5.2.10", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@fontsource-variable/space-grotesk/-/space-grotesk-5.2.10.tgz", {}, "sha512-yJQO/o35/hAP3CFnpdFTwQku2yzJOae2HIpBmqkOVoxhhXJaQP3g+b6Jrz7u+eI7A5ZdCIf88uMWpBJdFiGr5w=="],
 
     "@fontsource/bebas-neue": ["@fontsource/bebas-neue@5.2.7", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@fontsource/bebas-neue/-/bebas-neue-5.2.7.tgz", {}, "sha512-DsmBrmq55d9BCU0mt4DT4RZDdH8vhWRKEUOfbuNB1EEjMuwbtFvM8N+3gIlkYSFbsb10P8Q19BV5OdpMu2h0fA=="],
+
+    "@fontsource/playfair-display": ["@fontsource/playfair-display@5.2.8", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@fontsource/playfair-display/-/playfair-display-5.2.8.tgz", {}, "sha512-fUEhib70SszNhQVsGbUMSsWJhr7Je0rdeuZdtGpDNu0GKF1xJM8QhpI/y0pckU25GcChXm9TLOmeZupkvvZo2g=="],
+
+    "@fontsource/unifrakturcook": ["@fontsource/unifrakturcook@5.2.8", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@fontsource/unifrakturcook/-/unifrakturcook-5.2.8.tgz", {}, "sha512-CfSVmZWbkUO2XEgjhKWBgzoQbndmlt/idxcwqHfqsI8b9rja7sbgnGZ6H/Wd3vuu9xYQ/eOreKOPGlKCGdK3Ww=="],
 
     "@hookform/resolvers": ["@hookform/resolvers@5.2.2", "", { "dependencies": { "@standard-schema/utils": "^0.3.0" }, "peerDependencies": { "react-hook-form": "^7.55.0" } }, "sha512-A/IxlMLShx3KjV/HeTcTfaMxdwy690+L/ZADoeaTltLx+CVuzkeVIPuybK3jrRfw7YZnmdKsVVHAlEPIAEUNlA=="],
 
