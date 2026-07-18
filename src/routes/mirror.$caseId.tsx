@@ -676,7 +676,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                         setTab(next);
                       }
                     }}
-                    className={`rounded px-3 py-1 font-mono text-[10px] tracking-widest transition ${
+                    className={`touch-manipulation rounded px-4 py-1 font-mono text-[10px] tracking-widest transition min-h-[36px] sm:min-h-0 sm:px-3 ${
                       tab === t ? "bg-primary/15 text-primary" : "text-white/50 hover:text-white"
                     }`}
                   >
@@ -685,17 +685,19 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 ))}
 
                 <div className="flex-1" />
+                {/* Desktop-only: VERIFY / CALL IT live in the meter row.
+                    On mobile they move down into the composer cluster (Fix 4). */}
                 <button
                   onClick={() => setShowVob(true)}
                   disabled={ended || messages.length < 2}
-                  className="rounded border border-primary/50 bg-primary/10 px-2 py-1 text-[9px] font-mono tracking-widest text-primary hover:bg-primary/20 disabled:opacity-40"
+                  className="hidden sm:inline-flex items-center rounded border border-primary/50 bg-primary/10 px-2 py-1 text-[9px] font-mono tracking-widest text-primary hover:bg-primary/20 disabled:opacity-40"
                 >
                   <ShieldCheck className="inline h-3 w-3 mr-1" /> VERIFY
                 </button>
                 <button
                   onClick={onEnd}
                   disabled={messages.length < 2}
-                  className="rounded border border-destructive/50 bg-destructive/10 px-2 py-1 text-[9px] font-mono tracking-widest text-destructive hover:bg-destructive/20 disabled:opacity-40"
+                  className="hidden sm:inline-flex items-center rounded border border-destructive/50 bg-destructive/10 px-2 py-1 text-[9px] font-mono tracking-widest text-destructive hover:bg-destructive/20 disabled:opacity-40"
                 >
                   <Phone className="inline h-3 w-3 mr-1" /> CALL IT
                 </button>
@@ -731,6 +733,23 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
             {tab === "chat" && (
               <QuickBrief refs={refs} openRef={openRef} onToggle={(r) => setOpenRef((cur) => (cur === r ? null : r))} />
             )}
+            {/* Mobile-only thumb-reach cluster for the two most consequential controls. */}
+            <div className="mb-2 flex justify-end gap-2 sm:hidden">
+              <button
+                onClick={() => setShowVob(true)}
+                disabled={ended || messages.length < 2}
+                className="touch-manipulation inline-flex min-h-[44px] items-center rounded-full border border-primary/50 bg-primary/10 px-4 text-[11px] font-mono tracking-widest text-primary active:bg-primary/20 disabled:opacity-40"
+              >
+                <ShieldCheck className="inline h-3.5 w-3.5 mr-1" /> VERIFY
+              </button>
+              <button
+                onClick={onEnd}
+                disabled={messages.length < 2}
+                className="touch-manipulation inline-flex min-h-[44px] items-center rounded-full border border-destructive/50 bg-destructive/10 px-4 text-[11px] font-mono tracking-widest text-destructive active:bg-destructive/20 disabled:opacity-40"
+              >
+                <Phone className="inline h-3.5 w-3.5 mr-1" /> CALL IT
+              </button>
+            </div>
             <div className="flex gap-2">
               <input
                 id="mirror-composer"
@@ -740,21 +759,21 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 placeholder={ended ? "Chat ended — make your call." : skin.placeholder}
                 disabled={ended || typing}
                 aria-label="Type your reply"
-                className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-sm text-white outline-none focus:border-primary disabled:opacity-50"
+                className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-base sm:text-sm text-white outline-none focus:border-primary disabled:opacity-50 min-h-[44px] sm:min-h-0"
               />
 
               <button
                 onClick={send}
                 disabled={ended || typing || !input.trim()}
                 aria-label="Send message"
-                className="rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40"
+                className="touch-manipulation rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
               >
                 <Send className="h-4 w-4" aria-hidden="true" />
               </button>
 
             </div>
             <div className="mt-1.5 flex items-center justify-between font-mono text-[9px] tracking-widest text-white/40">
-              <span>ASK FOR A "VOICE NOTE" · TAP PIN TO FLAG</span>
+              <span>HOLD A MESSAGE TO FLAG IT · OR TAP ITS PIN</span>
               <span>{messages.filter((m) => m.role === "player").length} SENT</span>
             </div>
           </div>
@@ -773,7 +792,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               id="mirror-panel-chat"
               role="tabpanel"
               aria-labelledby="mirror-tab-chat"
-              className={`flex-1 overflow-y-auto p-3 space-y-2.5 ${skin.bodyClass}`}
+              className={`flex-1 overflow-y-auto overscroll-contain p-3 space-y-2.5 ${skin.bodyClass}`}
               style={skin.bodyStyle}
             >
               <div role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation messages" className="contents">
@@ -902,6 +921,54 @@ function MessageRow({
 
   const isPlayer = m.role === "player";
   const showMark = isPlayer && !!grade && !!hasReply && !!why && !!onOpenMark && !!onCloseMark;
+  // Long-press affordance: hold a contact bubble for 500ms to toggle the pin.
+  // Touch-only so desktop text selection is unaffected. Cancels on move > 10px.
+  const lpRef = useRef<{
+    timer: number | null;
+    startX: number;
+    startY: number;
+    fired: boolean;
+    holding: boolean;
+  }>({ timer: null, startX: 0, startY: 0, fired: false, holding: false });
+  const [holding, setHolding] = useState(false);
+  const canLongPress = !isPlayer && !!onPin;
+  const clearLp = () => {
+    if (lpRef.current.timer !== null) {
+      window.clearTimeout(lpRef.current.timer);
+      lpRef.current.timer = null;
+    }
+    lpRef.current.holding = false;
+    setHolding(false);
+  };
+  const bubbleTouchProps = canLongPress
+    ? {
+        onPointerDown: (e: React.PointerEvent) => {
+          if (e.pointerType !== "touch") return;
+          lpRef.current.startX = e.clientX;
+          lpRef.current.startY = e.clientY;
+          lpRef.current.fired = false;
+          lpRef.current.holding = true;
+          setHolding(true);
+          lpRef.current.timer = window.setTimeout(() => {
+            if (!lpRef.current.holding) return;
+            lpRef.current.fired = true;
+            onPin?.();
+            setHolding(false);
+          }, 500);
+        },
+        onPointerMove: (e: React.PointerEvent) => {
+          if (e.pointerType !== "touch" || !lpRef.current.holding) return;
+          const dx = Math.abs(e.clientX - lpRef.current.startX);
+          const dy = Math.abs(e.clientY - lpRef.current.startY);
+          if (dx > 10 || dy > 10) clearLp();
+        },
+        onPointerUp: clearLp,
+        onPointerCancel: clearLp,
+        onContextMenu: (e: React.MouseEvent) => {
+          if (lpRef.current.holding || lpRef.current.fired) e.preventDefault();
+        },
+      }
+    : {};
   return (
     <div className={`msg-in flex ${isPlayer ? "justify-end" : "justify-start"} gap-2`}>
       {!isPlayer && onPin && (
@@ -909,7 +976,7 @@ function MessageRow({
           onClick={onPin}
           aria-pressed={pinned}
           aria-label={pinned ? "Unpin evidence" : "Pin as suspicious"}
-          className={`self-end mb-1 rounded p-1 transition ${
+          className={`self-end mb-1 rounded p-2.5 transition touch-manipulation active:bg-caution/10 ${
             pinned ? "bg-caution/20 text-caution" : "text-muted-foreground hover:text-caution"
           }`}
         >
@@ -939,13 +1006,14 @@ function MessageRow({
       ) : (
         <div className="flex flex-col items-end gap-0.5" style={{ maxWidth: "80%" }}>
           <div
-            className={`px-3.5 py-2 text-sm whitespace-pre-wrap shadow-sm ${
+            {...bubbleTouchProps}
+            className={`px-3.5 py-2 text-sm whitespace-pre-wrap shadow-sm transition ${
               isPlayer
                 ? skin.outBubble
                 : pinned
                   ? "bg-caution/20 border border-caution/50 text-white rounded-lg rounded-tl-none"
                   : skin.inBubble
-            }`}
+            } ${holding ? "ring-1 ring-caution/50" : ""}`}
           >
             <span className="sr-only">{isPlayer ? "You" : speakerName}: </span>
             {m.text}
@@ -1520,7 +1588,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
               type="button"
               aria-pressed={picked.includes(c.id)}
               onClick={() => toggle(c.id)}
-              className={`rounded-full border px-3 py-1.5 text-xs transition ${
+              className={`rounded-full border px-3 py-2.5 text-xs transition touch-manipulation min-h-[44px] sm:min-h-0 sm:py-1.5 ${
                 picked.includes(c.id)
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
@@ -1543,7 +1611,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
           onChange={(e) => setConclusion(e.target.value.slice(0, 300))}
           placeholder="In one line: why do you believe this? (max 300 chars)"
           rows={3}
-          className="w-full rounded-md border border-border bg-background p-3 text-sm placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none"
+          className="w-full rounded-md border border-border bg-background p-3 text-base placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none sm:text-sm"
         />
         <div className="mt-1 text-right font-mono text-[10px] text-muted-foreground">
           {conclusion.length}/300

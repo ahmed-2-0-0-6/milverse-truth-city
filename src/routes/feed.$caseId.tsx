@@ -415,7 +415,7 @@ function Sim({
                   <button
                     key={t}
                     onClick={() => setTab(t)}
-                    className={`rounded px-3 py-1 font-mono text-[10px] tracking-widest transition ${
+                    className={`touch-manipulation rounded px-4 py-1 font-mono text-[10px] tracking-widest transition min-h-[36px] sm:min-h-0 sm:px-3 ${
                       tab === t ? "bg-primary/15 text-primary" : "text-white/50 hover:text-white"
                     }`}
                   >
@@ -425,10 +425,11 @@ function Sim({
                   </button>
                 ))}
                 <div className="flex-1" />
+                {/* Mobile: DELIVER VERDICT moves to composer cluster (Fix 4). */}
                 <button
                   onClick={onDeliverVerdict}
                   disabled={messages.length < 2}
-                  className="rounded border border-primary/50 bg-primary/10 px-2 py-1 text-[9px] font-mono tracking-widest text-primary hover:bg-primary/20 disabled:opacity-40"
+                  className="hidden sm:inline-flex rounded border border-primary/50 bg-primary/10 px-2 py-1 text-[9px] font-mono tracking-widest text-primary hover:bg-primary/20 disabled:opacity-40"
                 >
                   DELIVER VERDICT →
                 </button>
@@ -438,6 +439,16 @@ function Sim({
         }
         composer={
           <div className="p-3">
+            {/* Mobile-only thumb-reach cluster for DELIVER VERDICT. */}
+            <div className="mb-2 flex justify-end sm:hidden">
+              <button
+                onClick={onDeliverVerdict}
+                disabled={messages.length < 2}
+                className="touch-manipulation inline-flex min-h-[44px] items-center rounded-full border border-primary/50 bg-primary/10 px-4 text-[11px] font-mono tracking-widest text-primary active:bg-primary/20 disabled:opacity-40"
+              >
+                DELIVER VERDICT →
+              </button>
+            </div>
             <div className="flex gap-2">
               <input
                 id="feed-composer"
@@ -446,13 +457,13 @@ function Sim({
                 onKeyDown={(e) => e.key === "Enter" && send()}
                 placeholder="Reply to them…"
                 aria-label="Type your reply"
-                className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-sm text-white outline-none focus:border-primary"
+                className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-base sm:text-sm text-white outline-none focus:border-primary min-h-[44px] sm:min-h-0"
               />
               <button
                 onClick={send}
                 disabled={!input.trim()}
                 aria-label="Send message"
-                className="rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40"
+                className="touch-manipulation rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
               >
                 <Send className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -477,7 +488,7 @@ function Sim({
             aria-live="polite"
             aria-relevant="additions text"
             aria-label="Conversation messages"
-            className="flex-1 overflow-y-auto p-3 space-y-3"
+            className="flex-1 overflow-y-auto overscroll-contain p-3 space-y-3"
           >
 
             <FormatFrame
@@ -774,7 +785,7 @@ function VerdictScreen({
           onChange={(e) => setFinalReply(e.target.value)}
           rows={5}
           placeholder="Type what you'd actually send them…"
-          className="w-full rounded-md border border-input bg-background p-3 text-sm outline-none focus:border-primary"
+          className="w-full rounded-md border border-input bg-background p-3 text-base outline-none focus:border-primary sm:text-sm"
         />
         <div className={`mt-1 font-mono text-[10px] tracking-widest ${toneColor}`}>
           TONE READ: {tone.toUpperCase()}
@@ -790,7 +801,7 @@ function VerdictScreen({
           onChange={(e) => setConclusion(e.target.value.slice(0, 300))}
           rows={2}
           placeholder="In one line: why this verdict? (max 300 chars)"
-          className="w-full rounded-md border border-input bg-background p-3 text-sm outline-none focus:border-primary"
+          className="w-full rounded-md border border-input bg-background p-3 text-base outline-none focus:border-primary sm:text-sm"
         />
         <div className="mt-1 text-right font-mono text-[10px] text-muted-foreground">
           {conclusion.length}/300

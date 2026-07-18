@@ -448,7 +448,7 @@ function BossPlay() {
                       key={m.id}
                       disabled={played}
                       onClick={() => doMove(m.id)}
-                      className="text-[11px] px-2.5 py-1 rounded-full border border-emerald-500/40 bg-emerald-950/30 text-emerald-200 hover:bg-emerald-950/60 disabled:opacity-30"
+                      className="touch-manipulation text-[11px] px-3 py-1 rounded-full border border-emerald-500/40 bg-emerald-950/30 text-emerald-200 hover:bg-emerald-950/60 disabled:opacity-30 min-h-[44px] sm:min-h-0 sm:px-2.5"
                       title={m.blurb}
                     >
                       ▶ {m.label}
@@ -465,19 +465,19 @@ function BossPlay() {
               <div className="grid grid-cols-3 gap-1.5">
                 <button
                   onClick={handleComply}
-                  className="text-[10px] py-2 rounded border border-white/20 hover:bg-white/5"
+                  className="touch-manipulation text-[10px] py-2 rounded border border-white/20 hover:bg-white/5 min-h-[44px] sm:min-h-0"
                 >
                   <HandCoins className="w-3 h-3 inline mr-1" /> COMPLY
                 </button>
                 <button
                   onClick={() => commit("REFUSE_REPORT")}
-                  className="text-[10px] py-2 rounded border border-white/20 hover:bg-white/5"
+                  className="touch-manipulation text-[10px] py-2 rounded border border-white/20 hover:bg-white/5 min-h-[44px] sm:min-h-0"
                 >
                   <ShieldOff className="w-3 h-3 inline mr-1" /> REFUSE
                 </button>
                 <button
                   onClick={() => commit("HOLD_UNVERIFIED")}
-                  className="text-[10px] py-2 rounded border border-red-500/50 bg-red-950/30 hover:bg-red-950/60 font-bold"
+                  className="touch-manipulation text-[10px] py-2 rounded border border-red-500/50 bg-red-950/30 hover:bg-red-950/60 font-bold min-h-[44px] sm:min-h-0"
                 >
                   <ShieldCheck className="w-3 h-3 inline mr-1" /> HOLD
                 </button>
@@ -492,7 +492,7 @@ function BossPlay() {
         {/* Chat log body — boss fights arrive over the messenger (skin is
             presentation only; outcome logic lives in the engine). */}
         <div
-          className="flex-1 overflow-y-auto px-3 py-3 space-y-2.5"
+          className="flex-1 overflow-y-auto overscroll-contain px-3 py-3 space-y-2.5"
           style={CHAT_SKINS.whatsapp.bodyStyle}
         >
           <div className="flex justify-center">
