@@ -28,8 +28,11 @@ export interface StoredTape {
   messages: TapeMessage[];
 }
 
+// Owner: mirror/tapes (StoredTape FIFO, cap 10). Reclaim() may drop the
+// oldest half when disk is full. Bump the suffix on breaking shape change.
 const KEY = "milverse.tapes.v1";
 const CAP = 10;
+
 
 function strip(m: Message): TapeMessage {
   const out: TapeMessage = { role: m.role, text: m.text ?? "", ts: m.ts };
