@@ -16,8 +16,12 @@ export interface ReceiptData {
   stake: number;
   delta: number; // +N or -N
   streak: number;
-  sharpness: number; // "sharper than X% of the city"
+  /** "sharper than X% of the city". Optional — omitted if not derivable. */
+  sharpness?: number;
   siteUrl: string;
+  /** Only present when the day's aggregate cleared the n>=5 suppression floor.
+   *  Never set for rebuilt spool receipts (historical splits aren't stored). */
+  citySplit?: { pct: number; total: number };
 }
 
 const COLOR: Record<ReceiptData["outcome"], string> = {
@@ -39,7 +43,18 @@ export function receiptText(d: ReceiptData): string {
   const result = d.correct
     ? `staked ${d.stake} → won ${d.delta}`
     : `staked ${d.stake} → lost ${Math.abs(d.delta)}`;
-  return `MILVERSE #${d.dropNumber} ${emoji} · ${result} · ${d.streak} days on watch · sharper than ${d.sharpness}% of the city\n${d.siteUrl}`;
+  let head = `MILVERSE #${d.dropNumber} ${emoji} · ${result} · ${d.streak} days on watch`;
+  if (typeof d.sharpness === "number") {
+    head += ` · sharper than ${d.sharpness}% of the city`;
+  }
+  const lines = [head];
+  if (d.citySplit) {
+    lines.push(
+      `CITY SPLIT · ${d.citySplit.pct}% CALLED IT RIGHT · ${d.citySplit.total} REPORTED`,
+    );
+  }
+  lines.push(d.siteUrl);
+  return lines.join("\n");
 }
 
 function drawReceipt(canvas: HTMLCanvasElement, d: ReceiptData) {
