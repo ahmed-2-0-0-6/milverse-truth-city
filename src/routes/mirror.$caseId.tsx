@@ -80,6 +80,7 @@ import {
 } from "@/lib/mirror/coldreads";
 import { fetchPinnedLines, type PinnedLine } from "@/lib/mirror/pinned.functions";
 import { consumeStandoffArm } from "@/lib/standoff/rules";
+import { buildHand, toHandScenario, type HandChip } from "@/lib/mirror/hand";
 
 /**
  * THE MOST SUSPECTED LINE — hash architecture.
@@ -461,6 +462,37 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
   const tacticFlashed = useRef<boolean>(false);
   const [tacticFlash, setTacticFlash] = useState<null | ReturnType<typeof tacticForMirror>>(null);
   const [contactsOpen, setContactsOpen] = useState(false);
+
+  // ── THE HAND — tactical reply chips. Truth-blind by construction.
+  const [handMode, setHandMode] = useState<"hand" | "type">(() => {
+    if (typeof window === "undefined") return "hand";
+    const v = localStorage.getItem("milverse.hand.mode");
+    return v === "type" ? "type" : "hand";
+  });
+  function toggleHandMode() {
+    setHandMode((m) => {
+      const next = m === "hand" ? "type" : "hand";
+      try { localStorage.setItem("milverse.hand.mode", next); } catch { /* noop */ }
+      return next;
+    });
+  }
+  const [handTeachSeen, setHandTeachSeen] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("milverse.hand.teach.seen") === "1";
+  });
+  const handChips = useMemo(
+    () => buildHand(toHandScenario(scenario), state.factProbes, state.turnCount ?? 0),
+    [scenario, state.factProbes, state.turnCount],
+  );
+  function pickChip(chip: HandChip) {
+    if (!handTeachSeen) {
+      try { localStorage.setItem("milverse.hand.teach.seen", "1"); } catch { /* noop */ }
+      setHandTeachSeen(true);
+    }
+    if (chip.tag === "VERIFY") { setShowVob(true); return; }
+    if (chip.sendText) void send(chip.sendText);
+  }
+
   const claimedClock = useMemo(() => clockFor(scenario.id), [scenario.id]);
   const clockExpiredRef = useRef(false);
   function handleClockExpire() {
@@ -625,8 +657,8 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
 
   const aiReply = useServerFn(generateContactReply);
 
-  async function send() {
-    const text = input.trim();
+  async function send(override?: string) {
+    const text = (override ?? input).trim();
     if (!text || ended || typing) return;
     lastActivity.current = Date.now();
     nudged.current = false;
@@ -959,39 +991,112 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 <Phone className="inline h-3.5 w-3.5 mr-1" /> CALL IT
               </button>
             </div>
-            <div className="flex gap-2">
-              <input
-                id="mirror-composer"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && send()}
-                placeholder={
-                  coldMode && drillExpired
-                    ? "Time. Call it."
-                    : ended
-                      ? "Chat ended — make your call."
-                      : skin.placeholder
-                }
-                disabled={ended || typing || (coldMode && drillExpired)}
-                aria-label="Type your reply"
-                className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-base sm:text-sm text-white outline-none focus:border-primary disabled:opacity-50 min-h-[44px] sm:min-h-0"
-              />
 
-              <button
-                onClick={send}
-                disabled={ended || typing || !input.trim() || (coldMode && drillExpired)}
-                aria-label="Send message"
-                className="touch-manipulation rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
-              >
-                <Send className="h-4 w-4" aria-hidden="true" />
-              </button>
+            {/* ── THE HAND — tactical reply chips. Chips SEND real text through the
+                existing send() path; VERIFY opens the existing modal. Zero engine
+                diffs; the deck is authored keys that guarantee the engine's best
+                content actually fires. Truth-blind by construction (see hand.ts). */}
+            {handMode === "hand" && !ended && !(coldMode && drillExpired) && (
+              <>
+                {!handTeachSeen && (
+                  <div
+                    className="mb-2 rounded-md border border-primary/30 bg-primary/5 p-2 text-[11px] text-white/80"
+                    role="note"
+                  >
+                    <span className="font-mono text-[9px] tracking-widest text-primary mr-1">YOUR HAND</span>
+                    things you could say next. PROBE tests what only the real one knows.
+                    PRESS corners a dodge. PLAY keeps them talking. VERIFY leaves the chat
+                    to check. Typing your own works too — ⌨.
+                  </div>
+                )}
+                <div
+                  role="radiogroup"
+                  aria-label="Your hand — tactical replies"
+                  className="mb-2 grid grid-cols-1 gap-1.5 sm:grid-cols-2"
+                >
+                  {handChips.map((chip) => {
+                    const disabled = typing;
+                    const tagColor =
+                      chip.tag === "PROBE" ? "text-primary"
+                      : chip.tag === "PRESS" ? "text-caution"
+                      : chip.tag === "VERIFY" ? "text-primary"
+                      : "text-white/40";
+                    const border =
+                      chip.tag === "PRESS" ? "border-caution/40"
+                      : chip.tag === "VERIFY" ? "border-primary/40"
+                      : "border-white/15";
+                    const srName =
+                      chip.tag === "VERIFY"
+                        ? `Verify: ${chip.label}. Opens out-of-band verification.`
+                        : `${chip.tag.charAt(0) + chip.tag.slice(1).toLowerCase()}: ${chip.sendText ?? chip.label}`;
+                    return (
+                      <button
+                        key={chip.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={false}
+                        aria-label={srName}
+                        disabled={disabled}
+                        onClick={() => pickChip(chip)}
+                        className={`relative touch-manipulation rounded-md border ${border} bg-neutral-900/70 px-3 py-2 pt-3.5 text-left text-[13px] leading-snug text-white min-h-[48px] hover:bg-neutral-900 disabled:opacity-40`}
+                      >
+                        <span className={`absolute right-1.5 top-0.5 font-mono text-[8px] tracking-widest ${tagColor}`}>
+                          {chip.tag}
+                        </span>
+                        <span className="block">{chip.label}</span>
+                        {chip.hint && (
+                          <span className="mt-0.5 block font-mono text-[9px] tracking-wider text-white/45">
+                            {chip.hint}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
 
+            {handMode === "type" && (
+              <div className="flex gap-2">
+                <input
+                  id="mirror-composer"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") send(); }}
+                  placeholder={
+                    coldMode && drillExpired
+                      ? "Time. Call it."
+                      : ended
+                        ? "Chat ended — make your call."
+                        : skin.placeholder
+                  }
+                  disabled={ended || typing || (coldMode && drillExpired)}
+                  aria-label="Type your reply"
+                  className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-base sm:text-sm text-white outline-none focus:border-primary disabled:opacity-50 min-h-[44px] sm:min-h-0"
+                />
+                <button
+                  onClick={() => send()}
+                  disabled={ended || typing || !input.trim() || (coldMode && drillExpired)}
+                  aria-label="Send message"
+                  className="touch-manipulation rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
+                >
+                  <Send className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </div>
+            )}
 
-            </div>
             <div className="mt-1.5 flex items-center justify-between font-mono text-[9px] tracking-widest text-white/40">
-              <span>HOLD A MESSAGE TO FLAG IT · OR TAP ITS PIN</span>
+              <button
+                type="button"
+                onClick={toggleHandMode}
+                className="hover:text-white/70"
+                aria-label={handMode === "hand" ? "Switch to typing" : "Switch to the hand"}
+              >
+                {handMode === "hand" ? "TYPE INSTEAD ⌨" : "SHOW THE HAND ▤"}
+              </button>
               <span>{messages.filter((m) => m.role === "player").length} SENT</span>
             </div>
+
           </div>
         }
       >
