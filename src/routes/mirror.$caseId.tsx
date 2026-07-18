@@ -792,7 +792,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               id="mirror-panel-chat"
               role="tabpanel"
               aria-labelledby="mirror-tab-chat"
-              className={`flex-1 overflow-y-auto p-3 space-y-2.5 ${skin.bodyClass}`}
+              className={`flex-1 overflow-y-auto overscroll-contain p-3 space-y-2.5 ${skin.bodyClass}`}
               style={skin.bodyStyle}
             >
               <div role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation messages" className="contents">

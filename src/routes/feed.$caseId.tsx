@@ -477,7 +477,7 @@ function Sim({
             aria-live="polite"
             aria-relevant="additions text"
             aria-label="Conversation messages"
-            className="flex-1 overflow-y-auto p-3 space-y-3"
+            className="flex-1 overflow-y-auto overscroll-contain p-3 space-y-3"
           >
 
             <FormatFrame

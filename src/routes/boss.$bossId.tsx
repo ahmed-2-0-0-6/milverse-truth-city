@@ -492,7 +492,7 @@ function BossPlay() {
         {/* Chat log body — boss fights arrive over the messenger (skin is
             presentation only; outcome logic lives in the engine). */}
         <div
-          className="flex-1 overflow-y-auto px-3 py-3 space-y-2.5"
+          className="flex-1 overflow-y-auto overscroll-contain px-3 py-3 space-y-2.5"
           style={CHAT_SKINS.whatsapp.bodyStyle}
         >
           <div className="flex justify-center">

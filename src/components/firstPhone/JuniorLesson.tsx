@@ -164,7 +164,7 @@ export function JuniorLesson({ lesson, state, onBackHome, onComplete }: Props) {
           />
         }
       >
-        <div ref={scroller} className="flex-1 overflow-y-auto p-3 space-y-2.5">
+        <div ref={scroller} className="flex-1 overflow-y-auto overscroll-contain p-3 space-y-2.5">
           {adultBubbles.map((b, i) => (
             <MessageBubble key={i} bubble={b} />
           ))}
@@ -245,7 +245,7 @@ export function JuniorLesson({ lesson, state, onBackHome, onComplete }: Props) {
         ) : undefined
       }
     >
-      <div ref={scroller} className="flex-1 overflow-y-auto p-3 space-y-2.5">
+      <div ref={scroller} className="flex-1 overflow-y-auto overscroll-contain p-3 space-y-2.5">
         {bubbles.map((b, i) => (
           <MessageBubble key={i} bubble={b} />
         ))}
