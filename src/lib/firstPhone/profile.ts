@@ -14,6 +14,8 @@ export interface FirstPhoneState {
   wallpaper: number;
   /** ADDITIVE: once-per-child handover beat played? */
   handoverSeen: boolean;
+  /** ADDITIVE: once-per-child guided phone tour played (or skipped)? */
+  tourSeen: boolean;
 }
 
 function fresh(): FirstPhoneState {
