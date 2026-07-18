@@ -166,7 +166,7 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone, 
 
       {/* Case file */}
       <div
-        className={`relative w-[min(88vw,520px)] rounded-sm border border-white/15 bg-[#0b0f16] shadow-[0_40px_120px_-20px_rgba(0,0,0,0.9)] ${stage === "stamp" || stage === "reveal" || stage === "trail" ? "verdict-shake" : ""}`}
+        className={`relative w-[min(88vw,520px)] rounded-sm border border-white/15 bg-[#0b0f16] shadow-[0_40px_120px_-20px_rgba(0,0,0,0.9)] ${!quiet && (stage === "stamp" || stage === "reveal" || stage === "trail") ? "verdict-shake" : ""}`}
         style={{ transform: "translateZ(0)" }}
       >
         <div className="px-5 py-3 border-b border-white/10 flex items-center gap-3">
