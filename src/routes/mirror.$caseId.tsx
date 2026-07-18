@@ -978,7 +978,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               />
 
               <button
-                onClick={send}
+                onClick={() => send()}
                 disabled={ended || typing || !input.trim() || (coldMode && drillExpired)}
                 aria-label="Send message"
                 className="touch-manipulation rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
