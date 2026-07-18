@@ -13,6 +13,7 @@ import { computeXp, rankFromXp } from "@/lib/ranks";
 import { DistrictHero } from "@/components/DistrictHero";
 import studioArt from "@/assets/district-studio.jpg";
 import { Clapperboard, ChevronLeft, ChevronRight, Sparkles, ArrowLeft } from "lucide-react";
+import { deskReview, deskScore } from "@/lib/studio/editorsDesk";
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
