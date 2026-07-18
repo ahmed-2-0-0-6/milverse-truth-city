@@ -2,6 +2,8 @@
 // Persisted in localStorage; no backend.
 
 import type { TierId } from "./scenarios";
+import { readStore, recoverStore, writeStore } from "@/lib/storage";
+
 
 export interface HistoryEntry {
   caseId: string;
