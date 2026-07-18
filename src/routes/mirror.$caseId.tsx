@@ -2042,13 +2042,13 @@ function Debrief({ scenario }: { scenario: Scenario }) {
 
       // Hash every contact line in the transcript so we can match the
       // city's top hash even when the player didn't pin it.
-      const contactHashes: { text: string; hash: string }[] = [];
+      const contactHashes: { text: string; hash: string; wasTell: boolean }[] = [];
       for (const m of sim.messages) {
         if (m.role !== "contact") continue;
         if (typeof m.text !== "string" || m.text.trim().length === 0) continue;
         try {
           const h = await hashLine12(m.text);
-          contactHashes.push({ text: m.text, hash: h });
+          contactHashes.push({ text: m.text, hash: h, wasTell: !!m.isTell });
         } catch {
           /* noop */
         }
@@ -2075,6 +2075,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           text: match.hit.text,
           pins: match.row.pins,
           playerPinned: playerHashes.has(match.hit.hash),
+          wasTell: match.hit.wasTell,
         });
       } else {
         setCityLine({ fallback: true });
