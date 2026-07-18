@@ -2039,6 +2039,26 @@ html[data-force-reduce-motion="on"] .marquee-track {
   }
 }
 
+/* THE DESK — dying-item glyph pulse. Slow, honest, decoration only. */
+@keyframes desk-dying-kf {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.desk-dying {
+  animation: desk-dying-kf 2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .desk-dying {
+    animation: none !important;
+    opacity: 1;
+  }
+}
+
 /* CitizenOS phone shell */
 .chat-shell-backdrop {
   background:
