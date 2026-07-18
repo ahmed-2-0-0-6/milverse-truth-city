@@ -162,6 +162,7 @@ function FeedIndex() {
           ← CITY
         </Link>
         <SeasonAdvisory season={season} />
+        <NightShiftAdvisory />
 
         <div className="mt-6 mb-3 font-mono text-[10px] tracking-widest text-muted-foreground">
           {shelfLine}
