@@ -476,6 +476,9 @@ function AssessmentTab({ passcode }: { passcode: string }) {
             </div>
           )}
 
+          <PlainReading rollup={rollup} days={daysSpan} />
+
+
           {rollup.nPaired < 5 ? (
             <div className="mt-4 rounded-sm border border-caution/40 bg-caution/5 p-4 text-sm">
               <div className="stencil text-[10px] text-caution mb-1">NOT ENOUGH DATA YET</div>
