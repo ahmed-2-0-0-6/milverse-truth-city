@@ -845,15 +845,14 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 Cold mode: VERIFY is dropped (the doors stay — spec — but VERIFY is
                 the training-wheel door for tiered play; CALL IT is the discipline). */}
             <div className="mb-2 flex justify-end gap-2 sm:hidden">
-              {!coldMode && (
-                <button
-                  onClick={() => setShowVob(true)}
-                  disabled={ended || messages.length < 2}
-                  className="touch-manipulation inline-flex min-h-[44px] items-center rounded-full border border-primary/50 bg-primary/10 px-4 text-[11px] font-mono tracking-widest text-primary active:bg-primary/20 disabled:opacity-40"
-                >
-                  <ShieldCheck className="inline h-3.5 w-3.5 mr-1" /> VERIFY
-                </button>
-              )}
+              <button
+                onClick={() => setShowVob(true)}
+                disabled={ended || messages.length < 2}
+                className="touch-manipulation inline-flex min-h-[44px] items-center rounded-full border border-primary/50 bg-primary/10 px-4 text-[11px] font-mono tracking-widest text-primary active:bg-primary/20 disabled:opacity-40"
+              >
+                <ShieldCheck className="inline h-3.5 w-3.5 mr-1" /> VERIFY
+              </button>
+
               <button
                 onClick={onEnd}
                 disabled={messages.length < 2}
