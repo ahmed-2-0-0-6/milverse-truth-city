@@ -620,6 +620,9 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 </Link>
               </div>
             )}
+            {tab === "chat" && (
+              <QuickBrief refs={refs} openRef={openRef} onToggle={(r) => setOpenRef((cur) => (cur === r ? null : r))} />
+            )}
             <div className="flex gap-2">
               <input
                 value={input}
