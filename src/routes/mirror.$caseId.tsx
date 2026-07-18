@@ -1483,7 +1483,7 @@ function loadSim(): StoredSim | null {
   }
 }
 
-function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void }) {
+function Verdict({ scenario, coldMode = false, onDone }: { scenario: Scenario; coldMode?: boolean; onDone: () => void }) {
   const [verdict, setVerdict] = useState<"REAL" | "FAKE" | null>(null);
   const [confidence, setConfidence] = useState<60 | 75 | 90 | null>(null);
   const [picked, setPicked] = useState<string[]>([]);
