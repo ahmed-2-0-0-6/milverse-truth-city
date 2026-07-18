@@ -164,15 +164,16 @@ function CityMap() {
             existing setView pattern above. */}
         <div className="w-full flex flex-col items-center min-h-[420px] sm:min-h-[460px]">
           {returning ? (
-            <CitizenDesk />
+            <CitizenDesk shift={shift} />
           ) : (
             <>
               <div className="stencil text-[10px] text-cyan-300/80 mb-4 hud-blink">
-                // MILVERSE · CITY OF VERIFICATION
+                {kicker}
               </div>
               <HeroType />
               <p className="mt-4 max-w-xl text-center text-white/70 text-sm sm:text-base">
                 A city that trains your trust — play today's forward.
+
               </p>
               <p className="mt-2 max-w-xl text-center text-white/50 text-xs sm:text-sm">
                 Fakes beat eyes. They don't beat verification.
