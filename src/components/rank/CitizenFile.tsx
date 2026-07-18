@@ -1,0 +1,135 @@
+// MILVERSE — The Citizen File sheet.
+// A private, read-only dossier the player has on themselves. Presentation only.
+
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import { operatorCallsign, type TrustProfile } from "@/lib/mirror/profile";
+import { rankFromXp } from "@/lib/ranks";
+import { MANUAL_ENTRIES } from "@/lib/manual/entries";
+
+interface Props {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  profile: TrustProfile | null;
+  xp: number;
+  manualUnlocks: number;
+}
+
+export function CitizenFile({ open, onOpenChange, profile, xp, manualUnlocks }: Props) {
+  const rank = rankFromXp(xp);
+  const pct = Math.round(rank.progress * 100);
+  const isMax = !rank.next;
+  const codename = profile ? operatorCallsign(profile) : null;
+  const delta = rank.next ? Math.max(0, rank.next.minXp - xp) : 0;
+
+  const casesPlayed = profile?.casesPlayed ?? 0;
+  const correct = profile?.correctVerdicts ?? 0;
+  const missed = profile?.missedScams ?? 0;
+  const falseAlarms = profile?.falseAlarms ?? 0;
+  const streak = profile?.dailyStreak ?? 0;
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="right"
+        className="w-full sm:max-w-md overflow-y-auto bg-background p-0"
+      >
+        <div className="border-b border-border px-5 py-4">
+          <SheetTitle asChild>
+            <div className="stencil text-xs text-primary">CITIZEN FILE</div>
+          </SheetTitle>
+          <SheetDescription asChild>
+            <div className="mt-1 stencil text-sm text-foreground">
+              {codename && codename !== "———" ? codename : "UNREGISTERED CITIZEN"}
+            </div>
+          </SheetDescription>
+        </div>
+
+        {/* Rank block */}
+        <section className="px-5 py-5 border-b border-border">
+          <div className="stencil text-[10px] text-muted-foreground">CURRENT RANK</div>
+          <div className="mt-1 flex items-baseline justify-between gap-3">
+            <div className="text-2xl font-semibold tracking-tight text-foreground">
+              {rank.current.name}
+            </div>
+            <div className="font-mono text-sm text-muted-foreground">
+              {xp} XP
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <div
+              className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+              role="progressbar"
+              aria-valuenow={pct}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`Progress from ${rank.current.name} to ${rank.next?.name ?? "max"}`}
+            >
+              <span
+                className={`block h-full ${isMax ? "bg-caution" : "bg-primary"}`}
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+            <div className="mt-1.5 flex justify-between stencil text-[9px] text-muted-foreground">
+              <span>{rank.current.name}</span>
+              <span>{rank.next?.name ?? "MAX"}</span>
+            </div>
+          </div>
+
+          <p className="mt-4 text-xs text-muted-foreground italic">
+            Verdicts pay. Calibration pays more. Designing cases pays most.
+          </p>
+        </section>
+
+        {/* Ledger */}
+        <section className="px-5 py-5 border-b border-border">
+          <div className="stencil text-[10px] text-muted-foreground mb-3">THE LEDGER</div>
+          <dl className="space-y-1.5 font-mono text-xs">
+            <Row label="Cases played" value={casesPlayed} />
+            <Row label="Correct verdicts" value={correct} />
+            <Row label="Missed scams" value={missed} />
+            <Row label="False alarms" value={falseAlarms} />
+            <Row label="Daily streak" value={streak} />
+            <Row
+              label="Manual entries"
+              value={`${manualUnlocks} / ${MANUAL_ENTRIES.length}`}
+            />
+          </dl>
+          <p className="mt-3 text-[11px] text-muted-foreground italic">
+            Both columns lose. Gullibility and paranoia are the same bill.
+          </p>
+        </section>
+
+        {/* Next */}
+        <section className="px-5 py-5">
+          {rank.next ? (
+            <div className="flex items-baseline justify-between">
+              <div className="stencil text-[10px] text-muted-foreground">
+                NEXT: {rank.next.name}
+              </div>
+              <div className="font-mono text-xs text-foreground">{delta} XP short</div>
+            </div>
+          ) : (
+            <div className="stencil text-xs text-caution">
+              THE CITY KNOWS YOUR NAME.
+            </div>
+          )}
+        </section>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function Row({ label, value }: { label: string; value: number | string }) {
+  return (
+    <div className="flex items-baseline justify-between border-b border-border/40 pb-1">
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd className="tabular-nums text-foreground">{value}</dd>
+    </div>
+  );
+}
