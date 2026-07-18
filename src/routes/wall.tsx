@@ -246,6 +246,7 @@ function WallPage() {
         falseAlarms: p.falseAlarms,
         streak: p.dailyStreak,
       });
+      setTapes(readTapes());
     };
     rebuild();
     const on = () => rebuild();
