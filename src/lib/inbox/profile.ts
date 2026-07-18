@@ -1,0 +1,72 @@
+// MILVERSE — Citizen Inbox local state. Per-day arrival / read log.
+// Fully client-side, localStorage only. Resets on new UTC+5 day key.
+
+import { dropDateKey } from "@/lib/daily/rotation";
+
+const KEY = "milverse.inbox.v1";
+
+export interface InboxProfile {
+  dateKey: string;
+  arrived: string[];
+  opened: string[];
+}
+
+function fresh(dateKey = dropDateKey()): InboxProfile {
+  return { dateKey, arrived: [], opened: [] };
+}
+
+export function loadInbox(): InboxProfile {
+  if (typeof window === "undefined") return fresh();
+  try {
+    const raw = localStorage.getItem(KEY);
+    const today = dropDateKey();
+    if (!raw) return fresh(today);
+    const p = JSON.parse(raw) as Partial<InboxProfile>;
+    if (p.dateKey !== today) return fresh(today);
+    return {
+      dateKey: today,
+      arrived: Array.isArray(p.arrived) ? p.arrived : [],
+      opened: Array.isArray(p.opened) ? p.opened : [],
+    };
+  } catch {
+    return fresh();
+  }
+}
+
+export function saveInbox(p: InboxProfile) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(KEY, JSON.stringify(p));
+  } catch {
+    /* localStorage unavailable */
+  }
+  window.dispatchEvent(new Event("milverse:inbox"));
+}
+
+export function markArrived(id: string) {
+  const p = loadInbox();
+  if (!p.arrived.includes(id)) {
+    p.arrived.push(id);
+    saveInbox(p);
+  }
+}
+
+export function markOpened(id: string) {
+  const p = loadInbox();
+  let changed = false;
+  if (!p.arrived.includes(id)) {
+    p.arrived.push(id);
+    changed = true;
+  }
+  if (!p.opened.includes(id)) {
+    p.opened.push(id);
+    changed = true;
+  }
+  if (changed) saveInbox(p);
+}
+
+export function unreadCount(): number {
+  const p = loadInbox();
+  const opened = new Set(p.opened);
+  return p.arrived.filter((id) => !opened.has(id)).length;
+}
