@@ -64,12 +64,34 @@ export function HomeScreen({ state, onOpenLesson, onOpenLicense, onOpenSpotIt }:
               {done} / {LESSONS.length} lessons
             </div>
           </div>
-          {state.kidCityName && (
-            <div className="text-right" data-tour="name">
-              <div className="font-mono text-[10px] tracking-[0.25em] opacity-80">CITIZEN</div>
-              <div className="text-sm font-medium">{state.kidCityName}</div>
+          <div className="flex items-center gap-3">
+            {state.kidCityName && (
+              <div className="text-right" data-tour="name">
+                <div className="font-mono text-[10px] tracking-[0.25em] opacity-80">CITIZEN</div>
+                <div className="text-sm font-medium">{state.kidCityName}</div>
+              </div>
+            )}
+            <div
+              className="flex flex-col items-center"
+              title="The phone charges as you learn."
+              aria-label={`Battery ${batteryPct} percent. The phone charges as you learn.`}
+            >
+              <span className="relative block h-3 w-7 rounded-[3px] border border-white/80">
+                <span
+                  className="absolute -right-[3px] top-1/2 -translate-y-1/2 h-1.5 w-[2px] rounded-r bg-white/80"
+                  aria-hidden="true"
+                />
+                <span
+                  className="absolute inset-y-[1px] left-[1px] rounded-[2px] bg-white/80 transition-[width] duration-500"
+                  style={{ width: `calc(${batteryPct}% - 2px)` }}
+                  aria-hidden="true"
+                />
+              </span>
+              <span className="mt-0.5 font-mono text-[9px] tracking-widest opacity-80">
+                {batteryPct}%
+              </span>
             </div>
-          )}
+          </div>
         </div>
 
         <ul data-tour="adult" className="grid grid-cols-4 gap-3" aria-label="First Phone lessons">
