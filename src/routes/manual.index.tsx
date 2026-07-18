@@ -180,21 +180,34 @@ function ManualIndex() {
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {MANUAL_ENTRIES.map((e) => {
             const isUnlocked = unlocked.has(e.id);
+            const rec = record.get(e.id);
+            const chipTone =
+              rec && rec.losses > 0 ? "text-caution" : "text-muted-foreground";
             const inner = (
               <>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <div className="stencil text-[10px] tracking-widest text-muted-foreground">
                     FILE · {e.code}
                   </div>
-                  {isUnlocked ? (
-                    <span className="inline-flex items-center gap-1 stencil text-[9px] tracking-widest text-primary">
-                      <FileText className="h-3 w-3" /> DECLASSIFIED
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 stencil text-[9px] tracking-widest text-muted-foreground">
-                      <Lock className="h-3 w-3" /> REDACTED
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {rec && (
+                      <span
+                        className={`font-mono text-[9px] tracking-widest ${chipTone}`}
+                        aria-label={`Met ${rec.met}, lost ${rec.losses}`}
+                      >
+                        MET {rec.met} · LOST {rec.losses}
+                      </span>
+                    )}
+                    {isUnlocked ? (
+                      <span className="inline-flex items-center gap-1 stencil text-[9px] tracking-widest text-primary">
+                        <FileText className="h-3 w-3" /> DECLASSIFIED
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 stencil text-[9px] tracking-widest text-muted-foreground">
+                        <Lock className="h-3 w-3" /> REDACTED
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div
                   className="mt-3 text-2xl font-black tracking-tight leading-tight"
@@ -207,6 +220,7 @@ function ManualIndex() {
                 </p>
               </>
             );
+
             const skin = isUnlocked
               ? "border-primary/40 bg-card hover:border-primary hover:-translate-y-0.5"
               : "border-dashed border-border bg-muted/20 cursor-not-allowed";
