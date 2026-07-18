@@ -24,12 +24,14 @@ function ArenaRoute() {
   const [unlocked, setUnlocked] = useState(false);
   const [runs, setRuns] = useState(0);
   const [cases, setCases] = useState(0);
+  const [standoffRounds, setStandoffRounds] = useState(0);
 
   useEffect(() => {
     const p = loadProfile();
     setCases(p.casesPlayed);
     setUnlocked(p.casesPlayed >= 5);
     setRuns(loadRedHandsLog().runs);
+    setStandoffRounds(loadStandoffLog().rounds.length);
   }, []);
 
   return (
