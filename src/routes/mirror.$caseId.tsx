@@ -47,6 +47,8 @@ import { ContactsSheet } from "@/components/chat/ContactsSheet";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 import { clockFor } from "@/lib/mirror/clocks";
 import { ClockChip } from "@/components/mirror/ClockChip";
+import { pendingRetestForCase, scheduleRetest, resolveRetest, type RetestResolution } from "@/lib/mirror/retests";
+import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
