@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  Library,
   ScrollText,
   Users,
   ArrowRight,
@@ -17,7 +16,7 @@ import { TopBar } from "@/components/TopBar";
 import { SCENARIOS, type Scenario, saveCitizenCase } from "@/lib/mirror/scenarios";
 import { listCommunityCases } from "@/lib/story.functions";
 import { loadProfile, type HistoryEntry, type TrustProfile } from "@/lib/mirror/profile";
-import { DistrictIntro } from "@/components/DistrictIntro";
+import { DistrictHero } from "@/components/DistrictHero";
 import archiveArt from "@/assets/district-archive.jpg";
 
 export const Route = createFileRoute("/archive")({
@@ -113,35 +112,32 @@ function ArchivePage() {
   return (
     <div className="min-h-screen grain">
       <TopBar />
-      <main className="mx-auto max-w-6xl px-4 py-10">
-        <DistrictIntro
-          id="archive"
-          chapter="CHAPTER 04"
-          title="THE ARCHIVE"
-          art={archiveArt}
-          district="archive"
-          lines={[
-            "Every case in this room was survived — or wasn't — by someone real. This is the city's memory.",
-            "Read it like a debrief, not a museum. Tomorrow's target is in one of these files.",
-          ]}
-        />
 
-        {/* HEADER — library reading room */}
-        <div className="mb-8 rounded-sm border border-primary/30 bg-gradient-to-b from-primary/[0.06] to-transparent p-6">
-          <div className="stencil text-[10px] text-primary">THE CITY LIBRARY</div>
-          <h1 className="mt-2 text-3xl sm:text-5xl font-semibold uppercase tracking-tight flex items-center gap-3">
-            <Library className="h-8 w-8 text-primary" /> Mission Archive
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm text-foreground/90 italic">
-            "Every case the city solves is archived here. The library is written by its players."
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
-            <span className="stencil text-[10px]">
-              READING ROOM · {officialAll.length} OFFICIAL · {community.length} COMMUNITY ·{" "}
-              {mineHistory.length} ON YOUR SHELF
-            </span>
+      <DistrictHero
+        art={archiveArt}
+        district="archive"
+        glow="245,185,66"
+        kicker="CHAPTER 04 · THE ARCHIVE · THE CITY LIBRARY"
+        title="The city's memory."
+        thesis={
+          <>
+            Every case in this room was survived — or wasn't — by someone real. Read it like a{" "}
+            <strong className="text-white">debrief</strong>, not a museum. Tomorrow's target is in
+            one of these files.
+          </>
+        }
+        aside={
+          <div className="rounded-sm border border-caution/40 bg-black/50 px-4 py-3 font-mono text-[11px] tracking-widest text-caution backdrop-blur-sm">
+            <div>READING ROOM</div>
+            <div className="mt-1 text-white/80">
+              {officialAll.length} OFFICIAL · {community.length} COMMUNITY
+            </div>
+            <div className="text-white/80">{mineHistory.length} ON YOUR SHELF</div>
           </div>
-        </div>
+        }
+      />
+
+      <main className="mx-auto max-w-6xl px-4 py-8">
 
         {/* SHELF TABS */}
         <div className="mb-4 flex flex-wrap gap-1 rounded-sm border border-border bg-card p-1 w-fit">
