@@ -24,7 +24,7 @@ const REAL_MASK: RackTemplate = {
   blurb: "REAL — bet on their paranoia.",
   build: () => ({
     isMask: true,
-    tactic: "authority",
+    tactic: "impersonation",
     title: "Rimsha — school friend",
     teaser: "Yaar it's Rimsha, changed my number. Remember the Murree trip?",
     channel: "text",
@@ -83,7 +83,7 @@ const URGENT_MONEY: RackTemplate = {
   blurb: "IMPOSTER — bet on their trust.",
   build: () => ({
     isMask: true,
-    tactic: "urgency",
+    tactic: "urgency-fear",
     title: "Uncle Aslam — bank trouble",
     teaser: "Beta bank ne block kar diya, jaldi transfer bhej do warna mushkil ho jayegi.",
     channel: "text",
@@ -148,7 +148,7 @@ const COUSIN_OTP: RackTemplate = {
   blurb: "IMPOSTER — bet on their trust.",
   build: () => ({
     isMask: true,
-    tactic: "credential-hijack",
+    tactic: "phishing",
     title: "Cousin Zara — locked out",
     teaser: "Bhai I got locked out, code aa raha hai tumhare number pe, jaldi bhej do.",
     channel: "text",
