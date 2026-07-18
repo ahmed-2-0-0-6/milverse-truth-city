@@ -2500,3 +2500,20 @@ html[data-force-reduce-motion="on"] .redact-bar {
   transform: none !important;
   opacity: 1 !important;
 }
+
+/* ---------- CITIZEN SUPPLEMENT — unread dot ---------- */
+@keyframes supp-unread-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.35); opacity: 0.55; }
+}
+.supp-unread-dot {
+  animation: supp-unread-pulse 1.8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .supp-unread-dot { animation: none !important; transform: none !important; }
+}
+html[data-high-legibility="on"] .supp-unread-dot,
+html[data-force-reduce-motion="on"] .supp-unread-dot {
+  animation: none !important;
+  transform: none !important;
+}
