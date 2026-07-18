@@ -42,7 +42,12 @@ import { tacticForMirror } from "@/lib/mirror/tactics";
 import { labelForTactic } from "@/lib/handler/profile";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChatHeader } from "@/components/chat/ChatHeader";
-import { skinForCase, receiptFor, type ChatSkin } from "@/lib/chat/skins";
+import { skinForCase, receiptFor, type ChatSkin, CLEAN_ROOM_SKIN } from "@/lib/chat/skins";
+import { Airlock } from "@/components/mirror/Airlock";
+import { VobRitual } from "@/components/mirror/VobRitual";
+import { roomNoteFor } from "@/lib/mirror/cleanroom";
+import { useVisualMode } from "@/lib/visual-quality";
+
 import { ContactsSheet } from "@/components/chat/ContactsSheet";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 import { clockFor } from "@/lib/mirror/clocks";
@@ -226,12 +231,27 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
 
       <SendOff />
 
+      {scenario.tier === 5 && (
+        <div className="mt-6 rounded-sm border border-[#1b2430]/40 bg-[#f4f4f0] p-5 text-[#1b2430]">
+          <div className="stencil text-[11px] tracking-[0.3em] text-[#1b2430]/70">
+            TIER 5 · THE CLEAN ROOM
+          </div>
+          <p className="mt-3 text-sm leading-relaxed">
+            Every fact you hold will be answered correctly. Every tell you've learned will be
+            absent. Reading this conversation cannot settle it — in here, a flawless performance
+            and the plain truth look identical. The door out is marked VERIFY. It was always the
+            door.
+          </p>
+        </div>
+      )}
+
       <button
         onClick={onStart}
         className="mt-6 w-full rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground transition-transform hover:scale-[1.01]"
       >
         I'VE MEMORIZED IT — START
       </button>
+
       <p className="mt-3 text-center text-xs text-muted-foreground">
         The brief rides along in NOTES. Pin what smells wrong and tag which fact it breaks.
       </p>
@@ -257,7 +277,13 @@ interface StoredSim {
 }
 
 function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void }) {
-  const skin = skinForCase(scenario.id);
+  const isCleanRoom = scenario.tier === 5;
+  const { mode } = useVisualMode();
+  const cinematic = mode === "cinematic";
+  const skin = isCleanRoom ? CLEAN_ROOM_SKIN : skinForCase(scenario.id);
+  const useRitual = isCleanRoom && cinematic;
+  const [airlockOn, setAirlockOn] = useState<boolean>(isCleanRoom && cinematic);
+
   const refs = useMemo(() => factRefsFor(scenario), [scenario]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [state, setState] = useState<EngineState>(() => initState(scenario));
@@ -596,7 +622,10 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
   return (
     <>
       <TacticFlash tacticId={tacticFlash} onDone={() => setTacticFlash(null)} />
+      {airlockOn && <Airlock onDone={() => setAirlockOn(false)} />}
+      <div className={showVob && useRitual ? "ritual-recede" : ""}>
       <ChatShell
+
         logRegion={false}
 
         header={
@@ -712,9 +741,10 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               onClose={() => setContactsOpen(false)}
               mirrorNoHelp={true}
             />
-            {showVob && (
+            {showVob && !useRitual && (
               <VobModal onClose={() => setShowVob(false)} onPick={useVob} tier={scenario.tier} />
             )}
+
           </>
         }
         composer={
@@ -871,9 +901,17 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
           )}
         </div>
       </ChatShell>
+      </div>
+      {showVob && useRitual && (
+        <VobRitual
+          onClose={() => setShowVob(false)}
+          onPick={(m) => useVob(m)}
+        />
+      )}
     </>
   );
 }
+
 
 function MessageRow({
   m,
@@ -1915,7 +1953,18 @@ function Debrief({ scenario }: { scenario: Scenario }) {
             been the safer read. <b>Spotting is dying. Verifying is forever.</b>
           </p>
         )}
+        {scenario.tier === 5 && (() => {
+          const note = roomNoteFor(scenario.id);
+          if (!note) return null;
+          return (
+            <div className="mt-4 border-t border-current/20 pt-3">
+              <div className="stencil text-[11px] tracking-[0.3em] opacity-80">THE ROOM</div>
+              <p className="mt-2 text-sm leading-relaxed opacity-95">{note}</p>
+            </div>
+          );
+        })()}
       </div>
+
 
       <RetestReveal resolution={retestResolution} />
 

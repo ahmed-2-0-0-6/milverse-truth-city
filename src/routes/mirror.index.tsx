@@ -283,6 +283,12 @@ function CaseFiles() {
                   </span>
                 )}
               </div>
+              {tier === 5 && isUnlocked && (
+                <div className="mb-3 -mt-2 font-mono text-[10px] tracking-widest text-muted-foreground">
+                  TWO FILES. NO TELLS. THE DOOR IS MARKED VERIFY.
+                </div>
+              )}
+
 
               {cases.length === 0 ? (
                 <div className="rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">

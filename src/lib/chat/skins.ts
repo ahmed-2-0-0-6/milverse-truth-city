@@ -72,6 +72,35 @@ export const CHAT_SKINS: Record<ChatPlatform, ChatSkin> = {
 };
 
 /**
+ * MILVERSE — Tier 5 CLEAN ROOM skin.
+ * A bleached, shadowless place. Chosen for a contrast reason, not a mood
+ * one: at Tier 5 the engine runs "clean" (no artifacts, no cracks), so the
+ * room can't lean on noir tells. Bone body, white bubbles, dark text.
+ * All text/background pairs ≥ 4.5:1.
+ *
+ * Not registered in CHAT_SKINS — Tier 5 opts in explicitly at the route.
+ */
+export const CLEAN_ROOM_SKIN: ChatSkin = {
+  id: "sms",
+  bodyClass: "",
+  bodyStyle: {
+    backgroundColor: "#f4f4f0",
+  },
+  inBubble:
+    "bg-white text-[#1b2430] border border-[#d8d8d2] rounded-2xl rounded-bl-md",
+  outBubble:
+    "bg-[#e8e6df] text-[#1b2430] border border-[#d8d8d2] rounded-2xl rounded-br-md",
+  receiptStyle: "delivered",
+  readColor: "text-[#1b2430]/60",
+  headerClass: "bg-[#fbfaf7] text-[#1b2430]",
+  presenceLine: "online",
+  placeholder: "Type…",
+  systemNote: "This room has no shadows. Everything here will check out.",
+};
+
+
+
+/**
  * Which platform each case conversation renders in. Presentation judgment
  * only — chosen for where this kind of traffic actually arrives in Pakistan:
  * bank/prize/txn blasts land as SMS, school-age contacts live in DMs,
