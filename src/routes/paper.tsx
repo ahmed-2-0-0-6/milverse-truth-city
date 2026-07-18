@@ -18,6 +18,7 @@ import { getLatestEdition, listArchive, getEdition } from "@/lib/paper.functions
 import type { Edition, EditionContent } from "@/lib/paper/types";
 import { dropDateKey } from "@/lib/daily/rotation";
 import { readEditionRecord } from "@/lib/paper/profile";
+import { currentShift, isNightRegister } from "@/lib/city/shift";
 import {
   supplementWeek,
   readLastSeenWeek,
