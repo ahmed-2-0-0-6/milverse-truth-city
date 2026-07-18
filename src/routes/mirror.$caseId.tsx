@@ -224,50 +224,59 @@ function CasePlay() {
   // In the "sim" phase, ChatShell owns the whole viewport (phone frame).
   if (phase === "sim") {
     return (
-      <StandoffContext.Provider value={standoffMode}>
-        <ColdReadContext.Provider value={coldMode}>
-          <Simulation scenario={scenario} onEnd={() => setPhase("verdict")} />
-        </ColdReadContext.Provider>
-      </StandoffContext.Provider>
+      <MaskContext.Provider value={{ active: maskMode, shareCode: maskCode }}>
+        <StandoffContext.Provider value={standoffMode}>
+          <ColdReadContext.Provider value={coldMode}>
+            <Simulation scenario={scenario} onEnd={() => setPhase("verdict")} />
+          </ColdReadContext.Provider>
+        </StandoffContext.Provider>
+      </MaskContext.Provider>
     );
   }
 
   return (
-    <StandoffContext.Provider value={standoffMode}>
-      <ColdReadContext.Provider value={coldMode}>
-        <div className="min-h-screen grain">
-          <TopBar />
-          {!coldMode && !standoffMode && (
-            <ShiftBanner kind="mirror" caseId={scenario.id} phase={phase} />
-          )}
-          {!coldMode && (
-            <div className="mx-auto max-w-3xl px-4 pt-4">
-              <RookieIntro />
-            </div>
-          )}
-          {phase === "dossier" && (
-            standoffMode
-              ? <StandoffInterstitial scenario={scenario} onStart={() => setPhase("sim")} />
-              : coldMode
-                ? <ColdInterstitial scenario={scenario} onStart={() => setPhase("sim")} />
-                : <Dossier scenario={scenario} onStart={() => setPhase("sim")} />
-          )}
-          {phase === "verdict" && <Verdict scenario={scenario} coldMode={coldMode} onDone={() => setPhase("reveal")} />}
-          {phase === "reveal" && (
-            <VerdictReveal scenario={scenario} onDone={() => setPhase("debrief")} />
-          )}
-          {phase === "debrief" && (
-            standoffMode
-              ? <StandoffHandoff />
-              : coldMode
-                ? <ColdDebrief scenario={scenario} />
-                : <Debrief scenario={scenario} />
-          )}
-        </div>
-      </ColdReadContext.Provider>
-    </StandoffContext.Provider>
+    <MaskContext.Provider value={{ active: maskMode, shareCode: maskCode }}>
+      <StandoffContext.Provider value={standoffMode}>
+        <ColdReadContext.Provider value={coldMode}>
+          <div className="min-h-screen grain">
+            <TopBar />
+            {!coldMode && !standoffMode && !maskMode && (
+              <ShiftBanner kind="mirror" caseId={scenario.id} phase={phase} />
+            )}
+            {!coldMode && !maskMode && (
+              <div className="mx-auto max-w-3xl px-4 pt-4">
+                <RookieIntro />
+              </div>
+            )}
+            {phase === "dossier" && (
+              maskMode
+                ? <MaskInterstitial scenario={scenario} onStart={() => setPhase("sim")} />
+                : standoffMode
+                  ? <StandoffInterstitial scenario={scenario} onStart={() => setPhase("sim")} />
+                  : coldMode
+                    ? <ColdInterstitial scenario={scenario} onStart={() => setPhase("sim")} />
+                    : <Dossier scenario={scenario} onStart={() => setPhase("sim")} />
+            )}
+            {phase === "verdict" && <Verdict scenario={scenario} coldMode={coldMode} onDone={() => setPhase("reveal")} />}
+            {phase === "reveal" && (
+              <VerdictReveal scenario={scenario} onDone={() => setPhase("debrief")} />
+            )}
+            {phase === "debrief" && (
+              maskMode
+                ? <MaskDebrief scenario={scenario} shareCode={maskCode} />
+                : standoffMode
+                  ? <StandoffHandoff />
+                  : coldMode
+                    ? <ColdDebrief scenario={scenario} />
+                    : <Debrief scenario={scenario} />
+            )}
+          </div>
+        </ColdReadContext.Provider>
+      </StandoffContext.Provider>
+    </MaskContext.Provider>
   );
 }
+
 
 function StandoffInterstitial({ scenario, onStart }: { scenario: Scenario; onStart: () => void }) {
   return (
