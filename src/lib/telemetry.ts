@@ -15,7 +15,8 @@ export type TelemetryEventType =
   | "manual_open"
   | "share_copy"
   | "lite_fallback"
-  | "paper_section_done";
+  | "paper_section_done"
+  | "pin_flag";
 
 export interface TelemetryEvent {
   event_type: TelemetryEventType;
