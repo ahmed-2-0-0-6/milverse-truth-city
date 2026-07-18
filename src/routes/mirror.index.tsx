@@ -37,6 +37,7 @@ import { IncomingToast } from "@/components/inbox/IncomingToast";
 import { IncomingCall } from "@/components/inbox/IncomingCall";
 import { loadInbox } from "@/lib/inbox/profile";
 import { SeasonAdvisory, SeasonGlyph, useSeason } from "@/components/season/SeasonAdvisory";
+import { NightShiftAdvisory } from "@/components/hub/NightShiftAdvisory";
 import { tacticForMirror } from "@/lib/mirror/tactics";
 
 
