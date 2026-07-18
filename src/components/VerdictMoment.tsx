@@ -17,6 +17,13 @@ interface Props {
   stampLabel: string; // "TRUE" / "FAKE" / "MISLEADING" / etc.
   outcome: CalibrationOutcome;
   onDone: () => void;
+  /**
+   * "The Quiet File" — survivor cases end quiet. The stamp fades in over
+   * 400ms (no scale/slam), screen-shake and audio cues are skipped.
+   * Result text, outcome, and timing handoff are identical to standard.
+   * Default: "standard" — every existing call site is byte-identical.
+   */
+  register?: "standard" | "quiet";
 }
 
 const GRADES: Record<
