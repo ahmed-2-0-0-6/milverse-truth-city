@@ -1543,7 +1543,7 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
           onChange={(e) => setConclusion(e.target.value.slice(0, 300))}
           placeholder="In one line: why do you believe this? (max 300 chars)"
           rows={3}
-          className="w-full rounded-md border border-border bg-background p-3 text-sm placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none"
+          className="w-full rounded-md border border-border bg-background p-3 text-base placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none sm:text-sm"
         />
         <div className="mt-1 text-right font-mono text-[10px] text-muted-foreground">
           {conclusion.length}/300
