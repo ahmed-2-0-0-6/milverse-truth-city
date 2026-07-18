@@ -782,6 +782,15 @@ function Debrief({
         }
       />
 
+      {(outcome.result === "missed_fake" || outcome.result === "false_alarm") && (
+        <LossBeat
+          result={outcome.result === "missed_fake" ? "missed_scam" : "false_alarm"}
+          tacticLabel={scenario.tacticId ? labelForTactic(scenario.tacticId as never) : null}
+          seedKey={`feed:${scenario.id}`}
+        />
+      )}
+
+
       <NextCaseCard wing="feed" currentId={scenario.id} />
 
       <div className="flex gap-2">
