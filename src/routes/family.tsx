@@ -364,6 +364,10 @@ function FamilyPage() {
               </>
             )}
 
+            <DinnerBriefs doneSet={new Set(lessonList)} />
+
+
+
             <p className="mt-6 text-xs text-muted-foreground italic border-t border-border pt-4">
               What you see: lesson count, skills mastered, calibration trend, license status.
               Day-level activity only — no exact timestamps.
