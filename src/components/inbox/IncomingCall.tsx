@@ -62,6 +62,7 @@ export function IncomingCall() {
 
   function landVoicemail(_reason: "decline" | "timeout" | "answer") {
     if (!call) return;
+    stopRing();
     if (ringTimer.current) {
       window.clearTimeout(ringTimer.current);
       ringTimer.current = null;
