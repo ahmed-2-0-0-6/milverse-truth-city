@@ -688,10 +688,25 @@ function VerdictScreen({
       </p>
 
 
-      <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2">
-        {(["TRUE", "MISLEADING", "FALSE", "UNVERIFIED"] as FeedVerdict[]).map((v) => (
+      <div
+        className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2"
+        role="radiogroup"
+        aria-label="Your verdict"
+      >
+        {(["TRUE", "MISLEADING", "FALSE", "UNVERIFIED"] as FeedVerdict[]).map((v, i, arr) => (
           <button
             key={v}
+            role="radio"
+            type="button"
+            aria-checked={verdict === v}
+            tabIndex={verdict === v || (!verdict && i === 0) ? 0 : -1}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+                e.preventDefault();
+                const dir = e.key === "ArrowRight" ? 1 : -1;
+                setVerdict(arr[(i + dir + arr.length) % arr.length]);
+              }
+            }}
             onClick={() => setVerdict(v)}
             className={`rounded-md border-2 p-4 font-mono text-xs tracking-widest transition ${
               verdict === v
@@ -709,6 +724,7 @@ function VerdictScreen({
           </button>
         ))}
       </div>
+
       <p className="mt-2 text-xs text-muted-foreground">
         UNVERIFIED = the claim can neither be confirmed nor disproved. Refusing to forward fear you
         can't check is the correct move.
