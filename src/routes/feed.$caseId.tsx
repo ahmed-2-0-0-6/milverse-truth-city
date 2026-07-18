@@ -125,7 +125,10 @@ function FeedPlay() {
           setVerdict={setVerdict}
           conclusion={conclusion}
           setConclusion={setConclusion}
+          loadBearing={loadBearing}
+          setLoadBearing={setLoadBearing}
           onConfirm={() => {
+
             if (!verdict) return;
             const oc = gradeVerdict(scenario, state, verdict, finalReply);
             setOutcome(oc);
