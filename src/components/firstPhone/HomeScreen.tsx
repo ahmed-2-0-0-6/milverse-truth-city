@@ -42,10 +42,12 @@ interface Props {
  * The First Phone HOME SCREEN — the LessonPath, rendered as apps.
  * Pure DOM/CSS; works everywhere.
  */
-export function HomeScreen({ state, onOpenLesson, onOpenLicense }: Props) {
+export function HomeScreen({ state, onOpenLesson, onOpenLicense, onOpenSpotIt }: Props) {
   const wp = getWallpaper(state.wallpaper);
   const licensed = !!state.licenseIssuedAt;
   const done = state.lessonsCompleted.length;
+  const batteryPct = Math.max(10, Math.min(100, 10 + done * 9));
+  const spotItReady = done > 0;
 
   return (
     <div
