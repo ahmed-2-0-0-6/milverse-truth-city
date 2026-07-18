@@ -52,9 +52,15 @@ function CityMap() {
   const [booted, setBooted] = useState(mode !== "cinematic");
   const [intro, setIntro] = useState(false);
   const [view, setView] = useState<"map" | "list">("map");
+  // Hydration idiom (mirrors the existing setView useEffect below): SSR
+  // renders the poster (isReturning=false); the desk is enabled after
+  // mount when localStorage is readable. Wrapped in a stable-height
+  // container to avoid layout shift on either path.
+  const [returning, setReturning] = useState(false);
 
   useEffect(() => {
     setView(preferredDefaultView());
+    setReturning(isReturningCitizen());
     if (typeof window !== "undefined" && !localStorage.getItem(INTRO_KEY)) setIntro(true);
   }, []);
 
