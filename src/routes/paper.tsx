@@ -2,7 +2,7 @@
 // Human-published newspaper. The site always shows the latest published edition.
 
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { TopBar } from "@/components/TopBar";
 import { PaperFrontPage } from "@/components/paper/PaperFrontPage";
@@ -17,6 +17,10 @@ import { getLatestEdition, listArchive, getEdition } from "@/lib/paper.functions
 import type { Edition, EditionContent } from "@/lib/paper/types";
 import { dropDateKey } from "@/lib/daily/rotation";
 import { readEditionRecord } from "@/lib/paper/profile";
+import {
+  supplementWeek,
+  readLastSeenWeek,
+} from "@/lib/paper/supplement";
 import { Newspaper, Printer, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/paper")({
@@ -151,6 +155,8 @@ function PaperPage() {
             )}
           </div>
         </div>
+
+        <SupplementBanner />
 
         {/* Masthead */}
         <header
@@ -301,6 +307,51 @@ function Divider({ label }: { label: string }) {
     </div>
   );
 }
+
+function SupplementBanner() {
+  const [unread, setUnread] = useState(false);
+  const week = useMemo(() => supplementWeek(new Date()), []);
+
+  useEffect(() => {
+    const check = () => setUnread(readLastSeenWeek() !== week.weekKey);
+    check();
+    const on = () => check();
+    window.addEventListener("milverse:supplement-seen", on);
+    window.addEventListener("storage", on);
+    return () => {
+      window.removeEventListener("milverse:supplement-seen", on);
+      window.removeEventListener("storage", on);
+    };
+  }, [week.weekKey]);
+
+  return (
+    <div className="no-print mb-6">
+      <Link
+        to="/paper/supplement"
+        className="group flex items-center justify-between gap-3 border-2 border-current/50 px-4 py-3 rounded-sm hover:bg-black/5 transition-colors"
+        style={{ borderColor: "var(--paper-rule)" }}
+      >
+        <div>
+          <div className="paper-mono text-[10px] tracking-[0.25em] text-[color:var(--paper-muted)]">
+            CITIZEN SUPPLEMENT
+          </div>
+          <div className="paper-serif text-base sm:text-lg mt-0.5" style={{ fontWeight: 800 }}>
+            Week {week.isoWeek} is in. Read your week
+            <span className="paper-mono text-xs ml-2">→</span>
+          </div>
+        </div>
+        {unread && (
+          <span
+            aria-label="Unread supplement"
+            className="supp-unread-dot inline-block h-2.5 w-2.5 rounded-full"
+            style={{ background: "var(--paper-ink)" }}
+          />
+        )}
+      </Link>
+    </div>
+  );
+}
+
 
 function YesterdaysPapers({
   currentNumber,

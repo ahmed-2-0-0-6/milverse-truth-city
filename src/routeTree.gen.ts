@@ -36,6 +36,7 @@ import { Route as MirrorIndexRouteImport } from './routes/mirror.index'
 import { Route as ManualIndexRouteImport } from './routes/manual.index'
 import { Route as FeedIndexRouteImport } from './routes/feed.index'
 import { Route as BossIndexRouteImport } from './routes/boss.index'
+import { Route as PaperSupplementRouteImport } from './routes/paper.supplement'
 import { Route as MirrorCaseIdRouteImport } from './routes/mirror.$caseId'
 import { Route as ManualTakeItOutsideRouteImport } from './routes/manual.take-it-outside'
 import { Route as ManualEntryIdRouteImport } from './routes/manual.$entryId'
@@ -179,6 +180,11 @@ const BossIndexRoute = BossIndexRouteImport.update({
   path: '/boss/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaperSupplementRoute = PaperSupplementRouteImport.update({
+  id: '/supplement',
+  path: '/supplement',
+  getParentRoute: () => PaperRoute,
+} as any)
 const MirrorCaseIdRoute = MirrorCaseIdRouteImport.update({
   id: '/mirror/$caseId',
   path: '/mirror/$caseId',
@@ -230,7 +236,7 @@ export interface FileRoutesByFullPath {
   '/first-phone': typeof FirstPhoneRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
-  '/paper': typeof PaperRoute
+  '/paper': typeof PaperRouteWithChildren
   '/pilot': typeof PilotRoute
   '/pressroom': typeof PressroomRoute
   '/profile': typeof ProfileRoute
@@ -245,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/manual/$entryId': typeof ManualEntryIdRoute
   '/manual/take-it-outside': typeof ManualTakeItOutsideRoute
   '/mirror/$caseId': typeof MirrorCaseIdRoute
+  '/paper/supplement': typeof PaperSupplementRoute
   '/boss/': typeof BossIndexRoute
   '/feed/': typeof FeedIndexRoute
   '/manual/': typeof ManualIndexRoute
@@ -266,7 +273,7 @@ export interface FileRoutesByTo {
   '/first-phone': typeof FirstPhoneRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
-  '/paper': typeof PaperRoute
+  '/paper': typeof PaperRouteWithChildren
   '/pilot': typeof PilotRoute
   '/pressroom': typeof PressroomRoute
   '/profile': typeof ProfileRoute
@@ -281,6 +288,7 @@ export interface FileRoutesByTo {
   '/manual/$entryId': typeof ManualEntryIdRoute
   '/manual/take-it-outside': typeof ManualTakeItOutsideRoute
   '/mirror/$caseId': typeof MirrorCaseIdRoute
+  '/paper/supplement': typeof PaperSupplementRoute
   '/boss': typeof BossIndexRoute
   '/feed': typeof FeedIndexRoute
   '/manual': typeof ManualIndexRoute
@@ -303,7 +311,7 @@ export interface FileRoutesById {
   '/first-phone': typeof FirstPhoneRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
-  '/paper': typeof PaperRoute
+  '/paper': typeof PaperRouteWithChildren
   '/pilot': typeof PilotRoute
   '/pressroom': typeof PressroomRoute
   '/profile': typeof ProfileRoute
@@ -318,6 +326,7 @@ export interface FileRoutesById {
   '/manual/$entryId': typeof ManualEntryIdRoute
   '/manual/take-it-outside': typeof ManualTakeItOutsideRoute
   '/mirror/$caseId': typeof MirrorCaseIdRoute
+  '/paper/supplement': typeof PaperSupplementRoute
   '/boss/': typeof BossIndexRoute
   '/feed/': typeof FeedIndexRoute
   '/manual/': typeof ManualIndexRoute
@@ -356,6 +365,7 @@ export interface FileRouteTypes {
     | '/manual/$entryId'
     | '/manual/take-it-outside'
     | '/mirror/$caseId'
+    | '/paper/supplement'
     | '/boss/'
     | '/feed/'
     | '/manual/'
@@ -392,6 +402,7 @@ export interface FileRouteTypes {
     | '/manual/$entryId'
     | '/manual/take-it-outside'
     | '/mirror/$caseId'
+    | '/paper/supplement'
     | '/boss'
     | '/feed'
     | '/manual'
@@ -428,6 +439,7 @@ export interface FileRouteTypes {
     | '/manual/$entryId'
     | '/manual/take-it-outside'
     | '/mirror/$caseId'
+    | '/paper/supplement'
     | '/boss/'
     | '/feed/'
     | '/manual/'
@@ -450,7 +462,7 @@ export interface RootRouteChildren {
   FirstPhoneRoute: typeof FirstPhoneRoute
   KitRoute: typeof KitRoute
   MarketRoute: typeof MarketRoute
-  PaperRoute: typeof PaperRoute
+  PaperRoute: typeof PaperRouteWithChildren
   PilotRoute: typeof PilotRoute
   PressroomRoute: typeof PressroomRoute
   ProfileRoute: typeof ProfileRoute
@@ -662,6 +674,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BossIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/paper/supplement': {
+      id: '/paper/supplement'
+      path: '/supplement'
+      fullPath: '/paper/supplement'
+      preLoaderRoute: typeof PaperSupplementRouteImport
+      parentRoute: typeof PaperRoute
+    }
     '/mirror/$caseId': {
       id: '/mirror/$caseId'
       path: '/mirror/$caseId'
@@ -725,6 +744,16 @@ const ArchiveRouteChildren: ArchiveRouteChildren = {
 const ArchiveRouteWithChildren =
   ArchiveRoute._addFileChildren(ArchiveRouteChildren)
 
+interface PaperRouteChildren {
+  PaperSupplementRoute: typeof PaperSupplementRoute
+}
+
+const PaperRouteChildren: PaperRouteChildren = {
+  PaperSupplementRoute: PaperSupplementRoute,
+}
+
+const PaperRouteWithChildren = PaperRoute._addFileChildren(PaperRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ArchiveRoute: ArchiveRouteWithChildren,
@@ -740,7 +769,7 @@ const rootRouteChildren: RootRouteChildren = {
   FirstPhoneRoute: FirstPhoneRoute,
   KitRoute: KitRoute,
   MarketRoute: MarketRoute,
-  PaperRoute: PaperRoute,
+  PaperRoute: PaperRouteWithChildren,
   PilotRoute: PilotRoute,
   PressroomRoute: PressroomRoute,
   ProfileRoute: ProfileRoute,
