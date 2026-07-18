@@ -36,6 +36,27 @@ import { SignalBeacons, BEACON_ANCHORS } from "@/components/city/SignalBeacons";
 import { AmbientLife } from "@/components/city/AmbientLife";
 import type { CitySignal } from "@/lib/city/signals";
 import { useSeason } from "@/components/season/SeasonAdvisory";
+import { SIGNAGE, SIGN_ORDER } from "@/lib/city/signage";
+import { Link } from "@tanstack/react-router";
+
+/** Landmark id → signage id mapping. Hubs collapse to their district. */
+const LANDMARK_SIGN: Record<string, string> = {
+  "mirror-tower": "mirror",
+  "feed-antenna": "feed",
+  "city-hall": "city-hall",
+  studio: "studio",
+  archive: "archive",
+  manual: "manual",
+  profile: "profile",
+  educators: "", // no signage entry — labelled plain
+  market: "market",
+  arena: "arena",
+};
+function landmarkSub(id: string): string | null {
+  const key = LANDMARK_SIGN[id];
+  return key && SIGNAGE[key] ? SIGNAGE[key].sub : null;
+}
+
 
 /** Full-map seasonal wash — a whisper, never a shout. */
 function SeasonMapWash() {
