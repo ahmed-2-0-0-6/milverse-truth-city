@@ -28,9 +28,15 @@ export function SendOff() {
     const weakest = weakestTactic(stats);
     const recentResults = (profile.history ?? []).slice(-5).map((h) => h.result);
     const seed = sendOffSeed(dropDateKey(), profile.casesPlayed ?? 0);
+    const conv = computeConviction(profile.history ?? []);
     const fallback = buildSendOff(
       reading,
-      { weakest, dailyStreak: profile.dailyStreak ?? 0, recentResults },
+      {
+        weakest,
+        dailyStreak: profile.dailyStreak ?? 0,
+        recentResults,
+        oversure: conv.status === "ok" && conv.label === "oversure",
+      },
       seed,
     );
     return { reading, weakest, fallback };
