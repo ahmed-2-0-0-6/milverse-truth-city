@@ -35,19 +35,32 @@ export interface AmbientLifeProps {
   animateMetro: boolean;
 }
 
+// Tints aligned to `cityShift` bands so the map, marquee, and copy switch
+// on the same boundary. Do NOT re-thread these values against a different
+// clock — the point of THE NIGHT SHIFT is one boundary for everything.
 function tintFor(hour: number): { fill: string; opacity: number } | null {
-  if (hour >= 5 && hour < 8) return { fill: "#f5b942", opacity: 0.04 };
-  if (hour >= 8 && hour < 17) return null; // day — transparent
-  if (hour >= 17 && hour < 20) return { fill: "#f97316", opacity: 0.05 };
+  // day (06 ≤ h < 17) — transparent
+  if (hour >= 6 && hour < 17) return null;
+  // evening (17 ≤ h < 21) — sodium orange
+  if (hour >= 17 && hour < 21) return { fill: "#f97316", opacity: 0.05 };
+  // smallHours (01 ≤ h < 06) — deepest indigo
+  if (hour >= 1 && hour < 6) return { fill: "#0f0d2e", opacity: 0.16 };
+  // night (21 ≤ h < 24 or 00 ≤ h < 01) — indigo
   return { fill: "#1e1b4b", opacity: 0.12 };
 }
 
+// Amber horizon glow — only rendered during smallHours. Static, sits under
+// the tint. Pointer-inert. Contributes ONE extra <rect>; no animation.
+function horizonGlowVisible(hour: number): boolean {
+  return hour >= 1 && hour < 6;
+}
+
 function litThresholdFor(hour: number): number {
-  // Night/dusk → 34, day/dawn → 10.
-  if (hour >= 8 && hour < 17) return 10;
-  if (hour >= 5 && hour < 8) return 10;
+  // Day → few windows lit; evening/night/smallHours → many.
+  if (hour >= 6 && hour < 17) return 10;
   return 34;
 }
+
 
 export function AmbientLife({
   hour,
