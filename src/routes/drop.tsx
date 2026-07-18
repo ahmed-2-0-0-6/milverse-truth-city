@@ -20,6 +20,11 @@ import {
   isDesignerFriday,
 } from "@/lib/daily/rotation";
 import { commitDailyPlay, readDailyStatus, stakeBounds, localSharpness } from "@/lib/daily/profile";
+import { loadProfile } from "@/lib/mirror/profile";
+import { computeXp } from "@/lib/ranks";
+import { loadUnlocked } from "@/lib/manual/state";
+import { writeXpDelta } from "@/lib/rank/xpSnapshot";
+import { XpDeltaLine } from "@/components/rank/XpDeltaLine";
 import {
   logDailyPlay,
   fetchDailySplit,
@@ -409,6 +414,8 @@ function PlayFlow({
   const commit = async () => {
     if (!verdict || committing) return;
     setCommitting(true);
+    const pBefore = loadProfile();
+    const xpBefore = computeXp(pBefore, loadUnlocked().size, pBefore.publishedCount ?? 0);
     const result = commitDailyPlay({
       caseId: scenario.id,
       verdict,
@@ -416,6 +423,11 @@ function PlayFlow({
       stake,
       probesUsed: probesUsed.length,
     });
+    if (result) {
+      const pAfter = loadProfile();
+      const xpAfter = computeXp(pAfter, loadUnlocked().size, pAfter.publishedCount ?? 0);
+      writeXpDelta(xpBefore, xpAfter);
+    }
     if (!result) {
       setCommitting(false);
       onDone();
