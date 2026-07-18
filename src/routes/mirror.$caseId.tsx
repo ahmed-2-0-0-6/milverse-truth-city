@@ -885,6 +885,7 @@ function loadSim(): StoredSim | null {
 
 function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void }) {
   const [verdict, setVerdict] = useState<"REAL" | "FAKE" | null>(null);
+  const [confidence, setConfidence] = useState<60 | 75 | 90 | null>(null);
   const [picked, setPicked] = useState<string[]>([]);
   const [conclusion, setConclusion] = useState("");
 
@@ -900,13 +901,14 @@ function Verdict({ scenario, onDone }: { scenario: Scenario; onDone: () => void 
   }
 
   function submit() {
-    if (!verdict) return;
+    if (!verdict || !confidence) return;
     sessionStorage.setItem(
       VERDICT_KEY,
-      JSON.stringify({ verdict, picked, conclusion: conclusion.trim().slice(0, 300) }),
+      JSON.stringify({ verdict, confidence, picked, conclusion: conclusion.trim().slice(0, 300) }),
     );
     onDone();
   }
+
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
