@@ -16,7 +16,15 @@ interface Props {
   variant?: "detective" | "junior";
   /** Optional style (used by junior surface to paint the wallpaper behind). */
   style?: CSSProperties;
+  /**
+   * When true (default) the scrolling content region carries role="log" for
+   * screen readers. Consumers with tabbed panels (Mirror NOTES, Feed TOOLKIT)
+   * should set false and place role="log" on the actual message scroller so
+   * non-chat panels stay outside chat-log semantics.
+   */
+  logRegion?: boolean;
 }
+
 
 /**
  * CitizenOS phone frame. On desktop, renders a rounded device silhouette on the
