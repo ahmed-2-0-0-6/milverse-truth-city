@@ -1,11 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import { getManualEntry, type ManualEntry } from "@/lib/manual/entries";
 import { loadUnlocked } from "@/lib/manual/state";
 import { RedactedTitle } from "@/components/RedactedTitle";
 import { track } from "@/lib/telemetry";
 import { ArrowLeft, Shield, Flag, Compass, Lock } from "lucide-react";
+import { loadProfile } from "@/lib/mirror/profile";
+import { encountersFor, type Encounter } from "@/lib/manual/encounters";
+
 
 export const Route = createFileRoute("/manual/$entryId")({
   loader: ({ params }) => {
