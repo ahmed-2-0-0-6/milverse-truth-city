@@ -736,18 +736,44 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                   </div>
                 </div>
               )}
-              {messages.map((m, i) => (
-                <MessageRow
-                  key={i}
-                  m={m}
-                  pinned={pins.includes(i)}
-                  onPin={m.role === "contact" ? () => togglePin(i) : undefined}
-                  speakerName={scenario.claimedIdentity}
-                  speakerVoiceDesc={scenario.persona.voice}
-                  read={typing || messages.some((later, j) => j > i && later.role === "contact")}
-                  skin={skin}
-                />
-              ))}
+              {messages.map((m, i) => {
+                const hasReply = messages.some((later, j) => j > i && later.role === "contact");
+                const grade = m.role === "player" ? (m.probeQuality as CraftGrade | undefined) : undefined;
+                let autoOpen = false;
+                if (grade && hasReply) {
+                  const isFirstOfGrade = firstOfGrade[grade] === i;
+                  if (grade === "wasted") {
+                    if (isFirstOfGrade && !wastedFiredThisCase()) {
+                      autoOpen = true;
+                      markWastedFired();
+                    } else if (isFirstOfGrade && !craftSeenRef.current.includes(grade)) {
+                      autoOpen = true;
+                    }
+                  } else if (isFirstOfGrade && !craftSeenRef.current.includes(grade)) {
+                    autoOpen = true;
+                  }
+                }
+                return (
+                  <MessageRow
+                    key={i}
+                    m={m}
+                    pinned={pins.includes(i)}
+                    onPin={m.role === "contact" ? () => togglePin(i) : undefined}
+                    speakerName={scenario.claimedIdentity}
+                    speakerVoiceDesc={scenario.persona.voice}
+                    read={typing || hasReply}
+                    skin={skin}
+                    hasReply={hasReply}
+                    grade={grade}
+                    why={grade ? craftWhyFor(scenario, m.text, grade) : undefined}
+                    markOpen={openMarkIdx === i}
+                    autoOpenMark={autoOpen}
+                    onOpenMark={() => setOpenMarkIdx(i)}
+                    onCloseMark={() => setOpenMarkIdx((cur) => (cur === i ? null : cur))}
+                  />
+                );
+              })}
+
               {typing && <TypingBubble name={scenario.claimedIdentity} skin={skin} />}
               {ended && endReason === "contact_left" && (
                 <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-center text-xs font-mono tracking-widest text-destructive">
