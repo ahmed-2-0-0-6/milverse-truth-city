@@ -57,6 +57,13 @@ import { aftermathFor } from "@/lib/mirror/aftermath";
 import { saveTape } from "@/lib/mirror/tapes";
 import { TapeReview } from "@/components/mirror/TapeReview";
 import { factRefsFor, findRef, GUT_REF, type FactRef } from "@/lib/mirror/factRefs";
+import {
+  loadSeen as loadCraftSeen,
+  markSeen as markCraftSeen,
+  whyFor as craftWhyFor,
+  type Grade as CraftGrade,
+} from "@/lib/mirror/craftMarks";
+import { CraftMark } from "@/components/mirror/CraftMark";
 
 export const Route = createFileRoute("/mirror/$caseId")({
   loader: ({ params }) => {
@@ -333,6 +340,45 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
       localStorage.setItem("milverse.mirror.bandSeen", "1");
     }
   }, [showBandOnMount]);
+
+  // Craft Marks — per-profile snapshot of grades that have auto-explained.
+  // Snapshotted on mount so mid-case flips don't retrigger.
+  const craftSeenRef = useRef<CraftGrade[]>([]);
+  useEffect(() => {
+    craftSeenRef.current = loadCraftSeen();
+  }, []);
+  const [openMarkIdx, setOpenMarkIdx] = useState<number | null>(null);
+  const wastedCaseKey = `milverse.craftmarks.wasted:${scenario.id}`;
+  const wastedFiredThisCase = () =>
+    typeof window !== "undefined" && window.sessionStorage.getItem(wastedCaseKey) === "1";
+  const markWastedFired = () => {
+    if (typeof window !== "undefined") window.sessionStorage.setItem(wastedCaseKey, "1");
+  };
+
+  // First-occurrence indices per grade among player messages whose reply has landed.
+  const firstOfGrade = useMemo(() => {
+    const out: Record<CraftGrade, number | undefined> = { strong: undefined, weak: undefined, wasted: undefined };
+    for (let i = 0; i < messages.length; i++) {
+      const m = messages[i];
+      if (m.role !== "player" || !m.probeQuality) continue;
+      const g = m.probeQuality as CraftGrade;
+      const hasReply = messages.some((later, j) => j > i && later.role === "contact");
+      if (!hasReply) continue;
+      if (out[g] === undefined) out[g] = i;
+    }
+    return out;
+  }, [messages]);
+
+  // Persist first-of-grade sightings so this profile only auto-explains once.
+  useEffect(() => {
+    (["strong", "weak", "wasted"] as CraftGrade[]).forEach((g) => {
+      if (firstOfGrade[g] !== undefined && !craftSeenRef.current.includes(g)) {
+        markCraftSeen(g);
+        craftSeenRef.current = [...craftSeenRef.current, g];
+      }
+    });
+  }, [firstOfGrade]);
+
 
   const currentBand = bandFor(state.meter);
 
@@ -690,18 +736,44 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                   </div>
                 </div>
               )}
-              {messages.map((m, i) => (
-                <MessageRow
-                  key={i}
-                  m={m}
-                  pinned={pins.includes(i)}
-                  onPin={m.role === "contact" ? () => togglePin(i) : undefined}
-                  speakerName={scenario.claimedIdentity}
-                  speakerVoiceDesc={scenario.persona.voice}
-                  read={typing || messages.some((later, j) => j > i && later.role === "contact")}
-                  skin={skin}
-                />
-              ))}
+              {messages.map((m, i) => {
+                const hasReply = messages.some((later, j) => j > i && later.role === "contact");
+                const grade = m.role === "player" ? (m.probeQuality as CraftGrade | undefined) : undefined;
+                let autoOpen = false;
+                if (grade && hasReply) {
+                  const isFirstOfGrade = firstOfGrade[grade] === i;
+                  if (grade === "wasted") {
+                    if (isFirstOfGrade && !wastedFiredThisCase()) {
+                      autoOpen = true;
+                      markWastedFired();
+                    } else if (isFirstOfGrade && !craftSeenRef.current.includes(grade)) {
+                      autoOpen = true;
+                    }
+                  } else if (isFirstOfGrade && !craftSeenRef.current.includes(grade)) {
+                    autoOpen = true;
+                  }
+                }
+                return (
+                  <MessageRow
+                    key={i}
+                    m={m}
+                    pinned={pins.includes(i)}
+                    onPin={m.role === "contact" ? () => togglePin(i) : undefined}
+                    speakerName={scenario.claimedIdentity}
+                    speakerVoiceDesc={scenario.persona.voice}
+                    read={typing || hasReply}
+                    skin={skin}
+                    hasReply={hasReply}
+                    grade={grade}
+                    why={grade ? craftWhyFor(scenario, m.text, grade) : undefined}
+                    markOpen={openMarkIdx === i}
+                    autoOpenMark={autoOpen}
+                    onOpenMark={() => setOpenMarkIdx(i)}
+                    onCloseMark={() => setOpenMarkIdx((cur) => (cur === i ? null : cur))}
+                  />
+                );
+              })}
+
               {typing && <TypingBubble name={scenario.claimedIdentity} skin={skin} />}
               {ended && endReason === "contact_left" && (
                 <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-center text-xs font-mono tracking-widest text-destructive">
@@ -741,6 +813,13 @@ function MessageRow({
   speakerVoiceDesc,
   read,
   skin,
+  hasReply,
+  grade,
+  why,
+  markOpen,
+  autoOpenMark,
+  onOpenMark,
+  onCloseMark,
 }: {
   m: Message;
   pinned: boolean;
@@ -750,6 +829,14 @@ function MessageRow({
   /** Player bubbles: has the contact "seen" this yet (replied or typing)? */
   read?: boolean;
   skin: ChatSkin;
+  /** True when a later contact message exists — gates craft marks. */
+  hasReply?: boolean;
+  grade?: CraftGrade;
+  why?: string;
+  markOpen?: boolean;
+  autoOpenMark?: boolean;
+  onOpenMark?: () => void;
+  onCloseMark?: () => void;
 }) {
   if (m.role === "system") {
     return (
@@ -763,6 +850,7 @@ function MessageRow({
   }
 
   const isPlayer = m.role === "player";
+  const showMark = isPlayer && !!grade && !!hasReply && !!why && !!onOpenMark && !!onCloseMark;
   return (
     <div className={`msg-in flex ${isPlayer ? "justify-end" : "justify-start"} gap-2`}>
       {!isPlayer && onPin && (
@@ -809,11 +897,22 @@ function MessageRow({
             {m.text}
           </div>
           <MessageMeta ts={m.ts} isPlayer={isPlayer} read={!!read} skin={skin} />
+          {showMark && (
+            <CraftMark
+              grade={grade!}
+              why={why!}
+              open={!!markOpen}
+              onOpen={onOpenMark!}
+              onClose={onCloseMark!}
+              autoOpen={!!autoOpenMark}
+            />
+          )}
         </div>
       )}
     </div>
   );
 }
+
 
 /** Under-bubble meta line, rendered per the platform skin's receipt language. */
 function MessageMeta({
@@ -956,7 +1055,19 @@ function NotesTab({
         </ul>
       </section>
 
+      {(() => {
+        const s = messages.filter((m) => m.role === "player" && m.probeQuality === "strong").length;
+        const w = messages.filter((m) => m.role === "player" && m.probeQuality === "weak").length;
+        const x = messages.filter((m) => m.role === "player" && m.probeQuality === "wasted").length;
+        return (
+          <div className="font-mono text-[10px] tracking-widest text-muted-foreground">
+            PROBES THIS CALL: {s} strong · {w} weak · {x} wasted
+          </div>
+        );
+      })()}
+
       <section>
+
         <div className="flex items-center gap-2 font-mono text-[10px] tracking-widest text-caution">
           <Pin className="h-3 w-3" /> PINNED · {pins.length}/5
         </div>
