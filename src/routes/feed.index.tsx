@@ -1,10 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import { FEED_SCENARIOS } from "@/lib/feed/scenarios";
 import { FormatBadge } from "@/components/feed/FormatFrame";
 import { DistrictIntro } from "@/components/DistrictIntro";
 import { DistrictHero } from "@/components/DistrictHero";
-import { CaseCard } from "@/components/CaseCard";
+import { CaseCard, type CaseCardOutcome, type ArtifactChip } from "@/components/CaseCard";
+import { TierRail } from "@/components/hub/TierRail";
+import { loadFeedWall } from "@/lib/feed/wall";
+import { loadInbox } from "@/lib/inbox/profile";
 import feedArt from "@/assets/district-feed.jpg";
 import { Newspaper, Share2 } from "lucide-react";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
