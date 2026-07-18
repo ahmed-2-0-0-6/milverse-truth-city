@@ -41,7 +41,7 @@ export function PageHeader({
   );
 }
 
-export function LoadingState({ label = "Loading…", rows = 3 }: { label?: string; rows?: number }) {
+export function LoadingState({ label = "Loading", rows = 3 }: { label?: string; rows?: number }) {
   return (
     <div role="status" aria-live="polite" aria-busy="true" className="space-y-3 py-8">
       <span className="sr-only">{label}</span>
@@ -91,10 +91,10 @@ export function EmptyState({
 }
 
 export function ErrorState({
-  title = "Something went wrong",
-  description = "Please try again. If the problem persists, refresh the page.",
+  title = "This didn't load.",
+  description = "The fault's on our end. A refresh usually clears it.",
   onRetry,
-  retryLabel = "Try again",
+  retryLabel = "Refresh",
 }: {
   title?: string;
   description?: ReactNode;

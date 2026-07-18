@@ -61,11 +61,11 @@ function DevIntelPage() {
       const b = await listBriefsFn({ data: { passcode } });
       setBriefs((b as unknown as { rows: typeof briefs }).rows);
       setAuthed(true);
-      toast.success("Intel desk open");
+      toast.success("Intel desk open.");
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Access denied.";
       setErr(msg);
-      toast.error("Access denied", { description: msg });
+      toast.error("Access denied.", { description: msg });
     } finally {
       setBusy(false);
     }
@@ -76,11 +76,11 @@ function DevIntelPage() {
     try {
       const s = await fetchIntelFn({ data: { passcode } });
       setIntel(s);
-      toast.success("Intel refreshed");
+      toast.success("Intel refreshed.");
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       setErr(msg);
-      toast.error("Refresh failed", { description: msg });
+      toast.error("Refresh failed.", { description: msg });
     } finally {
       setBusy(false);
     }
@@ -94,11 +94,11 @@ function DevIntelPage() {
       const b = await listBriefsFn({ data: { passcode } });
       setBriefs((b as unknown as { rows: typeof briefs }).rows);
       setTab("briefs");
-      toast.success("New brief generated");
+      toast.success("New brief generated.");
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       setErr(msg);
-      toast.error("Brief generation failed", { description: msg });
+      toast.error("Brief generation failed.", { description: msg });
     } finally {
       setBusy(false);
     }

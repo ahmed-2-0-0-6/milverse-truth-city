@@ -68,7 +68,7 @@ function BoardPage() {
         setRows(res.rows ?? []);
         setMyHandle(res.myHandle ?? null);
       } catch {
-        setErr("Couldn't reach the board. Try again in a moment.");
+        setErr("The board's dark. Try again in a moment.");
       }
       if (!silent) setBusy(false);
       setLoadedOnce(true);
@@ -101,7 +101,7 @@ function BoardPage() {
   function refresh() {
     const wait = REFRESH_COOLDOWN_MS - (Date.now() - lastRefreshRef.current);
     if (wait > 0) {
-      toast(`Hold on — try again in ${Math.ceil(wait / 1000)}s.`);
+      toast(`Ease off — retry in ${Math.ceil(wait / 1000)}s.`);
       return;
     }
     void load();

@@ -78,11 +78,11 @@ function ReviewPage() {
       const res = await listFn({ data: { passcode } as never });
       setRows((res as { rows: StoryRow[] }).rows);
       setAuthed(true);
-      toast.success("Signed in to review console");
+      toast.success("Signed in.");
     } catch (e) {
       const msg = (e as Error).message;
       setErr(msg);
-      toast.error("Authentication failed", { description: msg });
+      toast.error("Sign-in failed.", { description: msg });
     }
     setBusy(false);
   }
@@ -91,11 +91,11 @@ function ReviewPage() {
     try {
       const res = await listFn({ data: { passcode } as never });
       setRows((res as { rows: StoryRow[] }).rows);
-      toast("Queue refreshed");
+      toast("Queue refreshed.");
     } catch (e) {
       const msg = (e as Error).message;
       setErr(msg);
-      toast.error("Refresh failed", { description: msg });
+      toast.error("Refresh failed.", { description: msg });
     }
   }
 
@@ -247,13 +247,13 @@ function AssessmentTab({ passcode }: { passcode: string }) {
       setRows(res.entries ?? []);
       setPhase(res.phase?.phase ?? "intake");
       setLoadedCode(upper);
-      toast.success(`Loaded group ${upper}`, {
+      toast.success(`Loaded group ${upper}.`, {
         description: `${res.entries?.length ?? 0} responses.`,
       });
     } catch (e) {
       const msg = (e as Error).message;
       setErr(msg);
-      toast.error("Couldn't load group", { description: msg });
+      toast.error("Couldn't load group.", { description: msg });
     }
     setBusy(false);
   }
@@ -265,11 +265,11 @@ function AssessmentTab({ passcode }: { passcode: string }) {
     try {
       await flipFn({ data: { passcode, groupCode: loadedCode, phase: next } as never });
       setPhase(next);
-      toast.success(`Group phase → ${next.toUpperCase()}`);
+      toast.success(`Group phase → ${next.toUpperCase()}.`);
     } catch (e) {
       const msg = (e as Error).message;
       setErr(msg);
-      toast.error("Couldn't change phase", { description: msg });
+      toast.error("Couldn't change phase.", { description: msg });
     }
     setBusy(false);
   }
@@ -316,7 +316,7 @@ function AssessmentTab({ passcode }: { passcode: string }) {
   function exportCsv() {
     if (!loadedCode) return;
     if (!rows.length) {
-      toast.error("Nothing to export");
+      toast.error("Nothing to export.");
       return;
     }
     const header = [
@@ -394,7 +394,7 @@ function AssessmentTab({ passcode }: { passcode: string }) {
     a.download = `assessment-${loadedCode}-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success(`Exported ${rows.length} rows`);
+    toast.success(`Exported ${rows.length} rows.`);
   }
 
   return (
@@ -762,10 +762,10 @@ function SubmissionCard({
     };
     try {
       await onApprove(scenario as unknown as Record<string, unknown>);
-      toast.success("Submission approved and published");
+      toast.success("Approved and published.");
     } catch (e) {
       const msg = (e as Error).message;
-      toast.error("Approve failed", { description: msg });
+      toast.error("Approve failed.", { description: msg });
     }
     setBusy(false);
   }
