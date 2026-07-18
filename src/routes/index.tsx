@@ -15,6 +15,8 @@ import { InboxManager } from "@/components/inbox/InboxManager";
 import { IncomingToast } from "@/components/inbox/IncomingToast";
 import { IncomingCall } from "@/components/inbox/IncomingCall";
 import { FirstCall } from "@/components/onboarding/FirstCall";
+import { CitizenDesk } from "@/components/landing/CitizenDesk";
+import { isReturningCitizen } from "@/lib/city/returning";
 
 export const Route = createFileRoute("/")({
   head: () => ({
