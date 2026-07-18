@@ -1234,6 +1234,9 @@ function Debrief({ scenario }: { scenario: Scenario }) {
           DEBRIEF · TIER {scenario.tier}
         </div>
         <h1 className="mt-2 text-2xl font-semibold">{truthHeadline}</h1>
+        <div className="mt-3">
+          <XpDeltaLine />
+        </div>
         <p className="mt-1 text-sm opacity-90">
           You said <b>{verdictRaw.verdict}</b> · Result:{" "}
           <b>{result.resultKind.replace("_", " ").toUpperCase()}</b>
