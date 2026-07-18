@@ -31,12 +31,15 @@ import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer } from "l
 import { RealCaseFile } from "@/components/RealCaseFile";
 import { NextCaseCard } from "@/components/NextCaseCard";
 import { RookieIntro } from "@/components/handler/RookieIntro";
+import { SendOff } from "@/components/handler/SendOff";
+import { LossBeat } from "@/components/handler/LossBeat";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 import { TacticStamp } from "@/components/TacticStamp";
 import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
 import { CitySolved } from "@/components/CitySolved";
 import { TacticFlash } from "@/components/TacticFlash";
 import { tacticForMirror } from "@/lib/mirror/tactics";
+import { labelForTactic } from "@/lib/handler/profile";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { skinForCase, receiptFor, type ChatSkin } from "@/lib/chat/skins";
@@ -165,6 +168,8 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
           </ul>
         </section>
       </div>
+
+      <SendOff />
 
       <button
         onClick={onStart}
@@ -1279,6 +1284,14 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       </div>
 
       <TacticStamp tacticId={tacticForMirror(scenario.id)} />
+
+      {(result.resultKind === "missed_scam" || result.resultKind === "false_alarm") && (
+        <LossBeat
+          result={result.resultKind}
+          tacticLabel={labelForTactic(tacticForMirror(scenario.id))}
+          seedKey={`mirror:${scenario.id}`}
+        />
+      )}
 
       <CalibrationQuadrant profile={profileSnap} compact caption="CALIBRATION · AFTER THIS CASE" />
 

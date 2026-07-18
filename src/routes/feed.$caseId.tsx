@@ -33,6 +33,9 @@ import { CitySolved } from "@/components/CitySolved";
 import { TacticFlash } from "@/components/TacticFlash";
 import { VerdictMoment, type CalibrationOutcome } from "@/components/VerdictMoment";
 import { RookieIntro } from "@/components/handler/RookieIntro";
+import { SendOff } from "@/components/handler/SendOff";
+import { LossBeat } from "@/components/handler/LossBeat";
+import { labelForTactic } from "@/lib/handler/profile";
 import { track } from "@/lib/telemetry";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChatHeader } from "@/components/chat/ChatHeader";
@@ -260,6 +263,7 @@ function Brief({ scenario, onStart }: { scenario: FeedScenario; onStart: () => v
           </div>
         </section>
       </div>
+      <SendOff />
       <button
         onClick={onStart}
         className="mt-6 w-full rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground transition-transform hover:scale-[1.01]"
@@ -777,6 +781,15 @@ function Debrief({
               : "false_alarm"
         }
       />
+
+      {(outcome.result === "missed_fake" || outcome.result === "false_alarm") && (
+        <LossBeat
+          result={outcome.result === "missed_fake" ? "missed_scam" : "false_alarm"}
+          tacticLabel={scenario.tacticId ? labelForTactic(scenario.tacticId as never) : null}
+          seedKey={`feed:${scenario.id}`}
+        />
+      )}
+
 
       <NextCaseCard wing="feed" currentId={scenario.id} />
 
