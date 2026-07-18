@@ -1666,6 +1666,68 @@ function Debrief({ scenario }: { scenario: Scenario }) {
         </section>
       )}
 
+      {/* YOUR NOTES, GRADED — reads back the player's own pins and tags. */}
+      {(() => {
+        const pinIdxs: number[] =
+          (sim?.state as EngineState & { pins?: number[] })?.pins ?? [];
+        if (!sim || pinIdxs.length === 0) return null;
+        const tags = sim.pinTags ?? {};
+        const refs = factRefsFor(scenario);
+        return (
+          <section className="rounded-xl border border-border bg-card p-6">
+            <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
+              YOUR NOTES, GRADED
+            </div>
+            <ul className="space-y-2">
+              {pinIdxs.map((idx, i) => {
+                const m = sim.messages[idx];
+                if (!m) return null;
+                const tag = findRef(refs, tags[idx]);
+                const wasTell = m.role === "contact" && m.isTell === true;
+                const status = wasTell ? "TELL" : "CLEAN";
+                const statusTone = wasTell
+                  ? "border-caution text-caution bg-caution/10"
+                  : "border-border text-muted-foreground bg-muted/20";
+                const refTone =
+                  tag.kind === "known"
+                    ? "border-primary/50 text-primary bg-primary/10"
+                    : tag.kind === "public"
+                      ? "border-border text-muted-foreground bg-muted/30"
+                      : "border-caution/40 text-caution bg-caution/10";
+                return (
+                  <li
+                    key={i}
+                    className="rounded-md border border-border bg-background/30 p-3"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`rounded-sm border px-1 py-0.5 font-mono text-[9px] tracking-widest ${refTone}`}
+                      >
+                        {tag.ref}
+                      </span>
+                      <span
+                        className={`rounded-sm border px-1 py-0.5 font-mono text-[9px] tracking-widest ${statusTone}`}
+                      >
+                        {status}
+                      </span>
+                    </div>
+                    <div className="mt-1.5 text-sm italic">
+                      "{(m.text || "[voice note]").slice(0, 140)}"
+                    </div>
+                    {tag.kind !== "gut" && (
+                      <div className="mt-1 text-[11px] text-muted-foreground">
+                        vs {tag.ref}: {tag.text}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        );
+      })()}
+
+
       {/* Quoted tells from THIS conversation */}
       {result.tells.length > 0 && (
         <section className="rounded-xl border border-border bg-card p-6">
