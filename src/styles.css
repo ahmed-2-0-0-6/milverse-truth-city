@@ -2654,3 +2654,55 @@ html[data-force-reduce-motion="on"] .stamp-quiet {
   animation: none !important;
   opacity: 1 !important;
 }
+
+/* ---------- TIER 5 · THE CLEAN ROOM ---------- */
+/* Airlock wash (dossier START → sim). Beat timings live in Airlock.tsx;
+   these keyframes only handle the entry fade of the white plane. */
+@keyframes airlock-wash {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.airlock-wash {
+  animation: airlock-wash 600ms ease-out both;
+}
+
+/* Ritual — the chat visibly recedes behind the overlay. */
+@keyframes ritual-recede-kf {
+  from { transform: scale(1); filter: blur(0); }
+  to   { transform: scale(0.96); filter: blur(4px); }
+}
+.ritual-recede {
+  animation: ritual-recede-kf 320ms ease-out both;
+  transform-origin: center;
+}
+
+/* The Act — one staged line fades in. */
+@keyframes ritual-line-kf {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.ritual-line {
+  animation: ritual-line-kf 420ms ease-out both;
+}
+
+/* Kill lists — both branches. Under reduced-motion / LITE the ritual is
+   not mounted (the route falls back to VobModal), but if these classes ever
+   render there they land on the final frame with no motion. */
+@media (prefers-reduced-motion: reduce) {
+  .airlock-wash,
+  .ritual-recede,
+  .ritual-line {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+html[data-force-reduce-motion="on"] .airlock-wash,
+html[data-force-reduce-motion="on"] .ritual-recede,
+html[data-force-reduce-motion="on"] .ritual-line {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+}
