@@ -16,6 +16,7 @@ import {
   reapExpired,
   bestForSeed,
   type ActiveShift,
+  type SlotResult,
   type FinishedShift,
 } from "@/lib/shift/state";
 import { historyKey, slotTitle, type SlotRef } from "@/lib/shift/docket";
