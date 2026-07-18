@@ -883,12 +883,18 @@ function NotesTab({
   scenario,
   messages,
   pins,
+  pinTags,
+  refs,
   onUnpin,
+  onTag,
 }: {
   scenario: Scenario;
   messages: Message[];
   pins: number[];
+  pinTags: Record<number, string>;
+  refs: FactRef[];
   onUnpin: (i: number) => void;
+  onTag: (i: number, ref: string) => void;
 }) {
   return (
     <div className="h-full overflow-y-auto p-4 space-y-6">
@@ -903,7 +909,7 @@ function NotesTab({
         <ul className="mt-1 space-y-1 text-xs">
           {scenario.dossier.knownFacts.map((f, i) => (
             <li key={i} className="flex gap-2">
-              <span className="text-primary shrink-0">·</span>
+              <span className="shrink-0 font-mono text-primary">K{i + 1}</span>
               <span>{f}</span>
             </li>
           ))}
@@ -914,7 +920,7 @@ function NotesTab({
         <ul className="mt-1 space-y-1 text-xs text-muted-foreground">
           {scenario.dossier.publicFacts.map((f, i) => (
             <li key={i} className="flex gap-2">
-              <span className="shrink-0">·</span>
+              <span className="shrink-0 font-mono">P{i + 1}</span>
               <span>{f}</span>
             </li>
           ))}
@@ -927,31 +933,153 @@ function NotesTab({
         </div>
         {pins.length === 0 ? (
           <p className="mt-2 text-xs text-muted-foreground">
-            Pin any contact message you find suspicious — they'll show up here for side-by-side
-            comparison against the dossier.
+            Pin any contact message you find suspicious — then tag which brief fact it collides with.
           </p>
         ) : (
-          <ul className="mt-2 space-y-2">
-            {pins.map((i) => (
-              <li
-                key={i}
-                className="rounded-md border border-caution/40 bg-caution/10 p-2 text-xs whitespace-pre-wrap"
-              >
-                {messages[i]?.text || "[voice note]"}
-                <button
-                  onClick={() => onUnpin(i)}
-                  className="mt-1 block font-mono text-[9px] tracking-widest text-caution/70 hover:text-caution"
+          <ul className="mt-2 space-y-3">
+            {pins.map((i) => {
+              const currentRef = pinTags[i];
+              const tagged = findRef(refs, currentRef);
+              const isGut = !currentRef || currentRef === "GUT";
+              return (
+                <li
+                  key={i}
+                  className="rounded-md border border-caution/40 bg-caution/10 p-2.5 text-xs"
                 >
-                  UNPIN
-                </button>
-              </li>
-            ))}
+                  <div className="whitespace-pre-wrap">
+                    {messages[i]?.text || "[voice note]"}
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1" role="group" aria-label="Tag this pin against a brief fact">
+                    {refs.map((r) => {
+                      const selected = currentRef === r.ref;
+                      const tone =
+                        r.kind === "known"
+                          ? selected
+                            ? "border-primary bg-primary/20 text-primary"
+                            : "border-primary/40 text-primary/80 hover:border-primary"
+                          : selected
+                            ? "border-muted-foreground bg-muted/40 text-foreground"
+                            : "border-border text-muted-foreground hover:border-foreground/50";
+                      return (
+                        <button
+                          key={r.ref}
+                          type="button"
+                          aria-pressed={selected}
+                          aria-label={r.ariaLabel}
+                          onClick={() => onTag(i, r.ref)}
+                          className={`rounded-sm border px-1.5 py-0.5 font-mono text-[10px] tracking-widest ${tone}`}
+                        >
+                          {r.ref}
+                        </button>
+                      );
+                    })}
+                    <button
+                      type="button"
+                      aria-pressed={isGut}
+                      aria-label="Tag as gut feeling — no fact attached yet"
+                      onClick={() => onTag(i, "GUT")}
+                      className={`rounded-sm border px-1.5 py-0.5 font-mono text-[10px] tracking-widest ${
+                        isGut
+                          ? "border-caution bg-caution/20 text-caution"
+                          : "border-border text-muted-foreground hover:border-caution/60"
+                      }`}
+                    >
+                      GUT
+                    </button>
+                  </div>
+                  {!isGut && (
+                    <div className="mt-2 rounded-sm border border-border/60 bg-background/40 p-2 text-[11px] italic text-muted-foreground">
+                      <span className="mr-1.5 font-mono not-italic text-primary/80">
+                        {tagged.ref}
+                      </span>
+                      {tagged.text}
+                    </div>
+                  )}
+                  {isGut && (
+                    <div className="mt-2 font-mono text-[10px] tracking-widest text-muted-foreground/80">
+                      gut feeling — no fact attached yet
+                    </div>
+                  )}
+                  <button
+                    onClick={() => onUnpin(i)}
+                    className="mt-2 block font-mono text-[9px] tracking-widest text-caution/70 hover:text-caution"
+                  >
+                    UNPIN
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
     </div>
   );
 }
+
+/** Above-composer quick-brief: horizontal ref badges + a one-line reveal strip. */
+function QuickBrief({
+  refs,
+  openRef,
+  onToggle,
+}: {
+  refs: FactRef[];
+  openRef: string | null;
+  onToggle: (ref: string) => void;
+}) {
+  const open = refs.find((r) => r.ref === openRef) ?? null;
+  return (
+    <div className="mb-2">
+      <div
+        aria-live="polite"
+        className="min-h-0"
+      >
+        {open && (
+          <div className="mb-1 flex items-start gap-2 rounded-md border border-primary/40 bg-primary/10 px-2 py-1.5 text-[11px] leading-relaxed text-primary">
+            <span className="font-mono tracking-widest">{open.ref}</span>
+            <span className="text-foreground/90">{open.text}</span>
+            <button
+              type="button"
+              onClick={() => onToggle(open.ref)}
+              aria-label="Close brief entry"
+              className="ml-auto font-mono text-[10px] tracking-widest text-primary/80 hover:text-primary"
+            >
+              ×
+            </button>
+          </div>
+        )}
+      </div>
+      <div className="flex flex-wrap gap-1" role="group" aria-label="Quick brief">
+        <span className="mr-1 font-mono text-[9px] tracking-widest text-white/40 self-center">
+          BRIEF
+        </span>
+        {refs.map((r) => {
+          const selected = openRef === r.ref;
+          const tone =
+            r.kind === "known"
+              ? selected
+                ? "border-primary bg-primary/20 text-primary"
+                : "border-primary/40 text-primary/80 hover:border-primary"
+              : selected
+                ? "border-white/60 bg-white/10 text-white"
+                : "border-white/20 text-white/60 hover:border-white/50";
+          return (
+            <button
+              key={r.ref}
+              type="button"
+              aria-pressed={selected}
+              aria-label={r.ariaLabel}
+              onClick={() => onToggle(r.ref)}
+              className={`rounded-sm border px-1.5 py-0.5 font-mono text-[10px] tracking-widest ${tone}`}
+            >
+              {r.ref}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 
 /* ─────────────────────────── VERDICT ─────────────────────────── */
 
