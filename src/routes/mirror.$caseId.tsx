@@ -947,8 +947,10 @@ function MessageRow({
                   : skin.inBubble
             }`}
           >
+            <span className="sr-only">{isPlayer ? "You" : speakerName}: </span>
             {m.text}
           </div>
+
           <MessageMeta ts={m.ts} isPlayer={isPlayer} read={!!read} skin={skin} />
           {showMark && (
             <CraftMark
