@@ -9,6 +9,7 @@ import { useMemo } from "react";
 import { deskReport, type DeskItem, type DeskUrgency } from "@/lib/city/returning";
 import { loadProfile } from "@/lib/mirror/profile";
 import { rankFromXp, computeXp } from "@/lib/ranks";
+import { currentShift, type Shift } from "@/lib/city/shift";
 
 function urgencyGlyph(u: DeskUrgency): string {
   if (u === "dying") return "▲";
