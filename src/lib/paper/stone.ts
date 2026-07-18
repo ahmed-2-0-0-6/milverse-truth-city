@@ -272,24 +272,12 @@ export function stoneCheck(c: EditionContent, today: string = ""): StoneNote[] {
     });
   }
 
-  // 10 · ADVISE — eidetic-date (past only)
-  if (today && /^\d{4}-\d{2}-\d{2}$/.test(today) && /^\d{4}-\d{2}-\d{2}$/.test(c.lead ? "" : "")) {
-    // dummy branch keeps types
-  }
-  {
-    const d = (arguments as unknown) as unknown; // silence unused
-    void d;
-  }
-  // edition_date is on Edition, not EditionContent — the pressroom passes it via param.
-  // We accept `today` as second arg; the caller also passes the edition_date.
-  // Wire below: the pressroom calls stoneCheck(content, today) AND passes editionDate
-  // through a shim; but per spec today is the reference clock. The editor separately
-  // holds edition_date. To keep the pure signature tight, treat "past" check by
-  // comparing today to a synthetic date attached at the pressroom's call site — see
-  // stoneCheckWithDate below.
+  // 10 · ADVISE — eidetic-date lives in stoneCheckWithDate (needs edition_date,
+  // which is on Edition, not EditionContent). The pure core stops here.
 
   return out;
 }
+
 
 // Convenience — pass edition_date so the eidetic-date rule can fire.
 export function stoneCheckWithDate(
