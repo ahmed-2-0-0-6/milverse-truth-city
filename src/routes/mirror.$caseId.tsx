@@ -462,6 +462,37 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
   const tacticFlashed = useRef<boolean>(false);
   const [tacticFlash, setTacticFlash] = useState<null | ReturnType<typeof tacticForMirror>>(null);
   const [contactsOpen, setContactsOpen] = useState(false);
+
+  // ── THE HAND — tactical reply chips. Truth-blind by construction.
+  const [handMode, setHandMode] = useState<"hand" | "type">(() => {
+    if (typeof window === "undefined") return "hand";
+    const v = localStorage.getItem("milverse.hand.mode");
+    return v === "type" ? "type" : "hand";
+  });
+  function toggleHandMode() {
+    setHandMode((m) => {
+      const next = m === "hand" ? "type" : "hand";
+      try { localStorage.setItem("milverse.hand.mode", next); } catch { /* noop */ }
+      return next;
+    });
+  }
+  const [handTeachSeen, setHandTeachSeen] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("milverse.hand.teach.seen") === "1";
+  });
+  const handChips = useMemo(
+    () => buildHand(toHandScenario(scenario), state.factProbes, state.turnCount ?? 0),
+    [scenario, state.factProbes, state.turnCount],
+  );
+  function pickChip(chip: HandChip) {
+    if (!handTeachSeen) {
+      try { localStorage.setItem("milverse.hand.teach.seen", "1"); } catch { /* noop */ }
+      setHandTeachSeen(true);
+    }
+    if (chip.tag === "VERIFY") { setShowVob(true); return; }
+    if (chip.sendText) void send(chip.sendText);
+  }
+
   const claimedClock = useMemo(() => clockFor(scenario.id), [scenario.id]);
   const clockExpiredRef = useRef(false);
   function handleClockExpire() {
