@@ -434,14 +434,51 @@ function WallPage() {
             aria-label="Closed cases"
             className="[column-fill:_balance] columns-1 sm:columns-2 lg:columns-3 gap-4"
           >
-            {filtered.map((c, i) => (
-              <div role="listitem" key={c.key} className="relative">
-                <CaseStampCard card={c} index={i} />
-              </div>
-            ))}
+            {filtered.map((c, i) => {
+              const t = tapeForCard(c);
+              return (
+                <div role="listitem" key={c.key} className="relative">
+                  <CaseStampCard
+                    card={c}
+                    index={i}
+                    onOpenTape={t ? () => setOpenTape(t) : undefined}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {tapes.length > 0 && (
+          <div className="mt-8 flex justify-end">
+            <button
+              type="button"
+              onClick={burnArmed ? doBurn : armBurn}
+              className={`stencil text-[10px] tracking-widest rounded-md border px-3 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive ${
+                burnArmed
+                  ? "border-destructive/60 text-destructive bg-destructive/10"
+                  : "border-border text-muted-foreground hover:text-foreground"
+              }`}
+              aria-label={burnArmed ? `Confirm burn all ${tapes.length} tapes` : "Burn the tapes"}
+            >
+              {burnArmed ? `SURE? BURN ALL ${tapes.length}` : "BURN THE TAPES"}
+            </button>
           </div>
         )}
       </main>
+
+      {openTape ? (() => {
+        const sc = getScenario(openTape.caseId);
+        if (!sc) return null;
+        return (
+          <TapeReview
+            scenario={sc}
+            messages={openTape.messages}
+            result={openTape.result}
+            onClose={() => setOpenTape(null)}
+          />
+        );
+      })() : null}
     </div>
   );
 }
