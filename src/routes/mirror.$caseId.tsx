@@ -79,6 +79,7 @@ import {
   saveColdRead,
 } from "@/lib/mirror/coldreads";
 import { fetchPinnedLines, type PinnedLine } from "@/lib/mirror/pinned.functions";
+import { consumeStandoffArm } from "@/lib/standoff/rules";
 
 /**
  * THE MOST SUSPECTED LINE — hash architecture.
@@ -110,6 +111,15 @@ async function hashLine12(text: string): Promise<string> {
  * back to normal mode — acceptable, and simplest.
  */
 const ColdReadContext = createContext<boolean>(false);
+/**
+ * THE STANDOFF — same fence as cold reads, different flag. When true, the
+ * mirror route runs in cold-mode chrome (drill clock, no assists, no meter)
+ * AND the debrief slot renders <StandoffHandoff/> instead of <Debrief/>,
+ * so the write-heavy debrief effect (savedRef) never mounts. Reported
+ * mechanism: reuse of the coldMode presentation fence + one extra branch
+ * in the phase-router below. Zero engine diffs.
+ */
+const StandoffContext = createContext<boolean>(false);
 const COLD_START_KEY = "milverse.coldread.startTs";
 
 
@@ -131,21 +141,33 @@ function CasePlay() {
   const { scenario } = Route.useLoaderData();
   const [phase, setPhase] = useState<Phase>("dossier");
 
-  // COLD READ arm — lazy-init so the first paint already knows which mode we're in.
-  // Consuming the arm here clears it; reload => normal case (spec).
-  const [coldMode] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
+  // COLD READ + STANDOFF arms — lazy-init so the first paint already knows
+  // which mode we're in. Consuming the arm here clears it; reload => normal
+  // case (spec). Standoff piggy-backs on the coldMode chrome (drill clock,
+  // no assists, hidden meter number) but also raises its own flag so the
+  // debrief slot can hand off to /standoff instead of writing to profile.
+  const [{ coldMode, standoffMode }] = useState<{ coldMode: boolean; standoffMode: boolean }>(() => {
+    if (typeof window === "undefined") return { coldMode: false, standoffMode: false };
+    const standoffArm = consumeStandoffArm();
+    if (standoffArm === scenario.id) {
+      try {
+        sessionStorage.setItem(COLD_START_KEY, String(Date.now()));
+        sessionStorage.removeItem(SIM_KEY);
+        sessionStorage.removeItem(VERDICT_KEY);
+      } catch { /* noop */ }
+      return { coldMode: true, standoffMode: true };
+    }
     const armed = consumeColdArm();
-    if (!armed || armed !== scenario.id) return false;
+    if (!armed || armed !== scenario.id) return { coldMode: false, standoffMode: false };
     try {
       const p = loadProfile();
-      if (!isColdEligible(p, scenario.id)) return false;
+      if (!isColdEligible(p, scenario.id)) return { coldMode: false, standoffMode: false };
       sessionStorage.setItem(COLD_START_KEY, String(Date.now()));
       sessionStorage.removeItem(SIM_KEY);
       sessionStorage.removeItem(VERDICT_KEY);
-      return true;
+      return { coldMode: true, standoffMode: false };
     } catch {
-      return false;
+      return { coldMode: false, standoffMode: false };
     }
   });
 
@@ -167,39 +189,92 @@ function CasePlay() {
   // In the "sim" phase, ChatShell owns the whole viewport (phone frame).
   if (phase === "sim") {
     return (
-      <ColdReadContext.Provider value={coldMode}>
-        <Simulation scenario={scenario} onEnd={() => setPhase("verdict")} />
-      </ColdReadContext.Provider>
+      <StandoffContext.Provider value={standoffMode}>
+        <ColdReadContext.Provider value={coldMode}>
+          <Simulation scenario={scenario} onEnd={() => setPhase("verdict")} />
+        </ColdReadContext.Provider>
+      </StandoffContext.Provider>
     );
   }
 
   return (
-    <ColdReadContext.Provider value={coldMode}>
-      <div className="min-h-screen grain">
-        <TopBar />
-        {!coldMode && (
-          <div className="mx-auto max-w-3xl px-4 pt-4">
-            <RookieIntro />
-          </div>
-        )}
-        {phase === "dossier" && (
-          coldMode
-            ? <ColdInterstitial scenario={scenario} onStart={() => setPhase("sim")} />
-            : <Dossier scenario={scenario} onStart={() => setPhase("sim")} />
-        )}
-        {phase === "verdict" && <Verdict scenario={scenario} coldMode={coldMode} onDone={() => setPhase("reveal")} />}
-        {phase === "reveal" && (
-          <VerdictReveal scenario={scenario} onDone={() => setPhase("debrief")} />
-        )}
-        {phase === "debrief" && (
-          coldMode
-            ? <ColdDebrief scenario={scenario} />
-            : <Debrief scenario={scenario} />
-        )}
-      </div>
-    </ColdReadContext.Provider>
+    <StandoffContext.Provider value={standoffMode}>
+      <ColdReadContext.Provider value={coldMode}>
+        <div className="min-h-screen grain">
+          <TopBar />
+          {!coldMode && (
+            <div className="mx-auto max-w-3xl px-4 pt-4">
+              <RookieIntro />
+            </div>
+          )}
+          {phase === "dossier" && (
+            standoffMode
+              ? <StandoffInterstitial scenario={scenario} onStart={() => setPhase("sim")} />
+              : coldMode
+                ? <ColdInterstitial scenario={scenario} onStart={() => setPhase("sim")} />
+                : <Dossier scenario={scenario} onStart={() => setPhase("sim")} />
+          )}
+          {phase === "verdict" && <Verdict scenario={scenario} coldMode={coldMode} onDone={() => setPhase("reveal")} />}
+          {phase === "reveal" && (
+            <VerdictReveal scenario={scenario} onDone={() => setPhase("debrief")} />
+          )}
+          {phase === "debrief" && (
+            standoffMode
+              ? <StandoffHandoff />
+              : coldMode
+                ? <ColdDebrief scenario={scenario} />
+                : <Debrief scenario={scenario} />
+          )}
+        </div>
+      </ColdReadContext.Provider>
+    </StandoffContext.Provider>
   );
 }
+
+function StandoffInterstitial({ scenario, onStart }: { scenario: Scenario; onStart: () => void }) {
+  return (
+    <main className="mx-auto max-w-2xl px-4 py-10">
+      <div className="rounded-xl border-2 border-caution/50 bg-caution/5 p-6">
+        <div className="font-mono text-[10px] tracking-[0.3em] text-caution">
+          THE STANDOFF · THE READ · TIER {scenario.tier}
+        </div>
+        <h1
+          data-phase-anchor="mirror"
+          tabIndex={-1}
+          className="mt-3 text-2xl font-semibold outline-none"
+        >
+          Four minutes. No file. No assists.
+        </h1>
+        <p className="mt-3 text-sm leading-relaxed text-foreground/85">
+          The warden picked this one. You read it cold. When the clock hits zero the phone calls
+          it for you, same as the drills. The reveal happens together.
+        </p>
+      </div>
+      <button
+        onClick={onStart}
+        className="mt-6 w-full min-h-[48px] rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground transition-transform hover:scale-[1.01]"
+      >
+        DEAL ME IN
+      </button>
+    </main>
+  );
+}
+
+function StandoffHandoff() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate({ to: "/standoff", replace: true });
+  }, [navigate]);
+  return (
+    <main className="mx-auto max-w-2xl px-4 py-16 text-center">
+      <div className="font-mono text-xs tracking-[0.3em] text-muted-foreground">
+        HANDING THE PHONE BACK…
+      </div>
+    </main>
+  );
+}
+
+
 
 
 
