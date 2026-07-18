@@ -363,6 +363,18 @@ function PostPlayState({
         <div className="mt-3">
           <XpDeltaLine />
         </div>
+        <div className="mt-4">
+          <CitySolved
+            caseId={today.scenario.id}
+            playerResult={
+              entry.correct
+                ? "correct"
+                : entry.truth === "SCAM"
+                  ? "missed_scam"
+                  : "false_alarm"
+            }
+          />
+        </div>
       </div>
 
       <button
