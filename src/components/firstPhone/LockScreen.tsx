@@ -32,11 +32,11 @@ export function LockScreen({
     const iv = setInterval(() => setNow(new Date()), 15_000);
     return () => clearInterval(iv);
   }, []);
-  const hh = now.getHours().toString().padStart(2, "0");
+  const h12 = ((now.getHours() + 11) % 12) + 1;
   const mm = now.getMinutes().toString().padStart(2, "0");
   const day = now.toLocaleDateString(undefined, {
     weekday: "long",
-    month: "short",
+    month: "long",
     day: "numeric",
   });
   const fg = wp.fg === "light" ? "text-white" : "text-neutral-900";
@@ -45,6 +45,7 @@ export function LockScreen({
     <div
       className={`relative flex-1 min-h-0 flex flex-col ${fg} ${className ?? ""}`}
       style={{ background: wp.bg }}
+      aria-label="Lock screen"
     >
       {/* Subtle glass overlay for readability */}
       <div className="absolute inset-0 bg-black/10 pointer-events-none" aria-hidden="true" />
