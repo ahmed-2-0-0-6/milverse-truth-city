@@ -72,6 +72,7 @@ function CityMap() {
     <div className="noir-landing min-h-screen relative overflow-x-hidden">
       <InboxManager />
       <IncomingToast />
+      <IncomingCall />
       {!booted && <BootScreen onDone={() => setBooted(true)} />}
       <TopBar />
       {intro && booted && (
