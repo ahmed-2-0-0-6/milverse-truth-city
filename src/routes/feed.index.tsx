@@ -10,6 +10,7 @@ import { Newspaper, Share2 } from "lucide-react";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 import { InboxManager } from "@/components/inbox/InboxManager";
 import { IncomingToast } from "@/components/inbox/IncomingToast";
+import { IncomingCall } from "@/components/inbox/IncomingCall";
 
 export const Route = createFileRoute("/feed/")({
   head: () => ({
@@ -39,6 +40,7 @@ function FeedIndex() {
     <div className="min-h-screen grain">
       <InboxManager />
       <IncomingToast />
+      <IncomingCall />
       <TopBar />
       <DistrictHero
         art={feedArt}

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Bell } from "lucide-react";
+import { Bell, Phone } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -13,11 +13,13 @@ import {
 import { loadInbox, markOpened } from "@/lib/inbox/profile";
 import { todaysArrivals, type InboxItem } from "@/lib/inbox/scheduler";
 import { platformStyle } from "./platform-style";
+import { VoicemailSheet } from "./VoicemailSheet";
 
 export function InboxTray() {
   const [open, setOpen] = useState(false);
   const [tick, setTick] = useState(0);
   const [allItems, setAllItems] = useState<InboxItem[]>([]);
+  const [voicemail, setVoicemail] = useState<InboxItem | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,12 +53,19 @@ export function InboxTray() {
   const badge = unread > 9 ? "9+" : String(unread);
 
   const openRow = (it: InboxItem) => {
+    if (it.type === "call") {
+      markOpened(it.id);
+      setOpen(false);
+      setVoicemail(it);
+      return;
+    }
     markOpened(it.id);
     setOpen(false);
     navigate({ to: it.route });
   };
 
   return (
+    <>
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <button
@@ -97,6 +106,7 @@ export function InboxTray() {
           <ul className="flex flex-col divide-y divide-border">
             {rows.map((it) => {
               const s = platformStyle(it.platform);
+              const isCall = it.type === "call";
               return (
                 <li key={it.id}>
                   <button
@@ -104,24 +114,29 @@ export function InboxTray() {
                     className={`w-full text-left flex items-start gap-3 px-4 py-3 hover:bg-accent/40 focus-visible:outline-none focus-visible:bg-accent/60 transition-colors ${
                       it.read ? "opacity-50" : ""
                     }`}
-                    style={{ borderLeft: `3px solid ${s.border}` }}
+                    style={{ borderLeft: `3px solid ${isCall ? "#ef4444" : s.border}` }}
                   >
                     <span
                       className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                      style={{ background: s.border }}
+                      style={{ background: isCall ? "#ef4444" : s.border }}
                       aria-hidden
                     >
-                      {s.glyph}
+                      {isCall ? <Phone className="h-4 w-4" /> : s.glyph}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center gap-2 text-[13px] font-semibold text-foreground leading-tight">
                         <span className="truncate">{it.senderName}</span>
                         <span className="ml-auto stencil text-[9px] text-muted-foreground">
-                          {s.label}
+                          {isCall ? "MISSED" : s.label}
                         </span>
                       </span>
+                      {isCall && it.number && (
+                        <span className="mt-0.5 block truncate font-mono text-[11px] text-muted-foreground">
+                          {it.number}
+                        </span>
+                      )}
                       <span className="mt-0.5 block truncate text-xs text-muted-foreground">
-                        {it.preview}
+                        {isCall ? "Voicemail · tap to play" : it.preview}
                       </span>
                     </span>
                   </button>
@@ -132,5 +147,13 @@ export function InboxTray() {
         )}
       </SheetContent>
     </Sheet>
+    {voicemail && (
+      <VoicemailSheet
+        item={voicemail}
+        open={!!voicemail}
+        onOpenChange={(o) => !o && setVoicemail(null)}
+      />
+    )}
+    </>
   );
 }

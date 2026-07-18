@@ -29,6 +29,7 @@ import mirrorVideo from "@/assets/mirror.mp4.asset.json";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 import { InboxManager } from "@/components/inbox/InboxManager";
 import { IncomingToast } from "@/components/inbox/IncomingToast";
+import { IncomingCall } from "@/components/inbox/IncomingCall";
 
 export const Route = createFileRoute("/mirror/")({
   head: () => ({
@@ -115,6 +116,7 @@ function CaseFiles() {
     <div className="min-h-screen grain">
       <InboxManager />
       <IncomingToast />
+      <IncomingCall />
       <TopBar />
       <DistrictHero
         art={mirrorArt}

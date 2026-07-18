@@ -17,6 +17,7 @@ import {
 } from "@/lib/mirror/engine";
 import { generateContactReply } from "@/lib/mirror/ai.functions";
 import { ARTIFACT_LABEL } from "@/lib/mirror/voice";
+import { fakeNumberForCase } from "@/lib/chat/fakeNumber";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
 import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
@@ -424,7 +425,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
           <>
             <ChatHeader
               name={scenario.claimedIdentity}
-              number={`+92 3xx ${String(((scenario.id.length * 137) % 900) + 100)} ${String(((scenario.id.length * 41) % 9000) + 1000)}`}
+              number={fakeNumberForCase(scenario.id)}
               isSaved={false}
               subtitle={
                 skin.presenceLine ??

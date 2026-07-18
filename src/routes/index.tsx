@@ -13,6 +13,7 @@ import { DailyBeacon } from "@/components/DailyBeacon";
 import { useVisualMode } from "@/lib/visual-quality";
 import { InboxManager } from "@/components/inbox/InboxManager";
 import { IncomingToast } from "@/components/inbox/IncomingToast";
+import { IncomingCall } from "@/components/inbox/IncomingCall";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -71,6 +72,7 @@ function CityMap() {
     <div className="noir-landing min-h-screen relative overflow-x-hidden">
       <InboxManager />
       <IncomingToast />
+      <IncomingCall />
       {!booted && <BootScreen onDone={() => setBooted(true)} />}
       <TopBar />
       {intro && booted && (
