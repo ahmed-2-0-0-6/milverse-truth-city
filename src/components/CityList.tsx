@@ -127,26 +127,37 @@ function LandmarkTile({
   to,
   Icon,
   label,
+  sub,
   muted,
   badge,
 }: {
   to: string;
   Icon: typeof Eye;
   label: string;
+  sub?: string;
   muted?: boolean;
   badge?: string;
 }) {
   return (
     <Link
       to={to as "/city-hall"}
-      className={`flex items-center gap-2 rounded-sm border p-2 text-sm ${muted ? "border-dashed border-primary/30 text-muted-foreground" : "border-border hover:border-primary"}`}
+      className={`flex items-start gap-2 rounded-sm border p-2 text-sm ${muted ? "border-dashed border-primary/30 text-muted-foreground" : "border-border hover:border-primary"}`}
+      aria-label={sub ? `${label}, ${sub}` : label}
     >
-      <Icon className="h-4 w-4 text-primary" />
-      <span className="flex-1 truncate">{label}</span>
-      {badge && <span className="stencil text-[9px] text-primary shrink-0">{badge}</span>}
+      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+      <span className="flex-1 min-w-0">
+        <span className="block truncate font-medium">{label}</span>
+        {sub && (
+          <span className="block text-[11px] text-muted-foreground/90 leading-snug mt-0.5">
+            {sub}
+          </span>
+        )}
+      </span>
+      {badge && <span className="stencil text-[9px] text-primary shrink-0 mt-0.5">{badge}</span>}
     </Link>
   );
 }
+
 
 function DistrictSection({
   color,
