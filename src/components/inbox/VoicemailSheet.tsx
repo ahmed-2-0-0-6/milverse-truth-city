@@ -62,7 +62,7 @@ export function VoicemailSheet({ item, open, onOpenChange }: Props) {
         <div className="px-5 py-6">
           {voicemailText ? (
             <VoiceNote
-              voice={{ text: voicemailText }}
+              voice={{ text: voicemailText, artifact: null, artifactPos: 0.5 }}
               speakerName={item.senderName}
               speakerVoiceDesc={item.speakerVoiceDesc}
             />
