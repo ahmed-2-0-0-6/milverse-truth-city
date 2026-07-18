@@ -65,6 +65,7 @@ export function InboxTray() {
   };
 
   return (
+    <>
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <button
