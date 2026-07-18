@@ -761,12 +761,23 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
         }
       >
         <div className="flex-1 min-h-0 flex flex-col">
+          <a
+            href="#mirror-composer"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-primary focus:px-3 focus:py-1 focus:text-xs focus:text-primary-foreground"
+          >
+            Skip to reply
+          </a>
           {tab === "chat" ? (
             <div
               ref={scroller}
+              id="mirror-panel-chat"
+              role="tabpanel"
+              aria-labelledby="mirror-tab-chat"
               className={`flex-1 overflow-y-auto p-3 space-y-2.5 ${skin.bodyClass}`}
               style={skin.bodyStyle}
             >
+              <div className="sr-only" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation messages" />
+
               {skin.systemNote && (
                 <div className="flex justify-center">
                   <div className="max-w-[85%] rounded-md bg-black/40 border border-white/10 px-3 py-1.5 text-center text-[10px] leading-relaxed text-amber-200/80">
