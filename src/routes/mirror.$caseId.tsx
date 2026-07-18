@@ -203,6 +203,9 @@ function CasePlay() {
       <ColdReadContext.Provider value={coldMode}>
         <div className="min-h-screen grain">
           <TopBar />
+          {!coldMode && !standoffMode && (
+            <ShiftBanner kind="mirror" caseId={scenario.id} phase={phase} />
+          )}
           {!coldMode && (
             <div className="mx-auto max-w-3xl px-4 pt-4">
               <RookieIntro />
