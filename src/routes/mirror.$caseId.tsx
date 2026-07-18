@@ -1257,6 +1257,16 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       ts: nowTs,
     });
     saveProfile(p);
+    // The Tape — local-only annotated transcript, keyed to the same ts the
+    // wall row uses so /wall can attach a "TAPE ON FILE →" affordance.
+    if (sim?.messages?.length) {
+      saveTape({
+        caseId: scenario.id,
+        ts: nowTs,
+        result: result.resultKind,
+        messages: sim.messages,
+      });
+    }
     const xpAfter = computeXp(p, loadUnlocked().size, p.publishedCount ?? 0);
     writeXpDelta(xpBefore, xpAfter);
     logPilotEntry({
