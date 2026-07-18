@@ -33,6 +33,7 @@ import { TacticFlash } from "@/components/TacticFlash";
 import { tacticForMirror } from "@/lib/mirror/tactics";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChatHeader } from "@/components/chat/ChatHeader";
+import { skinForCase, receiptFor, type ChatSkin } from "@/lib/chat/skins";
 import { ContactsSheet } from "@/components/chat/ContactsSheet";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 
@@ -185,6 +186,7 @@ interface StoredSim {
 }
 
 function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void }) {
+  const skin = skinForCase(scenario.id);
   const [messages, setMessages] = useState<Message[]>([]);
   const [state, setState] = useState<EngineState>(() => initState(scenario));
   const [input, setInput] = useState("");
@@ -424,7 +426,13 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               name={scenario.claimedIdentity}
               number={`+92 3xx ${String(((scenario.id.length * 137) % 900) + 100)} ${String(((scenario.id.length * 41) % 9000) + 1000)}`}
               isSaved={false}
-              subtitle={`CLAIMED · TIER ${scenario.tier}${scenario.tier >= 3 ? " · TIMED" : ""}`}
+              subtitle={
+                skin.presenceLine ??
+                `CLAIMED · TIER ${scenario.tier}${scenario.tier >= 3 ? " · TIMED" : ""}`
+              }
+              chrome={skin.headerClass}
+              avatarRing={skin.avatarRing}
+              presenceDot={skin.id === "instagram"}
               onContacts={() => setContactsOpen(true)}
             />
             {/* meter + tabs */}
@@ -518,7 +526,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
                 placeholder={
-                  ended ? "Chat ended — make your call." : "Type anything you want to ask…"
+                  ended ? "Chat ended — make your call." : skin.placeholder
                 }
                 disabled={ended || typing}
                 className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-sm text-white outline-none focus:border-primary disabled:opacity-50"
@@ -540,7 +548,18 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
       >
         <div className="flex-1 min-h-0 flex flex-col">
           {tab === "chat" ? (
-            <div ref={scroller} className="flex-1 overflow-y-auto p-3 space-y-2.5">
+            <div
+              ref={scroller}
+              className={`flex-1 overflow-y-auto p-3 space-y-2.5 ${skin.bodyClass}`}
+              style={skin.bodyStyle}
+            >
+              {skin.systemNote && (
+                <div className="flex justify-center">
+                  <div className="max-w-[85%] rounded-md bg-black/40 border border-white/10 px-3 py-1.5 text-center text-[10px] leading-relaxed text-amber-200/80">
+                    🔒 {skin.systemNote}
+                  </div>
+                </div>
+              )}
               {messages.map((m, i) => (
                 <MessageRow
                   key={i}
@@ -553,9 +572,10 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                     typing ||
                     messages.some((later, j) => j > i && later.role === "contact")
                   }
+                  skin={skin}
                 />
               ))}
-              {typing && <TypingBubble name={scenario.claimedIdentity} />}
+              {typing && <TypingBubble name={scenario.claimedIdentity} skin={skin} />}
               {ended && endReason === "contact_left" && (
                 <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-center text-xs font-mono tracking-widest text-destructive">
                   CONTACT LEFT THE CHAT — MAKE YOUR CALL
@@ -585,6 +605,7 @@ function MessageRow({
   speakerName,
   speakerVoiceDesc,
   read,
+  skin,
 }: {
   m: Message;
   pinned: boolean;
@@ -593,6 +614,7 @@ function MessageRow({
   speakerVoiceDesc?: string;
   /** Player bubbles: has the contact "seen" this yet (replied or typing)? */
   read?: boolean;
+  skin: ChatSkin;
 }) {
   if (m.role === "system") {
     return (
@@ -624,10 +646,8 @@ function MessageRow({
         <div className="flex flex-col gap-1">
           {m.text && (
             <div
-              className={`max-w-[80%] rounded-2xl px-3 py-1.5 text-xs italic ${
-                isPlayer
-                  ? "bg-primary text-primary-foreground rounded-br-sm"
-                  : "bg-neutral-800 border border-white/10 rounded-bl-sm text-white/80"
+              className={`max-w-[80%] px-3 py-1.5 text-xs italic shadow-sm ${
+                isPlayer ? skin.outBubble : `${skin.inBubble} text-white/80`
               }`}
             >
               {m.text}
@@ -643,39 +663,58 @@ function MessageRow({
       ) : (
         <div className="flex flex-col items-end gap-0.5" style={{ maxWidth: "80%" }}>
           <div
-            className={`rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${
+            className={`px-3.5 py-2 text-sm whitespace-pre-wrap shadow-sm ${
               isPlayer
-                ? "bg-primary text-primary-foreground rounded-br-sm"
+                ? skin.outBubble
                 : pinned
-                  ? "bg-caution/20 border border-caution/50 text-white rounded-bl-sm"
-                  : "bg-neutral-800 border border-white/10 text-white rounded-bl-sm"
+                  ? "bg-caution/20 border border-caution/50 text-white rounded-lg rounded-tl-none"
+                  : skin.inBubble
             }`}
           >
             {m.text}
           </div>
-          <div
-            className={`flex items-center gap-1 px-1 font-mono text-[9px] text-white/35 ${isPlayer ? "" : "self-start"}`}
-            aria-hidden
-          >
-            <span>
-              {new Date(m.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-            </span>
-            {isPlayer && (
-              <span className={read ? "text-primary/80" : "text-white/35"}>
-                {read ? "✓✓" : "✓"}
-              </span>
-            )}
-          </div>
+          <MessageMeta ts={m.ts} isPlayer={isPlayer} read={!!read} skin={skin} />
         </div>
       )}
     </div>
   );
 }
 
-function TypingBubble({ name }: { name: string }) {
+/** Under-bubble meta line, rendered per the platform skin's receipt language. */
+function MessageMeta({
+  ts,
+  isPlayer,
+  read,
+  skin,
+}: {
+  ts: number;
+  isPlayer: boolean;
+  read: boolean;
+  skin: ChatSkin;
+}) {
+  const stamp = new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const r = receiptFor(skin, read, stamp);
+  return (
+    <div
+      className={`flex items-center gap-1 px-1 font-mono text-[9px] text-white/35 ${isPlayer ? "" : "self-start"}`}
+      aria-hidden
+    >
+      {isPlayer && !r.showTicks ? (
+        <span className={read ? skin.readColor : "text-white/35"}>{r.text}</span>
+      ) : (
+        <span>{stamp}</span>
+      )}
+      {isPlayer && r.showTicks && (
+        <span className={read ? skin.readColor : "text-white/35"}>{read ? "✓✓" : "✓"}</span>
+      )}
+    </div>
+  );
+}
+
+function TypingBubble({ name, skin }: { name: string; skin: ChatSkin }) {
   return (
     <div className="msg-in flex items-center gap-2">
-      <div className="rounded-2xl bg-neutral-800 border border-white/10 px-4 py-3">
+      <div className={`px-4 py-3 shadow-sm ${skin.inBubble}`}>
         <div className="flex gap-1">
           <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/50" />
           <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/50" />

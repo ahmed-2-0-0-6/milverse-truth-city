@@ -12,6 +12,12 @@ interface Props {
   onCall?: () => void;
   right?: ReactNode;
   accent?: "primary" | "destructive";
+  /** Platform-skin chrome: bg class override (default noir). */
+  chrome?: string;
+  /** Instagram-style story ring around the avatar. */
+  avatarRing?: boolean;
+  /** Online presence dot on the avatar (green). */
+  presenceDot?: boolean;
 }
 
 export function ChatHeader({
@@ -25,6 +31,9 @@ export function ChatHeader({
   onCall,
   right,
   accent = "primary",
+  chrome,
+  avatarRing,
+  presenceDot,
 }: Props) {
   const initials =
     avatarInitials ??
@@ -40,7 +49,9 @@ export function ChatHeader({
       : "bg-primary/15 text-primary border-primary/30";
 
   return (
-    <div className="border-b border-white/10 bg-neutral-950/90 backdrop-blur shadow-[0_1px_0_0_rgba(255,255,255,0.03)]">
+    <div
+      className={`border-b border-white/10 backdrop-blur shadow-[0_1px_0_0_rgba(255,255,255,0.03)] ${chrome ?? "bg-neutral-950/90"}`}
+    >
       <div className="flex items-center gap-2 px-3 py-2.5">
         {onBack && (
           <button
@@ -51,10 +62,18 @@ export function ChatHeader({
             <ChevronLeft className="h-5 w-5" />
           </button>
         )}
-        <div
-          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-semibold shadow-sm ${accentBg}`}
-        >
-          {initials.slice(0, 2) || "?"}
+        <div className={`relative shrink-0 ${avatarRing ? "rounded-full p-[2px] bg-gradient-to-tr from-amber-400 via-pink-500 to-purple-500" : ""}`}>
+          <div
+            className={`flex h-9 w-9 items-center justify-center rounded-full border font-mono text-xs font-semibold shadow-sm ${accentBg} ${avatarRing ? "border-black bg-neutral-900" : ""}`}
+          >
+            {initials.slice(0, 2) || "?"}
+          </div>
+          {presenceDot && (
+            <span
+              className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 border-2 border-black"
+              aria-hidden
+            />
+          )}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
