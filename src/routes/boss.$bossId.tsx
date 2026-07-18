@@ -30,6 +30,7 @@ import { DOCTRINE_RULES } from "@/lib/boss/doctrine";
 import { logPilotEntry } from "@/lib/pilot";
 import { loadProfile } from "@/lib/mirror/profile";
 import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
+import { VerdictMoment } from "@/components/VerdictMoment";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ContactsSheet } from "@/components/chat/ContactsSheet";
@@ -87,7 +88,7 @@ function BossPlay() {
   const boss = getBoss(bossId);
   const reducedMotion = useReducedMotion();
 
-  const [stage, setStage] = useState<"intro" | "play" | "debrief">("intro");
+  const [stage, setStage] = useState<"intro" | "play" | "cinema" | "debrief">("intro");
   const [state, setState] = useState<BossState | null>(null);
   const [log, setLog] = useState<LogItem[]>([]);
   const [outcome, setOutcome] = useState<BossOutcome | null>(null);
@@ -131,7 +132,10 @@ function BossPlay() {
     );
   }
 
-  if (!canRematch(boss.id)) {
+  // Entry guard only. After a loss commits, recordBossAttempt creates the
+  // remediation assignment immediately — guarding on every render would
+  // hijack the verdict cinema and debrief of the round that just ended.
+  if (stage === "intro" && !canRematch(boss.id)) {
     return (
       <div className="min-h-screen bg-black text-white p-6">
         <TopBar />
@@ -303,7 +307,7 @@ function BossPlay() {
         points: out.kind === "WIN" ? 100 : 0,
         ts: Date.now(),
       });
-      setStage("debrief");
+      setStage("cinema");
     }
 
     function handleComply() {
@@ -509,6 +513,33 @@ function BossPlay() {
           )}
         </div>
       </ChatShell>
+    );
+  }
+
+  /* ── VERDICT CINEMA — stamp slam between the chat and the debrief ── */
+  if (stage === "cinema" && outcome) {
+    const stamp =
+      outcome.kind === "WIN"
+        ? "CASE CLOSED"
+        : outcome.kind === "LOSS_TRANSACTED"
+          ? "TRANSACTED"
+          : outcome.kind === "LOSS_FALSE_ALARM"
+            ? "FALSE ALARM"
+            : "PARANOIA";
+    return (
+      <VerdictMoment
+        caseTitle={`${boss.codename} — ${variant.truth === "REAL" ? "true request" : "imposter"}`}
+        caseId={`boss-${boss.id}`}
+        stampLabel={stamp}
+        outcome={
+          outcome.kind === "WIN"
+            ? "correct"
+            : outcome.kind === "LOSS_TRANSACTED"
+              ? "missed_scam"
+              : "false_alarm"
+        }
+        onDone={() => setStage("debrief")}
+      />
     );
   }
 
