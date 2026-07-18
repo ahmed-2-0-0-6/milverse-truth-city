@@ -53,6 +53,12 @@ export function InboxTray() {
   const badge = unread > 9 ? "9+" : String(unread);
 
   const openRow = (it: InboxItem) => {
+    if (it.type === "call") {
+      markOpened(it.id);
+      setOpen(false);
+      setVoicemail(it);
+      return;
+    }
     markOpened(it.id);
     setOpen(false);
     navigate({ to: it.route });
