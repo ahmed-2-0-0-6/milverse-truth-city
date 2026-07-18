@@ -829,21 +829,35 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 </Link>
               </div>
             )}
-            {tab === "chat" && (
+            {tab === "chat" && !coldMode && (
               <QuickBrief refs={refs} openRef={openRef} onToggle={(r) => setOpenRef((cur) => (cur === r ? null : r))} />
             )}
-            {/* Mobile-only thumb-reach cluster for the two most consequential controls. */}
-            <div className="mb-2 flex justify-end gap-2 sm:hidden">
-              <button
-                onClick={() => setShowVob(true)}
-                disabled={ended || messages.length < 2}
-                className="touch-manipulation inline-flex min-h-[44px] items-center rounded-full border border-primary/50 bg-primary/10 px-4 text-[11px] font-mono tracking-widest text-primary active:bg-primary/20 disabled:opacity-40"
+            {coldMode && drillExpired && (
+              <div
+                className="mb-2 rounded-md border border-caution/50 bg-caution/10 p-2 text-center font-mono text-[11px] tracking-widest text-caution"
+                role="status"
+                aria-live="polite"
               >
-                <ShieldCheck className="inline h-3.5 w-3.5 mr-1" /> VERIFY
-              </button>
+                Time. Call it.
+              </div>
+            )}
+            {/* Mobile-only thumb-reach cluster for the two most consequential controls.
+                Cold mode: VERIFY is dropped (the doors stay — spec — but VERIFY is
+                the training-wheel door for tiered play; CALL IT is the discipline). */}
+            <div className="mb-2 flex justify-end gap-2 sm:hidden">
+              {!coldMode && (
+                <button
+                  onClick={() => setShowVob(true)}
+                  disabled={ended || messages.length < 2}
+                  className="touch-manipulation inline-flex min-h-[44px] items-center rounded-full border border-primary/50 bg-primary/10 px-4 text-[11px] font-mono tracking-widest text-primary active:bg-primary/20 disabled:opacity-40"
+                >
+                  <ShieldCheck className="inline h-3.5 w-3.5 mr-1" /> VERIFY
+                </button>
+              )}
               <button
                 onClick={onEnd}
                 disabled={messages.length < 2}
+                autoFocus={coldMode && drillExpired}
                 className="touch-manipulation inline-flex min-h-[44px] items-center rounded-full border border-destructive/50 bg-destructive/10 px-4 text-[11px] font-mono tracking-widest text-destructive active:bg-destructive/20 disabled:opacity-40"
               >
                 <Phone className="inline h-3.5 w-3.5 mr-1" /> CALL IT
@@ -855,20 +869,27 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
-                placeholder={ended ? "Chat ended — make your call." : skin.placeholder}
-                disabled={ended || typing}
+                placeholder={
+                  coldMode && drillExpired
+                    ? "Time. Call it."
+                    : ended
+                      ? "Chat ended — make your call."
+                      : skin.placeholder
+                }
+                disabled={ended || typing || (coldMode && drillExpired)}
                 aria-label="Type your reply"
                 className="flex-1 rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-base sm:text-sm text-white outline-none focus:border-primary disabled:opacity-50 min-h-[44px] sm:min-h-0"
               />
 
               <button
                 onClick={send}
-                disabled={ended || typing || !input.trim()}
+                disabled={ended || typing || !input.trim() || (coldMode && drillExpired)}
                 aria-label="Send message"
                 className="touch-manipulation rounded-full bg-primary px-4 text-primary-foreground disabled:opacity-40 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
               >
                 <Send className="h-4 w-4" aria-hidden="true" />
               </button>
+
 
             </div>
             <div className="mt-1.5 flex items-center justify-between font-mono text-[9px] tracking-widest text-white/40">
