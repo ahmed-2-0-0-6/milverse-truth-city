@@ -4,10 +4,14 @@
 import type { ItemResponse, Metrics, CohortAttempt } from "./scoring";
 import { scoreAttempt } from "./scoring";
 import type { FormId } from "./items";
+import { readStore, recoverStore, writeStore } from "@/lib/storage";
 
+// Owner: assessment/state (pilot attempts + codename). Bump the suffix on
+// breaking shape change; readStore validators are the compatibility gate.
 const LOCAL_KEY = "milverse.assessment.local.v1";
 // Distinct namespace so the codename hash is stable across dev sessions.
 const CODENAME_KEY = "milverse.pilot.codename";
+
 
 export interface StoredAttempt {
   groupCode: string;
