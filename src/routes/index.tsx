@@ -96,7 +96,7 @@ function CityMap() {
 
 
   return (
-    <div className="noir-landing min-h-screen relative overflow-x-hidden">
+    <div className={`noir-landing min-h-screen relative overflow-x-hidden ${night ? "city-night" : ""}`}>
       <InboxManager />
       <IncomingToast />
       <IncomingCall />
