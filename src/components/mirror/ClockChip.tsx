@@ -25,6 +25,7 @@ function fmt(s: number): string {
 export function ClockChip({ clock, onExpire }: Props) {
   const startedAtRef = useRef<number>(0);
   const firedRef = useRef<boolean>(false);
+  const tenseFiredRef = useRef<boolean>(false);
   const onExpireRef = useRef(onExpire);
   onExpireRef.current = onExpire;
 
@@ -35,6 +36,15 @@ export function ClockChip({ clock, onExpire }: Props) {
     startedAtRef.current = Date.now();
     setRemaining(clock.seconds);
     firedRef.current = false;
+    tenseFiredRef.current = clock.seconds < 60; // already tense on start = no cue
+    const iv = window.setInterval(() => {
+      const elapsed = (Date.now() - startedAtRef.current) / 1000;
+      const left = Math.max(0, clock.seconds - elapsed);
+      setRemaining(left);
+      if (left > 0 && left < 60 && !tenseFiredRef.current) {
+        tenseFiredRef.current = true;
+        clockTense();
+      }
     const iv = window.setInterval(() => {
       const elapsed = (Date.now() - startedAtRef.current) / 1000;
       const left = Math.max(0, clock.seconds - elapsed);
