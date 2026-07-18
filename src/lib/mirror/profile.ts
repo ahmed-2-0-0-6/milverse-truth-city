@@ -15,8 +15,11 @@ export interface HistoryEntry {
   usedVob?: boolean;
   /** Optional conviction pick at verdict-lock: 60 (HUNCH) | 75 (READ) | 90 (CERTAIN). */
   confidence?: number;
+  /** Seconds the line stayed open (clamped 0..1800). Optional/additive. */
+  timeHeld?: number;
   ts: number;
 }
+
 
 /** A single Daily Drop play (date-keyed). */
 export interface DailyPlayEntry {

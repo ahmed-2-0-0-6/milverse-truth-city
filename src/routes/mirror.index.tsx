@@ -44,8 +44,9 @@ import { tacticForMirror } from "@/lib/mirror/tactics";
 export const Route = createFileRoute("/mirror/")({
   head: () => ({
     meta: [
-      { title: "The Mirror — Case Files — MILVERSE" },
-      { name: "description", content: "Live conversations. Real or imposter? You decide." },
+      { title: "The Mirror — Counter-Scam Desk — MILVERSE" },
+      { name: "description", content: "Pick up the line. Keep them talking. Every minute burns theirs, not a victim's." },
+
     ],
   }),
   component: function MirrorIndexGuarded() {
@@ -188,13 +189,13 @@ function CaseFiles() {
       <DistrictHero
         art={mirrorArt}
         district="mirror"
-        kicker="CHAPTER 01 · THE MIRROR · TEXT CHANNEL"
-        title="Case Files"
+        kicker="CHAPTER 01 · THE MIRROR · COUNTER-SCAM DESK"
+        title="Counter-Scam Desk"
         thesis={
           <>
-            Live, unscripted conversations. Your job isn't to guess from vibes — it's to{" "}
-            <span className="text-white font-semibold">verify</span>. Two clean wins in a tier and
-            the next one opens.
+            Scammers are working your district. The city routes their calls to{" "}
+            <span className="text-white font-semibold">you</span>. Pick up, keep them
+            talking, take them down.
           </>
         }
         rooted="SCENARIOS ROOTED IN REAL REPORTED SCAM PATTERNS FROM PAKISTAN"
@@ -215,13 +216,16 @@ function CaseFiles() {
           district="mirror"
           lines={[
             "Someone's uncle answered a message like this last week. He's still paying for it.",
-            "Your turn to answer better. Verify the person, not the vibe.",
+            "Your turn. Keep them on the line. Every minute they burn on you is a minute stolen from a real victim.",
           ]}
         />
         <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
           {/* PLAIN signage under the noir title. */}
-          Catch the scammer sliding into your DMs.
+          Counter-scam desk. Pick up, play them, burn them.
         </p>
+
+
+
 
 
         {/* Share code entry */}

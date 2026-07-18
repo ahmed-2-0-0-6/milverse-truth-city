@@ -357,10 +357,11 @@ function OutroBeat({
 }) {
   const headline =
     outro === "correct"
-      ? "You just did the whole job."
+      ? "You just worked your first line."
       : outro === "wrong"
         ? "That one stings. Good."
         : "The city can wait. The scammers won't.";
+
   const sub =
     outro === "correct"
       ? "Question, verify, then decide. The city runs on that reflex. Everything in here is a rep."

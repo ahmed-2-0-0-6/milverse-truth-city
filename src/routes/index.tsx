@@ -177,8 +177,9 @@ function CityMap() {
               </div>
               <HeroType />
               <p className="mt-4 max-w-xl text-center text-white/80 text-sm sm:text-base">
-                Scammers are about to text you. Catch them. Level up.
+                Scammers are working your city. Pick up. Play them. Burn them.
               </p>
+
 
               <div className="mt-8 w-full max-w-[360px]">
                 <PlayButton />

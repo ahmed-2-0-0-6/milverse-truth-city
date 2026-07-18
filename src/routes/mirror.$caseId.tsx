@@ -20,6 +20,8 @@ import { generateContactReply } from "@/lib/mirror/ai.functions";
 import { ARTIFACT_LABEL } from "@/lib/mirror/voice";
 import { fakeNumberForCase } from "@/lib/chat/fakeNumber";
 import { loadProfile, saveProfile } from "@/lib/mirror/profile";
+import { caseSeconds, formatMS } from "@/lib/mirror/timeStolen";
+
 import { computeXp } from "@/lib/ranks";
 import { loadUnlocked } from "@/lib/manual/state";
 import { writeXpDelta } from "@/lib/rank/xpSnapshot";
@@ -325,9 +327,12 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
 
       <div className="mt-6 rounded-xl border border-caution/30 bg-caution/5 p-6">
         <div className="flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-caution">
-          <FileText className="h-4 w-4" /> CASE DOSSIER · TIER {scenario.tier}
+          <FileText className="h-4 w-4" /> ASSIGNMENT · TIER {scenario.tier}
         </div>
         <h1 data-phase-anchor="mirror" tabIndex={-1} className="mt-4 text-2xl font-semibold outline-none">{scenario.title}</h1>
+        <p className="mt-3 font-mono text-[11px] tracking-wide text-muted-foreground italic">
+          This number's been working the district. The desk routed it to you.
+        </p>
 
         {/* THE CLAIM — bordered claim card. */}
         <section className="mt-6">
@@ -341,6 +346,7 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
             <p className="text-sm leading-relaxed">{scenario.dossier.contactClaim}</p>
           </div>
         </section>
+
 
         {/* KNOWN — numbered reference cards (K1..). */}
         <section className="mt-6">
@@ -1098,7 +1104,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               >
                 {handMode === "hand" ? "TYPE INSTEAD ⌨" : "SHOW THE HAND ▤"}
               </button>
-              <span>{messages.filter((m) => m.role === "player").length} SENT</span>
+              <span title="Every minute they burn on you is a minute stolen from a real victim.">{messages.filter((m) => m.role === "player").length} SENT · LINE HELD</span>
             </div>
 
           </div>
@@ -2103,6 +2109,8 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     if (result.resultKind === "missed_scam") p.missedScams += 1;
     if (result.resultKind === "false_alarm") p.falseAlarms += 1;
     const nowTs = Date.now();
+    // Time held on the line — derived from message ts range; clamped to 30m in helper.
+    const heldSecs = caseSeconds(sim?.messages ?? []);
     p.history.push({
       caseId: scenario.id,
       tier: scenario.tier,
@@ -2112,8 +2120,10 @@ function Debrief({ scenario }: { scenario: Scenario }) {
       points: result.points,
       usedVob: result.usedVob,
       confidence: verdictRaw.confidence,
+      timeHeld: heldSecs ?? undefined,
       ts: nowTs,
     });
+
     saveProfile(p);
     // The Tape — local-only annotated transcript, keyed to the same ts the
     // wall row uses so /wall can attach a "TAPE ON FILE →" affordance.
