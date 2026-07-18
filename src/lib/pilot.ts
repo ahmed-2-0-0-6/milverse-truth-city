@@ -46,14 +46,18 @@ function key(code: string) {
   return `milverse.pilot.log.${code.toUpperCase()}`;
 }
 
+function isEntryListShape(v: unknown): v is PilotEntry[] {
+  return Array.isArray(v);
+}
+
 export function loadPilotLog(code: string): PilotEntry[] {
   if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(key(code));
-    return raw ? (JSON.parse(raw) as PilotEntry[]) : [];
-  } catch {
-    return [];
+  const read = readStore<PilotEntry[]>(key(code), isEntryListShape);
+  if (read === "corrupt") {
+    const rec = recoverStore<PilotEntry[]>(key(code), isEntryListShape);
+    return rec ?? [];
   }
+  return read ?? [];
 }
 
 /** Fire-and-forget: always write to localStorage. If a group is active, also
@@ -64,11 +68,12 @@ export function logPilotEntry(entry: PilotEntry) {
   if (!code) return;
   const list = loadPilotLog(code);
   list.push(entry);
-  localStorage.setItem(key(code), JSON.stringify(list));
+  writeStore(key(code), list);
   window.dispatchEvent(new Event("milverse:pilot"));
   enqueueOutbox({ groupCode: code, deviceId: getDeviceId(), entry });
   void flushOutbox();
 }
+
 
 /* ── OUTBOX ────────────────────────────────────────────────────────────────
    DELIBERATE DECISION: NO service worker / PWA caching backs this outbox.
