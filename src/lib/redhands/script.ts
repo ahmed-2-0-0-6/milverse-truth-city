@@ -412,7 +412,7 @@ export function loadRedHandsLog(): RedHandsLog {
 
 export function saveRedHandsRun(ending: Ending): void {
   const cur = loadRedHandsLog();
-  writeStore<RedHandsLog>(LOG_KEY, {
+  writeStore(LOG_KEY, {
     runs: cur.runs + 1,
     endings: [...cur.endings, ending].slice(-10),
     ts: Date.now(),
