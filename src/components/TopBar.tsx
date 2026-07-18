@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Volume2, VolumeX, BookOpen, Menu, X } from "lucide-react";
 import { InboxTray } from "@/components/inbox/InboxTray";
+import { RankChip } from "@/components/rank/RankChip";
 import { useJuniorMode } from "@/hooks/useJuniorMode";
 import {
   Sheet,
@@ -162,6 +163,7 @@ export function TopBar() {
             <BookOpen className="h-3.5 w-3.5" />
             <span className="hidden lg:inline">MANUAL</span>
           </Link>
+          {showRankChip && <RankChip />}
           {showInbox && <InboxTray />}
           <VisualQualityToggle />
           <AccessPanel />
