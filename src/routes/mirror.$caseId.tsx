@@ -687,7 +687,15 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto">
-              <NotesTab scenario={scenario} messages={messages} pins={pins} onUnpin={togglePin} />
+              <NotesTab
+                scenario={scenario}
+                messages={messages}
+                pins={pins}
+                pinTags={pinTags}
+                refs={refs}
+                onUnpin={togglePin}
+                onTag={setPinTag}
+              />
             </div>
           )}
         </div>
