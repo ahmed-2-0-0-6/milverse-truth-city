@@ -7,6 +7,7 @@ import { useNavigate } from "@tanstack/react-router";
 import type { InboxItem } from "@/lib/inbox/scheduler";
 import { markOpened } from "@/lib/inbox/profile";
 import { shouldReduceMotion } from "@/lib/access";
+import { arrivalTap } from "@/lib/mirror/audio";
 import { platformStyle } from "./platform-style";
 
 const AUTO_HIDE_MS = 6000;
