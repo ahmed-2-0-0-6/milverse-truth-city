@@ -2306,6 +2306,45 @@ function Debrief({ scenario }: { scenario: Scenario }) {
         </section>
       )}
 
+      {/* THE MOST SUSPECTED LINE — the crowd's record on this case. */}
+      {cityLine && "fallback" in cityLine ? (
+        <section className="rounded-xl border border-border bg-card p-6">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
+            THE CITY'S RECORD ON THIS LINE
+          </div>
+          <p className="text-sm text-muted-foreground">
+            The city has a record on this case — but its most-suspected line didn't come up in your run. Conversations fork; suspicion maps differently every time.
+          </p>
+        </section>
+      ) : cityLine ? (
+        <section className="rounded-xl border border-border bg-card p-6">
+          <div className="font-mono text-xs tracking-widest text-muted-foreground mb-3">
+            THE CITY'S RECORD ON THIS LINE
+          </div>
+          <blockquote
+            role="blockquote"
+            className="rounded-md border-l-2 border-caution bg-caution/5 pl-3 py-2 text-sm italic"
+          >
+            "{cityLine.text}"
+            <figcaption className="mt-1.5 not-italic font-mono text-[10px] tracking-widest text-muted-foreground">
+              {cityLine.pins.toLocaleString()} citizens pinned this exact line.
+            </figcaption>
+          </blockquote>
+          <p className="mt-3 text-xs text-muted-foreground">
+            {result.truthLabel === "FAKE"
+              ? cityLine.wasTell
+                ? "The crowd found the crack in the same place. That's not coincidence — that's the tell doing its job."
+                : "The city's suspicion pooled here — but the real slip was elsewhere. Crowds find smoke; verification finds fire."
+              : `A real person's ordinary sentence, and ${cityLine.pins.toLocaleString()} citizens flagged it. That's what a false alarm looks like from above — suspicion is cheap, and it pools on the innocent.`}
+          </p>
+          {cityLine.playerPinned && (
+            <p className="mt-2 font-mono text-[10px] tracking-widest text-caution">
+              YOUR PIN IS IN THAT COUNT.
+            </p>
+          )}
+        </section>
+      ) : null}
+
       {/* The Tape — annotated playback of the whole exchange. */}
       {sim?.messages?.length ? (
         <div>
