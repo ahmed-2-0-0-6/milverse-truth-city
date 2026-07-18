@@ -11,6 +11,7 @@ import { TacticFlash } from "@/components/TacticFlash";
 import { ReceiptCard, type ReceiptData } from "@/components/daily/ReceiptCard";
 import { CitySolved } from "@/components/CitySolved";
 import { StreakBeat } from "@/components/daily/StreakBeat";
+import { Spool } from "@/components/daily/Spool";
 import { HandlerDropLine } from "@/components/handler/HandlerDropLine";
 import {
   todaysDailyCase,
@@ -251,6 +252,8 @@ function DropPage() {
           )}
         </section>
 
+        <Spool />
+
         <Leaderboards />
       </main>
     </div>
@@ -270,11 +273,27 @@ function PostPlayState({
 }) {
   const entry = status.todayEntry!;
   const [split, setSplit] = useState<{ total: number; correct: number } | null>(null);
+  const [splitOk, setSplitOk] = useState(false);
   useEffect(() => {
     fetchDailySplit({ data: { dropDate: entry.dateKey, caseId: entry.caseId } })
-      .then((r) => setSplit(r))
-      .catch(() => setSplit({ total: 1, correct: entry.correct ? 1 : 0 }));
+      .then((r) => {
+        setSplit(r);
+        setSplitOk(true);
+      })
+      .catch(() => {
+        setSplit({ total: 1, correct: entry.correct ? 1 : 0 });
+        setSplitOk(false);
+      });
   }, [entry.dateKey, entry.caseId, entry.correct]);
+
+  const pct = split && split.total > 0 ? Math.round((split.correct / split.total) * 100) : null;
+
+  // Split stamp on the artifact: only when the live fetch resolved with the
+  // aggregate above the n>=5 suppression floor. Fallback path never stamps.
+  const stampedSplit =
+    splitOk && split && split.total >= 5 && pct !== null
+      ? { pct, total: split.total }
+      : undefined;
 
   const receipt: ReceiptData = useMemo(
     () => ({
@@ -289,11 +308,11 @@ function PostPlayState({
       sharpness: localSharpness(),
       siteUrl:
         typeof window !== "undefined" ? `${window.location.origin}/drop` : "milverse.app/drop",
+      citySplit: stampedSplit,
     }),
-    [entry, status.streak],
+    [entry, status.streak, stampedSplit],
   );
 
-  const pct = split && split.total > 0 ? Math.round((split.correct / split.total) * 100) : null;
 
   return (
     <div className="mt-6 space-y-6">

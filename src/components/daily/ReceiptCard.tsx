@@ -16,8 +16,12 @@ export interface ReceiptData {
   stake: number;
   delta: number; // +N or -N
   streak: number;
-  sharpness: number; // "sharper than X% of the city"
+  /** "sharper than X% of the city". Optional — omitted if not derivable. */
+  sharpness?: number;
   siteUrl: string;
+  /** Only present when the day's aggregate cleared the n>=5 suppression floor.
+   *  Never set for rebuilt spool receipts (historical splits aren't stored). */
+  citySplit?: { pct: number; total: number };
 }
 
 const COLOR: Record<ReceiptData["outcome"], string> = {
@@ -39,7 +43,18 @@ export function receiptText(d: ReceiptData): string {
   const result = d.correct
     ? `staked ${d.stake} → won ${d.delta}`
     : `staked ${d.stake} → lost ${Math.abs(d.delta)}`;
-  return `MILVERSE #${d.dropNumber} ${emoji} · ${result} · ${d.streak} days on watch · sharper than ${d.sharpness}% of the city\n${d.siteUrl}`;
+  let head = `MILVERSE #${d.dropNumber} ${emoji} · ${result} · ${d.streak} days on watch`;
+  if (typeof d.sharpness === "number") {
+    head += ` · sharper than ${d.sharpness}% of the city`;
+  }
+  const lines = [head];
+  if (d.citySplit) {
+    lines.push(
+      `CITY SPLIT · ${d.citySplit.pct}% CALLED IT RIGHT · ${d.citySplit.total} REPORTED`,
+    );
+  }
+  lines.push(d.siteUrl);
+  return lines.join("\n");
 }
 
 function drawReceipt(canvas: HTMLCanvasElement, d: ReceiptData) {
@@ -118,10 +133,24 @@ function drawReceipt(canvas: HTMLCanvasElement, d: ReceiptData) {
   ctx.font = "bold 96px 'Impact', sans-serif";
   ctx.fillText(String(d.streak), cardX + 40, bandY + 670);
 
-  // City-sharper
-  ctx.fillStyle = "#22d3ee";
-  ctx.font = "bold 28px 'Courier New', monospace";
-  ctx.fillText(`SHARPER THAN ${d.sharpness}% OF THE CITY`, cardX + 40, bandY + 740);
+  // City-sharper (optional — spool omits for past days it can still reconstruct,
+  // but the field can be undefined for rebuilt receipts that predate the metric)
+  if (typeof d.sharpness === "number") {
+    ctx.fillStyle = "#22d3ee";
+    ctx.font = "bold 28px 'Courier New', monospace";
+    ctx.fillText(`SHARPER THAN ${d.sharpness}% OF THE CITY`, cardX + 40, bandY + 740);
+  }
+
+  // City split stamp (only present when today's aggregate cleared n>=5)
+  if (d.citySplit) {
+    ctx.fillStyle = "#f5b942";
+    ctx.font = "bold 24px 'Courier New', monospace";
+    ctx.fillText(
+      `CITY SPLIT · ${d.citySplit.pct}% CALLED IT RIGHT · ${d.citySplit.total} REPORTED`,
+      cardX + 40,
+      bandY + 782,
+    );
+  }
 
   // Footer
   ctx.fillStyle = "#8a8a8a";
@@ -201,7 +230,7 @@ export function ReceiptCard({ data }: { data: ReceiptData }) {
   return (
     <div className="space-y-3">
       <div className="rounded-sm border border-primary/40 bg-black/60 overflow-hidden">
-        <canvas ref={canvasRef} className="block w-full h-auto" />
+        <canvas ref={canvasRef} className="block w-full h-auto" role="img" aria-label={text} />
       </div>
       <pre className="whitespace-pre-wrap break-words rounded-sm border border-border bg-card p-3 text-xs text-muted-foreground font-mono">
         {text}
