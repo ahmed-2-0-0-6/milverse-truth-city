@@ -122,6 +122,26 @@ export function AmbientLife({
         </g>
       )}
 
+      {/* amber horizon glow — smallHours only, sits under the tint. */}
+      {horizonGlowVisible(hour) && (
+        <rect
+          x={0}
+          y={0}
+          width={WORLD_W}
+          height={Math.round(WORLD_H * 0.22)}
+          fill="url(#milverse-night-horizon)"
+          style={{ pointerEvents: "none" }}
+        />
+      )}
+      {/* Gradient defs are declared here so this file remains self-contained. */}
+      <defs>
+        <linearGradient id="milverse-night-horizon" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#f5b942" stopOpacity="0.10" />
+          <stop offset="55%" stopColor="#f5b942" stopOpacity="0.04" />
+          <stop offset="100%" stopColor="#f5b942" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+
       {/* day/night tint — full-map overlay */}
       {tint && (
         <rect
@@ -137,3 +157,4 @@ export function AmbientLife({
     </g>
   );
 }
+
