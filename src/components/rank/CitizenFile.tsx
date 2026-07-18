@@ -14,6 +14,8 @@ import { rankFromXp } from "@/lib/ranks";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 import { getActiveGroup } from "@/lib/pilot";
 import { computeConviction } from "@/lib/mirror/conviction";
+import { lifetimeStolenSeconds, formatHM } from "@/lib/mirror/timeStolen";
+
 
 interface Props {
   open: boolean;
