@@ -73,7 +73,10 @@ interface CardShellProps {
   outcome?: CaseCardOutcome;
   artifactChip?: ArtifactChip;
   unreadThread?: boolean;
+  /** Show the seasonal-circulation ⛆ glyph beside the tier meter. */
+  seasonGlyph?: ReactNode;
 }
+
 
 function CardShell({
   icon,
@@ -87,7 +90,9 @@ function CardShell({
   outcome,
   artifactChip,
   unreadThread,
+  seasonGlyph,
 }: CardShellProps) {
+
   const no = fileNo(title);
   const stamp = outcome ? OUTCOME_STAMP[outcome] : null;
   const dim = outcome === "closed";
@@ -152,9 +157,12 @@ function CardShell({
         )}
 
         <div className="relative">
-          {(metaTopRight || artifactChip) && (
+          {(metaTopRight || artifactChip || seasonGlyph) && (
             <div className="flex flex-col items-end gap-1 min-w-0 float-right ml-3">
-              {metaTopRight}
+              <div className="flex items-center gap-1.5">
+                {seasonGlyph}
+                {metaTopRight}
+              </div>
               {artifactChip && (
                 <span
                   className={`inline-flex items-center rounded-sm border bg-background/50 px-1.5 py-0.5 font-mono text-[9px] tracking-widest ${CHIP_TONE[artifactChip.tone]}`}
@@ -165,6 +173,7 @@ function CardShell({
               )}
             </div>
           )}
+
           <h3 className="text-lg font-semibold leading-snug">{title}</h3>
           <p className="mt-1.5 text-sm text-muted-foreground line-clamp-2 clear-none">{teaser}</p>
           {badges && <div className="mt-4 flex flex-wrap items-center gap-2">{badges}</div>}
@@ -216,6 +225,9 @@ interface CaseCardProps<TParams extends Record<string, string>> {
   coldStamp?: string;
   /** Small footer affordance — e.g. "COLD READ →". Stops link propagation. */
   coldAction?: { label: string; onClick: () => void; ariaLabel?: string };
+  /** Seasonal-circulation glyph (⛆). Appends ", in seasonal circulation" to aria. */
+  seasonGlyph?: ReactNode;
+  inSeason?: boolean;
 }
 
 export function CaseCard<TParams extends Record<string, string>>({
@@ -234,6 +246,8 @@ export function CaseCard<TParams extends Record<string, string>>({
   unreadThread,
   coldStamp,
   coldAction,
+  seasonGlyph,
+  inSeason,
 }: CaseCardProps<TParams>) {
   const footer = !locked ? (
     <div className="mt-5 flex items-center justify-between gap-3">
@@ -281,15 +295,18 @@ export function CaseCard<TParams extends Record<string, string>>({
       outcome={outcome}
       artifactChip={artifactChip}
       unreadThread={unreadThread}
+      seasonGlyph={seasonGlyph}
     />
   );
 
   if (locked) return shell;
 
   const ariaParts: string[] = [title];
+  if (inSeason) ariaParts.push("in seasonal circulation");
   if (outcome) ariaParts.push(OUTCOME_STAMP[outcome].aria);
   if (unreadThread) ariaParts.push("new arrival");
   const ariaLabel = ariaParts.join(", ");
+
 
   // Typed at call site with TanStack Link's overloads.
   return (

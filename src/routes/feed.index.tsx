@@ -15,6 +15,8 @@ import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 import { InboxManager } from "@/components/inbox/InboxManager";
 import { IncomingToast } from "@/components/inbox/IncomingToast";
 import { IncomingCall } from "@/components/inbox/IncomingCall";
+import { SeasonAdvisory, SeasonGlyph, useSeason } from "@/components/season/SeasonAdvisory";
+
 
 export const Route = createFileRoute("/feed/")({
   head: () => ({
@@ -42,6 +44,8 @@ const TIER_NAMES: Record<1 | 2 | 3, string> = {
 function FeedIndex() {
   const [outcomes, setOutcomes] = useState<Map<string, CaseCardOutcome>>(new Map());
   const [unread, setUnread] = useState<Set<string>>(new Set());
+  const season = useSeason();
+
 
   useEffect(() => {
     const readOutcomes = () => {
@@ -156,10 +160,12 @@ function FeedIndex() {
         >
           ← CITY
         </Link>
+        <SeasonAdvisory season={season} />
 
         <div className="mt-6 mb-3 font-mono text-[10px] tracking-widest text-muted-foreground">
           {shelfLine}
         </div>
+
 
         <div className="flex gap-6">
           <TierRail nodes={railNodes} frontierTier={highestUnlocked} />
@@ -173,27 +179,33 @@ function FeedIndex() {
                 TIER {tier} · {TIER_NAMES[tier as 1 | 2 | 3]}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {cases.map((s) => (
-                  <CaseCard
-                    key={s.id}
-                    to="/feed/$caseId"
-                    params={{ caseId: s.id }}
-                    icon={<Newspaper className="h-5 w-5" />}
-                    metaTopRight={
-                      <>
-                        <FormatBadge format={s.format ?? "whatsapp"} aiGenerated={s.aiGenerated} />
-                        <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[9px] font-mono tracking-widest text-primary">
-                          <Share2 className="h-2.5 w-2.5" /> T{s.tier}
-                        </span>
-                      </>
-                    }
-                    title={s.title}
-                    teaser={s.teaser}
-                    outcome={outcomes.get(s.id)}
-                    artifactChip={chipFor(s.format)}
-                    unreadThread={unread.has(s.id)}
-                  />
-                ))}
+                {cases.map((s) => {
+                  const inSeason = !!season && !!s.tacticId && season.tactics.includes(s.tacticId);
+                  return (
+                    <CaseCard
+                      key={s.id}
+                      to="/feed/$caseId"
+                      params={{ caseId: s.id }}
+                      icon={<Newspaper className="h-5 w-5" />}
+                      metaTopRight={
+                        <>
+                          <FormatBadge format={s.format ?? "whatsapp"} aiGenerated={s.aiGenerated} />
+                          <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[9px] font-mono tracking-widest text-primary">
+                            <Share2 className="h-2.5 w-2.5" /> T{s.tier}
+                          </span>
+                        </>
+                      }
+                      seasonGlyph={inSeason ? <SeasonGlyph season={season} /> : undefined}
+                      inSeason={inSeason}
+                      title={s.title}
+                      teaser={s.teaser}
+                      outcome={outcomes.get(s.id)}
+                      artifactChip={chipFor(s.format)}
+                      unreadThread={unread.has(s.id)}
+                    />
+                  );
+                })}
+
               </div>
             </section>
           );

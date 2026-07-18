@@ -36,6 +36,9 @@ import { InboxManager } from "@/components/inbox/InboxManager";
 import { IncomingToast } from "@/components/inbox/IncomingToast";
 import { IncomingCall } from "@/components/inbox/IncomingCall";
 import { loadInbox } from "@/lib/inbox/profile";
+import { SeasonAdvisory, SeasonGlyph, useSeason } from "@/components/season/SeasonAdvisory";
+import { tacticForMirror } from "@/lib/mirror/tactics";
+
 
 export const Route = createFileRoute("/mirror/")({
   head: () => ({
@@ -60,6 +63,8 @@ const TIER_NAMES: Record<TierId, string> = {
 
 function CaseFiles() {
   const navigate = useNavigate();
+  const season = useSeason();
+
   const [profile, setProfile] = useState<TrustProfile | null>(null);
   const [citizen, setCitizen] = useState<Scenario[]>([]);
   const [code, setCode] = useState("");
@@ -261,10 +266,13 @@ function CaseFiles() {
         {/* The Double — perspective-flip drill. Locked under 3 solved cases. */}
         <DoubleBeacon casesPlayed={profile?.casesPlayed ?? 0} />
 
+        {/* Seasonal advisory strip — off-season this renders nothing. */}
+        <SeasonAdvisory season={season} />
 
         <div className="mt-6 mb-3 font-mono text-[10px] tracking-widest text-muted-foreground">
           {shelfLine}
         </div>
+
 
         <div className="flex gap-6">
           <TierRail nodes={railNodes} frontierTier={frontierTier} />
@@ -310,6 +318,7 @@ function CaseFiles() {
                     );
                     const coldOk = !!profile && isColdEligible(profile, s.id);
                     const best = coldOk ? bestClearedSeconds(s.id) : null;
+                    const inSeason = !!season && season.tactics.includes(tacticForMirror(s.id));
                     return (
                       <CaseCard
                         key={s.id}
@@ -318,11 +327,14 @@ function CaseFiles() {
                         locked={!isUnlocked}
                         icon={<MessageSquare className="h-5 w-5" />}
                         metaTopRight={<TierMeter tier={s.tier} />}
+                        seasonGlyph={inSeason ? <SeasonGlyph season={season} /> : undefined}
+                        inSeason={inSeason}
                         title={s.title}
                         teaser={s.teaser}
                         outcome={latestOutcome.get(s.id)}
                         artifactChip={chipFor(s.id)}
                         unreadThread={unread.has(s.id)}
+
                         coldStamp={best !== null ? `COLD CLEARED · ${formatDrillTime(best)}` : undefined}
                         coldAction={
                           coldOk && isUnlocked

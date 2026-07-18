@@ -1,6 +1,11 @@
 // LAYER-4 — Live-feeling ticker. Pure CSS marquee, pauses on hover.
+// Seasonal marquee lines are spliced in at the front when a season is live;
+// off-season, the base list is byte-identical to pre-Season chrome.
+import { useSeason } from "@/components/season/SeasonAdvisory";
+
 export function Marquee() {
-  const items = [
+  const season = useSeason();
+  const base = [
     "CASE #47 · CLOSED",
     "312 VERIFICATIONS THIS WEEK",
     "NEW STORY IN THE LIBRARY",
@@ -10,6 +15,7 @@ export function Marquee() {
     "PILOT COHORT 12 · CALIBRATING",
     "STUDIO · 6 CASES SUBMITTED",
   ];
+  const items = season ? [...season.marquee, ...base] : base;
   return (
     <div
       className="relative overflow-hidden border-y border-primary/30 bg-black/40 backdrop-blur-sm"
