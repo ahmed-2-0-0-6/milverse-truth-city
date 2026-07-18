@@ -97,7 +97,7 @@ export function VerdictMoment({ caseTitle, caseId, stampLabel, outcome, onDone }
     }
     const t1 = window.setTimeout(() => {
       setStage("stamp");
-      playThud();
+      stampSlam();
     }, 380);
     const t2 = window.setTimeout(() => {
       setStage("reveal");
