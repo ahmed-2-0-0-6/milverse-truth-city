@@ -6,10 +6,14 @@ import { SCENARIOS, getScenario } from "@/lib/mirror/scenarios";
 import type { TrustProfile } from "@/lib/mirror/profile";
 import { unlockedMaxTier } from "@/lib/mirror/profile";
 import type { TacticId } from "@/lib/manual/entries";
+import { readStore, recoverStore, writeStore } from "@/lib/storage";
 
+// Owner: mirror/retests (Retest queue). Bump the suffix on breaking shape
+// change; readStore validators are the compatibility gate.
 const KEY = "milverse.retests.v1";
 const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
 const QUEUE_CAP = 3;
+
 
 export type RetestStatus = "pending" | "closed";
 
