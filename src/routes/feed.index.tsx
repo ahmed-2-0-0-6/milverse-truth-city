@@ -37,6 +37,8 @@ const TIER_NAMES: Record<1 | 2 | 3, string> = {
 function FeedIndex() {
   return (
     <div className="min-h-screen grain">
+      <InboxManager />
+      <IncomingToast />
       <TopBar />
       <DistrictHero
         art={feedArt}
