@@ -77,6 +77,7 @@ export function IncomingCall() {
 
   function answer() {
     if (!call || phase !== "ringing") return;
+    stopRing();
     if (ringTimer.current) {
       window.clearTimeout(ringTimer.current);
       ringTimer.current = null;
@@ -91,6 +92,7 @@ export function IncomingCall() {
 
   useEffect(() => {
     return () => {
+      stopRing();
       if (ringTimer.current) window.clearTimeout(ringTimer.current);
       if (connectTimer.current) window.clearTimeout(connectTimer.current);
     };
