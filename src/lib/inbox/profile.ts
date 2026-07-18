@@ -23,35 +23,37 @@ function fresh(dateKey = dropDateKey()): InboxProfile {
   return { dateKey, arrived: [], opened: [], firedCalls: [], paperRead: null };
 }
 
+function isInboxShape(v: unknown): v is Partial<InboxProfile> {
+  if (!v || typeof v !== "object") return false;
+  const o = v as Record<string, unknown>;
+  if (o.dateKey !== undefined && typeof o.dateKey !== "string") return false;
+  return true;
+}
+
 export function loadInbox(): InboxProfile {
   if (typeof window === "undefined") return fresh();
-  try {
-    const raw = localStorage.getItem(KEY);
-    const today = dropDateKey();
-    if (!raw) return fresh(today);
-    const p = JSON.parse(raw) as Partial<InboxProfile>;
-    if (p.dateKey !== today) return fresh(today);
-    return {
-      dateKey: today,
-      arrived: Array.isArray(p.arrived) ? p.arrived : [],
-      opened: Array.isArray(p.opened) ? p.opened : [],
-      firedCalls: Array.isArray(p.firedCalls) ? p.firedCalls : [],
-      paperRead: typeof p.paperRead === "string" ? p.paperRead : null,
-    };
-  } catch {
-    return fresh();
-  }
+  const today = dropDateKey();
+  const read = readStore<Partial<InboxProfile>>(KEY, isInboxShape);
+  const p =
+    read === "corrupt"
+      ? recoverStore<Partial<InboxProfile>>(KEY, isInboxShape) ?? null
+      : read;
+  if (!p || p.dateKey !== today) return fresh(today);
+  return {
+    dateKey: today,
+    arrived: Array.isArray(p.arrived) ? p.arrived : [],
+    opened: Array.isArray(p.opened) ? p.opened : [],
+    firedCalls: Array.isArray(p.firedCalls) ? p.firedCalls : [],
+    paperRead: typeof p.paperRead === "string" ? p.paperRead : null,
+  };
 }
 
 export function saveInbox(p: InboxProfile) {
   if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(KEY, JSON.stringify(p));
-  } catch {
-    /* localStorage unavailable */
-  }
+  writeStore(KEY, p);
   window.dispatchEvent(new Event("milverse:inbox"));
 }
+
 
 export function markArrived(id: string) {
   const p = loadInbox();
