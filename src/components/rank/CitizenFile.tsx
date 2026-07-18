@@ -8,9 +8,11 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { operatorCallsign, type TrustProfile } from "@/lib/mirror/profile";
 import { rankFromXp } from "@/lib/ranks";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
+import { getActiveGroup } from "@/lib/pilot";
 
 interface Props {
   open: boolean;
