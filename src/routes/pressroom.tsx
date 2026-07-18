@@ -694,6 +694,88 @@ function TacticSelect({ v, on }: { v: string | undefined; on: (v: string) => voi
   );
 }
 
+function StonePanel({
+  notes,
+  stops,
+  advisories,
+}: {
+  notes: StoneNote[];
+  stops: number;
+  advisories: number;
+}) {
+  const clean = stops === 0 && advisories === 0;
+  const header = clean
+    ? "THE STONE IS CLEAN. CAST THE PLATES."
+    : `THE STONE · ${stops} STOP${stops === 1 ? "" : "S"} · ${advisories} NOTE${advisories === 1 ? "" : "S"}`;
+
+  const stopsRows = notes.filter((n) => n.severity === "stop");
+  const adviseRows = notes.filter((n) => n.severity === "advise");
+  const passRows = notes.filter((n) => n.severity === "pass");
+
+  function Row({ n }: { n: StoneNote }) {
+    const g =
+      n.severity === "stop"
+        ? { glyph: "■", cls: "text-destructive", label: "stop" }
+        : n.severity === "advise"
+          ? { glyph: "✎", cls: "text-caution", label: "advise" }
+          : { glyph: "✓", cls: "text-muted-foreground", label: "pass" };
+    return (
+      <li className="grid grid-cols-[auto_auto_1fr] gap-2 items-baseline py-1 border-b border-border/40 last:border-0">
+        <span aria-label={g.label} className={`font-mono text-xs ${g.cls}`}>
+          {g.glyph}
+        </span>
+        <span className="stencil text-[10px] text-muted-foreground">{n.section}</span>
+        <span className="text-xs text-foreground/90">{n.note}</span>
+      </li>
+    );
+  }
+
+  return (
+    <section className="mt-6 rounded-sm border border-border p-4">
+      <div
+        aria-live="polite"
+        className={`stencil text-[10px] tracking-[0.25em] ${clean ? "text-muted-foreground" : "text-primary"}`}
+      >
+        {header}
+      </div>
+      {stopsRows.length > 0 && (
+        <div className="mt-3">
+          <div className="stencil text-[10px] text-destructive mb-1">STOP</div>
+          <ul>
+            {stopsRows.map((n) => (
+              <Row key={n.id} n={n} />
+            ))}
+          </ul>
+        </div>
+      )}
+      {adviseRows.length > 0 && (
+        <div className="mt-3">
+          <div className="stencil text-[10px] text-caution mb-1">ADVISE</div>
+          <ul>
+            {adviseRows.map((n) => (
+              <Row key={n.id} n={n} />
+            ))}
+          </ul>
+        </div>
+      )}
+      {passRows.length > 0 && (
+        <details className="mt-3">
+          <summary className="cursor-pointer stencil text-[10px] text-muted-foreground">
+            PASS · {passRows.length}
+          </summary>
+          <ul className="mt-1">
+            {passRows.map((n) => (
+              <Row key={n.id} n={n} />
+            ))}
+          </ul>
+        </details>
+      )}
+    </section>
+  );
+}
+
+
+
 function blankContent(): EditionContent {
   return {
     lead: {
