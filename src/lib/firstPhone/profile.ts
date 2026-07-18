@@ -1,7 +1,12 @@
 // MILVERSE — FIRST PHONE program state.
 // Additive layer; own localStorage key. Never edits the trust profile schema.
 
+import { readStore, recoverStore, writeStore } from "@/lib/storage";
+
+// Owner: firstPhone/profile (FirstPhoneState). Bump the suffix on
+// breaking shape change; readStore validators are the compatibility gate.
 const KEY = "milverse.firstphone.v1";
+
 
 export interface FirstPhoneState {
   active: boolean;
