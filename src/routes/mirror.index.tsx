@@ -242,7 +242,7 @@ function CaseFiles() {
         {/* Boss Protocol beacon */}
         <Link
           to="/boss"
-          className="mt-6 mb-4 block border border-red-900/60 bg-gradient-to-r from-red-950/40 via-black to-black rounded-lg p-4 hover:border-red-500/70 transition"
+          className="mt-6 block border border-red-900/60 bg-gradient-to-r from-red-950/40 via-black to-black rounded-lg p-4 hover:border-red-500/70 transition"
         >
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -257,6 +257,10 @@ function CaseFiles() {
             <div className="text-red-500 text-3xl font-black">›</div>
           </div>
         </Link>
+
+        {/* The Double — perspective-flip drill. Locked under 3 solved cases. */}
+        <DoubleBeacon casesPlayed={profile?.casesPlayed ?? 0} />
+
 
         <div className="mt-6 mb-3 font-mono text-[10px] tracking-widest text-muted-foreground">
           {shelfLine}
