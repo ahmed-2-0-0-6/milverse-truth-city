@@ -1120,7 +1120,7 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     try {
       const raw = sessionStorage.getItem(VERDICT_KEY);
       return raw
-        ? (JSON.parse(raw) as { verdict: "REAL" | "FAKE"; picked: string[]; conclusion?: string })
+        ? (JSON.parse(raw) as { verdict: "REAL" | "FAKE"; confidence?: number; picked: string[]; conclusion?: string })
         : null;
     } catch {
       return null;
