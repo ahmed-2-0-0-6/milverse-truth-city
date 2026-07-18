@@ -78,6 +78,11 @@ export function buildSendOff(
   stats: SendOffStats,
   seed = 0,
 ): string {
+  // Conviction override — OVERSURE outranks other pools (verbatim, no exclamations).
+  if (stats.oversure) {
+    return "You've been certain and wrong this week. Certainty is a claim. Verify yours.";
+  }
+
   // Streak-honoring nudge for calibrated players on hot streaks.
   if (reading.id === "calibrated" && stats.dailyStreak >= 5) {
     return pick(
