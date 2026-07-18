@@ -13,6 +13,7 @@ import { getScenario } from "@/lib/mirror/scenarios";
 import { BOSSES } from "@/lib/boss/scenarios";
 import { loadBossProfile } from "@/lib/boss/profile";
 import { loadColdReads } from "@/lib/mirror/coldreads";
+import { getActiveShift } from "@/lib/shift/state";
 
 export interface NextAction {
   label: string;
@@ -87,6 +88,19 @@ export function resolveNextAction(_now: Date = new Date()): NextAction {
       sublabel:
         daily.streak >= 1 ? `day ${daily.streak + 1} of your streak` : "start a streak",
       to: "/drop",
+    };
+  }
+
+  // 2.5. Active shift — resume next slot before per-case retests.
+  const active = getActiveShift();
+  if (active && active.slot < active.caseRefs.length && active.lives > 0) {
+    const ref = active.caseRefs[active.slot];
+    const slotNum = active.slot + 1;
+    return {
+      label: `SHIFT · SLOT ${slotNum}/${active.caseRefs.length}`,
+      sublabel: `resume the docket — ${active.lives} live${active.lives === 1 ? "" : "s"}`,
+      to: ref.kind === "mirror" ? "/mirror/$caseId" : "/feed/$caseId",
+      params: { caseId: ref.id },
     };
   }
 

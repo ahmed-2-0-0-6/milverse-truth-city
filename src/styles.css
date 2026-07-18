@@ -2186,6 +2186,20 @@ html[data-force-reduce-motion="on"] .xp-pop {
   animation: none !important;
 }
 
+/* ---------- THE SHIFT (punch-out score tally) ---------- */
+.shift-tally {
+  /* JS-driven count-up; nothing to animate at the CSS layer.
+     Kill lists exist so future decorators (glow, flicker) stay opt-out. */
+}
+@media (prefers-reduced-motion: reduce) {
+  .shift-tally { animation: none !important; transition: none !important; }
+}
+html[data-high-legibility="on"] .shift-tally,
+html[data-force-reduce-motion="on"] .shift-tally {
+  animation: none !important;
+  transition: none !important;
+}
+
 
 /* ---------- CITIZEN INBOX (arrival toasts) ---------- */
 @keyframes inbox-toast-in {

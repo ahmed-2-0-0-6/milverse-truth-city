@@ -22,6 +22,7 @@ import { logPilotEntry } from "@/lib/pilot";
 import { appendFeedWall } from "@/lib/feed/wall";
 import { dignityBandFor } from "@/lib/mirror/meterBands";
 import { MeterNote } from "@/components/chat/MeterNote";
+import { ShiftBanner } from "@/components/shift/ShiftBanner";
 
 import { Send, Search, Heart, AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
@@ -127,6 +128,7 @@ function FeedPlay() {
   return (
     <div className="min-h-screen grain">
       <TopBar />
+      <ShiftBanner kind="feed" caseId={scenario.id} phase={phase} />
       <div className="mx-auto max-w-3xl px-4 pt-4">
         <RookieIntro />
       </div>

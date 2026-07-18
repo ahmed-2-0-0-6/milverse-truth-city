@@ -56,6 +56,7 @@ import { ClockChip } from "@/components/mirror/ClockChip";
 import { pendingRetestForCase, scheduleRetest, resolveRetest, type RetestResolution } from "@/lib/mirror/retests";
 import { bandFor } from "@/lib/mirror/meterBands";
 import { MeterNote } from "@/components/chat/MeterNote";
+import { ShiftBanner } from "@/components/shift/ShiftBanner";
 
 import { CONVICTION_CHIPS, computeConviction, debriefLineFor } from "@/lib/mirror/conviction";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
@@ -203,6 +204,9 @@ function CasePlay() {
       <ColdReadContext.Provider value={coldMode}>
         <div className="min-h-screen grain">
           <TopBar />
+          {!coldMode && !standoffMode && (
+            <ShiftBanner kind="mirror" caseId={scenario.id} phase={phase} />
+          )}
           {!coldMode && (
             <div className="mx-auto max-w-3xl px-4 pt-4">
               <RookieIntro />

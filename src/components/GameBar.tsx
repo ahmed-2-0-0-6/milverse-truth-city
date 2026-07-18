@@ -6,11 +6,12 @@
 
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Flame } from "lucide-react";
+import { Flame, Heart } from "lucide-react";
 import { loadProfile } from "@/lib/mirror/profile";
 import { loadUnlocked } from "@/lib/manual/state";
 import { readDailyStatus } from "@/lib/daily/profile";
 import { computeXp, rankFromXp, RANKS } from "@/lib/ranks";
+import { getActiveShift, playedToday, type ActiveShift } from "@/lib/shift/state";
 
 interface Snapshot {
   xp: number;
@@ -158,7 +159,53 @@ export function GameBar({ compact = false }: { compact?: boolean }) {
           <span className="tabular-nums">{snap.streak}</span>
         </Link>
       )}
+
+      {/* SHIFT chip */}
+      <ShiftChip />
     </div>
+  );
+}
+
+/** SHIFT chip — surfaces the run-mode ledger on every playing surface. */
+function ShiftChip() {
+  const [active, setActive] = useState<ActiveShift | null>(null);
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    const push = () => {
+      setActive(getActiveShift());
+      setDone(playedToday());
+    };
+    push();
+    window.addEventListener("milverse:shift", push);
+    window.addEventListener("storage", push);
+    return () => {
+      window.removeEventListener("milverse:shift", push);
+      window.removeEventListener("storage", push);
+    };
+  }, []);
+  if (active) {
+    const slot = Math.min(active.slot + 1, active.caseRefs.length);
+    return (
+      <Link
+        to="/shift"
+        className="inline-flex items-center gap-1 rounded border border-primary/60 bg-primary/10 px-2 py-1 stencil text-[10px] text-primary min-h-[36px] whitespace-nowrap"
+        aria-label={`Shift: slot ${slot} of ${active.caseRefs.length}, ${active.lives} lives.`}
+      >
+        <span>SHIFT · {slot}/{active.caseRefs.length}</span>
+        <Heart className="h-3 w-3" />
+        <span className="tabular-nums">{active.lives}</span>
+      </Link>
+    );
+  }
+  if (done) return null;
+  return (
+    <Link
+      to="/shift"
+      className="inline-flex items-center rounded border border-border px-2 py-1 stencil text-[10px] text-muted-foreground hover:text-foreground hover:bg-accent min-h-[36px] whitespace-nowrap"
+      aria-label="The Shift — clock in for today's docket."
+    >
+      SHIFT
+    </Link>
   );
 }
 
