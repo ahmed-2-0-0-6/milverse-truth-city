@@ -38,17 +38,58 @@ function BossLobby() {
   return (
     <div className="min-h-screen bg-black text-white">
       <TopBar />
-      <div className="max-w-4xl mx-auto px-4 pt-8 pb-24">
-        <div className="mb-8">
-          <div className="text-xs tracking-[0.3em] text-red-500 mb-2">SPECIAL CASE FILE</div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight">BOSS PROTOCOL</h1>
-          <p className="text-white/60 mt-2 max-w-2xl">
+
+      {/* ── Red-noir title card — pure CSS, no art asset ── */}
+      <header className="relative overflow-hidden border-b border-red-900/40">
+        {/* interrogation-room light cone + alarm wash */}
+        <div
+          className="absolute inset-0"
+          aria-hidden
+          style={{
+            background:
+              "radial-gradient(80% 120% at 50% -20%, rgba(220,38,38,0.28), transparent 60%)," +
+              "radial-gradient(40% 60% at 85% 100%, rgba(220,38,38,0.12), transparent 70%)," +
+              "linear-gradient(180deg, #0a0000 0%, #000 100%)",
+          }}
+        />
+        {/* hazard chevrons, faint */}
+        <div
+          className="absolute inset-x-0 top-0 h-1.5"
+          aria-hidden
+          style={{
+            background:
+              "repeating-linear-gradient(-45deg, rgba(220,38,38,0.8) 0 14px, transparent 14px 28px)",
+          }}
+        />
+        {/* slow red sweep (respects reduced motion via global rule) */}
+        <div className="scan-sweep-red absolute inset-0 pointer-events-none" aria-hidden />
+
+        <div className="relative max-w-4xl mx-auto px-4 pt-12 pb-10">
+          <div className="flex items-center gap-2 text-xs tracking-[0.3em] text-red-500 mb-3">
+            <Skull className="w-4 h-4" />
+            SPECIAL CASE FILE · CAPSTONE
+          </div>
+          <h1
+            className="text-6xl md:text-8xl font-black tracking-tight leading-[0.85]"
+            style={{
+              fontFamily: '"Bebas Neue", "Space Grotesk", sans-serif',
+              textShadow: "0 0 32px rgba(220,38,38,0.5), 0 0 8px rgba(220,38,38,0.9)",
+            }}
+          >
+            BOSS PROTOCOL
+          </h1>
+          <p className="text-white/70 mt-4 max-w-2xl text-base sm:text-lg leading-relaxed">
             Capstone cases where the scam is built from <em>true facts</em>. Every surface
             fact-check confirms the cover story. Beatable only by protocol: callback, second-person,
             shared-secret, or HOLD.
           </p>
+          <div className="mt-5 inline-block border-2 border-red-600/70 px-4 py-1.5 font-mono text-[11px] tracking-[0.35em] text-red-400 -rotate-2">
+            FACT-CHECKS WILL NOT SAVE YOU
+          </div>
         </div>
+      </header>
 
+      <div className="max-w-4xl mx-auto px-4 pt-8 pb-24">
         {/* Doctrine card */}
         <div className="border border-red-900/50 bg-gradient-to-br from-red-950/40 to-black rounded-lg p-5 mb-8">
           <div className="text-[10px] tracking-[0.3em] text-red-400 mb-3">
@@ -97,9 +138,6 @@ function BossLobby() {
                       </div>
                       <div className="text-xl font-black">{b.codename}</div>
                       <div className="text-sm text-white/60 mt-1">{b.tagline}</div>
-                      <div className="mt-3 text-[11px] tracking-widest text-red-500/80 font-mono">
-                        FACT-CHECKS WILL NOT SAVE YOU
-                      </div>
                     </div>
                     <div className="text-right text-xs text-white/50 space-y-1 shrink-0">
                       {wins > 0 && (

@@ -222,6 +222,15 @@
   animation: scan-sweep 5s linear infinite;
   pointer-events: none;
 }
+/* Boss Protocol red-noir variant */
+.scan-sweep-red::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent, oklch(0.6 0.22 25 / 0.07), transparent);
+  animation: scan-sweep 6s linear infinite;
+  pointer-events: none;
+}
 
 /* LAYER-5 — atmosphere overlays */
 @keyframes atmo-grain-shift {
@@ -2049,7 +2058,8 @@ html[data-high-legibility="on"] .fx-rain,
 html[data-high-legibility="on"] .fx-rain-hard,
 html[data-high-legibility="on"] .fx-lightning,
 html[data-high-legibility="on"] .kenburns,
-html[data-high-legibility="on"] .scan-sweep::before {
+html[data-high-legibility="on"] .scan-sweep::before,
+html[data-high-legibility="on"] .scan-sweep-red::before {
   display: none !important;
   animation: none !important;
 }
