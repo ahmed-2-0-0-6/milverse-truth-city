@@ -964,7 +964,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                 id="mirror-composer"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && send()}
+                onKeyDown={(e) => { if (e.key === "Enter") send(); }}
                 placeholder={
                   coldMode && drillExpired
                     ? "Time. Call it."
