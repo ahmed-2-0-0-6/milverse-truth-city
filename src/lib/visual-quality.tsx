@@ -22,10 +22,28 @@ function autoForceLite(): boolean {
   // @ts-expect-error non-standard
   const mem = navigator.deviceMemory as number | undefined;
   if (typeof mem === "number" && mem <= 2) return true;
+  const cores = navigator.hardwareConcurrency;
+  if (typeof cores === "number" && cores <= 2) return true;
+  // Network-aware: honour data-saver + 2G-class links. One-time check on mount;
+  // we deliberately do not listen for changes — mode flapping mid-session is
+  // worse than a stale guess for the school pilot's shared devices.
+  try {
+    // @ts-expect-error non-standard
+    const conn = navigator.connection as
+      | { saveData?: boolean; effectiveType?: string }
+      | undefined;
+    if (conn) {
+      if (conn.saveData === true) return true;
+      if (conn.effectiveType === "2g" || conn.effectiveType === "slow-2g") return true;
+    }
+  } catch {
+    /* connection API unavailable */
+  }
   if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return true;
   if (!detectWebGL()) return true;
   return false;
 }
+
 
 interface Ctx {
   mode: VisualMode;
