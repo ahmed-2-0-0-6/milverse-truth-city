@@ -621,7 +621,7 @@ function VerdictScreen({
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
       <div className="font-mono text-xs tracking-[0.3em] text-caution">INVESTIGATION BOARD</div>
-      <h1 className="mt-2 text-2xl font-semibold">Assemble the case. Deliver the verdict.</h1>
+      <h1 data-phase-anchor="feed" tabIndex={-1} className="mt-2 text-2xl font-semibold outline-none">Assemble the case. Deliver the verdict.</h1>
 
       <span className="sr-only" aria-live="polite" role="status">
         {srMsg}
