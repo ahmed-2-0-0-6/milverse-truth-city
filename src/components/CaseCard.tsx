@@ -90,7 +90,9 @@ function CardShell({
   outcome,
   artifactChip,
   unreadThread,
+  seasonGlyph,
 }: CardShellProps) {
+
   const no = fileNo(title);
   const stamp = outcome ? OUTCOME_STAMP[outcome] : null;
   const dim = outcome === "closed";
