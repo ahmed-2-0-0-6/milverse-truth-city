@@ -6,6 +6,7 @@ import { loadUnlocked } from "@/lib/manual/state";
 import { BOSSES } from "@/lib/boss/scenarios";
 import { loadBossProfile } from "@/lib/boss/profile";
 import { RedactedTitle } from "@/components/RedactedTitle";
+import { EngravedReveal } from "@/components/civic/EngravedReveal";
 import { FileText, Lock, ExternalLink, Skull } from "lucide-react";
 
 export const Route = createFileRoute("/manual/")({
