@@ -31,7 +31,16 @@ function fresh(): FirstPhoneState {
     wallpaper: 0,
     handoverSeen: false,
     tourSeen: false,
+    spotItBest: 0,
   };
+}
+
+export function setSpotItBest(n: number) {
+  const s = loadFirstPhone();
+  if (n > s.spotItBest) {
+    s.spotItBest = n;
+    saveFirstPhone(s);
+  }
 }
 
 export function setWallpaper(i: number) {
