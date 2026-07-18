@@ -1091,13 +1091,29 @@ function renderTierChecks(list: Station[], color: string) {
 function LandmarkNode({ l, onClick }: { l: WorldLandmark; onClick: () => void }) {
   const isScaffold = l.kind === "scaffold";
   const stroke = isScaffold ? "#93c5fd" : "#7dd3fc";
+  const sub = landmarkSub(l.id);
+  // Wrap subtitle into up to two lines by width (~24 chars / line at 11px).
+  const subLines: string[] = (() => {
+    if (!sub) return [];
+    const words = sub.split(" ");
+    const lines: string[] = [""];
+    for (const w of words) {
+      const candidate = lines[lines.length - 1] ? `${lines[lines.length - 1]} ${w}` : w;
+      if (candidate.length <= 26) lines[lines.length - 1] = candidate;
+      else if (lines.length < 2) lines.push(w);
+      else lines[lines.length - 1] += ` ${w}`;
+    }
+    return lines.filter(Boolean);
+  })();
+  const plateExtra = subLines.length * 12 + (l.id === "archive" ? 14 : 0);
+  const plateH = 22 + plateExtra;
   return (
     <g
       transform={`translate(${l.x} ${l.y})`}
       onClick={onClick}
       style={{ cursor: "pointer" }}
       role="button"
-      aria-label={l.label}
+      aria-label={sub ? `${l.label}, ${sub}` : l.label}
     >
       {/* base */}
       <rect
@@ -1113,27 +1129,8 @@ function LandmarkNode({ l, onClick }: { l: WorldLandmark; onClick: () => void })
       />
       {isScaffold && (
         <>
-          <line
-            x1={-48}
-            y1={-48}
-            x2={48}
-            y2={48}
-            stroke={stroke}
-            strokeWidth={1.5}
-            strokeDasharray="4 4"
-            opacity={0.7}
-          />
-          <line
-            x1={48}
-            y1={-48}
-            x2={-48}
-            y2={48}
-            stroke={stroke}
-            strokeWidth={1.5}
-            strokeDasharray="4 4"
-            opacity={0.7}
-          />
-          {/* crane */}
+          <line x1={-48} y1={-48} x2={48} y2={48} stroke={stroke} strokeWidth={1.5} strokeDasharray="4 4" opacity={0.7} />
+          <line x1={48} y1={-48} x2={-48} y2={48} stroke={stroke} strokeWidth={1.5} strokeDasharray="4 4" opacity={0.7} />
           <line x1={-30} y1={-48} x2={-30} y2={-100} stroke={stroke} strokeWidth={2} />
           <line x1={-30} y1={-100} x2={30} y2={-90} stroke={stroke} strokeWidth={2} />
           <line x1={20} y1={-90} x2={20} y2={-70} stroke={stroke} strokeWidth={1.5} />
@@ -1143,10 +1140,10 @@ function LandmarkNode({ l, onClick }: { l: WorldLandmark; onClick: () => void })
       {!isScaffold && <rect x={-52} y={-58} width={104} height={12} fill={stroke} opacity={0.4} />}
       {/* label plate */}
       <rect
-        x={-70}
+        x={-88}
         y={54}
-        width={140}
-        height={l.id === "archive" ? 34 : 22}
+        width={176}
+        height={plateH}
         rx={2}
         fill="#0b1224"
         stroke={stroke}
@@ -1156,17 +1153,24 @@ function LandmarkNode({ l, onClick }: { l: WorldLandmark; onClick: () => void })
         {l.label}
       </text>
       {l.id === "archive" && (
-        <text
-          y={83}
-          textAnchor="middle"
-          fontSize={9}
-          className="stencil"
-          fill={stroke}
-          opacity={0.75}
-        >
+        <text y={83} textAnchor="middle" fontSize={9} className="stencil" fill={stroke} opacity={0.75}>
           CITY LIBRARY
         </text>
       )}
+      {/* PLAIN subtitle — deliberately non-stencil (signage layer). */}
+      {subLines.map((line, i) => (
+        <text
+          key={i}
+          y={70 + (l.id === "archive" ? 14 : 0) + 14 + i * 12}
+          textAnchor="middle"
+          fontSize={11}
+          fill="#ffffff"
+          fillOpacity={0.6}
+          style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+        >
+          {line}
+        </text>
+      ))}
       {isScaffold && (
         <text y={-4} textAnchor="middle" fontSize={11} className="stencil" fill={stroke}>
           BLUEPRINT
@@ -1175,6 +1179,7 @@ function LandmarkNode({ l, onClick }: { l: WorldLandmark; onClick: () => void })
     </g>
   );
 }
+
 
 /* ── station node ───────────────────────────────────────────── */
 function StationNode({
