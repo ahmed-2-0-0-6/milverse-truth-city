@@ -254,12 +254,19 @@ function CaseFiles() {
           </div>
         </Link>
 
+        <div className="mt-6 mb-3 font-mono text-[10px] tracking-widest text-muted-foreground">
+          {shelfLine}
+        </div>
+
+        <div className="flex gap-6">
+          <TierRail nodes={railNodes} frontierTier={frontierTier} />
+          <div className="min-w-0 flex-1">
         {tiers.map((tier) => {
           const cases = SCENARIOS.filter((s) => s.tier === tier);
           const isUnlocked = tier <= maxTier;
           const wins = profile ? tierWins(profile, tier) : 0;
           return (
-            <section key={tier} className="mb-10">
+            <section key={tier} id={`tier-${tier}`} className="mb-10 scroll-mt-24">
               <div className="mb-3 flex flex-wrap items-baseline gap-x-3">
                 <div className="font-mono text-[11px] tracking-widest text-primary">
                   TIER {tier} · {TIER_NAMES[tier]}
@@ -297,6 +304,9 @@ function CaseFiles() {
                         metaTopRight={<TierMeter tier={s.tier} />}
                         title={s.title}
                         teaser={s.teaser}
+                        outcome={latestOutcome.get(s.id)}
+                        artifactChip={chipFor(s.id)}
+                        unreadThread={unread.has(s.id)}
                         badges={
                           <>
                             {s.isSurvivorStory && (
@@ -324,6 +334,9 @@ function CaseFiles() {
             </section>
           );
         })}
+          </div>
+        </div>
+
 
         {/* Citizen Cases shelf */}
         <section className="mt-4 mb-10">
