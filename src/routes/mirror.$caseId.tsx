@@ -42,7 +42,12 @@ import { tacticForMirror } from "@/lib/mirror/tactics";
 import { labelForTactic } from "@/lib/handler/profile";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { ChatHeader } from "@/components/chat/ChatHeader";
-import { skinForCase, receiptFor, type ChatSkin } from "@/lib/chat/skins";
+import { skinForCase, receiptFor, type ChatSkin, CLEAN_ROOM_SKIN } from "@/lib/chat/skins";
+import { Airlock } from "@/components/mirror/Airlock";
+import { VobRitual } from "@/components/mirror/VobRitual";
+import { roomNoteFor } from "@/lib/mirror/cleanroom";
+import { useVisualMode } from "@/lib/visual-quality";
+
 import { ContactsSheet } from "@/components/chat/ContactsSheet";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 import { clockFor } from "@/lib/mirror/clocks";
