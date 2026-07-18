@@ -130,6 +130,15 @@ export function RankUpBeat() {
             {rankUp.code} · {rankUp.tagline}
           </div>
         </div>
+        <Link
+          to="/profile"
+          hash="the-road"
+          onClick={() => setRankUp(null)}
+          className="pointer-events-auto stencil text-[10px] tracking-widest text-primary/90 hover:text-primary underline underline-offset-4"
+        >
+          SEE THE ROAD →
+        </Link>
+
       </div>
     </div>
   );
