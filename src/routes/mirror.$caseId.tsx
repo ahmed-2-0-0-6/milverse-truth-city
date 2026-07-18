@@ -141,36 +141,57 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
         </div>
         <h1 className="mt-4 text-2xl font-semibold">{scenario.title}</h1>
 
+        {/* THE CLAIM — bordered claim card. */}
         <section className="mt-6">
           <div className="font-mono text-[11px] tracking-widest text-muted-foreground">
             WHO IS CONTACTING YOU
           </div>
-          <p className="mt-1 text-sm">{scenario.dossier.contactClaim}</p>
+          <div className="relative mt-2 rounded-md border border-border bg-background/50 p-4">
+            <span className="absolute right-2 top-1.5 font-mono text-[9px] tracking-[0.3em] text-caution">
+              THE CLAIM
+            </span>
+            <p className="text-sm leading-relaxed">{scenario.dossier.contactClaim}</p>
+          </div>
         </section>
 
+        {/* KNOWN — numbered reference cards (K1..). */}
         <section className="mt-6">
           <div className="font-mono text-[11px] tracking-widest text-muted-foreground">
-            WHAT YOU KNOW FOR CERTAIN
+            WHAT YOU KNOW FOR CERTAIN — ONLY YOU AND THE REAL ONE
           </div>
-          <ul className="mt-2 space-y-1.5 text-sm">
+          <ul className="mt-2 space-y-1.5">
             {scenario.dossier.knownFacts.map((f, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="font-mono text-primary shrink-0">·</span>
-                <span>{f}</span>
+              <li
+                key={i}
+                className="flex gap-3 rounded-md border border-primary/30 bg-primary/5 p-2.5"
+              >
+                <span className="shrink-0 rounded-sm border border-primary/40 bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] tracking-widest text-primary">
+                  K{i + 1}
+                </span>
+                <span className="text-sm leading-relaxed">{f}</span>
               </li>
             ))}
           </ul>
         </section>
 
+        {/* PUBLIC — numbered reference cards (P1..). */}
         <section className="mt-6">
           <div className="font-mono text-[11px] tracking-widest text-muted-foreground">
-            PUBLICLY FINDABLE · CAREFUL, IMPOSTERS CAN KNOW THESE
+            PUBLICLY FINDABLE — AMMUNITION FOR IMPOSTERS
           </div>
-          <ul className="mt-2 space-y-1.5 text-sm">
+          <div className="mt-1 font-mono text-[10px] tracking-widest text-muted-foreground/80">
+            If they only ever prove these, they've proven nothing.
+          </div>
+          <ul className="mt-2 space-y-1.5">
             {scenario.dossier.publicFacts.map((f, i) => (
-              <li key={i} className="flex gap-2 text-muted-foreground">
-                <span className="font-mono shrink-0">·</span>
-                <span>{f}</span>
+              <li
+                key={i}
+                className="flex gap-3 rounded-md border border-border bg-muted/20 p-2.5"
+              >
+                <span className="shrink-0 rounded-sm border border-border bg-background/60 px-1.5 py-0.5 font-mono text-[10px] tracking-widest text-muted-foreground">
+                  P{i + 1}
+                </span>
+                <span className="text-sm leading-relaxed text-muted-foreground">{f}</span>
               </li>
             ))}
           </ul>
@@ -186,11 +207,12 @@ function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => voi
         I'VE MEMORIZED IT — START
       </button>
       <p className="mt-3 text-center text-xs text-muted-foreground">
-        The dossier stays available in the NOTES tab during the chat.
+        The brief rides along in NOTES. Pin what smells wrong and tag which fact it breaks.
       </p>
     </main>
   );
 }
+
 
 /* ────────────────────────── SIMULATION ───────────────────────── */
 
