@@ -29,6 +29,15 @@ export function CitizenFile({ open, onOpenChange, profile, xp, manualUnlocks }: 
   const codename = profile ? operatorCallsign(profile) : null;
   const delta = rank.next ? Math.max(0, rank.next.minXp - xp) : 0;
 
+  const [activeGroup, setActiveGroupState] = useState<string | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    setActiveGroupState(getActiveGroup());
+    const on = () => setActiveGroupState(getActiveGroup());
+    window.addEventListener("milverse:pilot", on);
+    return () => window.removeEventListener("milverse:pilot", on);
+  }, [open]);
+
   const casesPlayed = profile?.casesPlayed ?? 0;
   const correct = profile?.correctVerdicts ?? 0;
   const missed = profile?.missedScams ?? 0;
