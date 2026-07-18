@@ -597,6 +597,8 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
     <>
       <TacticFlash tacticId={tacticFlash} onDone={() => setTacticFlash(null)} />
       <ChatShell
+        logRegion={false}
+
         header={
           <>
             <ChatHeader
