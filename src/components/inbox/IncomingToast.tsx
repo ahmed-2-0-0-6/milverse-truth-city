@@ -9,6 +9,7 @@ import { markOpened } from "@/lib/inbox/profile";
 import { shouldReduceMotion } from "@/lib/access";
 import { arrivalTap } from "@/lib/mirror/audio";
 import { platformStyle } from "./platform-style";
+import { currentShift, isNightRegister } from "@/lib/city/shift";
 
 const AUTO_HIDE_MS = 6000;
 
