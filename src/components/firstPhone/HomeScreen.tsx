@@ -35,6 +35,7 @@ interface Props {
   state: FirstPhoneState;
   onOpenLesson: (n: number) => void;
   onOpenLicense: () => void;
+  onOpenSpotIt: () => void;
 }
 
 /**
