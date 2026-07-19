@@ -16,6 +16,7 @@ import { caseForDate } from "@/lib/daily/rotation";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 import { readTapes, clearTapes, type StoredTape } from "@/lib/mirror/tapes";
 import { TapeReview } from "@/components/mirror/TapeReview";
+import corkboardImg from "@/assets/corkboard.jpg";
 
 export const Route = createFileRoute("/wall")({
   head: () => ({
@@ -341,7 +342,7 @@ function WallPage() {
     <div
       className="min-h-screen bg-background text-foreground"
       style={{
-        backgroundImage: `linear-gradient(180deg, rgba(2,4,10,0.94), rgba(2,4,10,0.97)), url(/src/assets/corkboard.jpg)`,
+        backgroundImage: `linear-gradient(180deg, rgba(2,4,10,0.94), rgba(2,4,10,0.97)), url(${corkboardImg})`,
         backgroundSize: "cover",
         backgroundAttachment: "fixed",
         backgroundPosition: "center",
