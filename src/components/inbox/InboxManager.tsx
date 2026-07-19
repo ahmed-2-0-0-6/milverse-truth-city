@@ -92,6 +92,11 @@ export function InboxManager() {
           if (!alreadyArrived) markArrived(paper.id);
           return;
         }
+        if (PAPER_ARRIVE_SEC <= 0) {
+          if (!alreadyArrived) markArrived(paper.id);
+          setPaperCard(paper);
+          return;
+        }
         const h = window.setTimeout(() => {
           if (!alreadyArrived) markArrived(paper.id);
           setPaperCard(paper);
