@@ -65,9 +65,9 @@ function ShiftPage() {
   }, []);
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
-      <main className="mx-auto max-w-3xl px-4 py-6">
+      <main id="main" role="main" className="mx-auto max-w-3xl px-4 sm:px-6 py-6 safe-bottom">
         {expiredNotice && !active && !finished && (
           <p className="mb-4 stencil text-[10px] text-muted-foreground">
             Yesterday's shift expired on the desk. Today's docket is fresh.
@@ -84,6 +84,7 @@ function ShiftPage() {
     </div>
   );
 }
+
 
 /* ─────────────── CLOCK IN ─────────────── */
 
