@@ -24,6 +24,8 @@ import { CitizenDesk } from "@/components/landing/CitizenDesk";
 import { LiveBait, hasSeenLiveBait } from "@/components/landing/LiveBait";
 import { isReturningCitizen } from "@/lib/city/returning";
 import { currentShift, isNightRegister, type Shift } from "@/lib/city/shift";
+import detectiveDeskImg from "@/assets/detective-desk.jpg";
+import corkboardImg from "@/assets/corkboard.jpg";
 
 
 export const Route = createFileRoute("/")({
