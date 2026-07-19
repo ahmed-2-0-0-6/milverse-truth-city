@@ -443,6 +443,42 @@ html[data-force-reduce-motion="on"] .marquee-track {
     0 0 12px rgba(34, 211, 238, 0.7),
     0 0 32px rgba(34, 211, 238, 0.35);
 }
+.word-red {
+  color: #ff3b47;
+  text-shadow:
+    0 0 12px rgba(255, 59, 71, 0.55),
+    0 0 32px rgba(255, 59, 71, 0.28);
+}
+.word-yellow {
+  color: #f5b942;
+  text-shadow:
+    0 0 12px rgba(245, 185, 66, 0.6),
+    0 0 32px rgba(245, 185, 66, 0.3);
+}
+
+/* Per-letter typewriter reveal for beat headlines. Letters start hidden;
+   parent gets `.typed` when the section scrolls into view. Compositor-only
+   (opacity + transform) so it doesn't fight the paint thread. */
+.beat-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translate3d(0, 6px, 0);
+  will-change: transform, opacity;
+}
+.beat-headline.typed .beat-letter {
+  animation: beat-letter-in 520ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation-delay: var(--letter-delay, 0ms);
+}
+@keyframes beat-letter-in {
+  0%   { opacity: 0; transform: translate3d(0, 6px, 0); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .beat-letter { opacity: 1; transform: none; }
+  .beat-headline.typed .beat-letter { animation: none; }
+}
+
 @keyframes glitch-shift {
   0%,
   92%,
