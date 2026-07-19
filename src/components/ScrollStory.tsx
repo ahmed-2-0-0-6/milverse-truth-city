@@ -207,9 +207,14 @@ export function ScrollStory() {
                 backgroundSize: "3px 3px",
               }}
             />
-            {i === 0 && <DetectiveDesk />}
           </div>
-          <div className="relative max-w-4xl text-center">
+          {i === 0 && (
+            <div className="absolute inset-0 z-0 pointer-events-none" aria-hidden>
+              <DetectiveDesk />
+            </div>
+          )}
+          <div className="relative z-10 max-w-4xl text-center">
+
             <div className="stencil text-[10px] text-cyan-300/70 mb-6">BEAT · 0{i + 1} / 04</div>
             <TypedHeadline text={b.headline} />
             <p className="beat-line mt-6 text-base sm:text-lg text-white/60 max-w-xl mx-auto">
