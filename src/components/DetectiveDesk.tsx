@@ -910,7 +910,311 @@ function Raccoon() {
   );
 }
 
-// ---------- dust motes ----------
+// ---------- brass compass ----------
+function Compass() {
+  const faceTex = useMemo(
+    () =>
+      canvasTex(256, 256, (ctx) => {
+        ctx.fillStyle = "#f0e6cf";
+        ctx.fillRect(0, 0, 256, 256);
+        ctx.strokeStyle = "#8b6a2a";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(128, 128, 108, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = "#1a1a1a";
+        ctx.font = "bold 22px 'Georgia', serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        const dirs = ["N", "E", "S", "W"];
+        for (let i = 0; i < 4; i++) {
+          const a = (i / 4) * Math.PI * 2 - Math.PI / 2;
+          ctx.fillText(dirs[i], 128 + Math.cos(a) * 86, 128 + Math.sin(a) * 86);
+        }
+        // tick marks
+        for (let i = 0; i < 60; i++) {
+          const a = (i / 60) * Math.PI * 2;
+          const long = i % 5 === 0;
+          ctx.strokeStyle = "#333";
+          ctx.lineWidth = long ? 2 : 1;
+          ctx.beginPath();
+          ctx.moveTo(128 + Math.cos(a) * 100, 128 + Math.sin(a) * 100);
+          ctx.lineTo(128 + Math.cos(a) * (long ? 90 : 94), 128 + Math.sin(a) * (long ? 90 : 94));
+          ctx.stroke();
+        }
+        // needle
+        ctx.fillStyle = "#8b1a1a";
+        ctx.beginPath();
+        ctx.moveTo(128, 40);
+        ctx.lineTo(120, 128);
+        ctx.lineTo(136, 128);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = "#222";
+        ctx.beginPath();
+        ctx.moveTo(128, 216);
+        ctx.lineTo(120, 128);
+        ctx.lineTo(136, 128);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = "#c48b3a";
+        ctx.beginPath();
+        ctx.arc(128, 128, 8, 0, Math.PI * 2);
+        ctx.fill();
+      }),
+    [],
+  );
+  return (
+    <group position={[7.5, 0.05, -3.5]} rotation={[0, 0.3, 0]}>
+      <mesh castShadow>
+        <cylinderGeometry args={[0.9, 0.9, 0.22, 32]} />
+        <meshStandardMaterial color="#c48b3a" metalness={0.9} roughness={0.28} />
+      </mesh>
+      <mesh position={[0, 0.12, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.78, 40]} />
+        <meshStandardMaterial map={faceTex} roughness={0.5} />
+      </mesh>
+      <mesh position={[0, 0.13, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.78, 0.86, 40]} />
+        <meshStandardMaterial color="#8b6a2a" metalness={0.8} roughness={0.3} />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- stapler ----------
+function Stapler() {
+  return (
+    <group position={[6, 0.05, 9]} rotation={[0, -0.6, 0]}>
+      {/* base */}
+      <mesh castShadow>
+        <boxGeometry args={[2.6, 0.24, 0.7]} />
+        <meshStandardMaterial color="#111" roughness={0.4} metalness={0.5} />
+      </mesh>
+      {/* pad */}
+      <mesh position={[0, 0.14, 0]}>
+        <boxGeometry args={[2.4, 0.06, 0.6]} />
+        <meshStandardMaterial color="#2b2b2b" roughness={0.6} />
+      </mesh>
+      {/* head (angled) */}
+      <group position={[-0.4, 0.22, 0]} rotation={[0, 0, 0.16]}>
+        <mesh castShadow>
+          <boxGeometry args={[2.2, 0.28, 0.55]} />
+          <meshStandardMaterial color="#8b1a1a" roughness={0.35} metalness={0.4} />
+        </mesh>
+        <mesh position={[0, 0.16, 0]}>
+          <boxGeometry args={[2.0, 0.05, 0.5]} />
+          <meshStandardMaterial color="#c48b3a" metalness={0.9} roughness={0.25} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+// ---------- paper clips scatter + push pins ----------
+function DeskClutter() {
+  const clips = useMemo(() => {
+    const r = seeded(77);
+    return Array.from({ length: 8 }).map(() => ({
+      x: (r() - 0.5) * 26,
+      z: (r() - 0.5) * 22,
+      rot: r() * Math.PI,
+    }));
+  }, []);
+  const pins = useMemo(() => {
+    const r = seeded(133);
+    const colors = ["#c81616", "#f5a623", "#22d3ee", "#9b59b6"];
+    return Array.from({ length: 6 }).map((_, i) => ({
+      x: (r() - 0.5) * 24,
+      z: (r() - 0.5) * 20,
+      color: colors[i % colors.length],
+    }));
+  }, []);
+  const coins = useMemo(() => {
+    const r = seeded(211);
+    return Array.from({ length: 4 }).map(() => ({
+      x: (r() - 0.5) * 22,
+      z: (r() - 0.5) * 18,
+    }));
+  }, []);
+  return (
+    <group>
+      {clips.map((c, i) => (
+        <mesh
+          key={`clip-${i}`}
+          position={[c.x, 0.09, c.z]}
+          rotation={[Math.PI / 2, 0, c.rot]}
+        >
+          <torusGeometry args={[0.22, 0.03, 8, 22, Math.PI * 1.6]} />
+          <meshStandardMaterial color="#d8d8d8" metalness={0.95} roughness={0.18} />
+        </mesh>
+      ))}
+      {pins.map((p, i) => (
+        <group key={`pin-${i}`} position={[p.x, 0.06, p.z]}>
+          <mesh castShadow>
+            <sphereGeometry args={[0.14, 14, 14]} />
+            <meshStandardMaterial color={p.color} roughness={0.25} metalness={0.15} />
+          </mesh>
+          <mesh position={[0, -0.08, 0]}>
+            <cylinderGeometry args={[0.02, 0.02, 0.16, 8]} />
+            <meshStandardMaterial color="#c9c9c9" metalness={0.9} roughness={0.2} />
+          </mesh>
+        </group>
+      ))}
+      {coins.map((c, i) => (
+        <mesh key={`coin-${i}`} position={[c.x, 0.045, c.z]} castShadow>
+          <cylinderGeometry args={[0.22, 0.22, 0.04, 20]} />
+          <meshStandardMaterial color="#c48b3a" metalness={0.92} roughness={0.28} />
+        </mesh>
+      ))}
+      {/* letter opener */}
+      <group position={[9, 0.05, 4]} rotation={[0, 0.4, 0]}>
+        <mesh castShadow>
+          <boxGeometry args={[2.4, 0.03, 0.16]} />
+          <meshStandardMaterial color="#dcdcdc" metalness={0.95} roughness={0.22} />
+        </mesh>
+        <mesh position={[-1.35, 0.02, 0]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.12, 0.12, 0.9, 14]} />
+          <meshStandardMaterial color="#4a2a12" roughness={0.7} />
+        </mesh>
+
+      </group>
+      {/* rolodex */}
+      <group position={[-8.5, 0.05, 2]} rotation={[0, 0.5, 0]}>
+        <mesh castShadow>
+          <boxGeometry args={[2.2, 0.5, 1.4]} />
+          <meshStandardMaterial color="#151515" roughness={0.6} />
+        </mesh>
+        <mesh position={[0, 0.4, 0]}>
+          <cylinderGeometry args={[0.55, 0.55, 2.0, 24]} />
+          <meshStandardMaterial color="#f0e6cf" roughness={0.9} />
+        </mesh>
+        <mesh position={[1.2, 0.4, 0]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.09, 0.09, 0.4, 12]} />
+          <meshStandardMaterial color="#c48b3a" metalness={0.9} roughness={0.3} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+// ---------- room (floor + back wall + side wall with picture frames) ----------
+function Room() {
+  const wallTex = useMemo(
+    () =>
+      canvasTex(1024, 1024, (ctx) => {
+        // warm damask wallpaper
+        const g = ctx.createLinearGradient(0, 0, 0, 1024);
+        g.addColorStop(0, "#1a0e08");
+        g.addColorStop(1, "#0a0604");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 1024, 1024);
+        // vertical wallpaper stripes
+        for (let x = 0; x < 1024; x += 48) {
+          ctx.fillStyle = `rgba(120,70,30,${0.05 + Math.random() * 0.05})`;
+          ctx.fillRect(x, 0, 2, 1024);
+        }
+        // damask motifs
+        for (let y = 60; y < 1024; y += 120) {
+          for (let x = 60; x < 1024; x += 120) {
+            ctx.strokeStyle = "rgba(180,130,70,0.08)";
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.ellipse(x, y, 22, 12, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.ellipse(x, y, 12, 22, 0, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        }
+        // grime
+        for (let i = 0; i < 400; i++) {
+          ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.15})`;
+          ctx.fillRect(Math.random() * 1024, Math.random() * 1024, Math.random() * 3, Math.random() * 3);
+        }
+      }),
+    [],
+  );
+  const floorTex = useMemo(
+    () =>
+      canvasTex(1024, 1024, (ctx) => {
+        ctx.fillStyle = "#0e0805";
+        ctx.fillRect(0, 0, 1024, 1024);
+        // plank boards
+        for (let y = 0; y < 1024; y += 96) {
+          ctx.fillStyle = `rgb(${25 + Math.random() * 12}, ${16 + Math.random() * 8}, ${8 + Math.random() * 6})`;
+          ctx.fillRect(0, y, 1024, 88);
+          // seams
+          ctx.strokeStyle = "rgba(0,0,0,0.7)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(0, y + 88);
+          ctx.lineTo(1024, y + 88);
+          ctx.stroke();
+          // random seams within
+          for (let x = Math.random() * 200; x < 1024; x += 180 + Math.random() * 200) {
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, y + 88);
+            ctx.stroke();
+          }
+        }
+        // grain
+        for (let i = 0; i < 3000; i++) {
+          ctx.fillStyle = `rgba(255,200,140,${Math.random() * 0.03})`;
+          ctx.fillRect(Math.random() * 1024, Math.random() * 1024, Math.random() * 30 + 10, 1);
+        }
+      }),
+    [],
+  );
+  return (
+    <group>
+      {/* floor */}
+      <mesh position={[0, -3.5, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[120, 120]} />
+        <meshStandardMaterial map={floorTex} roughness={0.95} />
+      </mesh>
+      {/* back wall */}
+      <mesh position={[0, 12, -34]} receiveShadow>
+        <planeGeometry args={[120, 40]} />
+        <meshStandardMaterial map={wallTex} roughness={0.95} />
+      </mesh>
+      {/* side wall left */}
+      <mesh position={[-42, 12, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[120, 40]} />
+        <meshStandardMaterial map={wallTex} roughness={0.95} />
+      </mesh>
+      {/* side wall right */}
+      <mesh position={[42, 12, 0]} rotation={[0, -Math.PI / 2, 0]}>
+        <planeGeometry args={[120, 40]} />
+        <meshStandardMaterial map={wallTex} roughness={0.95} />
+      </mesh>
+      {/* framed photos on back wall */}
+      {[-16, -6, 6, 16].map((x, i) => (
+        <group key={i} position={[x, 10, -33.7]}>
+          <mesh>
+            <planeGeometry args={[4.4, 5.2]} />
+            <meshStandardMaterial color="#c48b3a" metalness={0.7} roughness={0.4} />
+          </mesh>
+          <mesh position={[0, 0, 0.02]}>
+            <planeGeometry args={[3.8, 4.6]} />
+            <meshStandardMaterial color={i % 2 ? "#1a1a1a" : "#241608"} roughness={0.9} />
+          </mesh>
+        </group>
+      ))}
+      {/* wall lamp glow patches */}
+      <mesh position={[-20, 16, -33.5]}>
+        <circleGeometry args={[4, 32]} />
+        <meshBasicMaterial color="#ffb060" transparent opacity={0.08} />
+      </mesh>
+      <mesh position={[20, 16, -33.5]}>
+        <circleGeometry args={[4, 32]} />
+        <meshBasicMaterial color="#ffb060" transparent opacity={0.08} />
+      </mesh>
+    </group>
+  );
+}
+
 function DustMotes() {
   const ref = useRef<THREE.Points>(null);
   const geom = useMemo(() => {
@@ -1062,6 +1366,9 @@ export function DetectiveDesk({ className = "" }: Props) {
           <pointLight position={[0, 8, 0]} intensity={3} color="#ffb060" distance={26} decay={1.5} />
 
           <LampBreath />
+          {/* Room shell — floor, walls, framed portraits. Grounds the desk
+              inside a detective's office instead of floating in space. */}
+          <Room />
           <SpinningDesk>
             <Tabletop />
             <CaseFiles />
@@ -1070,6 +1377,9 @@ export function DetectiveDesk({ className = "" }: Props) {
             <Magnifier />
             <PenAndInk />
             <Clock />
+            <Compass />
+            <Stapler />
+            <DeskClutter />
             <Raccoon />
             <StickyNote />
             <BusinessCard />
@@ -1078,6 +1388,7 @@ export function DetectiveDesk({ className = "" }: Props) {
             <Ashtray />
           </SpinningDesk>
           <DustMotes />
+
         </Canvas>
       </Suspense>
       <div className="desk-vignette" />

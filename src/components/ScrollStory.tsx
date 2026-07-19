@@ -206,17 +206,21 @@ export function ScrollStory() {
   }, []);
 
   return (
-    <div ref={rootRef} className="scrollstory relative">
-      {/* Detective-desk background — one 3D scene fixed to the viewport
-          while any story beat is on screen. Fades in on entry, out on exit. */}
+    <div ref={rootRef} className="scrollstory relative isolate">
+      {/* Detective-desk background — sticky within ScrollStory only, so it
+          acts as the room behind the story beats and never leaks into the
+          rest of the page. */}
       <div
-        className={`pointer-events-none fixed inset-0 z-0 transition-opacity duration-700 ${deskActive ? "opacity-100" : "opacity-0"}`}
+        className={`pointer-events-none absolute inset-0 z-0 ${deskActive ? "opacity-100" : "opacity-0"} transition-opacity duration-700`}
         aria-hidden
       >
-        <Suspense fallback={null}>
-          <DetectiveDesk />
-        </Suspense>
+        <div className="sticky top-0 h-screen w-full">
+          <Suspense fallback={null}>
+            <DetectiveDesk />
+          </Suspense>
+        </div>
       </div>
+
 
       {/* Story beats */}
       {BEATS.map((b, i) => (
