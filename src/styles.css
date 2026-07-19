@@ -3469,11 +3469,19 @@ button[title*="lovable" i] {
 .desk-lamp-pool {
   position: absolute; inset: 0;
   background:
-    radial-gradient(60% 55% at 50% 55%, rgba(255,170,80,0.10), transparent 70%),
-    radial-gradient(120% 90% at 50% 60%, rgba(6,10,18,0.55), rgba(0,0,0,0.9) 80%);
-  mix-blend-mode: normal;
+    radial-gradient(55% 45% at 50% 48%, rgba(255,170,80,0.14), transparent 72%),
+    radial-gradient(120% 90% at 50% 60%, rgba(6,10,18,0.55), rgba(0,0,0,0.92) 82%);
   pointer-events: none;
+  z-index: 0;
 }
+/* Vignette on top of the canvas so the headline stays readable */
+.desk-vignette {
+  position: absolute; inset: 0;
+  background: radial-gradient(60% 45% at 50% 50%, rgba(0,0,0,0.55), transparent 70%);
+  pointer-events: none;
+  z-index: 2;
+}
+
 
 /* The whole tabletop very slowly spins in a full circle */
 @keyframes dd-table-spin {

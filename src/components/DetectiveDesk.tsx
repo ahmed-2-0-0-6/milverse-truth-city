@@ -1,291 +1,516 @@
-// LAYER-1 — Detective desk ambient scene.
-// Renders as a background layer inside the first story beat. SVG-only so it
-// stays crisp at any size and cheap on the paint thread. The whole tabletop
-// rotates in a very slow circle; individual props drift, coffee steams,
-// desk lamp breathes, raccoon paperweight keeps watch.
+// LAYER-1 — WebGL noir detective desk (three.js via r3f).
+// Same stack as the hero (NoirCityScene). Lazy-loaded, pauses off-screen
+// and when the tab is hidden. Presentation only.
 //
-// Presentation-only: no state, no data. Respects prefers-reduced-motion via
-// CSS (defined in styles.css under /* Detective desk */).
+// Composition: top-down 3/4 view of a circular walnut desk under a warm
+// tungsten spotlight. Scattered case files, coffee mug with animated
+// steam, brass magnifier, fountain pen, small brass clock with a ticking
+// second hand, tiny raccoon paperweight. Whole tabletop drifts extremely
+// slowly. Center of frame stays dark for headline legibility.
 
-type DetectiveDeskProps = {
-  className?: string;
-};
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import * as THREE from "three";
 
-export function DetectiveDesk({ className = "" }: DetectiveDeskProps) {
+// ---------- helpers ----------
+function seeded(seed: number) {
+  let s = seed >>> 0;
+  return () => {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    return s / 0xffffffff;
+  };
+}
+
+// ---------- desk surface ----------
+function Tabletop() {
+  const grainTex = useMemo(() => {
+    // Procedural walnut grain via canvas texture — cheap and cache-friendly.
+    const c = document.createElement("canvas");
+    c.width = 512;
+    c.height = 512;
+    const ctx = c.getContext("2d")!;
+    // base
+    const g = ctx.createRadialGradient(256, 256, 40, 256, 256, 260);
+    g.addColorStop(0, "#3a2617");
+    g.addColorStop(0.55, "#26170d");
+    g.addColorStop(1, "#0d0805");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 512, 512);
+    // concentric grain rings
+    ctx.strokeStyle = "rgba(255,210,160,0.05)";
+    for (let r = 20; r < 260; r += 4 + Math.random() * 6) {
+      ctx.lineWidth = 0.6 + Math.random() * 0.6;
+      ctx.beginPath();
+      ctx.ellipse(256, 256, r, r * (0.94 + Math.random() * 0.06), 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    // fine noise
+    const img = ctx.getImageData(0, 0, 512, 512);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const n = (Math.random() - 0.5) * 14;
+      img.data[i] += n;
+      img.data[i + 1] += n * 0.9;
+      img.data[i + 2] += n * 0.6;
+    }
+    ctx.putImageData(img, 0, 0);
+    const tex = new THREE.CanvasTexture(c);
+    tex.anisotropy = 4;
+    return tex;
+  }, []);
+
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
+      <circleGeometry args={[16, 96]} />
+      <meshStandardMaterial map={grainTex} roughness={0.85} metalness={0.05} />
+    </mesh>
+  );
+}
+
+// ---------- case files ----------
+type File = { x: number; z: number; rot: number; w: number; h: number; color: string; stamp: boolean };
+
+function CaseFiles() {
+  const rand = useMemo(() => seeded(9), []);
+  const files = useMemo<File[]>(() => {
+    const arr: File[] = [];
+    // cluster files in the four quadrants, keep the center clear
+    const spots: Array<[number, number]> = [
+      [-7.5, -5], [-8.5, -2], [-6, -6.5],
+      [7.5, 5], [8.5, 2], [6, 6.5],
+      [-8, 5.5], [8, -5.5],
+    ];
+    for (const [x, z] of spots) {
+      arr.push({
+        x: x + (rand() - 0.5) * 1.2,
+        z: z + (rand() - 0.5) * 1.2,
+        rot: (rand() - 0.5) * 0.9,
+        w: 4.2 + rand() * 0.6,
+        h: 5.6 + rand() * 0.8,
+        color: rand() > 0.55 ? "#d6c9a5" : rand() > 0.5 ? "#c9a26a" : "#e8dcbf",
+        stamp: rand() > 0.55,
+      });
+    }
+    return arr;
+  }, [rand]);
+
+  return (
+    <group>
+      {files.map((f, i) => (
+        <group key={i} position={[f.x, 0.02 + i * 0.006, f.z]} rotation={[0, f.rot, 0]}>
+          {/* folder */}
+          <mesh position={[0, 0, 0]} receiveShadow castShadow>
+            <boxGeometry args={[f.w, 0.04, f.h]} />
+            <meshStandardMaterial color={f.color} roughness={0.95} />
+          </mesh>
+          {/* typed label bar */}
+          <mesh position={[0, 0.025, -f.h / 2 + 0.6]}>
+            <planeGeometry args={[f.w * 0.6, 0.35]} />
+            <meshBasicMaterial color="#1a120a" transparent opacity={0.55} />
+          </mesh>
+          {/* body text lines */}
+          {[0, 1, 2, 3].map((k) => (
+            <mesh key={k} position={[0, 0.025, -f.h / 2 + 1.4 + k * 0.5]}>
+              <planeGeometry args={[f.w * 0.7, 0.08]} />
+              <meshBasicMaterial color="#3a2a18" transparent opacity={0.35} />
+            </mesh>
+          ))}
+          {/* redacted stamp */}
+          {f.stamp && (
+            <mesh position={[f.w * 0.22, 0.03, f.h * 0.28]} rotation={[-Math.PI / 2, 0, -0.4]}>
+              <planeGeometry args={[1.6, 0.55]} />
+              <meshBasicMaterial color="#8b1a1a" transparent opacity={0.7} />
+            </mesh>
+          )}
+        </group>
+      ))}
+    </group>
+  );
+}
+
+// ---------- surveillance photo (paperclipped) ----------
+function Photo() {
+  return (
+    <group position={[-4.5, 0.08, 1.5]} rotation={[0, 0.35, 0]}>
+      {/* white border */}
+      <mesh receiveShadow castShadow>
+        <boxGeometry args={[2.4, 0.03, 3]} />
+        <meshStandardMaterial color="#e8e2d4" roughness={0.9} />
+      </mesh>
+      {/* photo emulsion */}
+      <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[2.0, 2.6]} />
+        <meshBasicMaterial color="#1a1a1a" />
+      </mesh>
+      {/* silhouette figure */}
+      <mesh position={[0, 0.021, -0.2]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.35, 24]} />
+        <meshBasicMaterial color="#2a2a2a" />
+      </mesh>
+      <mesh position={[0, 0.021, 0.5]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[0.9, 1.2]} />
+        <meshBasicMaterial color="#242424" />
+      </mesh>
+      {/* paperclip */}
+      <mesh position={[0.4, 0.06, -1.35]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.22, 0.03, 8, 20, Math.PI * 1.5]} />
+        <meshStandardMaterial color="#c9c9c9" metalness={0.9} roughness={0.25} />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- coffee mug + steam ----------
+function CoffeeMug() {
+  const steamRef = useRef<THREE.Points>(null);
+  const geom = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    const n = 60;
+    const pos = new Float32Array(n * 3);
+    const seeds = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      pos[i * 3] = (Math.random() - 0.5) * 0.5;
+      pos[i * 3 + 1] = 1.2 + Math.random() * 2.4;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 0.5;
+      seeds[i] = Math.random();
+    }
+    g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    g.setAttribute("seed", new THREE.BufferAttribute(seeds, 1));
+    return g;
+  }, []);
+
+  useFrame((_, dt) => {
+    if (!steamRef.current) return;
+    const pos = steamRef.current.geometry.attributes.position as THREE.BufferAttribute;
+    const arr = pos.array as Float32Array;
+    for (let i = 0; i < arr.length; i += 3) {
+      arr[i + 1] += dt * 0.35;
+      arr[i] += Math.sin(performance.now() * 0.0004 + i) * dt * 0.08;
+      if (arr[i + 1] > 4) {
+        arr[i + 1] = 1.2;
+        arr[i] = (Math.random() - 0.5) * 0.5;
+        arr[i + 2] = (Math.random() - 0.5) * 0.5;
+      }
+    }
+    pos.needsUpdate = true;
+  });
+
+  return (
+    <group position={[6.5, 0, -3.5]}>
+      {/* mug body */}
+      <mesh position={[0, 0.6, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.85, 0.75, 1.2, 32]} />
+        <meshStandardMaterial color="#151515" roughness={0.6} metalness={0.15} />
+      </mesh>
+      {/* rim */}
+      <mesh position={[0, 1.2, 0]}>
+        <torusGeometry args={[0.82, 0.04, 8, 32]} />
+        <meshStandardMaterial color="#2a2a2a" roughness={0.5} />
+      </mesh>
+      {/* coffee surface */}
+      <mesh position={[0, 1.19, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.78, 32]} />
+        <meshStandardMaterial color="#1a0e05" roughness={0.3} metalness={0.2} />
+      </mesh>
+      {/* handle */}
+      <mesh position={[0.9, 0.6, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <torusGeometry args={[0.32, 0.09, 12, 24, Math.PI]} />
+        <meshStandardMaterial color="#151515" roughness={0.6} />
+      </mesh>
+      {/* saucer */}
+      <mesh position={[0, 0.02, 0]} receiveShadow>
+        <cylinderGeometry args={[1.35, 1.35, 0.05, 40]} />
+        <meshStandardMaterial color="#0f0f0f" roughness={0.7} />
+      </mesh>
+      {/* steam */}
+      <points ref={steamRef} geometry={geom}>
+        <pointsMaterial size={0.35} color="#e8dcc4" transparent opacity={0.18} depthWrite={false} sizeAttenuation />
+      </points>
+    </group>
+  );
+}
+
+// ---------- brass magnifier ----------
+function Magnifier() {
+  return (
+    <group position={[4.5, 0.05, 3.5]} rotation={[0, -0.5, 0]}>
+      {/* handle */}
+      <mesh position={[1.6, 0.08, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[0.08, 0.09, 2.4, 16]} />
+        <meshStandardMaterial color="#5a3a1a" roughness={0.5} />
+      </mesh>
+      {/* brass ring */}
+      <mesh position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <torusGeometry args={[0.9, 0.09, 14, 40]} />
+        <meshStandardMaterial color="#c48b3a" metalness={0.85} roughness={0.28} />
+      </mesh>
+      {/* glass */}
+      <mesh position={[0, 0.09, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.85, 40]} />
+        <meshPhysicalMaterial
+          color="#ffddaa"
+          transparent
+          opacity={0.18}
+          roughness={0.05}
+          transmission={0.9}
+          thickness={0.2}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- fountain pen ----------
+function Pen() {
+  return (
+    <group position={[-2, 0.06, 5]} rotation={[0, 0.9, 0]}>
+      <mesh castShadow rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.08, 0.08, 2.8, 20]} />
+        <meshStandardMaterial color="#0a0a0a" roughness={0.35} metalness={0.4} />
+      </mesh>
+
+      {/* nib */}
+      <mesh position={[1.5, 0, 0]}>
+        <coneGeometry args={[0.09, 0.35, 12]} />
+        <meshStandardMaterial color="#c9a24a" metalness={0.9} roughness={0.25} />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- desk clock with ticking hand ----------
+function Clock() {
+  const handRef = useRef<THREE.Mesh>(null);
+  useFrame(() => {
+    if (!handRef.current) return;
+    const s = new Date().getSeconds() + new Date().getMilliseconds() / 1000;
+    handRef.current.rotation.y = -(s / 60) * Math.PI * 2;
+  });
+  return (
+    <group position={[3.5, 0.05, -6]}>
+      {/* body */}
+      <mesh castShadow>
+        <cylinderGeometry args={[0.9, 0.9, 0.35, 40]} />
+        <meshStandardMaterial color="#c48b3a" metalness={0.8} roughness={0.3} />
+      </mesh>
+      {/* face */}
+      <mesh position={[0, 0.18, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.78, 40]} />
+        <meshBasicMaterial color="#efe6d0" />
+      </mesh>
+      {/* second hand */}
+      <mesh ref={handRef} position={[0, 0.185, 0]}>
+        <boxGeometry args={[0.03, 0.005, 0.65]} />
+        <meshBasicMaterial color="#8b1a1a" />
+      </mesh>
+      {/* hour ticks */}
+      {Array.from({ length: 12 }).map((_, i) => (
+        <mesh
+          key={i}
+          position={[Math.sin((i / 12) * Math.PI * 2) * 0.65, 0.185, Math.cos((i / 12) * Math.PI * 2) * 0.65]}
+        >
+          <boxGeometry args={[0.04, 0.005, 0.1]} />
+          <meshBasicMaterial color="#1a1a1a" />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+// ---------- raccoon paperweight ----------
+function Raccoon() {
+  return (
+    <group position={[-6.5, 0.04, -5.5]} rotation={[0, 0.6, 0]}>
+      {/* body */}
+      <mesh castShadow>
+        <sphereGeometry args={[0.35, 20, 16]} />
+        <meshStandardMaterial color="#3a3a3a" metalness={0.7} roughness={0.4} />
+      </mesh>
+      {/* head */}
+      <mesh position={[0, 0.28, 0.28]}>
+        <sphereGeometry args={[0.24, 20, 16]} />
+        <meshStandardMaterial color="#3a3a3a" metalness={0.7} roughness={0.4} />
+      </mesh>
+      {/* ears */}
+      <mesh position={[-0.14, 0.5, 0.28]}>
+        <coneGeometry args={[0.07, 0.12, 12]} />
+        <meshStandardMaterial color="#3a3a3a" metalness={0.7} roughness={0.4} />
+      </mesh>
+      <mesh position={[0.14, 0.5, 0.28]}>
+        <coneGeometry args={[0.07, 0.12, 12]} />
+        <meshStandardMaterial color="#3a3a3a" metalness={0.7} roughness={0.4} />
+      </mesh>
+      {/* mask stripe */}
+      <mesh position={[0, 0.28, 0.5]}>
+        <boxGeometry args={[0.38, 0.06, 0.02]} />
+        <meshBasicMaterial color="#0a0a0a" />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- dust motes floating in the light cone ----------
+function DustMotes() {
+  const ref = useRef<THREE.Points>(null);
+  const geom = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    const n = 90;
+    const pos = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+      pos[i * 3] = (Math.random() - 0.5) * 14;
+      pos[i * 3 + 1] = 1 + Math.random() * 8;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 14;
+    }
+    g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    return g;
+  }, []);
+  useFrame((_, dt) => {
+    if (!ref.current) return;
+    const pos = ref.current.geometry.attributes.position as THREE.BufferAttribute;
+    const arr = pos.array as Float32Array;
+    for (let i = 0; i < arr.length; i += 3) {
+      arr[i + 1] += dt * 0.15;
+      arr[i] += Math.sin(performance.now() * 0.0002 + i) * dt * 0.05;
+      if (arr[i + 1] > 9) arr[i + 1] = 1;
+    }
+    pos.needsUpdate = true;
+  });
+  return (
+    <points ref={ref} geometry={geom}>
+      <pointsMaterial size={0.06} color="#ffcf88" transparent opacity={0.55} depthWrite={false} />
+    </points>
+  );
+}
+
+// ---------- camera + lamp behaviour ----------
+function DeskRig() {
+  const { camera } = useThree();
+  const t0 = useRef(performance.now());
+  useFrame(() => {
+    const t = (performance.now() - t0.current) * 0.00005;
+    // slight lateral drift, keeps composition alive without disorienting
+    camera.position.x = Math.sin(t) * 1.2;
+    camera.position.z = 14 + Math.cos(t) * 0.6;
+    camera.position.y = 13;
+    camera.lookAt(0, 0, 0);
+  });
+  return null;
+}
+
+function LampBreath() {
+  const ref = useRef<THREE.SpotLight>(null);
+  useFrame(() => {
+    if (!ref.current) return;
+    const t = performance.now() * 0.0006;
+    ref.current.intensity = 9 + Math.sin(t) * 0.7;
+  });
+  return (
+    <spotLight
+      ref={ref}
+      position={[0, 10, 0]}
+      angle={1.0}
+      penumbra={0.85}
+      intensity={9}
+      color="#ffb060"
+      distance={30}
+      decay={1.4}
+      castShadow={false}
+    />
+  );
+}
+
+
+function SpinningDesk({ children }: { children: React.ReactNode }) {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((_, dt) => {
+    if (!ref.current) return;
+    ref.current.rotation.y += dt * 0.008; // ~13 min per full turn
+  });
+  return <group ref={ref}>{children}</group>;
+}
+
+function PauseWhenHidden() {
+  const { invalidate } = useThree();
+  useEffect(() => {
+    const on = () => {
+      if (!document.hidden) invalidate();
+    };
+    document.addEventListener("visibilitychange", on);
+    return () => document.removeEventListener("visibilitychange", on);
+  }, [invalidate]);
+  return null;
+}
+
+// ---------- scene root ----------
+type Props = { className?: string };
+
+export function DetectiveDesk({ className = "" }: Props) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(true);
+  const [reduced, setReduced] = useState(false);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.01 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (!mq) return;
+    setReduced(mq.matches);
+    const on = () => setReduced(mq.matches);
+    mq.addEventListener?.("change", on);
+    return () => mq.removeEventListener?.("change", on);
+  }, []);
+
+  const dpr: [number, number] =
+    typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches
+      ? [1, 1.4]
+      : [1, 1.8];
+
   return (
     <div
+      ref={wrapRef}
       className={`detective-desk pointer-events-none absolute inset-0 overflow-hidden ${className}`}
       aria-hidden
     >
-      {/* Warm desk-lamp pool bleeding through the ink */}
+      {/* Warm ambient wash bleeding through the ink */}
       <div className="desk-lamp-pool" />
+      <Suspense fallback={null}>
+        <Canvas
+          dpr={dpr}
+          frameloop={visible && !reduced ? "always" : "demand"}
+          camera={{ position: [0, 13, 14], fov: 45 }}
+          gl={{ antialias: true, powerPreference: "low-power", alpha: true }}
+          style={{ background: "transparent" }}
+        >
+          <PauseWhenHidden />
+          <DeskRig />
+          <fog attach="fog" args={["#0a0603", 22, 55]} />
+          <ambientLight intensity={0.35} color="#5a3a20" />
+          <hemisphereLight args={["#7a4a20", "#000000", 0.4]} />
+          <pointLight position={[0, 6, 0]} intensity={2.5} color="#ffb060" distance={20} decay={1.5} />
 
-      <svg
-        viewBox="0 0 1200 900"
-        preserveAspectRatio="xMidYMid slice"
-        className="absolute inset-0 h-full w-full"
-      >
-        <defs>
-          {/* Circular walnut tabletop */}
-          <radialGradient id="dd-wood" cx="50%" cy="45%" r="60%">
-            <stop offset="0%" stopColor="#3a2617" />
-            <stop offset="55%" stopColor="#25170d" />
-            <stop offset="100%" stopColor="#0d0805" />
-          </radialGradient>
-          <radialGradient id="dd-wood-rim" cx="50%" cy="50%" r="50%">
-            <stop offset="90%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.85)" />
-          </radialGradient>
-          {/* Wood grain — subtle concentric noise */}
-          <pattern id="dd-grain" x="0" y="0" width="1200" height="900" patternUnits="userSpaceOnUse">
-            <ellipse cx="600" cy="450" rx="380" ry="360" fill="none" stroke="rgba(255,220,180,0.03)" strokeWidth="1" />
-            <ellipse cx="600" cy="450" rx="300" ry="280" fill="none" stroke="rgba(255,220,180,0.025)" strokeWidth="1" />
-            <ellipse cx="600" cy="450" rx="220" ry="210" fill="none" stroke="rgba(255,220,180,0.02)" strokeWidth="1" />
-            <ellipse cx="600" cy="450" rx="150" ry="140" fill="none" stroke="rgba(255,220,180,0.02)" strokeWidth="1" />
-          </pattern>
-
-          {/* Warm lamp glow */}
-          <radialGradient id="dd-lamp" cx="50%" cy="45%" r="55%">
-            <stop offset="0%" stopColor="rgba(255,180,90,0.35)" />
-            <stop offset="35%" stopColor="rgba(255,140,60,0.12)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0)" />
-          </radialGradient>
-
-          {/* Case-file paper */}
-          <linearGradient id="dd-paper" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#f2ead3" />
-            <stop offset="100%" stopColor="#d8caa2" />
-          </linearGradient>
-          <linearGradient id="dd-paper-manila" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#d4a86a" />
-            <stop offset="100%" stopColor="#a67a3f" />
-          </linearGradient>
-          <linearGradient id="dd-paper-red" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#8a2a25" />
-            <stop offset="100%" stopColor="#4d1512" />
-          </linearGradient>
-
-          {/* Coffee */}
-          <radialGradient id="dd-coffee" cx="50%" cy="45%" r="50%">
-            <stop offset="0%" stopColor="#3b1e0d" />
-            <stop offset="80%" stopColor="#1a0c05" />
-            <stop offset="100%" stopColor="#000" />
-          </radialGradient>
-          <radialGradient id="dd-cup" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#f4efe6" />
-            <stop offset="80%" stopColor="#c9c2b3" />
-            <stop offset="100%" stopColor="#6c6558" />
-          </radialGradient>
-
-          {/* Vignette on top of everything */}
-          <radialGradient id="dd-vignette" cx="50%" cy="55%" r="70%">
-            <stop offset="55%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.85)" />
-          </radialGradient>
-
-          {/* Steam blur */}
-          <filter id="dd-steam-blur" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="3" />
-          </filter>
-
-          {/* Paper drop shadow */}
-          <filter id="dd-shadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
-            <feOffset dx="2" dy="4" result="off" />
-            <feComponentTransfer><feFuncA type="linear" slope="0.55" /></feComponentTransfer>
-            <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
-          </filter>
-        </defs>
-
-        {/* ---------- rotating tabletop ---------- */}
-        <g className="dd-table" style={{ transformOrigin: "600px 500px" }}>
-          {/* Wood disc */}
-          <circle cx="600" cy="500" r="560" fill="url(#dd-wood)" />
-          <circle cx="600" cy="500" r="560" fill="url(#dd-grain)" />
-          <circle cx="600" cy="500" r="560" fill="url(#dd-wood-rim)" />
-          {/* subtle scratches */}
-          <g stroke="rgba(255,220,180,0.05)" strokeWidth="0.6" fill="none">
-            <path d="M 320 300 Q 500 340 720 320" />
-            <path d="M 400 640 Q 600 660 820 620" />
-            <path d="M 260 480 Q 400 500 540 470" />
-          </g>
-
-          {/* Warm lamp pool baked into the wood */}
-          <circle cx="600" cy="470" r="500" fill="url(#dd-lamp)" />
-
-          {/* ---------- scattered case files ---------- */}
-          {/* red file, back-left */}
-          <g transform="translate(220 260) rotate(-14)" filter="url(#dd-shadow)" className="dd-paper dd-drift-a">
-            <rect x="0" y="0" width="220" height="280" rx="3" fill="url(#dd-paper-red)" />
-            <rect x="12" y="14" width="196" height="24" fill="rgba(0,0,0,0.35)" />
-            <text x="20" y="32" fontFamily="'JetBrains Mono', monospace" fontSize="14" fill="#f2ead3" letterSpacing="2">CASE · 0447</text>
-            <rect x="20" y="60" width="120" height="6" fill="rgba(242,234,211,0.55)" />
-            <rect x="20" y="76" width="180" height="4" fill="rgba(242,234,211,0.35)" />
-            <rect x="20" y="88" width="150" height="4" fill="rgba(242,234,211,0.35)" />
-            <rect x="20" y="120" width="180" height="90" fill="rgba(0,0,0,0.35)" />
-            <text x="30" y="140" fontFamily="'JetBrains Mono', monospace" fontSize="9" fill="rgba(242,234,211,0.7)">CLASSIFIED</text>
-          </g>
-
-          {/* manila folder, center-back */}
-          <g transform="translate(500 200) rotate(6)" filter="url(#dd-shadow)" className="dd-paper dd-drift-b">
-            <rect x="0" y="0" width="260" height="200" rx="4" fill="url(#dd-paper-manila)" />
-            <rect x="0" y="0" width="120" height="18" rx="3" fill="#8f6431" />
-            <text x="12" y="14" fontFamily="'JetBrains Mono', monospace" fontSize="10" fill="#f2ead3" letterSpacing="1.5">DOSSIER · 12B</text>
-            <rect x="16" y="36" width="228" height="150" fill="url(#dd-paper)" />
-            <rect x="30" y="52" width="140" height="5" fill="rgba(60,40,20,0.5)" />
-            <rect x="30" y="66" width="200" height="3" fill="rgba(60,40,20,0.3)" />
-            <rect x="30" y="76" width="180" height="3" fill="rgba(60,40,20,0.3)" />
-            <rect x="30" y="86" width="150" height="3" fill="rgba(60,40,20,0.3)" />
-            {/* portrait redaction */}
-            <rect x="30" y="102" width="70" height="70" fill="#3a2c18" />
-            <rect x="34" y="106" width="62" height="8" fill="#1a1408" />
-            <rect x="110" y="106" width="120" height="4" fill="rgba(60,40,20,0.4)" />
-            <rect x="110" y="118" width="100" height="4" fill="rgba(60,40,20,0.4)" />
-            <rect x="110" y="130" width="115" height="4" fill="rgba(60,40,20,0.4)" />
-            <rect x="110" y="160" width="90" height="10" fill="#8a2a25" />
-          </g>
-
-          {/* loose paper, right */}
-          <g transform="translate(800 320) rotate(9)" filter="url(#dd-shadow)" className="dd-paper dd-drift-c">
-            <rect x="0" y="0" width="200" height="260" rx="2" fill="url(#dd-paper)" />
-            <text x="16" y="30" fontFamily="'JetBrains Mono', monospace" fontSize="11" fill="#3a2c18" letterSpacing="2">TRANSCRIPT</text>
-            <line x1="16" y1="40" x2="184" y2="40" stroke="#3a2c18" strokeWidth="0.8" />
-            {Array.from({ length: 12 }).map((_, i) => (
-              <rect key={i} x="16" y={54 + i * 14} width={80 + ((i * 37) % 100)} height="3" fill="rgba(60,40,20,0.55)" />
-            ))}
-            {/* red stamp */}
-            <g transform="translate(110 190) rotate(-12)">
-              <rect x="0" y="0" width="80" height="30" fill="none" stroke="#8a2a25" strokeWidth="2" />
-              <text x="8" y="20" fontFamily="'Bebas Neue', sans-serif" fontSize="18" fill="#8a2a25" letterSpacing="2">VERIFIED</text>
-            </g>
-            {/* paper clip */}
-            <g transform="translate(150 -6)">
-              <path d="M 0 0 q 8 0 8 8 v 30 q 0 6 -6 6 t -6 -6 v -22" fill="none" stroke="#c9c9d0" strokeWidth="2.2" />
-              <path d="M 2 8 v 26" fill="none" stroke="#8f8f95" strokeWidth="1" />
-            </g>
-          </g>
-
-          {/* small note, front-left */}
-          <g transform="translate(320 620) rotate(-6)" filter="url(#dd-shadow)" className="dd-paper dd-drift-b">
-            <rect x="0" y="0" width="150" height="120" rx="2" fill="#f4d97a" />
-            <text x="12" y="24" fontFamily="'Space Grotesk', sans-serif" fontSize="12" fill="#3a2c18">check the</text>
-            <text x="12" y="42" fontFamily="'Space Grotesk', sans-serif" fontSize="12" fill="#3a2c18">timestamps —</text>
-            <text x="12" y="66" fontFamily="'Space Grotesk', sans-serif" fontSize="12" fontStyle="italic" fill="#8a2a25">they lied.</text>
-            <line x1="12" y1="86" x2="120" y2="86" stroke="rgba(60,40,20,0.35)" strokeWidth="1" />
-          </g>
-
-          {/* Polaroid */}
-          <g transform="translate(560 660) rotate(4)" filter="url(#dd-shadow)" className="dd-paper dd-drift-a">
-            <rect x="0" y="0" width="140" height="170" fill="#f2ead3" />
-            <rect x="10" y="10" width="120" height="120" fill="#0f1a2a" />
-            {/* faint face silhouette */}
-            <circle cx="70" cy="70" r="26" fill="#233248" />
-            <rect cx="70" y="96" width="60" height="34" x="40" fill="#1a2536" />
-            <text x="14" y="152" fontFamily="'Space Grotesk', sans-serif" fontSize="10" fill="#3a2c18">SUBJECT · UNKNOWN</text>
-          </g>
-
-          {/* ---------- pens & tools ---------- */}
-          {/* fountain pen */}
-          <g transform="translate(760 620) rotate(28)" className="dd-drift-c">
-            <rect x="0" y="0" width="180" height="10" rx="4" fill="#111" />
-            <rect x="0" y="0" width="60" height="10" rx="4" fill="#2a2018" />
-            <polygon points="180,0 200,5 180,10" fill="#c9a24a" />
-            <circle cx="60" cy="5" r="2.5" fill="#c9a24a" />
-          </g>
-          {/* pencil */}
-          <g transform="translate(280 500) rotate(-22)" className="dd-drift-a">
-            <rect x="0" y="0" width="170" height="8" rx="1" fill="#e4b73b" />
-            <rect x="150" y="0" width="14" height="8" fill="#c98a2a" />
-            <rect x="164" y="0" width="6" height="8" fill="#4a3418" />
-            <polygon points="0,0 -14,4 0,8" fill="#f2ead3" />
-            <polygon points="0,0 -8,4 0,8" fill="#111" />
-          </g>
-          {/* paper clips scattered */}
-          <g transform="translate(470 480)" className="dd-drift-b">
-            <path d="M 0 0 q 8 0 8 8 v 22 q 0 6 -6 6 t -6 -6 v -16" fill="none" stroke="#c9c9d0" strokeWidth="2" />
-          </g>
-          <g transform="translate(720 260) rotate(40)" className="dd-drift-c">
-            <path d="M 0 0 q 8 0 8 8 v 22 q 0 6 -6 6 t -6 -6 v -16" fill="none" stroke="#c9c9d0" strokeWidth="2" />
-          </g>
-
-          {/* magnifying glass */}
-          <g transform="translate(430 380) rotate(-18)" filter="url(#dd-shadow)" className="dd-drift-b">
-            <circle cx="0" cy="0" r="46" fill="rgba(180,220,255,0.08)" stroke="#c9a24a" strokeWidth="4" />
-            <circle cx="0" cy="0" r="46" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
-            <path d="M 33 33 L 78 78" stroke="#4a3418" strokeWidth="8" strokeLinecap="round" />
-            <path d="M 33 33 L 78 78" stroke="#c9a24a" strokeWidth="3" strokeLinecap="round" />
-            {/* lens highlight */}
-            <ellipse cx="-14" cy="-16" rx="14" ry="8" fill="rgba(255,255,255,0.25)" />
-          </g>
-
-          {/* ---------- coffee cup ---------- */}
-          <g transform="translate(870 500)" className="dd-cup" filter="url(#dd-shadow)">
-            {/* saucer */}
-            <ellipse cx="0" cy="6" rx="86" ry="24" fill="#1a1108" />
-            <ellipse cx="0" cy="4" rx="82" ry="22" fill="url(#dd-cup)" />
-            <ellipse cx="0" cy="2" rx="72" ry="18" fill="#0d0805" />
-            {/* cup body (top-down) */}
-            <ellipse cx="0" cy="-4" rx="60" ry="18" fill="url(#dd-cup)" />
-            <ellipse cx="0" cy="-6" rx="55" ry="16" fill="url(#dd-coffee)" />
-            {/* handle */}
-            <path d="M 55 -8 q 24 0 24 12 t -24 12" fill="none" stroke="#c9c2b3" strokeWidth="6" />
-            {/* crema highlight */}
-            <ellipse cx="-14" cy="-10" rx="16" ry="4" fill="rgba(255,220,180,0.15)" />
-          </g>
-
-          {/* ---------- raccoon paperweight (tiny) ---------- */}
-          <g transform="translate(660 470)" className="dd-raccoon">
-            {/* body/base */}
-            <ellipse cx="0" cy="14" rx="28" ry="10" fill="#0b0b0f" />
-            {/* head */}
-            <circle cx="0" cy="0" r="20" fill="#2e2a2f" />
-            <circle cx="0" cy="4" r="18" fill="#3a3438" />
-            {/* ears */}
-            <path d="M -18 -14 l -6 -10 l 10 -2 z" fill="#2e2a2f" />
-            <path d="M 18 -14 l 6 -10 l -10 -2 z" fill="#2e2a2f" />
-            <path d="M -16 -12 l -3 -6 l 6 -1 z" fill="#5a4a48" />
-            <path d="M 16 -12 l 3 -6 l -6 -1 z" fill="#5a4a48" />
-            {/* mask */}
-            <path d="M -16 2 q 16 -10 32 0 q 0 8 -16 8 q -16 0 -16 -8 z" fill="#0b0b0f" />
-            {/* eyes */}
-            <circle cx="-7" cy="4" r="2.6" fill="#ffdc73" className="dd-eye" />
-            <circle cx="7" cy="4" r="2.6" fill="#ffdc73" className="dd-eye" />
-            <circle cx="-7" cy="4" r="1" fill="#111" />
-            <circle cx="7" cy="4" r="1" fill="#111" />
-            {/* snout */}
-            <ellipse cx="0" cy="12" rx="6" ry="4" fill="#c9c2b3" />
-            <circle cx="0" cy="10" r="1.6" fill="#111" />
-            {/* muzzle stripe */}
-            <path d="M 0 12 v 4" stroke="#111" strokeWidth="0.8" />
-            {/* tiny "PAPERWEIGHT" pedestal */}
-            <rect x="-30" y="20" width="60" height="4" fill="#c9a24a" opacity="0.35" />
-          </g>
-
-          {/* inkwell */}
-          <g transform="translate(200 400)" filter="url(#dd-shadow)">
-            <ellipse cx="0" cy="14" rx="26" ry="8" fill="#0b0b0f" />
-            <rect x="-22" y="-4" width="44" height="20" rx="4" fill="#141018" />
-            <ellipse cx="0" cy="-4" rx="22" ry="6" fill="#0a0a10" />
-            <ellipse cx="0" cy="-5" rx="16" ry="4" fill="#050508" />
-          </g>
-        </g>
-
-        {/* ---------- steam (outside table so it doesn't rotate) ---------- */}
-        <g transform="translate(870 490)" filter="url(#dd-steam-blur)" opacity="0.7">
-          <path className="dd-steam dd-steam-a" d="M -10 0 q -8 -30 6 -60 q 10 -30 -4 -60" fill="none" stroke="rgba(230,235,245,0.45)" strokeWidth="6" strokeLinecap="round" />
-          <path className="dd-steam dd-steam-b" d="M 4 0 q 10 -34 -4 -66 q -10 -28 6 -58" fill="none" stroke="rgba(230,235,245,0.35)" strokeWidth="5" strokeLinecap="round" />
-          <path className="dd-steam dd-steam-c" d="M 18 0 q -6 -28 8 -58 q 10 -26 -6 -54" fill="none" stroke="rgba(230,235,245,0.3)" strokeWidth="4" strokeLinecap="round" />
-        </g>
-
-        {/* Lamp breathing highlight */}
-        <ellipse cx="600" cy="450" rx="520" ry="360" fill="url(#dd-lamp)" className="dd-lamp-breath" />
-
-        {/* Vignette caps the top so it blends into the beat text */}
-        <rect width="1200" height="900" fill="url(#dd-vignette)" />
-      </svg>
-
-      {/* Dust motes / lens grain over the top */}
-      <div className="dd-dust" />
+          <LampBreath />
+          <SpinningDesk>
+            <Tabletop />
+            <CaseFiles />
+            <Photo />
+            <CoffeeMug />
+            <Magnifier />
+            <Pen />
+            <Clock />
+            <Raccoon />
+          </SpinningDesk>
+          <DustMotes />
+        </Canvas>
+      </Suspense>
+      {/* Vignette on top — keeps the headline legible */}
+      <div className="desk-vignette" />
     </div>
   );
 }
+
+export default DetectiveDesk;
