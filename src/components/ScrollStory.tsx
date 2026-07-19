@@ -1,6 +1,6 @@
 // LAYER-7 — Scroll-driven story beats. GSAP ScrollTrigger + horizontal districts.
 // Lazy imports GSAP; respects reduced-motion (renders static).
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
 import mirrorArt from "@/assets/district-mirror.jpg";
@@ -569,9 +569,10 @@ function TypedHeadline({ text }: { text: string }) {
       {nodes.map((node, i) => {
         if (typeof node === "string") return <span key={i}>{wrapLetters(node)}</span>;
         // node is a <span className="word-*">TOK</span>
-        const el = node as React.ReactElement<{ className?: string; children?: React.ReactNode }>;
+        const el = node as ReactElement<{ className?: string; children?: ReactNode }>;
         const cls = el.props.className ?? "";
         const child = el.props.children;
+
         const str = typeof child === "string" ? child : "";
         return (
           <span key={i} className={cls}>
