@@ -1366,6 +1366,9 @@ export function DetectiveDesk({ className = "" }: Props) {
           <pointLight position={[0, 8, 0]} intensity={3} color="#ffb060" distance={26} decay={1.5} />
 
           <LampBreath />
+          {/* Room shell — floor, walls, framed portraits. Grounds the desk
+              inside a detective's office instead of floating in space. */}
+          <Room />
           <SpinningDesk>
             <Tabletop />
             <CaseFiles />
@@ -1374,6 +1377,9 @@ export function DetectiveDesk({ className = "" }: Props) {
             <Magnifier />
             <PenAndInk />
             <Clock />
+            <Compass />
+            <Stapler />
+            <DeskClutter />
             <Raccoon />
             <StickyNote />
             <BusinessCard />
@@ -1382,6 +1388,7 @@ export function DetectiveDesk({ className = "" }: Props) {
             <Ashtray />
           </SpinningDesk>
           <DustMotes />
+
         </Canvas>
       </Suspense>
       <div className="desk-vignette" />
