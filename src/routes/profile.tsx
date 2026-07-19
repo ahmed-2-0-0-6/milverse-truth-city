@@ -18,6 +18,8 @@ import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
 import { TheRoad } from "@/components/road/TheRoad";
 
 import { Download, Share2 } from "lucide-react";
+import crtImg from "@/assets/crt-terminal.jpg";
+import evidenceDeskImg from "@/assets/evidence-desk.jpg";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -92,7 +94,15 @@ function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen grain">
+    <div
+      className="min-h-screen grain"
+      style={{
+        backgroundImage: `linear-gradient(180deg, rgba(2,4,10,0.93), rgba(2,4,10,0.98)), url(${evidenceDeskImg})`,
+        backgroundSize: "cover",
+        backgroundAttachment: "fixed",
+        backgroundPosition: "center top",
+      }}
+    >
       <TopBar />
       <main className="mx-auto max-w-3xl px-4 py-10">
         <Link
@@ -108,21 +118,21 @@ function ProfilePage() {
 
 
 
-        <div className="mt-6 rounded-2xl border-2 border-primary/40 bg-card p-6 sm:p-8 relative overflow-hidden">
-          <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage: "radial-gradient(rgba(34,211,238,0.6) 1px, transparent 1px)",
-              backgroundSize: "6px 6px",
-            }}
-          />
+        <div
+          className="crt-panel mt-6 rounded-2xl p-6 sm:p-8"
+          style={{
+            backgroundImage: `linear-gradient(180deg, rgba(0,20,15,0.88), rgba(0,10,8,0.96)), url(${crtImg})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
           <div className="relative">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="stencil text-[10px] tracking-[0.3em] text-muted-foreground">
-                  OPERATOR PROFILE
+                <div className="crt-text text-[10px] tracking-[0.3em]">
+                  &gt; OPERATOR PROFILE
                 </div>
-                <div className="mt-1 stencil text-primary text-sm">{callsign}</div>
+                <div className="crt-text mt-1 text-sm">CALLSIGN: {callsign}</div>
                 <h1
                   className="mt-2 text-5xl sm:text-6xl font-black tracking-tight"
                   style={{ fontFamily: '"Bebas Neue", sans-serif' }}
@@ -134,12 +144,12 @@ function ProfilePage() {
                 </div>
               </div>
               <div className="text-right">
-                <div className="stencil text-[9px] tracking-widest text-muted-foreground">XP</div>
+                <div className="crt-text text-[9px] tracking-widest">XP</div>
                 <div
-                  className="text-4xl font-black text-primary tabular-nums"
+                  className="crt-text text-4xl font-black tabular-nums"
                   style={{ fontFamily: '"Bebas Neue", sans-serif' }}
                 >
-                  {xp}
+                  {xp.toString().padStart(4, "0")}
                 </div>
                 {rankInfo.next && (
                   <div className="stencil text-[9px] text-muted-foreground mt-1">

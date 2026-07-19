@@ -16,6 +16,7 @@ import { caseForDate } from "@/lib/daily/rotation";
 import { MANUAL_ENTRIES } from "@/lib/manual/entries";
 import { readTapes, clearTapes, type StoredTape } from "@/lib/mirror/tapes";
 import { TapeReview } from "@/components/mirror/TapeReview";
+import corkboardImg from "@/assets/corkboard.jpg";
 
 export const Route = createFileRoute("/wall")({
   head: () => ({
@@ -338,13 +339,26 @@ function WallPage() {
     }`;
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div
+      className="min-h-screen bg-background text-foreground"
+      style={{
+        backgroundImage: `linear-gradient(180deg, rgba(2,4,10,0.94), rgba(2,4,10,0.97)), url(${corkboardImg})`,
+        backgroundSize: "cover",
+        backgroundAttachment: "fixed",
+        backgroundPosition: "center",
+      }}
+    >
       <TopBar />
 
-      <main className="mx-auto max-w-6xl px-4 py-8">
-        <header className="mb-6">
-          <div className="stencil text-[10px] tracking-widest text-muted-foreground">
-            EVIDENCE ROOM
+      <main className="mx-auto max-w-6xl px-4 py-8 relative">
+        {/* red string overlay, decorative */}
+        <div className="evidence-strings" aria-hidden="true" />
+        <header className="mb-6 relative">
+          <div className="flex items-center gap-2">
+            <span className="pushpin" aria-hidden="true" />
+            <div className="stencil text-[10px] tracking-widest text-muted-foreground">
+              EVIDENCE ROOM
+            </div>
           </div>
           <h1 className="stencil mt-1 text-2xl sm:text-3xl text-foreground">THE CASE WALL</h1>
           <p className="mt-1 text-sm text-muted-foreground">

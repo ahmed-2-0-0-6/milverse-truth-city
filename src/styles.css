@@ -2981,3 +2981,75 @@ html[data-high-legibility="on"] .cold-tense {
   .dossier-locked:hover .dossier-body::after { opacity: 0.7; }
   .dossier-live:hover .dossier-body > .relative::before { transition: none; }
 }
+
+/* ============================================================
+   CRT MONITOR SURFACE — for profile / stat panels.
+   Scanlines, phosphor glow, subtle flicker.
+   ============================================================ */
+.crt-panel {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(0,20,15,0.85), rgba(0,10,8,0.95)),
+    radial-gradient(ellipse at center, rgba(80,255,180,0.10), transparent 70%);
+  border: 1px solid rgba(80, 220, 160, 0.35);
+  box-shadow:
+    inset 0 0 60px rgba(0, 0, 0, 0.6),
+    inset 0 0 6px rgba(80, 255, 180, 0.15),
+    0 0 30px rgba(80, 255, 180, 0.05);
+  overflow: hidden;
+}
+.crt-panel::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.25) 0 1px,
+    transparent 1px 3px
+  );
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+.crt-panel::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+  pointer-events: none;
+}
+@keyframes crt-flicker {
+  0%, 100% { opacity: 1; }
+  47% { opacity: 0.985; }
+  48% { opacity: 0.96; }
+  49% { opacity: 1; }
+}
+.crt-panel > * { animation: crt-flicker 4s infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .crt-panel > * { animation: none; }
+}
+
+/* Amber-mono text mode used inside .crt-panel headers */
+.crt-text {
+  color: #7cffb2;
+  text-shadow: 0 0 6px rgba(124, 255, 178, 0.55), 0 0 2px rgba(124, 255, 178, 0.9);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* ============================================================
+   RED STRING — decorative SVG-less connector overlay for the wall.
+   Uses conic gradients + rotated linear strips over an absolute layer.
+   ============================================================ */
+.evidence-strings {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(75deg, transparent 48%, rgba(220, 60, 50, 0.35) 49%, rgba(220, 60, 50, 0.35) 50%, transparent 51%),
+    linear-gradient(-60deg, transparent 48%, rgba(220, 60, 50, 0.28) 49%, rgba(220, 60, 50, 0.28) 50%, transparent 51%),
+    linear-gradient(20deg, transparent 48%, rgba(220, 60, 50, 0.22) 49%, rgba(220, 60, 50, 0.22) 50%, transparent 51%);
+  mix-blend-mode: screen;
+  opacity: 0.45;
+}
+
+/* Pushpins scattered across the wall header */
+.pushpin {
+  display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ff9a8a, #b3251b 65%, #4a0e08);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.7), inset 0 -1px 1px rgba(0,0,0,0.4);
+}
