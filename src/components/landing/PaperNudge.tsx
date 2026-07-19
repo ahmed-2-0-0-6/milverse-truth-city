@@ -36,7 +36,7 @@ export function PaperNudge() {
 
   return (
     <div
-      className="fixed z-40 bottom-64 left-4 right-4 sm:right-auto sm:max-w-sm paper-nudge-in"
+      className="w-full paper-nudge-in"
       role="region"
       aria-label="New supplement delivered"
     >
