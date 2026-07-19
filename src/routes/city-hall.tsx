@@ -343,14 +343,15 @@ function Quadrant({
 function StateOfTheCity({ census }: { census: CensusState }) {
   const today = new Date().toISOString().slice(0, 10);
   return (
-    <section className="mb-8 hud-frame border border-primary/30 bg-card/60 rounded-sm p-6">
+    <section className="mb-8 crt-panel border border-primary/30 rounded-sm p-6">
       <div className="flex items-center gap-3 mb-4">
-        <div className="stencil text-[10px] text-primary">
-          // STATE OF THE CITY · CENSUS
+        <div className="crt-text stencil text-[10px]">
+          &gt; STATE_OF_THE_CITY.EXE // CENSUS
         </div>
         <div className="h-px flex-1 bg-primary/20" />
-        <div className="stencil text-[10px] text-muted-foreground">{today}</div>
+        <div className="crt-text stencil text-[10px] opacity-70">{today}</div>
       </div>
+
 
       {census.kind === "loading" && (
         <div className="stencil text-[10px] text-muted-foreground">
