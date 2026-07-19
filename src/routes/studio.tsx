@@ -357,7 +357,7 @@ function Studio() {
 
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
 
       <DistrictHero
@@ -922,7 +922,7 @@ function MaskHandoff({ code, onDone }: { code: string; onDone: () => void }) {
   }
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
       <main className="mx-auto max-w-xl px-4 py-16 space-y-8">
         <div className="rounded-xl border-2 border-caution/50 bg-caution/5 p-8 text-center">

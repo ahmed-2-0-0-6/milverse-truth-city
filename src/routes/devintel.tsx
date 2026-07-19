@@ -106,7 +106,7 @@ function DevIntelPage() {
 
   if (!authed) {
     return (
-      <div className="min-h-screen grain">
+      <div className="min-h-dvh grain">
         <TopBar />
         <main className="mx-auto max-w-md px-4 py-24 text-center">
           <Lock className="mx-auto h-6 w-6 text-primary" />
@@ -152,7 +152,7 @@ function DevIntelPage() {
   }
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
       <main className="mx-auto max-w-5xl px-4 py-8">
         <div className="flex items-baseline justify-between">

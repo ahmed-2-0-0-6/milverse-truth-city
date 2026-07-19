@@ -95,7 +95,7 @@ function ProfilePage() {
 
   return (
     <div
-      className="min-h-screen grain"
+      className="min-h-dvh grain"
       style={{
         backgroundImage: `linear-gradient(180deg, rgba(2,4,10,0.93), rgba(2,4,10,0.98)), url(${evidenceDeskImg})`,
         backgroundSize: "cover",

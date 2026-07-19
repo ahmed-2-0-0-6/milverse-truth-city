@@ -75,7 +75,7 @@ export function DistrictBlueprint({ district, title, subtitle, concept, mechanic
   const arenaPct = Math.round((arena / total) * 100);
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <div className="pointer-events-none fixed inset-0 scanlines opacity-30" />
       <TopBar />
       <main className="mx-auto max-w-3xl px-4 py-10">

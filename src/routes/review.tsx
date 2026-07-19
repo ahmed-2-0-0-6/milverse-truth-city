@@ -101,7 +101,7 @@ function ReviewPage() {
 
   if (!authed) {
     return (
-      <div className="min-h-screen grain">
+      <div className="min-h-dvh grain">
         <TopBar />
         <main className="mx-auto max-w-md px-4 py-16">
           <div className="rounded-sm border border-border bg-card p-6">
@@ -135,7 +135,7 @@ function ReviewPage() {
   }
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
       <main className="mx-auto max-w-4xl px-4 py-10">
         <div className="mb-4 flex items-center gap-3">

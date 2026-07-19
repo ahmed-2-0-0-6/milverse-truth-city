@@ -77,7 +77,7 @@ function SupplementPage() {
 
   if (!profile || !supplement) {
     return (
-      <div className="paper min-h-screen">
+      <div className="paper min-h-dvh">
         <div className="no-print bg-background/90 backdrop-blur border-b border-border">
           <TopBar />
         </div>
@@ -89,7 +89,7 @@ function SupplementPage() {
   }
 
   return (
-    <div className="paper min-h-screen">
+    <div className="paper min-h-dvh">
       <div className="no-print bg-background/90 backdrop-blur border-b border-border">
         <TopBar />
       </div>

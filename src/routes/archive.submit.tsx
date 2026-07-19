@@ -96,7 +96,7 @@ function SubmitStory() {
 
   if (done) {
     return (
-      <div className="min-h-screen grain">
+      <div className="min-h-dvh grain">
         <TopBar />
         <main className="mx-auto max-w-2xl px-4 py-16 text-center">
           <CheckCircle2 className="mx-auto h-12 w-12 text-primary mb-4" />
@@ -117,7 +117,7 @@ function SubmitStory() {
   }
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
       <main className="mx-auto max-w-2xl px-4 py-10">
         <Link
