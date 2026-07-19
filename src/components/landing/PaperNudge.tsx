@@ -11,9 +11,12 @@ import {
  * impression. Once the current week has been seen or dismissed,
  * it stays quiet until the next Sunday rollover.
  */
-export function PaperNudge() {
+type PaperNudgeProps = {
+  show?: boolean;
+};
+
+export function PaperNudge({ show = true }: PaperNudgeProps) {
   const [dismissed, setDismissed] = useState(false);
-  const [ready, setReady] = useState(false);
   const week = supplementWeek();
 
   useEffect(() => {
@@ -26,25 +29,7 @@ export function PaperNudge() {
     }
   }, [week.weekKey]);
 
-  useEffect(() => {
-    // Deliver the paper exactly when the hero headline finishes typing.
-    // Fallback: if the event never fires (e.g. hero not mounted), reveal after
-    // the maximum expected type duration so the paper is never stranded.
-    let done = false;
-    const reveal = () => {
-      if (done) return;
-      done = true;
-      setReady(true);
-    };
-    window.addEventListener("milverse:hero-typed", reveal, { once: true });
-    const fallback = window.setTimeout(reveal, 1400);
-    return () => {
-      window.removeEventListener("milverse:hero-typed", reveal);
-      window.clearTimeout(fallback);
-    };
-  }, []);
-
-  if (dismissed || !ready) return null;
+  if (dismissed || !show) return null;
 
 
   const dismiss = () => {

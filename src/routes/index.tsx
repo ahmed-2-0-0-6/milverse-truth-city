@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import { CityWorld } from "@/components/CityWorld";
 import { CityList } from "@/components/CityList";
@@ -71,6 +71,7 @@ function CityMap() {
   const [returning, setReturning] = useState(false);
   const [showBait, setShowBait] = useState(false);
   const [showBeacon, setShowBeacon] = useState(true);
+  const [heroTyped, setHeroTyped] = useState(false);
 
   // THE NIGHT SHIFT — landing recomputes its band every 60s so a session
   // left open across a boundary catches up. Elsewhere band is per-mount.
@@ -107,6 +108,8 @@ function CityMap() {
       /* localStorage unavailable */
     }
   };
+
+  const handleHeroTyped = useCallback(() => setHeroTyped(true), []);
 
   const night = isNightRegister(shift.band);
   const kicker =
@@ -153,7 +156,7 @@ function CityMap() {
             onDismiss={() => setReturning(false)}
           />
         )}
-        <PaperNudge />
+        <PaperNudge show={heroTyped} />
       </div>
       {!booted && <BootScreen onDone={() => setBooted(true)} />}
 
@@ -222,7 +225,7 @@ function CityMap() {
           <div className="stencil text-[10px] text-cyan-300/80 mb-4 hud-blink text-center">
             {kicker}
           </div>
-          <HeroType />
+          <HeroType onComplete={handleHeroTyped} />
           <p className="mt-4 max-w-xl text-center text-white/80 text-step-0 px-2">
             Scammers are working your city. Pick up. Play them. Burn them.
           </p>

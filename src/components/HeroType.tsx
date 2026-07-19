@@ -1,12 +1,21 @@
 // LAYER-7 — Typed neon headline for the hero.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const TEXT = "TRAIN YOUR TRUST";
 
-export function HeroType() {
+type HeroTypeProps = {
+  onComplete?: () => void;
+};
+
+export function HeroType({ onComplete }: HeroTypeProps) {
   const [n, setN] = useState(0);
+  const firedRef = useRef(false);
+
   useEffect(() => {
     const fire = () => {
+      if (firedRef.current) return;
+      firedRef.current = true;
+      onComplete?.();
       try {
         window.dispatchEvent(new CustomEvent("milverse:hero-typed"));
       } catch {
@@ -31,7 +40,7 @@ export function HeroType() {
       }
     }, 60);
     return () => window.clearInterval(id);
-  }, []);
+  }, [onComplete]);
 
   return (
     <h1
