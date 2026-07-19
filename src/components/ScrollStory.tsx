@@ -1,9 +1,12 @@
 // LAYER-7 — Scroll-driven story beats. GSAP ScrollTrigger + horizontal districts.
 // Lazy imports GSAP; respects reduced-motion (renders static).
-import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
-import { DetectiveDesk } from "@/components/DetectiveDesk";
+const DetectiveDesk = lazy(() =>
+  import("@/components/DetectiveDesk").then((m) => ({ default: m.DetectiveDesk })),
+);
+
 import mirrorArt from "@/assets/district-mirror.jpg";
 import feedArt from "@/assets/district-feed.jpg";
 import studioArt from "@/assets/district-studio.jpg";
