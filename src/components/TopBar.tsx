@@ -154,7 +154,7 @@ export function TopBar() {
         {/* ── Desktop primary nav ── */}
         <nav
           aria-label="Primary"
-          className="hidden lg:flex items-center justify-center gap-0.5"
+          className="hidden xl:flex items-center justify-center gap-0.5"
         >
           {DESKTOP_PRIMARY.map((item) => {
             const active = isActive(item.to);
@@ -252,7 +252,7 @@ export function TopBar() {
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="lg:hidden inline-flex items-center justify-center h-10 w-10 tap rounded-md border border-border text-foreground hover:bg-accent"
+                className="xl:hidden inline-flex items-center justify-center h-10 w-10 tap rounded-md border border-border text-foreground hover:bg-accent"
                 aria-label="Open navigation menu"
               >
                 <Menu className="h-4 w-4" aria-hidden />
