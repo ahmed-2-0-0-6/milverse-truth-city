@@ -310,11 +310,12 @@ function PunchOut({ shift }: { shift: FinishedShift }) {
       <div className="stencil text-[10px] text-primary/80 mb-2">// SHIFT WORKED</div>
       <h1
         id="punchout-title"
-        className="text-6xl sm:text-8xl font-black text-foreground leading-none tracking-tight shift-tally tabular-nums"
+        className="text-step-6 font-black text-foreground leading-none tracking-tight shift-tally tabular-nums"
         style={{ fontFamily: '"Bebas Neue", sans-serif' }}
       >
         {display}
       </h1>
+
       <div className="mt-2 stencil text-[10px] text-muted-foreground">SHIFT SCORE</div>
 
       <div className="mt-5 grid grid-cols-5 gap-2">
