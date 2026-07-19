@@ -263,10 +263,11 @@ function Magnifier() {
 function Pen() {
   return (
     <group position={[-2, 0.06, 5]} rotation={[0, 0.9, 0]}>
-      <mesh castShadow>
-        <cylinderGeometry args={[0.08, 0.08, 2.8, 20]} rotation={[0, 0, Math.PI / 2] as any} />
+      <mesh castShadow rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.08, 0.08, 2.8, 20]} />
         <meshStandardMaterial color="#0a0a0a" roughness={0.35} metalness={0.4} />
       </mesh>
+
       {/* nib */}
       <mesh position={[1.5, 0, 0]}>
         <coneGeometry args={[0.09, 0.35, 12]} />
