@@ -112,7 +112,7 @@ function CityMap() {
 
 
   return (
-    <div className={`noir-landing min-h-screen relative overflow-x-hidden ${night ? "city-night" : ""}`}>
+    <div className={`noir-landing min-h-dvh relative overflow-x-hidden ${night ? "city-night" : ""}`}>
       <InboxManager />
       <IncomingToast />
       <IncomingCall />
@@ -131,21 +131,20 @@ function CityMap() {
         />
       )}
 
-
+      <main id="main" role="main">
       {/* ── HERO ── full-viewport cinematic. Detective-desk photo washes
           under the noir palette on every mode; the 3D city sits on top in
           cinematic. Gives the site the Ashcroft-office / FBI-field-office
           vibe requested for v2. */}
       <section
-        className={`crime-scene-hero hero-frame relative min-h-[100svh] flex flex-col items-center px-4 overflow-hidden ${mode === "cinematic" ? "justify-center" : "justify-start pt-24 sm:pt-28"}`}
+        aria-label="MILVERSE opening"
+        className={`crime-scene-hero hero-frame relative min-h-[100svh] flex flex-col items-center px-4 sm:px-6 overflow-hidden ${mode === "cinematic" ? "justify-center" : "justify-start pt-20 sm:pt-24 md:pt-28"}`}
         style={{ ["--crime-scene-img" as string]: `url(${detectiveDeskImg})` }}
       >
         <div className="absolute inset-0 -z-10">
           {mode === "cinematic" ? (
             <CityHero3D className="absolute inset-0" />
           ) : (
-            // LITE / low-memory fallback: static noir backdrop so the hero
-            // never renders as an empty black void.
             <>
               <div
                 className={`absolute inset-0 ${night ? "city-night-lite-bg" : ""}`}
@@ -178,12 +177,7 @@ function CityMap() {
           />
         </div>
 
-        {/* Hero copy block. First-time visitors (and SSR / judges without a
-            local profile) see the poster verbatim. Returning citizens land
-            on the desk instead. The stable min-height container prevents
-            layout shift on either path — hydration idiom follows the
-            existing setView pattern above. */}
-        <div className="w-full flex flex-col items-center min-h-[420px] sm:min-h-[460px]">
+        <div className="w-full flex flex-col items-center min-h-[380px] sm:min-h-[460px]">
           {showBait ? (
             <div className="w-full">
               <div className="stencil text-[10px] text-destructive/90 mb-4 hud-blink text-center">
@@ -195,16 +189,16 @@ function CityMap() {
             <CitizenDesk shift={shift} />
           ) : (
             <>
-              <div className="stencil text-[10px] text-cyan-300/80 mb-4 hud-blink">
+              <div className="stencil text-[10px] text-cyan-300/80 mb-4 hud-blink text-center">
                 {kicker}
               </div>
               <HeroType />
-              <p className="mt-4 max-w-xl text-center text-white/80 text-sm sm:text-base">
+              <p className="mt-4 max-w-xl text-center text-white/80 text-step-0 px-2">
                 Scammers are working your city. Pick up. Play them. Burn them.
               </p>
 
 
-              <div className="mt-8 w-full max-w-[360px]">
+              <div className="mt-6 sm:mt-8 w-full max-w-[380px]">
                 <PlayButton />
                 <StatStrip />
               </div>
@@ -217,12 +211,12 @@ function CityMap() {
         </div>
 
 
-
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 scroll-hint">
+        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 scroll-hint safe-bottom">
           <span className="stencil text-[9px] text-white/50">SCROLL</span>
-          <ChevronDown className="h-4 w-4 text-white/60" />
+          <ChevronDown className="h-4 w-4 text-white/60" aria-hidden />
         </div>
       </section>
+
 
       {/* ── SCROLL STORY ── */}
       <ScrollStory />
