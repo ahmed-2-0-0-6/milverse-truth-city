@@ -124,7 +124,7 @@ function CityMap() {
 
   return (
     <div className={`noir-landing min-h-dvh relative overflow-x-hidden ${night ? "city-night" : ""}`}>
-      <InboxManager />
+      <InboxManager paperDeliveryReady={heroTyped} />
       <IncomingToast />
       <IncomingCall />
       <TopBar />
