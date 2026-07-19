@@ -108,13 +108,13 @@ export function GameBar({ compact = false }: { compact?: boolean }) {
     >
       {/* LEVEL CHIP */}
       <Link
-        to="/profile"
-        hash="the-road"
+        to="/ranks"
         className="stencil text-[10px] tracking-widest rounded border border-border px-2 py-1 text-foreground/90 hover:bg-accent hover:text-primary min-h-[36px] inline-flex items-center whitespace-nowrap"
-        aria-label={`Rank: Level ${snap.levelIdx + 1}, ${snap.rankName}. Open the road.`}
+        aria-label={`Rank: Level ${snap.levelIdx + 1}, ${snap.rankName}. Open the ladder.`}
       >
         LVL {snap.levelIdx + 1} · {snap.rankName}
       </Link>
+
 
 
       {/* XP BAR */}
@@ -135,6 +135,11 @@ export function GameBar({ compact = false }: { compact?: boolean }) {
         <span className="stencil text-[10px] text-muted-foreground whitespace-nowrap tabular-nums">
           {atMax ? "MAX" : `${snap.cur} / ${snap.span}`}
         </span>
+        {!atMax && snap.next && (
+          <span className="stencil text-[10px] text-primary/80 whitespace-nowrap hidden sm:inline">
+            NEXT: {snap.next}
+          </span>
+        )}
         {pop != null && (
           <span
             aria-hidden
@@ -144,6 +149,7 @@ export function GameBar({ compact = false }: { compact?: boolean }) {
           </span>
         )}
       </div>
+
 
       {/* STREAK */}
       {snap.streak >= 1 && (

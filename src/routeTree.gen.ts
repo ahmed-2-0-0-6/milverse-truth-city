@@ -16,6 +16,7 @@ import { Route as StandoffRouteImport } from './routes/standoff'
 import { Route as ShiftRouteImport } from './routes/shift'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as RedHandsRouteImport } from './routes/red-hands'
+import { Route as RanksRouteImport } from './routes/ranks'
 import { Route as QuickTourRouteImport } from './routes/quick-tour'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PressroomRouteImport } from './routes/pressroom'
@@ -82,6 +83,11 @@ const ReviewRoute = ReviewRouteImport.update({
 const RedHandsRoute = RedHandsRouteImport.update({
   id: '/red-hands',
   path: '/red-hands',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RanksRoute = RanksRouteImport.update({
+  id: '/ranks',
+  path: '/ranks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QuickTourRoute = QuickTourRouteImport.update({
@@ -266,6 +272,7 @@ export interface FileRoutesByFullPath {
   '/pressroom': typeof PressroomRoute
   '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
+  '/ranks': typeof RanksRoute
   '/red-hands': typeof RedHandsRoute
   '/review': typeof ReviewRoute
   '/shift': typeof ShiftRoute
@@ -307,6 +314,7 @@ export interface FileRoutesByTo {
   '/pressroom': typeof PressroomRoute
   '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
+  '/ranks': typeof RanksRoute
   '/red-hands': typeof RedHandsRoute
   '/review': typeof ReviewRoute
   '/shift': typeof ShiftRoute
@@ -349,6 +357,7 @@ export interface FileRoutesById {
   '/pressroom': typeof PressroomRoute
   '/profile': typeof ProfileRoute
   '/quick-tour': typeof QuickTourRoute
+  '/ranks': typeof RanksRoute
   '/red-hands': typeof RedHandsRoute
   '/review': typeof ReviewRoute
   '/shift': typeof ShiftRoute
@@ -392,6 +401,7 @@ export interface FileRouteTypes {
     | '/pressroom'
     | '/profile'
     | '/quick-tour'
+    | '/ranks'
     | '/red-hands'
     | '/review'
     | '/shift'
@@ -433,6 +443,7 @@ export interface FileRouteTypes {
     | '/pressroom'
     | '/profile'
     | '/quick-tour'
+    | '/ranks'
     | '/red-hands'
     | '/review'
     | '/shift'
@@ -474,6 +485,7 @@ export interface FileRouteTypes {
     | '/pressroom'
     | '/profile'
     | '/quick-tour'
+    | '/ranks'
     | '/red-hands'
     | '/review'
     | '/shift'
@@ -516,6 +528,7 @@ export interface RootRouteChildren {
   PressroomRoute: typeof PressroomRoute
   ProfileRoute: typeof ProfileRoute
   QuickTourRoute: typeof QuickTourRoute
+  RanksRoute: typeof RanksRoute
   RedHandsRoute: typeof RedHandsRoute
   ReviewRoute: typeof ReviewRoute
   ShiftRoute: typeof ShiftRoute
@@ -584,6 +597,13 @@ declare module '@tanstack/react-router' {
       path: '/red-hands'
       fullPath: '/red-hands'
       preLoaderRoute: typeof RedHandsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ranks': {
+      id: '/ranks'
+      path: '/ranks'
+      fullPath: '/ranks'
+      preLoaderRoute: typeof RanksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/quick-tour': {
@@ -855,6 +875,7 @@ const rootRouteChildren: RootRouteChildren = {
   PressroomRoute: PressroomRoute,
   ProfileRoute: ProfileRoute,
   QuickTourRoute: QuickTourRoute,
+  RanksRoute: RanksRoute,
   RedHandsRoute: RedHandsRoute,
   ReviewRoute: ReviewRoute,
   ShiftRoute: ShiftRoute,
