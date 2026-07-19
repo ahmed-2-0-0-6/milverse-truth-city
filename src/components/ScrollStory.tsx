@@ -193,8 +193,31 @@ export function ScrollStory() {
     };
   }, []);
 
+  // Fixed-viewport desk stays visible whenever the ScrollStory is on screen.
+  const [deskActive, setDeskActive] = useState(false);
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(([e]) => setDeskActive(e.isIntersecting), {
+      threshold: 0,
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div ref={rootRef} className="scrollstory relative">
+      {/* Detective-desk background — one 3D scene fixed to the viewport
+          while any story beat is on screen. Fades in on entry, out on exit. */}
+      <div
+        className={`pointer-events-none fixed inset-0 z-0 transition-opacity duration-700 ${deskActive ? "opacity-100" : "opacity-0"}`}
+        aria-hidden
+      >
+        <Suspense fallback={null}>
+          <DetectiveDesk />
+        </Suspense>
+      </div>
+
       {/* Story beats */}
       {BEATS.map((b, i) => (
         <section
@@ -202,22 +225,13 @@ export function ScrollStory() {
           className={`story-beat relative min-h-[85vh] flex items-center justify-center overflow-hidden px-6 ${b.finale ? "finale-beat" : ""}`}
         >
           <div className="beat-bg absolute inset-0 -z-10" aria-hidden>
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/[0.04] to-transparent" />
-            <div
-              className="absolute inset-0 opacity-30"
+            <div className="absolute inset-0 opacity-20"
               style={{
-                backgroundImage: "radial-gradient(rgba(255,255,255,0.25) 1px, transparent 1px)",
+                backgroundImage: "radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px)",
                 backgroundSize: "3px 3px",
               }}
             />
           </div>
-          {i === 0 && (
-            <div className="absolute inset-0 z-0 pointer-events-none" aria-hidden>
-              <Suspense fallback={null}>
-                <DetectiveDesk />
-              </Suspense>
-            </div>
-          )}
 
           <div className="relative z-10 max-w-4xl text-center">
 
