@@ -3161,3 +3161,62 @@ html[data-high-legibility="on"] .cold-tense {
 .polaroid.locked:hover { transform: rotate(var(--tilt, -1deg)); box-shadow:
     0 1px 0 rgba(255,255,255,0.6) inset,
     0 10px 22px -8px rgba(0,0,0,0.75); }
+
+/* ────────────────────────────────────────────────────────────
+   UI v3 utilities — surfaces, elevation, fluid type, chips
+   ──────────────────────────────────────────────────────────── */
+@utility surface-1 { background-color: var(--surface-1); }
+@utility surface-2 { background-color: var(--surface-2); }
+@utility surface-3 { background-color: var(--surface-3); }
+@utility surface-4 { background-color: var(--surface-4); }
+@utility elev-1 { box-shadow: var(--elev-1); }
+@utility elev-2 { box-shadow: var(--elev-2); }
+@utility elev-3 { box-shadow: var(--elev-3); }
+@utility text-step--1 { font-size: var(--step--1); }
+@utility text-step-0  { font-size: var(--step-0);  line-height: 1.55; }
+@utility text-step-1  { font-size: var(--step-1);  line-height: 1.45; }
+@utility text-step-2  { font-size: var(--step-2);  line-height: 1.3; }
+@utility text-step-3  { font-size: var(--step-3);  line-height: 1.15; letter-spacing: -0.01em; }
+@utility text-step-4  { font-size: var(--step-4);  line-height: 1.05; letter-spacing: -0.015em; }
+@utility text-step-5  { font-size: var(--step-5);  line-height: 1;    letter-spacing: -0.02em; }
+@utility text-step-6  { font-size: var(--step-6);  line-height: 0.95; letter-spacing: -0.025em; }
+
+/* Physical tap target — enforces ≥44px hit area on mobile primary controls */
+@utility tap { min-height: 44px; min-width: 44px; }
+
+/* Unified panel — replaces the ad-hoc bg-card/60 + border-white/10 scatter */
+@utility panel {
+  background-color: var(--surface-2);
+  border: 1px solid var(--stroke-2);
+  border-radius: calc(var(--radius) + 2px);
+  box-shadow: var(--elev-1);
+}
+@utility panel-hover {
+  transition: border-color var(--dur-fast) var(--ease-out),
+              background-color var(--dur-fast) var(--ease-out),
+              transform var(--dur-base) var(--ease-out);
+  &:hover {
+    border-color: var(--stroke-3);
+    background-color: var(--surface-3);
+  }
+}
+
+/* Chip — small pill for status/badge use, honors tap size on interactive form */
+@utility chip {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--stroke-2);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  background: color-mix(in oklab, var(--surface-2) 80%, transparent);
+  color: var(--muted-foreground);
+}
+
+/* Sticky bottom bar sits above iOS safe-area */
+@utility safe-bottom { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+@utility safe-top    { padding-top:    max(0.75rem, env(safe-area-inset-top)); }
+
+/* Mobile viewport helper — swap h-screen for h-dvh where mobile chrome clips */
+@utility min-h-dvh { min-height: 100dvh; }
+@utility h-dvh     { height: 100dvh; }
