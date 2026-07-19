@@ -110,7 +110,7 @@ function ArchivePage() {
   }, [profile, tier]);
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
 
       <DistrictHero

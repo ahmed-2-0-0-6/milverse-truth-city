@@ -100,7 +100,7 @@ function DropPage() {
   const friday = isDesignerFriday(today.dateKey);
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
 
       {/* ── Broadcast banner — the day's forward going out over the city ── */}

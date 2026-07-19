@@ -36,7 +36,7 @@ function FirstPhonePage() {
   const needsHandover = state.ready && state.active && !state.handoverSeen;
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
       <main className="mx-auto max-w-3xl px-4 py-10">
         <Link

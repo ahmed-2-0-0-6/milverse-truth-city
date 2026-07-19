@@ -130,7 +130,7 @@ function PressroomPage() {
 
   if (!authed) {
     return (
-      <div className="min-h-screen grain">
+      <div className="min-h-dvh grain">
         <TopBar />
         <main className="mx-auto max-w-md px-4 py-16">
           <div className="rounded-sm border border-border bg-card p-6">
@@ -165,7 +165,7 @@ function PressroomPage() {
   }
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
       <main className="mx-auto max-w-6xl px-4 py-6">
         <header className="border-b border-border pb-4">

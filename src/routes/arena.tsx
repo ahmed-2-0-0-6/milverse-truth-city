@@ -35,7 +35,7 @@ function ArenaRoute() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-dvh bg-background text-foreground">
       <div className="mx-auto max-w-4xl px-4 pt-8">
         <div
           className={`rounded-lg border p-5 ${

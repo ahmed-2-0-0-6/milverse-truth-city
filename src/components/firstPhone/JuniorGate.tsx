@@ -23,7 +23,7 @@ export function useJuniorGate(districtName: string) {
 
 function JuniorNeutralScreen() {
   return (
-    <div className="min-h-screen grain" aria-busy="true">
+    <div className="min-h-dvh grain" aria-busy="true">
       <TopBar />
       <main className="mx-auto max-w-2xl px-4 py-16">
         <div className="h-40 rounded-2xl border border-border bg-card/50 animate-pulse" />
@@ -34,7 +34,7 @@ function JuniorNeutralScreen() {
 
 function JuniorLockScreen({ districtName }: { districtName: string }) {
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
       <main className="mx-auto max-w-2xl px-4 py-16">
         <Link

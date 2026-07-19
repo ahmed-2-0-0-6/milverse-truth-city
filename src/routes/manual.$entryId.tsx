@@ -25,7 +25,7 @@ export const Route = createFileRoute("/manual/$entryId")({
   },
   component: EntryPage,
   notFoundComponent: () => (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
       <main className="mx-auto max-w-2xl px-4 py-16 text-center">
         <p className="stencil text-xs tracking-widest text-muted-foreground">FILE NOT FOUND</p>
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/manual/$entryId")({
     </div>
   ),
   errorComponent: () => (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
       <main className="mx-auto max-w-2xl px-4 py-16 text-center">
         <p className="stencil text-xs tracking-widest text-destructive">FILE CORRUPTED</p>
@@ -79,7 +79,7 @@ function EntryPage() {
   const stamp = stampDate(e.id);
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
       <main className="mx-auto max-w-3xl px-4 py-10">
         <Link
@@ -214,7 +214,7 @@ function SectionRule() {
 
 function RedactedEntry({ entry: e }: { entry: ManualEntry }) {
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
       <main className="mx-auto max-w-3xl px-4 py-10">
         <Link

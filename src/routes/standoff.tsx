@@ -93,7 +93,7 @@ function StandoffRoute() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-dvh bg-background text-foreground">
       <TopBar />
       {session.stage === "terms" && <TermsScreen onNext={() => set({ stage: "pick" })} />}
       {session.stage === "pick" && (

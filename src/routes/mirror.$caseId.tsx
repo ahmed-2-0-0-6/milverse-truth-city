@@ -238,7 +238,7 @@ function CasePlay() {
     <MaskContext.Provider value={{ active: maskMode, shareCode: maskCode }}>
       <StandoffContext.Provider value={standoffMode}>
         <ColdReadContext.Provider value={coldMode}>
-          <div className="min-h-screen grain">
+          <div className="min-h-dvh grain">
             <TopBar />
             {!coldMode && !standoffMode && !maskMode && (
               <ShiftBanner kind="mirror" caseId={scenario.id} phase={phase} />
