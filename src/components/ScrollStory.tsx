@@ -214,7 +214,7 @@ export function ScrollStory() {
         aria-hidden
       >
         <Suspense fallback={null}>
-          {deskActive && <DetectiveDesk />}
+          <DetectiveDesk />
         </Suspense>
       </div>
 
