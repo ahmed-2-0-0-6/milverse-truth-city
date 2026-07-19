@@ -1437,18 +1437,19 @@ function MessageMeta({
   const r = receiptFor(skin, read, stamp);
   return (
     <div
-      className={`flex items-center gap-1 px-1 font-mono text-[9px] text-white/35 ${isPlayer ? "" : "self-start"}`}
+      className={`flex items-center gap-1 px-1 font-mono text-[10px] text-white/55 ${isPlayer ? "" : "self-start"}`}
       aria-hidden
     >
       {isPlayer && !r.showTicks ? (
-        <span className={read ? skin.readColor : "text-white/35"}>{r.text}</span>
+        <span className={read ? skin.readColor : "text-white/55"}>{r.text}</span>
       ) : (
         <span>{stamp}</span>
       )}
       {isPlayer && r.showTicks && (
-        <span className={read ? skin.readColor : "text-white/35"}>{read ? "✓✓" : "✓"}</span>
+        <span className={read ? skin.readColor : "text-white/55"}>{read ? "✓✓" : "✓"}</span>
       )}
     </div>
+
   );
 }
 
