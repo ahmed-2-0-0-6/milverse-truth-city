@@ -14,19 +14,16 @@ import {
  * it stays quiet until the next Sunday rollover.
  */
 export function PaperNudge() {
-  const [ready, setReady] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const week = supplementWeek();
 
   useEffect(() => {
     if (readLastSeenWeek() === week.weekKey) {
       setDismissed(true);
-      return;
     }
-    setReady(true);
   }, [week.weekKey]);
 
-  if (dismissed || !ready) return null;
+  if (dismissed) return null;
 
   const dismiss = () => {
     markSupplementSeen(week.weekKey);
