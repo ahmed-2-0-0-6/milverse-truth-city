@@ -183,8 +183,8 @@ export function callAlreadyFiredToday(): boolean {
   return loadInbox().firedCalls.length > 0;
 }
 
-/** Fixed delay for the Morning Edition thud. */
-export const PAPER_ARRIVE_SEC = 10;
+/** Fixed delay for the Morning Edition thud. Keep instant so it lands with the notification tower. */
+export const PAPER_ARRIVE_SEC = 0;
 
 /**
  * The Morning Edition delivery. Returns a "paper" InboxItem when an edition

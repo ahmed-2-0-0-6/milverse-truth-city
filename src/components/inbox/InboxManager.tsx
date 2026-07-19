@@ -28,8 +28,10 @@ export function InboxManager() {
   const dismissPaper = useCallback(() => setPaperCard(null), []);
 
   useEffect(() => {
-    if (!junior.ready) return;
-    if (junior.active) return; // never fire for juniors
+    if (junior.ready && junior.active) {
+      setPaperCard(null);
+      return; // never fire for juniors
+    }
     const items = todaysArrivals();
     const already = new Set(loadInbox().arrived);
     const reduce = shouldReduceMotion();
@@ -80,16 +82,41 @@ export function InboxManager() {
 
     // The Morning Edition — read-only edition fetch via /paper's server fn.
     let alive = true;
+    if (!lite) {
+      const dateKey = new Date().toISOString().slice(0, 10);
+      setPaperCard({
+        id: `paper:pending:${dateKey}`,
+        type: "paper",
+        caseId: "paper",
+        route: "/paper",
+        platform: "paper",
+        senderName: "The morning edition is on the desk.",
+        preview: "The paper is here.",
+        arriveAfterSec: 0,
+        editionId: `pending:${dateKey}`,
+        editionNumber: 0,
+        editionDate: dateKey,
+        headline: "The morning edition is on the desk.",
+      });
+    }
     fetchEdition()
       .then((row) => {
         if (!alive) return;
         const edition = row as unknown as Edition | null;
         const paper = morningEdition(new Date(), edition);
-        if (!paper) return;
+        if (!paper) {
+          setPaperCard(null);
+          return;
+        }
         const alreadyArrived = new Set(loadInbox().arrived).has(paper.id);
         if (lite) {
           // LITE: land it in the tray immediately, no floating card.
           if (!alreadyArrived) markArrived(paper.id);
+          return;
+        }
+        if (PAPER_ARRIVE_SEC <= 0) {
+          if (!alreadyArrived) markArrived(paper.id);
+          setPaperCard(paper);
           return;
         }
         const h = window.setTimeout(() => {
