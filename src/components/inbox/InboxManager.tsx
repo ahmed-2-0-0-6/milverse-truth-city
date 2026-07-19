@@ -19,7 +19,11 @@ import { getLatestEdition } from "@/lib/paper.functions";
 import type { Edition } from "@/lib/paper/types";
 import { PaperDropCard } from "./PaperDropCard";
 
-export function InboxManager() {
+type InboxManagerProps = {
+  paperDeliveryReady?: boolean;
+};
+
+export function InboxManager({ paperDeliveryReady = true }: InboxManagerProps) {
   const { mode } = useVisualMode();
   const junior = useJuniorMode();
   const fetchEdition = useServerFn(getLatestEdition);
@@ -82,6 +86,13 @@ export function InboxManager() {
 
     // The Morning Edition — read-only edition fetch via /paper's server fn.
     let alive = true;
+    if (!paperDeliveryReady) {
+      setPaperCard(null);
+      return () => {
+        alive = false;
+        for (const h of handles) window.clearTimeout(h);
+      };
+    }
     if (!lite) {
       const dateKey = new Date().toISOString().slice(0, 10);
       setPaperCard({
@@ -133,7 +144,7 @@ export function InboxManager() {
       alive = false;
       for (const h of handles) window.clearTimeout(h);
     };
-  }, [mode, junior.ready, junior.active, fetchEdition]);
+  }, [mode, junior.ready, junior.active, fetchEdition, paperDeliveryReady]);
 
   if (!paperCard || !paperCard.editionId) return null;
   return (
