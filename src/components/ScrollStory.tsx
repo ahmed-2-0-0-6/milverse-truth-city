@@ -213,9 +213,12 @@ export function ScrollStory() {
           </div>
           {i === 0 && (
             <div className="absolute inset-0 z-0 pointer-events-none" aria-hidden>
-              <DetectiveDesk />
+              <Suspense fallback={null}>
+                <DetectiveDesk />
+              </Suspense>
             </div>
           )}
+
           <div className="relative z-10 max-w-4xl text-center">
 
             <div className="stencil text-[10px] text-cyan-300/70 mb-6">BEAT · 0{i + 1} / 04</div>
