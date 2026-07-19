@@ -28,8 +28,10 @@ export function InboxManager() {
   const dismissPaper = useCallback(() => setPaperCard(null), []);
 
   useEffect(() => {
-    if (!junior.ready) return;
-    if (junior.active) return; // never fire for juniors
+    if (junior.ready && junior.active) {
+      setPaperCard(null);
+      return; // never fire for juniors
+    }
     const items = todaysArrivals();
     const already = new Set(loadInbox().arrived);
     const reduce = shouldReduceMotion();
