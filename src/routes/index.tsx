@@ -68,6 +68,8 @@ function CityMap() {
   // container to avoid layout shift on either path.
   const [returning, setReturning] = useState(false);
   const [showBait, setShowBait] = useState(false);
+  const [showBeacon, setShowBeacon] = useState(true);
+
   // THE NIGHT SHIFT — landing recomputes its band every 60s so a session
   // left open across a boundary catches up. Elsewhere band is per-mount.
   const [shift, setShift] = useState<Shift>(() => currentShift());
@@ -82,9 +84,13 @@ function CityMap() {
     // citizens go straight to the desk (they've been baited already).
     setShowBait(!isReturner && !hasSeenLiveBait());
     setShift(currentShift());
+    try {
+      if (sessionStorage.getItem("mv:beacon-dismissed") === "1") setShowBeacon(false);
+    } catch { /* sessionStorage unavailable */ }
     const tick = window.setInterval(() => setShift(currentShift()), 60_000);
     return () => window.clearInterval(tick);
   }, []);
+
 
 
   useEffect(() => {
@@ -123,6 +129,7 @@ function CityMap() {
           kind="bait"
           shift={shift}
           onDismiss={() => setShowBait(false)}
+          stack={showBeacon ? 1 : 0}
         />
       )}
       {booted && !showBait && returning && (
@@ -130,8 +137,21 @@ function CityMap() {
           kind="desk"
           shift={shift}
           onDismiss={() => setReturning(false)}
+          stack={showBeacon ? 1 : 0}
         />
       )}
+      {booted && showBeacon && (
+        <LandingNudge
+          kind="beacon"
+          shift={shift}
+          onDismiss={() => {
+            setShowBeacon(false);
+            try { sessionStorage.setItem("mv:beacon-dismissed", "1"); } catch { /* noop */ }
+          }}
+          stack={0}
+        />
+      )}
+
       {intro && booted && !showBait && (
         <FirstCall
           onDone={() => {
@@ -206,9 +226,8 @@ function CityMap() {
             <StatStrip />
           </div>
 
-          <div className="mt-6 w-full max-w-xl">
-            <DailyBeacon />
-          </div>
+
+
         </div>
 
 
