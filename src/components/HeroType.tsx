@@ -60,11 +60,7 @@ export function HeroType({ onComplete }: HeroTypeProps) {
           key={i}
           className={i < n ? "neon-letter" : "opacity-0"}
           style={{ animationDelay: `${i * 40}ms` }}
-          onAnimationEnd={
-            i === TEXT.length - 1
-              ? (event) => completeWhenPainted(event.currentTarget)
-              : undefined
-          }
+
         >
           {ch === " " ? "\u00A0" : ch}
         </span>
