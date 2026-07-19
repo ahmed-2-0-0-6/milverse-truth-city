@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Volume2, VolumeX, BookOpen, Menu, X } from "lucide-react";
+import { Volume2, VolumeX, BookOpen, Menu } from "lucide-react";
 import { InboxTray } from "@/components/inbox/InboxTray";
 import { RankChip } from "@/components/rank/RankChip";
 import { useJuniorMode } from "@/hooks/useJuniorMode";
