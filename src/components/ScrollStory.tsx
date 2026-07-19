@@ -265,7 +265,7 @@ export function ScrollStory() {
       </section>
 
       {/* Horizontal district gallery */}
-      <div ref={horizontalRef} className="relative hidden md:block overflow-hidden">
+      <div ref={horizontalRef} className="relative hidden overflow-hidden">
         <div className="absolute top-8 left-1/2 -translate-x-1/2 stencil text-[10px] text-cyan-300/70 z-10">
           THE DISTRICTS · SCROLL →
         </div>
@@ -391,7 +391,7 @@ export function ScrollStory() {
       </div>
 
       {/* Mobile district stack */}
-      <div className="md:hidden px-4 py-12 space-y-4">
+      <div className="px-4 py-12 space-y-4 max-w-2xl mx-auto">
         <div className="stencil text-[10px] text-cyan-300/70 text-center">THE DISTRICTS</div>
         {DISTRICTS.map((d) => {
           const isSubmerging = submerging === d.key;
