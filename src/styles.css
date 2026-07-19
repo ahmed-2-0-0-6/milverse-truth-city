@@ -3053,3 +3053,83 @@ html[data-high-legibility="on"] .cold-tense {
   background: radial-gradient(circle at 30% 30%, #ff9a8a, #b3251b 65%, #4a0e08);
   box-shadow: 0 1px 3px rgba(0,0,0,0.7), inset 0 -1px 1px rgba(0,0,0,0.4);
 }
+
+/* ────────────────────────────────────────────────────────────
+   POLAROID DOSSIER — Field Manual entries render as instant
+   photos pinned to the desk. Each card gets a slight tilt,
+   a white paper border, and a pushpin at the top.
+   ──────────────────────────────────────────────────────────── */
+.polaroid-desk {
+  background-image:
+    linear-gradient(180deg, rgba(8,6,4,0.72), rgba(8,6,4,0.88)),
+    url('/src/assets/polaroid-desk.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+@media (max-width: 768px) {
+  .polaroid-desk { background-attachment: scroll; }
+}
+.polaroid {
+  position: relative;
+  background: #f5f1e6;
+  color: #1a1512;
+  padding: 14px 14px 22px;
+  border-radius: 2px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.6) inset,
+    0 10px 22px -8px rgba(0,0,0,0.75),
+    0 2px 4px rgba(0,0,0,0.35);
+  transition: transform 200ms ease, box-shadow 200ms ease, filter 200ms ease;
+  transform: rotate(var(--tilt, -1.2deg));
+}
+.polaroid:nth-child(3n)   { --tilt:  1.4deg; }
+.polaroid:nth-child(4n+1) { --tilt: -0.8deg; }
+.polaroid:nth-child(5n)   { --tilt:  0.6deg; }
+.polaroid:hover, a.polaroid:focus-visible {
+  transform: rotate(0deg) translateY(-3px) scale(1.015);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.6) inset,
+    0 22px 40px -10px rgba(0,0,0,0.85),
+    0 4px 8px rgba(0,0,0,0.45);
+  z-index: 3;
+}
+.polaroid::before {
+  /* pushpin */
+  content: "";
+  position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+  width: 12px; height: 12px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ff9a8a, #b3251b 65%, #4a0e08);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.7), inset 0 -1px 1px rgba(0,0,0,0.4);
+  z-index: 2;
+}
+.polaroid-photo {
+  background: #0a0a0a;
+  aspect-ratio: 4 / 3;
+  border-radius: 1px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), inset 0 0 24px rgba(0,0,0,0.9);
+  position: relative; overflow: hidden;
+}
+.polaroid-photo.redacted::after {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.85) 0 6px, rgba(20,20,20,0.85) 6px 12px);
+}
+.polaroid-caption {
+  font-family: "Special Elite", "Courier New", monospace;
+  color: #1a1512;
+  text-align: center;
+  margin-top: 10px;
+  letter-spacing: 0.05em;
+}
+.polaroid-caption .code {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: #6b5a48;
+  margin-top: 2px;
+}
+.polaroid.locked { filter: grayscale(0.4) brightness(0.85); }
+.polaroid.locked:hover { transform: rotate(var(--tilt, -1deg)); box-shadow:
+    0 1px 0 rgba(255,255,255,0.6) inset,
+    0 10px 22px -8px rgba(0,0,0,0.75); }

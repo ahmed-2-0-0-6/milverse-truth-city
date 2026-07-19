@@ -66,7 +66,7 @@ function ManualIndex() {
   const pct = Math.round((unlockedCount / MANUAL_ENTRIES.length) * 100);
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-screen grain polaroid-desk">
       <TopBar />
 
       {/* ── Redacted-dossier banner — bars lift as files declassify ── */}
@@ -177,66 +177,63 @@ function ManualIndex() {
           </p>
         </EngravedReveal>
 
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
           {MANUAL_ENTRIES.map((e) => {
             const isUnlocked = unlocked.has(e.id);
             const rec = record.get(e.id);
             const chipTone =
-              rec && rec.losses > 0 ? "text-caution" : "text-muted-foreground";
+              rec && rec.losses > 0 ? "text-red-700" : "text-neutral-600";
             const inner = (
               <>
-                <div className="flex items-center justify-between gap-2">
-                  <div className="stencil text-[10px] tracking-widest text-muted-foreground">
-                    FILE · {e.code}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {rec && (
-                      <span
-                        className={`font-mono text-[9px] tracking-widest ${chipTone}`}
-                        aria-label={`Met ${rec.met}, lost ${rec.losses}`}
-                      >
-                        MET {rec.met} · LOST {rec.losses}
+                <div className={`polaroid-photo ${isUnlocked ? "" : "redacted"} flex items-end justify-between p-3`}>
+                  {isUnlocked ? (
+                    <>
+                      <FileText className="h-6 w-6 text-primary/70" />
+                      <span className="stencil text-[9px] tracking-widest text-primary/80">
+                        DECLASSIFIED
                       </span>
-                    )}
-                    {isUnlocked ? (
-                      <span className="inline-flex items-center gap-1 stencil text-[9px] tracking-widest text-primary">
-                        <FileText className="h-3 w-3" /> DECLASSIFIED
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="h-6 w-6 text-neutral-500 relative z-10" />
+                      <span className="stencil text-[9px] tracking-widest text-neutral-400 relative z-10">
+                        REDACTED
                       </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 stencil text-[9px] tracking-widest text-muted-foreground">
-                        <Lock className="h-3 w-3" /> REDACTED
-                      </span>
-                    )}
-                  </div>
+                    </>
+                  )}
                 </div>
-                <div
-                  className="mt-3 text-2xl font-black tracking-tight leading-tight"
-                  style={{ fontFamily: '"Bebas Neue", sans-serif' }}
-                >
-                  {isUnlocked ? e.name : <RedactedTitle text={e.name} />}
+                <div className="polaroid-caption">
+                  <div className="text-[15px] font-semibold leading-tight">
+                    {isUnlocked ? e.name : <RedactedTitle text={e.name} />}
+                  </div>
+                  <span className="code">FILE · {e.code}</span>
+                  {rec && (
+                    <span className={`code ${chipTone}`}>
+                      MET {rec.met} · LOST {rec.losses}
+                    </span>
+                  )}
+                  {isUnlocked && (
+                    <p className="mt-2 text-[11px] italic text-neutral-700 leading-snug px-1">
+                      {e.oneLine}
+                    </p>
+                  )}
                 </div>
-                <p className="mt-1 text-sm text-muted-foreground italic">
-                  {isUnlocked ? e.oneLine : "Face this tactic in play to declassify the file."}
-                </p>
               </>
             );
 
-            const skin = isUnlocked
-              ? "border-primary/40 bg-card hover:border-primary hover:-translate-y-0.5"
-              : "border-dashed border-border bg-muted/20 cursor-not-allowed";
             return isUnlocked ? (
               <Link
                 key={e.id}
                 to="/manual/$entryId"
                 params={{ entryId: e.id }}
-                className={`group rounded-xl border p-5 transition ${skin}`}
+                className="polaroid block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 {inner}
               </Link>
             ) : (
               <div
                 key={e.id}
-                className={`rounded-xl border p-5 ${skin}`}
+                className="polaroid locked"
                 title="Face this tactic in play to declassify."
                 aria-disabled="true"
               >
@@ -245,6 +242,7 @@ function ManualIndex() {
             );
           })}
         </div>
+
 
         {/* Boss Dossiers — declassified via Boss Protocol wins */}
         <div className="mt-12">
