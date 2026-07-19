@@ -100,13 +100,6 @@ function CityMap() {
     if (mode !== "cinematic") setBooted(true);
   }, [mode]);
 
-  // Fire the left-side notifications on a fixed 800ms schedule from landing,
-  // independent of the hero typing animation.
-  useEffect(() => {
-    const t = window.setTimeout(() => setHeroTyped(true), 800);
-    return () => window.clearTimeout(t);
-  }, []);
-
   const setViewPersist = (v: "map" | "list") => {
     setView(v);
     try {
