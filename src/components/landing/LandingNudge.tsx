@@ -33,7 +33,7 @@ export function LandingNudge({ kind, shift, onDismiss, stack = 0 }: Props) {
       stack === 0 ? "bottom-4" : stack === 1 ? "bottom-24" : "bottom-44";
     return (
       <div
-        className={`fixed z-40 ${bottomClass} right-4 left-4 sm:left-auto sm:max-w-sm`}
+        className={`fixed z-40 ${bottomClass} left-4 right-4 sm:right-auto sm:max-w-sm`}
         role="region"
         aria-label="Today's Forward"
       >
@@ -69,7 +69,7 @@ export function LandingNudge({ kind, shift, onDismiss, stack = 0 }: Props) {
   return (
     <>
       <div
-        className={`fixed z-40 ${bottomClass} right-4 left-4 sm:left-auto sm:max-w-sm`}
+        className={`fixed z-40 ${bottomClass} left-4 right-4 sm:right-auto sm:max-w-sm`}
         role="region"
         aria-label={title}
       >
