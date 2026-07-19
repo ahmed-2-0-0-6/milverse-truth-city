@@ -195,7 +195,7 @@ function CaseFiles() {
   const frontierTier = maxTier;
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <InboxManager />
       <IncomingToast />
       <IncomingCall />
@@ -214,7 +214,8 @@ function CaseFiles() {
         }
         rooted="SCENARIOS ROOTED IN REAL REPORTED SCAM PATTERNS FROM PAKISTAN"
       />
-      <main className="mx-auto max-w-6xl px-4 py-8">
+      <main id="main" role="main" className="mx-auto max-w-6xl px-4 sm:px-6 py-8 safe-bottom">
+
         <Link
           to="/"
           className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
