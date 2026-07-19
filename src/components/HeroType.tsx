@@ -6,21 +6,33 @@ const TEXT = "TRAIN YOUR TRUST";
 export function HeroType() {
   const [n, setN] = useState(0);
   useEffect(() => {
+    const fire = () => {
+      try {
+        window.dispatchEvent(new CustomEvent("milverse:hero-typed"));
+      } catch {
+        /* noop */
+      }
+    };
     if (
       typeof window !== "undefined" &&
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
     ) {
       setN(TEXT.length);
+      fire();
       return;
     }
     let i = 0;
     const id = window.setInterval(() => {
       i++;
       setN(i);
-      if (i >= TEXT.length) window.clearInterval(id);
+      if (i >= TEXT.length) {
+        window.clearInterval(id);
+        fire();
+      }
     }, 60);
     return () => window.clearInterval(id);
   }, []);
+
   return (
     <h1
       className="hero-type text-5xl sm:text-7xl md:text-8xl lg:text-[9rem] font-black tracking-[-0.02em] leading-[0.85] text-white text-center"

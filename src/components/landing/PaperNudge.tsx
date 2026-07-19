@@ -13,6 +13,7 @@ import {
  */
 export function PaperNudge() {
   const [dismissed, setDismissed] = useState(false);
+  const [ready, setReady] = useState(false);
   const week = supplementWeek();
 
   useEffect(() => {
@@ -26,18 +27,25 @@ export function PaperNudge() {
   }, [week.weekKey]);
 
   useEffect(() => {
-    const id = window.setTimeout(() => {
-      try {
-        if (sessionStorage.getItem(`milverse.supplement.dismissed.${week.weekKey}`) === "1") return;
-      } catch {
-        /* sessionStorage unavailable */
-      }
-      setDismissed(false);
-    }, 0);
-    return () => window.clearTimeout(id);
-  }, [week.weekKey]);
+    // Deliver the paper exactly when the hero headline finishes typing.
+    // Fallback: if the event never fires (e.g. hero not mounted), reveal after
+    // the maximum expected type duration so the paper is never stranded.
+    let done = false;
+    const reveal = () => {
+      if (done) return;
+      done = true;
+      setReady(true);
+    };
+    window.addEventListener("milverse:hero-typed", reveal, { once: true });
+    const fallback = window.setTimeout(reveal, 1400);
+    return () => {
+      window.removeEventListener("milverse:hero-typed", reveal);
+      window.clearTimeout(fallback);
+    };
+  }, []);
 
-  if (dismissed) return null;
+  if (dismissed || !ready) return null;
+
 
   const dismiss = () => {
     try {
