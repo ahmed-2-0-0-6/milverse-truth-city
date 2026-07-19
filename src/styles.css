@@ -3276,3 +3276,69 @@ html { scroll-padding-top: 72px; }
 @media (min-width: 640px) {
   .hub-header-row { display: flex; flex-wrap: wrap; justify-content: space-between; }
 }
+
+/* ────────────────────────────────────────────────────────────
+   UI v3 · Phase 6 · micro-polish
+   Unified hover/press feedback, shimmer skeleton, dialog motion.
+   ──────────────────────────────────────────────────────────── */
+
+/* Interactive press feedback — apply to any clickable panel/card/button */
+@utility press {
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+  &:hover { transform: translateY(-1px); }
+  &:active { transform: translateY(0); transition-duration: 60ms; }
+}
+
+/* Lift — pair with .panel to get a subtle elevated hover */
+@utility lift {
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--elev-2);
+    border-color: var(--stroke-3);
+  }
+  &:active { transform: translateY(0); }
+}
+
+/* Shimmer for the shadcn <Skeleton /> — swaps the flat pulse for a sweep */
+[data-slot="skeleton"],
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--muted) 70%, transparent);
+}
+[data-slot="skeleton"]::after,
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    color-mix(in oklab, var(--foreground) 6%, transparent) 50%,
+    transparent 80%
+  );
+  transform: translateX(-100%);
+  animation: skeleton-sweep 1.6s var(--ease-out) infinite;
+}
+@keyframes skeleton-sweep {
+  to { transform: translateX(100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="skeleton"]::after,
+  .skeleton-shimmer::after { animation: none; }
+}
+
+/* Consistent divider — soft, token-driven */
+@utility rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--stroke-2), transparent);
+  border: 0;
+}
+
