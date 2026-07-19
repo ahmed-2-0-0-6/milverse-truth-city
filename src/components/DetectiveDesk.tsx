@@ -488,9 +488,11 @@ export function DetectiveDesk({ className = "" }: Props) {
         >
           <PauseWhenHidden />
           <DeskRig />
-          <fog attach="fog" args={["#050301", 16, 40]} />
-          <ambientLight intensity={0.08} color="#3a2010" />
-          <hemisphereLight args={["#4a2a10", "#000000", 0.12]} />
+          <fog attach="fog" args={["#0a0603", 22, 55]} />
+          <ambientLight intensity={0.35} color="#5a3a20" />
+          <hemisphereLight args={["#7a4a20", "#000000", 0.4]} />
+          <pointLight position={[0, 6, 0]} intensity={2.5} color="#ffb060" distance={20} decay={1.5} />
+
           <LampBreath />
           <SpinningDesk>
             <Tabletop />
