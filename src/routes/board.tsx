@@ -117,9 +117,9 @@ function BoardPage() {
   );
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
-      <main className="mx-auto max-w-3xl px-4 py-10">
+      <main id="main" role="main" className="mx-auto max-w-3xl px-4 sm:px-6 py-10 safe-bottom">
         <Link
           to="/"
           className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
@@ -129,7 +129,7 @@ function BoardPage() {
 
         <header className="mt-4">
           <div className="font-mono text-xs tracking-[0.3em] text-primary">THE CITY BOARD</div>
-          <h1 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight">
+          <h1 className="mt-2 text-step-5 font-semibold tracking-tight">
             Your crew, ranked.
           </h1>
           <p className="mt-3 text-sm text-muted-foreground max-w-xl">
@@ -137,6 +137,7 @@ function BoardPage() {
             knows that.
           </p>
         </header>
+
 
         {!active ? (
           <section
