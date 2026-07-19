@@ -124,6 +124,8 @@ function CityMap() {
       <IncomingCall />
       {!booted && <BootScreen onDone={() => setBooted(true)} />}
       <TopBar />
+      {booted && <PaperNudge />}
+
       {booted && showBait && (
         <LandingNudge
           kind="bait"
