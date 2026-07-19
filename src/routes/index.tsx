@@ -22,6 +22,8 @@ import { IncomingCall } from "@/components/inbox/IncomingCall";
 import { FirstCall } from "@/components/onboarding/FirstCall";
 import { hasSeenLiveBait } from "@/components/landing/LiveBait";
 import { LandingNudge } from "@/components/landing/LandingNudge";
+import { PaperNudge } from "@/components/landing/PaperNudge";
+
 import { isReturningCitizen } from "@/lib/city/returning";
 import { currentShift, isNightRegister, type Shift } from "@/lib/city/shift";
 import detectiveDeskImg from "@/assets/detective-desk.jpg";
