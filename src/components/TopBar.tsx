@@ -166,14 +166,9 @@ export function TopBar() {
             <SheetContent side="right" className="w-full sm:max-w-sm overflow-y-auto p-0">
               <div className="flex items-center justify-between border-b border-border px-4 py-3 safe-top">
                 <SheetTitle className="stencil text-sm text-foreground">MILVERSE</SheetTitle>
-                <SheetClose
-                  className="tap inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:text-foreground hover:bg-accent"
-                  aria-label="Close menu"
-                >
-                  <X className="h-4 w-4" aria-hidden />
-                </SheetClose>
               </div>
               <SheetDescription className="sr-only">Site navigation and account</SheetDescription>
+
 
               {/* Status strip inside the drawer — one glance summary */}
               <div className="border-b border-border/60 px-4 py-3 flex items-center gap-3 text-[11px] font-mono text-muted-foreground">
