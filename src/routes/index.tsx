@@ -129,7 +129,7 @@ function CityMap() {
       <IncomingCall />
       <TopBar />
       <div
-        className="fixed z-[260] bottom-4 left-4 w-[calc(100%-2rem)] sm:w-[22rem] max-h-[80dvh] overflow-y-auto flex flex-col-reverse gap-3 pointer-events-none [&>*]:pointer-events-auto"
+        className="fixed z-[260] bottom-4 left-4 w-[calc(100%-2rem)] sm:w-[22rem] max-h-[80dvh] overflow-y-auto flex flex-col-reverse gap-3 pointer-events-none [&>*]:pointer-events-auto [&>*]:nudge-slide-in"
         aria-label="Notifications"
       >
         {booted && showBeacon && (

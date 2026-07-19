@@ -22,15 +22,6 @@ export function HeroType({ onComplete }: HeroTypeProps) {
     }
   };
 
-  const completeWhenPainted = (el: HTMLElement) => {
-    // Fire ~600-700ms earlier: signal on the very first paint of the last
-    // letter instead of waiting for its glow to ramp up.
-    window.requestAnimationFrame(() => {
-      void el;
-      complete();
-    });
-  };
-
   useEffect(() => {
     if (
       typeof window !== "undefined" &&
@@ -40,6 +31,10 @@ export function HeroType({ onComplete }: HeroTypeProps) {
       complete();
       return;
     }
+    // Fire the "hero-typed" signal ~200ms after the typing animation begins,
+    // so left-side notifications start their slow arrival right after the
+    // headline kicks off (not after it finishes).
+    const signal = window.setTimeout(complete, 200);
     let i = 0;
     const id = window.setInterval(() => {
       i++;
@@ -48,7 +43,10 @@ export function HeroType({ onComplete }: HeroTypeProps) {
         window.clearInterval(id);
       }
     }, 60);
-    return () => window.clearInterval(id);
+    return () => {
+      window.clearInterval(id);
+      window.clearTimeout(signal);
+    };
   }, []);
 
   return (
@@ -62,11 +60,7 @@ export function HeroType({ onComplete }: HeroTypeProps) {
           key={i}
           className={i < n ? "neon-letter" : "opacity-0"}
           style={{ animationDelay: `${i * 40}ms` }}
-          onAnimationEnd={
-            i === TEXT.length - 1
-              ? (event) => completeWhenPainted(event.currentTarget)
-              : undefined
-          }
+
         >
           {ch === " " ? "\u00A0" : ch}
         </span>
