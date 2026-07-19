@@ -26,7 +26,10 @@ import { AccessPanel } from "@/components/AccessPanel";
 import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp } from "@/lib/ranks";
 
-const NAV_GROUPS: { label: string; items: { label: string; to: string; desc?: string }[] }[] = [
+type NavItem = { label: string; to: string; desc?: string };
+type NavGroup = { label: string; items: NavItem[] };
+
+const NAV_GROUPS: NavGroup[] = [
   {
     label: "PLAY",
     items: [
@@ -62,6 +65,14 @@ const NAV_GROUPS: { label: string; items: { label: string; to: string; desc?: st
   },
 ];
 
+// Desktop primary rail — one item per group, everything else lives in the full menu
+const DESKTOP_PRIMARY: NavItem[] = [
+  { label: "City", to: "/" },
+  { label: "Mirror", to: "/mirror" },
+  { label: "Shift", to: "/shift" },
+  { label: "Feed", to: "/feed" },
+  { label: "Manual", to: "/manual" },
+];
 
 export function TopBar() {
   const [profile, setProfile] = useState<TrustProfile | null>(null);
@@ -112,67 +123,89 @@ export function TopBar() {
           ? "text-destructive border-destructive/50"
           : "text-muted-foreground border-border";
 
+  const isActive = (to: string) => (to === "/" ? pathname === "/" : pathname.startsWith(to));
+
   return (
-    <header className="print:hidden sticky top-0 z-50 border-b-2 border-primary/30 bg-background/90 backdrop-blur">
-      <div className="mx-auto grid max-w-6xl grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-2.5">
-        <Link to="/" className="flex items-center gap-3 group min-w-0">
-          <div className="relative h-7 w-7 shrink-0">
+    <header
+      role="banner"
+      className="print:hidden sticky top-0 z-50 border-b border-primary/25 bg-background/85 backdrop-blur-md supports-[backdrop-filter]:bg-background/70"
+    >
+      <div className="mx-auto grid max-w-6xl grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 safe-top">
+        {/* ── Brand ── */}
+        <Link
+          to="/"
+          className="flex items-center gap-2 sm:gap-3 group min-w-0 focus-visible:outline-none rounded-md -m-1 p-1"
+          aria-label="MILVERSE home"
+        >
+          <div className="relative h-7 w-7 shrink-0" aria-hidden>
             <div className="absolute inset-0 rounded-sm bg-primary shadow-[0_0_18px_oklch(0.82_0.14_195/0.7)] group-hover:animate-pulse" />
             <div className="absolute inset-1 rounded-sm border border-background/60" />
           </div>
           <div className="min-w-0">
-            <div className="stencil text-sm text-foreground leading-none">MILVERSE</div>
-            <div className="stencil text-[9px] text-primary/70 mt-0.5 hidden sm:block lg:hidden xl:block truncate">
+            <div className="stencil text-[13px] sm:text-sm text-foreground leading-none">
+              MILVERSE
+            </div>
+            <div className="stencil text-[9px] text-primary/70 mt-0.5 hidden xl:block truncate">
               MEDIA &amp; INFORMATION LITERACY LAB
             </div>
           </div>
         </Link>
 
-        {/* Desktop primary nav */}
-        <nav aria-label="Primary" className="hidden lg:flex items-center justify-center gap-1">
-          {NAV_GROUPS.flatMap((g) => g.items)
-            .filter((i) => ["/", "/first-phone", "/educators", "/family", "/visit"].includes(i.to))
-            .map((item) => {
-              const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  aria-current={active ? "page" : undefined}
-                  className={`relative stencil text-[10px] tracking-widest rounded px-2.5 py-1.5 transition-colors ${
-                    active
-                      ? "text-primary bg-primary/10 after:absolute after:left-2 after:right-2 after:-bottom-[9px] after:h-[2px] after:bg-primary after:shadow-[0_0_8px_oklch(0.82_0.14_195/0.7)]"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                  }`}
-                >
-                  {item.label.toUpperCase()}
-                </Link>
-              );
-            })}
-
+        {/* ── Desktop primary nav ── */}
+        <nav
+          aria-label="Primary"
+          className="hidden lg:flex items-center justify-center gap-0.5"
+        >
+          {DESKTOP_PRIMARY.map((item) => {
+            const active = isActive(item.to);
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                aria-current={active ? "page" : undefined}
+                className={`relative stencil text-[10px] tracking-widest rounded-md px-3 py-2 transition-colors ${
+                  active
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                }`}
+              >
+                {item.label.toUpperCase()}
+                {active && (
+                  <span
+                    aria-hidden
+                    className="absolute left-3 right-3 -bottom-[9px] h-[2px] bg-primary shadow-[0_0_8px_oklch(0.82_0.14_195/0.7)]"
+                  />
+                )}
+              </Link>
+            );
+          })}
           <button
             onClick={() => setNavOpen(true)}
-            className="stencil text-[10px] tracking-widest rounded px-2.5 py-1.5 text-muted-foreground hover:text-foreground hover:bg-accent inline-flex items-center gap-1"
+            className="stencil text-[10px] tracking-widest rounded-md px-3 py-2 text-muted-foreground hover:text-foreground hover:bg-accent inline-flex items-center gap-1"
             aria-label="Open full menu"
           >
-            <Menu className="h-3.5 w-3.5" /> ALL
+            <Menu className="h-3.5 w-3.5" aria-hidden /> ALL
           </button>
         </nav>
 
-        <div className="flex items-center gap-2 justify-end">
-          <div className="hidden xl:flex items-center gap-2 stencil text-[10px] text-muted-foreground border border-border rounded px-2.5 py-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary hud-blink" />
+        {/* ── Status / actions ── */}
+        <div className="flex items-center gap-1 sm:gap-1.5 justify-end">
+          <div className="hidden xl:flex items-center gap-2 chip">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary hud-blink" aria-hidden />
             <span>HANDLE</span>
-            <span className="text-foreground">{call}</span>
+            <span className="text-foreground normal-case tracking-normal">{call}</span>
           </div>
+
           <Link
             to="/manual"
-            className="hidden md:inline-flex items-center gap-1.5 rounded border border-border px-2 py-1.5 stencil text-[10px] text-muted-foreground hover:text-foreground hover:bg-accent"
+            className="hidden md:inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 h-9 stencil text-[10px] text-muted-foreground hover:text-foreground hover:bg-accent"
+            aria-label="Field Manual"
             title="Field Manual"
           >
-            <BookOpen className="h-3.5 w-3.5" />
+            <BookOpen className="h-3.5 w-3.5" aria-hidden />
             <span className="hidden lg:inline">MANUAL</span>
           </Link>
+
           {isGameSurface(pathname) && (
             <div className="hidden md:flex">
               <GameBar />
@@ -182,55 +215,72 @@ export function TopBar() {
           {showInbox && <InboxTray />}
           <VisualQualityToggle />
           <AccessPanel />
+
           <button
+            type="button"
             onClick={() => {
               setMuted(!muted);
               setLocalMuted(!muted);
             }}
-            className="rounded border border-border p-2 text-muted-foreground transition hover:text-foreground hover:bg-accent"
+            className="hidden sm:inline-flex items-center justify-center h-9 w-9 rounded-md border border-border text-muted-foreground transition hover:text-foreground hover:bg-accent"
             aria-label={muted ? "Unmute sound" : "Mute sound"}
-            title={muted ? "Unmute sound" : "Mute sound"}
+            aria-pressed={muted}
           >
-            {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+            {muted ? <VolumeX className="h-4 w-4" aria-hidden /> : <Volume2 className="h-4 w-4" aria-hidden />}
           </button>
+
           <Link
             to="/profile"
-            className={`hidden sm:flex items-center gap-2 rounded border px-2.5 py-1.5 stencil text-[10px] transition-colors hover:bg-accent ${toneClass}`}
+            className={`hidden md:flex items-center gap-2 rounded-md border px-2.5 h-9 stencil text-[10px] transition-colors hover:bg-accent ${toneClass}`}
             title={`${noirRank.current.name} · ${xp} XP${noirRank.next ? ` · next ${noirRank.next.name}` : ""}`}
+            aria-label={`Profile, rank ${noirRank.current.name}, ${xp} XP`}
           >
             <span className="opacity-70">{noirRank.current.code}</span>
-            <span className="hidden md:inline text-foreground/90">{noirRank.current.name}</span>
-            <span className="hidden lg:inline-block h-1 w-8 overflow-hidden rounded-full bg-muted">
+            <span className="hidden lg:inline text-foreground/90">{noirRank.current.name}</span>
+            <span className="hidden lg:inline-block h-1 w-8 overflow-hidden rounded-full bg-muted" aria-hidden>
               <span
-                className="block h-full bg-primary"
+                className="block h-full bg-primary transition-[width] duration-500"
                 style={{ width: `${Math.round(noirRank.progress * 100)}%` }}
               />
             </span>
-            <span className="hidden lg:inline text-muted-foreground">·</span>
-            <span className="hidden lg:inline opacity-80">{cal.label.toUpperCase()}</span>
+            <span className="hidden xl:inline text-muted-foreground" aria-hidden>·</span>
+            <span className="hidden xl:inline opacity-80">{cal.label.toUpperCase()}</span>
           </Link>
 
-          {/* Mobile / catch-all menu trigger */}
+          {/* Single mobile / catch-all trigger (Sheet gives Radix a11y for free) */}
           <Sheet open={navOpen} onOpenChange={setNavOpen}>
             <SheetTrigger asChild>
               <button
-                className="lg:hidden rounded border border-border p-2 text-muted-foreground hover:text-foreground hover:bg-accent"
-                aria-label="Open menu"
+                type="button"
+                className="lg:hidden inline-flex items-center justify-center h-10 w-10 tap rounded-md border border-border text-foreground hover:bg-accent"
+                aria-label="Open navigation menu"
               >
-                <Menu className="h-4 w-4" />
+                <Menu className="h-4 w-4" aria-hidden />
               </button>
             </SheetTrigger>
             <SheetContent side="right" className="w-full sm:max-w-sm overflow-y-auto p-0">
-              <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <div className="flex items-center justify-between border-b border-border px-4 py-3 safe-top">
                 <SheetTitle className="stencil text-sm text-foreground">MILVERSE</SheetTitle>
                 <SheetClose
-                  className="rounded p-1 text-muted-foreground hover:text-foreground hover:bg-accent"
+                  className="tap inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:text-foreground hover:bg-accent"
                   aria-label="Close menu"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-4 w-4" aria-hidden />
                 </SheetClose>
               </div>
-              <SheetDescription className="sr-only">Site navigation</SheetDescription>
+              <SheetDescription className="sr-only">Site navigation and account</SheetDescription>
+
+              {/* Status strip inside the drawer — one glance summary */}
+              <div className="border-b border-border/60 px-4 py-3 flex items-center gap-3 text-[11px] font-mono text-muted-foreground">
+                <span
+                  className={`chip !py-1 ${toneClass}`}
+                  aria-label={`Calibration ${cal.label}`}
+                >
+                  {noirRank.current.code} · {cal.label}
+                </span>
+                <span className="ml-auto">{xp} XP</span>
+              </div>
+
               <nav aria-label="Full site" className="px-2 py-3">
                 {NAV_GROUPS.map((group) => (
                   <div key={group.label} className="mb-4">
@@ -239,23 +289,24 @@ export function TopBar() {
                     </div>
                     <ul className="flex flex-col">
                       {group.items.map((item) => {
-                        const active =
-                          item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+                        const active = isActive(item.to);
                         return (
                           <li key={item.to}>
                             <SheetClose asChild>
                               <Link
                                 to={item.to}
                                 aria-current={active ? "page" : undefined}
-                                className={`flex flex-col rounded px-3 py-2 border-l-2 transition-colors ${
+                                className={`tap flex flex-col justify-center rounded-md px-3 py-2.5 border-l-2 transition-colors ${
                                   active
                                     ? "bg-primary/10 text-primary border-primary"
                                     : "text-foreground hover:bg-accent border-transparent"
                                 }`}
                               >
-                                <span className="text-sm font-medium">{item.label}</span>
+                                <span className="text-sm font-medium leading-tight">
+                                  {item.label}
+                                </span>
                                 {item.desc && (
-                                  <span className="text-[11px] text-muted-foreground">
+                                  <span className="text-[11px] text-muted-foreground leading-snug mt-0.5">
                                     {item.desc}
                                   </span>
                                 )}
@@ -267,29 +318,42 @@ export function TopBar() {
                     </ul>
                   </div>
                 ))}
-                <div className="border-t border-border px-3 pt-3 mt-2 flex flex-col gap-2">
+                <div className="border-t border-border px-3 pt-3 mt-2 flex flex-col gap-1">
                   <SheetClose asChild>
                     <Link
                       to="/profile"
-                      className="stencil text-[11px] text-muted-foreground hover:text-foreground"
+                      className="tap flex items-center rounded-md px-2 text-sm text-foreground hover:bg-accent"
                     >
-                      PROFILE · {noirRank.current.name} · {xp} XP
+                      Profile · {noirRank.current.name} · {xp} XP
                     </Link>
                   </SheetClose>
                   <SheetClose asChild>
                     <Link
                       to="/pilot"
-                      className="stencil text-[11px] text-muted-foreground hover:text-foreground"
+                      className="tap flex items-center rounded-md px-2 text-sm text-foreground hover:bg-accent"
                     >
-                      PILOT ACCESS
+                      Pilot Access
                     </Link>
                   </SheetClose>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMuted(!muted);
+                      setLocalMuted(!muted);
+                    }}
+                    className="tap flex items-center gap-2 rounded-md px-2 text-sm text-foreground hover:bg-accent text-left"
+                    aria-pressed={muted}
+                  >
+                    {muted ? <VolumeX className="h-4 w-4" aria-hidden /> : <Volume2 className="h-4 w-4" aria-hidden />}
+                    {muted ? "Unmute sound" : "Mute sound"}
+                  </button>
                 </div>
               </nav>
             </SheetContent>
           </Sheet>
         </div>
       </div>
+
       {isGameSurface(pathname) && (
         <div className="md:hidden border-t border-primary/20 bg-background/85 overflow-x-auto">
           <GameBar compact />
