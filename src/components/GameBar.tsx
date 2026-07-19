@@ -135,6 +135,11 @@ export function GameBar({ compact = false }: { compact?: boolean }) {
         <span className="stencil text-[10px] text-muted-foreground whitespace-nowrap tabular-nums">
           {atMax ? "MAX" : `${snap.cur} / ${snap.span}`}
         </span>
+        {!atMax && snap.next && (
+          <span className="stencil text-[10px] text-primary/80 whitespace-nowrap hidden sm:inline">
+            NEXT: {snap.next}
+          </span>
+        )}
         {pop != null && (
           <span
             aria-hidden
@@ -144,6 +149,7 @@ export function GameBar({ compact = false }: { compact?: boolean }) {
           </span>
         )}
       </div>
+
 
       {/* STREAK */}
       {snap.streak >= 1 && (
