@@ -130,132 +130,38 @@ export function TopBar() {
       role="banner"
       className="print:hidden sticky top-0 z-50 border-b border-primary/25 bg-background/85 backdrop-blur-md supports-[backdrop-filter]:bg-background/70"
     >
-      <div className="mx-auto grid max-w-6xl grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 safe-top">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 sm:px-4 py-2 safe-top">
         {/* ── Brand ── */}
         <Link
           to="/"
-          className="flex items-center gap-2 sm:gap-3 group min-w-0 focus-visible:outline-none rounded-md -m-1 p-1"
+          className="flex items-center gap-2 min-w-0 focus-visible:outline-none rounded-md -m-1 p-1"
           aria-label="MILVERSE home"
         >
           <div className="relative h-7 w-7 shrink-0" aria-hidden>
-            <div className="absolute inset-0 rounded-sm bg-primary shadow-[0_0_18px_oklch(0.82_0.14_195/0.7)] group-hover:animate-pulse" />
+            <div className="absolute inset-0 rounded-sm bg-primary shadow-[0_0_18px_oklch(0.82_0.14_195/0.7)]" />
             <div className="absolute inset-1 rounded-sm border border-background/60" />
           </div>
-          <div className="min-w-0">
-            <div className="stencil text-[13px] sm:text-sm text-foreground leading-none">
-              MILVERSE
-            </div>
-            <div className="stencil text-[9px] text-primary/70 mt-0.5 hidden xl:block truncate">
-              MEDIA &amp; INFORMATION LITERACY LAB
-            </div>
+          <div className="stencil text-[13px] sm:text-sm text-foreground leading-none truncate">
+            MILVERSE
           </div>
         </Link>
 
-        {/* ── Desktop primary nav ── */}
-        <nav
-          aria-label="Primary"
-          className="hidden xl:flex items-center justify-center gap-0.5"
-        >
-          {DESKTOP_PRIMARY.map((item) => {
-            const active = isActive(item.to);
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                aria-current={active ? "page" : undefined}
-                className={`relative stencil text-[10px] tracking-widest rounded-md px-3 py-2 transition-colors ${
-                  active
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                }`}
-              >
-                {item.label.toUpperCase()}
-                {active && (
-                  <span
-                    aria-hidden
-                    className="absolute left-3 right-3 -bottom-[9px] h-[2px] bg-primary shadow-[0_0_8px_oklch(0.82_0.14_195/0.7)]"
-                  />
-                )}
-              </Link>
-            );
-          })}
-          <button
-            onClick={() => setNavOpen(true)}
-            className="stencil text-[10px] tracking-widest rounded-md px-3 py-2 text-muted-foreground hover:text-foreground hover:bg-accent inline-flex items-center gap-1"
-            aria-label="Open full menu"
-          >
-            <Menu className="h-3.5 w-3.5" aria-hidden /> ALL
-          </button>
-        </nav>
-
-        {/* ── Status / actions ── */}
-        <div className="flex items-center gap-1 sm:gap-1.5 justify-end min-w-0">
-          <div className="hidden 2xl:flex items-center gap-2 chip">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary hud-blink" aria-hidden />
-            <span>HANDLE</span>
-            <span className="text-foreground normal-case tracking-normal">{call}</span>
-          </div>
-
-          <Link
-            to="/manual"
-            className="hidden xl:inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 h-9 stencil text-[10px] text-muted-foreground hover:text-foreground hover:bg-accent"
-            aria-label="Field Manual"
-            title="Field Manual"
-          >
-            <BookOpen className="h-3.5 w-3.5" aria-hidden />
-            <span className="hidden 2xl:inline">MANUAL</span>
-          </Link>
-
-          {isGameSurface(pathname) && (
-            <div className="hidden xl:flex">
-              <GameBar />
-            </div>
-          )}
-          {showRankChip && <div className="hidden lg:flex"><RankChip /></div>}
+        {/* ── Compact actions — only truly essential, always-fitting items ── */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {showRankChip && <RankChip />}
           {showInbox && <InboxTray />}
-          <div className="hidden md:flex"><VisualQualityToggle /></div>
-          <div className="hidden md:flex"><AccessPanel /></div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setMuted(!muted);
-              setLocalMuted(!muted);
-            }}
-            className="hidden lg:inline-flex items-center justify-center h-9 w-9 rounded-md border border-border text-muted-foreground transition hover:text-foreground hover:bg-accent"
-            aria-label={muted ? "Unmute sound" : "Mute sound"}
-            aria-pressed={muted}
-          >
-            {muted ? <VolumeX className="h-4 w-4" aria-hidden /> : <Volume2 className="h-4 w-4" aria-hidden />}
-          </button>
-
-          <Link
-            to="/profile"
-            className={`hidden xl:flex items-center gap-2 rounded-md border px-2.5 h-9 stencil text-[10px] transition-colors hover:bg-accent ${toneClass}`}
-            title={`${noirRank.current.name} · ${xp} XP${noirRank.next ? ` · next ${noirRank.next.name}` : ""}`}
-            aria-label={`Profile, rank ${noirRank.current.name}, ${xp} XP`}
-          >
-            <span className="opacity-70">{noirRank.current.code}</span>
-            <span className="hidden 2xl:inline text-foreground/90">{noirRank.current.name}</span>
-            <span className="hidden 2xl:inline-block h-1 w-8 overflow-hidden rounded-full bg-muted" aria-hidden>
-              <span
-                className="block h-full bg-primary transition-[width] duration-500"
-                style={{ width: `${Math.round(noirRank.progress * 100)}%` }}
-              />
-            </span>
-          </Link>
-
-          {/* Single mobile / catch-all trigger (Sheet gives Radix a11y for free) */}
           <Sheet open={navOpen} onOpenChange={setNavOpen}>
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="xl:hidden inline-flex items-center justify-center h-11 w-11 tap rounded-md border border-border text-foreground hover:bg-accent"
+                className="inline-flex items-center justify-center h-11 w-11 tap rounded-md border border-border text-foreground hover:bg-accent"
                 aria-label="Open navigation menu"
               >
                 <Menu className="h-5 w-5" aria-hidden />
               </button>
             </SheetTrigger>
+
             <SheetContent side="right" className="w-full sm:max-w-sm overflow-y-auto p-0">
               <div className="flex items-center justify-between border-b border-border px-4 py-3 safe-top">
                 <SheetTitle className="stencil text-sm text-foreground">MILVERSE</SheetTitle>
