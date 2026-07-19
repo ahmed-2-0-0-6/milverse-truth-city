@@ -407,16 +407,17 @@ function LampBreath() {
     <spotLight
       ref={ref}
       position={[0, 10, 0]}
-      angle={0.9}
-      penumbra={0.9}
-      intensity={4.2}
+      angle={1.0}
+      penumbra={0.85}
+      intensity={9}
       color="#ffb060"
-      distance={26}
-      decay={1.6}
+      distance={30}
+      decay={1.4}
       castShadow={false}
     />
   );
 }
+
 
 function SpinningDesk({ children }: { children: React.ReactNode }) {
   const ref = useRef<THREE.Group>(null);
