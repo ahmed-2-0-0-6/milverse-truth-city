@@ -23,7 +23,6 @@ import { FirstCall } from "@/components/onboarding/FirstCall";
 import { hasSeenLiveBait } from "@/components/landing/liveBaitState";
 import { LandingNudge } from "@/components/landing/LandingNudge";
 import { PaperNudge } from "@/components/landing/PaperNudge";
-import { DetectiveDeskScene } from "@/components/landing/DetectiveDeskScene";
 
 import { isReturningCitizen } from "@/lib/city/returning";
 import { currentShift, isNightRegister, type Shift } from "@/lib/city/shift";
@@ -269,11 +268,6 @@ function CityMap() {
         </div>
       </section>
 
-
-      {/* ── THE DETECTIVE'S DESK ── same footprint as the hero, sits
-          directly beneath it so as the citizen scrolls past the headline
-          the desk rises into frame. Pure SVG/CSS; rotates slowly. */}
-      <DetectiveDeskScene />
 
       {/* ── SCROLL STORY ── */}
       <ScrollStory />
