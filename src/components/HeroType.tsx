@@ -27,7 +27,7 @@ export function HeroType({ onComplete }: HeroTypeProps) {
     const check = () => {
       frames += 1;
       const opacity = Number(window.getComputedStyle(el).opacity);
-      if (opacity >= 0.98 || frames >= 30) {
+      if (opacity >= 0.55 || frames >= 12) {
         complete();
         return;
       }
