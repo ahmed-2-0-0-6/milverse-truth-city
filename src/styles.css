@@ -3375,3 +3375,24 @@ a[href*="lovable.dev/?via="] {
   pointer-events: none !important;
   z-index: 0 !important;
 }
+
+/* Any sibling close/dismiss button next to the Lovable badge */
+a[href*="lovable.dev"] ~ button,
+a[href*="lovable.dev"] + button,
+button[aria-label*="lovable" i],
+button[aria-label*="Lovable" i],
+button[title*="lovable" i] {
+  max-width: 1px !important;
+  max-height: 1px !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0.0001 !important;
+  transform: scale(0.0001);
+  transform-origin: bottom right;
+  overflow: hidden !important;
+  pointer-events: none !important;
+  position: fixed !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  z-index: 0 !important;
+}
