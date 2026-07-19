@@ -10,7 +10,6 @@ import { readDailyStatus } from "@/lib/daily/profile";
 import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp, RANKS } from "@/lib/ranks";
 import { CityHero3D } from "@/components/city3d/CityHero3D";
-import { LivingCityCanvas } from "@/components/hero/LivingCityCanvas";
 import { BootScreen } from "@/components/BootScreen";
 import { HeroType } from "@/components/HeroType";
 import { ScrollStory } from "@/components/ScrollStory";
@@ -215,7 +214,6 @@ function CityMap() {
               backgroundSize: "3px 3px",
             }}
           />
-          <LivingCityCanvas />
         </div>
 
         <div className="w-full flex flex-col items-center min-h-[380px] sm:min-h-[460px]">
