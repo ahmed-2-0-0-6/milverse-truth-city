@@ -1139,17 +1139,18 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               </div>
             )}
 
-            <div className="mt-1.5 flex items-center justify-between font-mono text-[9px] tracking-widest text-white/40">
+            <div className="mt-1.5 flex items-center justify-between font-mono text-[10px] tracking-widest text-white/60">
               <button
                 type="button"
                 onClick={toggleHandMode}
-                className="hover:text-white/70"
+                className="min-h-[32px] inline-flex items-center rounded px-2 -mx-2 hover:text-white/90 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
                 aria-label={handMode === "hand" ? "Switch to typing" : "Switch to the hand"}
               >
                 {handMode === "hand" ? "TYPE INSTEAD ⌨" : "SHOW THE HAND ▤"}
               </button>
               <span title="Every minute they burn on you is a minute stolen from a real victim.">{messages.filter((m) => m.role === "player").length} SENT · LINE HELD</span>
             </div>
+
 
           </div>
         }
