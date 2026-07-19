@@ -10,8 +10,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ShieldAlert, Check, X, ArrowRight } from "lucide-react";
-
-const SEEN_KEY = "milverse.livebait.seen.v1";
+import { markLiveBaitSeen } from "./liveBaitState";
 
 // The pretext. Written to feel like a real Pakistani smishing attempt:
 // urgency window, fake authority, "reply to prevent" pressure. No real
@@ -94,7 +93,7 @@ export function LiveBait({ onDismiss }: { onDismiss?: () => void }) {
     if (dismissed.current) return;
     dismissed.current = true;
     try {
-      sessionStorage.setItem(SEEN_KEY, "1");
+      markLiveBaitSeen();
     } catch {
       /* storage unavailable */
     }
@@ -249,12 +248,4 @@ export function LiveBait({ onDismiss }: { onDismiss?: () => void }) {
       )}
     </div>
   );
-}
-
-export function hasSeenLiveBait(): boolean {
-  try {
-    return sessionStorage.getItem(SEEN_KEY) === "1";
-  } catch {
-    return false;
-  }
 }
