@@ -23,8 +23,8 @@ export function GlowCursor() {
     };
     window.addEventListener("pointermove", onMove);
     const loop = () => {
-      tx += (x - tx) * 0.216;
-      ty += (y - ty) * 0.216;
+      tx += (x - tx) * 0.20;
+      ty += (y - ty) * 0.20;
       if (dotRef.current)
         dotRef.current.style.transform = `translate3d(${x}px,${y}px,0) translate(-50%,-50%)`;
       if (trailRef.current)
