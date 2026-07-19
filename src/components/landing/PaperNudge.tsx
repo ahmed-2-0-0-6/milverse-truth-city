@@ -23,7 +23,7 @@ export function PaperNudge() {
       setDismissed(true);
       return;
     }
-    const t = window.setTimeout(() => setReady(true), 1200);
+    const t = window.setTimeout(() => setReady(true), 150);
     return () => window.clearTimeout(t);
   }, [week.weekKey]);
 
