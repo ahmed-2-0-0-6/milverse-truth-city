@@ -85,10 +85,11 @@ function CityHall() {
   const faRate = p.falseAlarms / total;
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <div className="pointer-events-none fixed inset-0 scanlines opacity-30" />
       <TopBar />
-      <main className="mx-auto max-w-5xl px-4 py-10 relative">
+      <main id="main" role="main" className="mx-auto max-w-5xl px-4 sm:px-6 py-10 safe-bottom relative">
+
         <RecommendedStrip />
 
         <StateOfTheCity census={census} />

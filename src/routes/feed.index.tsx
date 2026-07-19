@@ -124,7 +124,7 @@ function FeedIndex() {
   }));
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <InboxManager />
       <IncomingToast />
       <IncomingCall />
@@ -143,7 +143,8 @@ function FeedIndex() {
         }
         rooted="SCENARIOS ROOTED IN REAL FORWARDS THAT SPREAD IN PAKISTANI CHATS"
       />
-      <main className="mx-auto max-w-5xl px-4 py-8">
+      <main id="main" role="main" className="mx-auto max-w-5xl px-4 sm:px-6 py-8 safe-bottom">
+
         <DistrictIntro
           id="feed"
           chapter="CHAPTER 02"
@@ -184,7 +185,7 @@ function FeedIndex() {
               <div className="mb-3 font-mono text-[11px] tracking-widest text-primary">
                 TIER {tier} · {TIER_NAMES[tier as 1 | 2 | 3]}
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="hub-grid">
                 {cases.map((s) => {
                   const inSeason = !!season && !!s.tacticId && season.tactics.includes(s.tacticId);
                   return (

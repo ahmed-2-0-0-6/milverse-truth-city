@@ -95,7 +95,7 @@ function PaperPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen paper">
+      <div className="min-h-dvh paper">
         <div className="mx-auto max-w-5xl px-4 py-24 text-center paper-mono text-xs">
           Setting type…
         </div>
@@ -105,7 +105,7 @@ function PaperPage() {
 
   if (err || !edition) {
     return (
-      <div className="min-h-screen paper">
+      <div className="min-h-dvh paper">
         <div className="mx-auto max-w-5xl px-4 py-24 text-center">
           <div className="paper-blackletter text-4xl">The Daily Mirage</div>
           <p className="mt-6 paper-body no-dropcap max-w-md mx-auto">
@@ -141,13 +141,13 @@ function PaperPage() {
       : dateLabelRaw;
 
   return (
-    <div className="paper min-h-screen">
+    <div className="paper min-h-dvh">
       {/* nav strip — dark, sits above paper */}
       <div className="no-print bg-background/90 backdrop-blur border-b border-border">
         <TopBar />
       </div>
 
-      <main className="mx-auto max-w-5xl px-4 sm:px-8 py-8 sm:py-12 paper-unfold">
+      <main id="main" role="main" className="mx-auto max-w-5xl px-4 sm:px-8 py-8 sm:py-12 paper-unfold safe-bottom">
         {/* Back link (dark on paper) */}
         <div className="no-print mb-6 flex items-center justify-between">
           <Link

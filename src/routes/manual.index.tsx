@@ -66,8 +66,9 @@ function ManualIndex() {
   const pct = Math.round((unlockedCount / MANUAL_ENTRIES.length) * 100);
 
   return (
-    <div className="min-h-screen grain polaroid-desk">
+    <div className="min-h-dvh grain polaroid-desk">
       <TopBar />
+
 
       {/* ── Redacted-dossier banner — bars lift as files declassify ── */}
       <header className="relative overflow-hidden border-b border-white/10">
@@ -105,7 +106,7 @@ function ManualIndex() {
                 THE FIELD MANUAL · MIL CODEX
               </div>
               <h1
-                className="mt-2 text-5xl sm:text-7xl font-black tracking-tight leading-[0.88]"
+                className="mt-2 text-step-6 font-black tracking-tight leading-[0.88]"
                 style={{
                   fontFamily: '"Bebas Neue", "Space Grotesk", sans-serif',
                   textShadow: "0 0 26px oklch(0.82 0.14 195 / 0.35)",
@@ -115,6 +116,7 @@ function ManualIndex() {
                 <br />
                 LEARN THE COUNTER-MOVE.
               </h1>
+
               <p className="mt-4 max-w-2xl text-white/75 leading-relaxed">
                 Files stay redacted until you meet the tactic in play. Then they open. This is your
                 dossier of how deception works — and how to shut it down. MILVERSE never rules on a
@@ -146,8 +148,9 @@ function ManualIndex() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-8">
+      <main id="main" role="main" className="mx-auto max-w-6xl px-4 sm:px-6 py-8 safe-bottom">
         <div className="flex flex-wrap items-center gap-3">
+
           <Link
             to="/manual/take-it-outside"
             className="inline-flex items-center gap-2 rounded-md border border-primary/50 bg-primary/10 px-3 py-1.5 stencil text-[10px] tracking-widest text-primary hover:bg-primary/20"
@@ -177,7 +180,7 @@ function ManualIndex() {
           </p>
         </EngravedReveal>
 
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
+        <div className="mt-10 hub-grid pt-4">
           {MANUAL_ENTRIES.map((e) => {
             const isUnlocked = unlocked.has(e.id);
             const rec = record.get(e.id);

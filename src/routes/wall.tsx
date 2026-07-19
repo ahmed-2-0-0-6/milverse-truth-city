@@ -340,7 +340,7 @@ function WallPage() {
 
   return (
     <div
-      className="min-h-screen bg-background text-foreground"
+      className="min-h-dvh bg-background text-foreground"
       style={{
         backgroundImage: `linear-gradient(180deg, rgba(2,4,10,0.94), rgba(2,4,10,0.97)), url(${corkboardImg})`,
         backgroundSize: "cover",
@@ -350,7 +350,7 @@ function WallPage() {
     >
       <TopBar />
 
-      <main className="mx-auto max-w-6xl px-4 py-8 relative">
+      <main id="main" role="main" className="mx-auto max-w-6xl px-4 sm:px-6 py-8 safe-bottom relative">
         {/* red string overlay, decorative */}
         <div className="evidence-strings" aria-hidden="true" />
         <header className="mb-6 relative">
@@ -360,11 +360,12 @@ function WallPage() {
               EVIDENCE ROOM
             </div>
           </div>
-          <h1 className="stencil mt-1 text-2xl sm:text-3xl text-foreground">THE CASE WALL</h1>
+          <h1 className="stencil mt-1 text-step-5 text-foreground">THE CASE WALL</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Every call you made. The city keeps receipts.
           </p>
         </header>
+
 
         {/* Summary strip */}
         <section className="mb-6 grid grid-cols-2 sm:grid-cols-5 gap-2">
