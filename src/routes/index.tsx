@@ -206,9 +206,8 @@ function CityMap() {
             <StatStrip />
           </div>
 
-          <div className="mt-6 w-full max-w-xl">
-            <DailyBeacon />
-          </div>
+
+
         </div>
 
 
