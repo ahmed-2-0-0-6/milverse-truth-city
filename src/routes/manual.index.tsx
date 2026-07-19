@@ -66,8 +66,9 @@ function ManualIndex() {
   const pct = Math.round((unlockedCount / MANUAL_ENTRIES.length) * 100);
 
   return (
-    <div className="min-h-screen grain polaroid-desk">
+    <div className="min-h-dvh grain polaroid-desk">
       <TopBar />
+
 
       {/* ── Redacted-dossier banner — bars lift as files declassify ── */}
       <header className="relative overflow-hidden border-b border-white/10">
