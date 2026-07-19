@@ -14,7 +14,7 @@ import { loadFirstPhone } from "@/lib/firstPhone/profile";
 import { readDailyStatus } from "@/lib/daily/profile";
 import { secondsToNextDrop } from "@/lib/daily/rotation";
 import { dueRetests } from "@/lib/mirror/retests";
-import { supplementWeek, readLastSeenWeek } from "@/lib/paper/supplement";
+import { supplementWeek, readLastSeenWeek } from "@/lib/paper/supplementMeta";
 import { loadBossProfile, canRematch } from "@/lib/boss/profile";
 
 export type DeskUrgency = "dying" | "due" | "standing";

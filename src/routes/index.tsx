@@ -20,7 +20,7 @@ import { InboxManager } from "@/components/inbox/InboxManager";
 import { IncomingToast } from "@/components/inbox/IncomingToast";
 import { IncomingCall } from "@/components/inbox/IncomingCall";
 import { FirstCall } from "@/components/onboarding/FirstCall";
-import { hasSeenLiveBait } from "@/components/landing/LiveBait";
+import { hasSeenLiveBait } from "@/components/landing/liveBaitState";
 import { LandingNudge } from "@/components/landing/LandingNudge";
 import { PaperNudge } from "@/components/landing/PaperNudge";
 
