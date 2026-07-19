@@ -3450,3 +3450,115 @@ button[title*="lovable" i] {
   html, body, * { cursor: none !important; }
   input, textarea, [contenteditable="true"] { cursor: text !important; }
 }
+
+/* ============================================================
+   Detective desk (background scene for the first story beat)
+   ============================================================ */
+.detective-desk {
+  /* Sit behind the beat text and lamp pool. */
+  z-index: 0;
+  isolation: isolate;
+  contain: layout paint;
+}
+.detective-desk svg {
+  display: block;
+  filter: saturate(0.92) contrast(1.05);
+}
+
+/* Warm ambient lamp bleeding through the ink around the scene */
+.desk-lamp-pool {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(60% 55% at 50% 55%, rgba(255,170,80,0.10), transparent 70%),
+    radial-gradient(120% 90% at 50% 60%, rgba(6,10,18,0.55), rgba(0,0,0,0.9) 80%);
+  mix-blend-mode: normal;
+  pointer-events: none;
+}
+
+/* The whole tabletop very slowly spins in a full circle */
+@keyframes dd-table-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.detective-desk .dd-table {
+  animation: dd-table-spin 240s linear infinite;
+  transform-box: fill-box;
+}
+
+/* Individual props drift gently against the spin so the composition
+   feels alive rather than mechanical. */
+@keyframes dd-drift-a {
+  0%,100% { transform: translate3d(0,0,0) rotate(0deg); }
+  50%     { transform: translate3d(4px,-3px,0) rotate(0.6deg); }
+}
+@keyframes dd-drift-b {
+  0%,100% { transform: translate3d(0,0,0) rotate(0deg); }
+  50%     { transform: translate3d(-3px,2px,0) rotate(-0.5deg); }
+}
+@keyframes dd-drift-c {
+  0%,100% { transform: translate3d(0,0,0) rotate(0deg); }
+  50%     { transform: translate3d(2px,3px,0) rotate(0.4deg); }
+}
+.dd-drift-a { animation: dd-drift-a 11s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.dd-drift-b { animation: dd-drift-b 13s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.dd-drift-c { animation: dd-drift-c 15s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+
+/* Coffee steam — three ribbons rising and dissipating out of phase */
+@keyframes dd-steam-rise {
+  0%   { transform: translate3d(0,10px,0) scale(1);   opacity: 0; }
+  20%  { opacity: 0.7; }
+  100% { transform: translate3d(0,-80px,0) scale(1.15); opacity: 0; }
+}
+.dd-steam { transform-box: fill-box; transform-origin: bottom center; }
+.dd-steam-a { animation: dd-steam-rise 5.5s ease-out infinite; }
+.dd-steam-b { animation: dd-steam-rise 6.5s ease-out infinite 0.9s; }
+.dd-steam-c { animation: dd-steam-rise 7.2s ease-out infinite 1.8s; }
+
+/* Lamp breathes very slightly — like a bulb on old wiring */
+@keyframes dd-lamp-breath {
+  0%,100% { opacity: 0.9; }
+  50%     { opacity: 1;   }
+}
+.dd-lamp-breath { animation: dd-lamp-breath 6s ease-in-out infinite; mix-blend-mode: screen; }
+
+/* Raccoon eyes catch the lamplight once in a while */
+@keyframes dd-eye-blink {
+  0%,92%,100% { transform: scaleY(1); }
+  95%         { transform: scaleY(0.1); }
+}
+.dd-raccoon .dd-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: dd-eye-blink 7s ease-in-out infinite;
+}
+
+/* Fine dust particles / grain over the top */
+.dd-dust {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(rgba(255,220,180,0.10) 1px, transparent 1.4px),
+    radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1.6px);
+  background-size: 90px 90px, 140px 140px;
+  background-position: 0 0, 40px 60px;
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  animation: dd-dust-drift 40s linear infinite;
+}
+@keyframes dd-dust-drift {
+  from { background-position: 0 0, 40px 60px; }
+  to   { background-position: 90px 90px, 130px 200px; }
+}
+
+/* Respect users who ask for calm */
+@media (prefers-reduced-motion: reduce) {
+  .detective-desk .dd-table,
+  .detective-desk .dd-drift-a,
+  .detective-desk .dd-drift-b,
+  .detective-desk .dd-drift-c,
+  .detective-desk .dd-steam,
+  .detective-desk .dd-lamp-breath,
+  .detective-desk .dd-raccoon .dd-eye,
+  .detective-desk .dd-dust {
+    animation: none !important;
+  }
+}
