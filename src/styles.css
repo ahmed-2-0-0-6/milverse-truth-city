@@ -3360,3 +3360,14 @@ html { scroll-padding-top: 72px; }
   border: 0;
 }
 
+
+/* Paper delivery — slides in from the left like it's dropped on the desk. */
+@keyframes paperDeliver {
+  0%   { opacity: 0; transform: translateX(-24px) rotate(-2deg); }
+  60%  { opacity: 1; transform: translateX(2px) rotate(0.5deg); }
+  100% { opacity: 1; transform: translateX(0) rotate(0); }
+}
+.paper-nudge-in { animation: paperDeliver 520ms cubic-bezier(.2,.8,.2,1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .paper-nudge-in { animation: none; }
+}
