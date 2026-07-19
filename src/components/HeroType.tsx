@@ -1,24 +1,48 @@
 // LAYER-7 — Typed neon headline for the hero.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const TEXT = "TRAIN YOUR TRUST";
 
-export function HeroType() {
+type HeroTypeProps = {
+  onComplete?: () => void;
+};
+
+export function HeroType({ onComplete }: HeroTypeProps) {
   const [n, setN] = useState(0);
-  useEffect(() => {
-    const fire = () => {
-      try {
-        window.dispatchEvent(new CustomEvent("milverse:hero-typed"));
-      } catch {
-        /* noop */
+  const completedRef = useRef(false);
+
+  const complete = () => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    onComplete?.();
+    try {
+      window.dispatchEvent(new CustomEvent("milverse:hero-typed"));
+    } catch {
+      /* noop */
+    }
+  };
+
+  const completeWhenPainted = (el: HTMLElement) => {
+    let frames = 0;
+    const check = () => {
+      frames += 1;
+      const opacity = Number(window.getComputedStyle(el).opacity);
+      if (opacity >= 0.98 || frames >= 30) {
+        complete();
+        return;
       }
+      window.requestAnimationFrame(check);
     };
+    window.requestAnimationFrame(check);
+  };
+
+  useEffect(() => {
     if (
       typeof window !== "undefined" &&
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
     ) {
       setN(TEXT.length);
-      fire();
+      complete();
       return;
     }
     let i = 0;
@@ -27,7 +51,6 @@ export function HeroType() {
       setN(i);
       if (i >= TEXT.length) {
         window.clearInterval(id);
-        fire();
       }
     }, 60);
     return () => window.clearInterval(id);
@@ -44,6 +67,11 @@ export function HeroType() {
           key={i}
           className={i < n ? "neon-letter" : "opacity-0"}
           style={{ animationDelay: `${i * 40}ms` }}
+          onAnimationEnd={
+            i === TEXT.length - 1
+              ? (event) => completeWhenPainted(event.currentTarget)
+              : undefined
+          }
         >
           {ch === " " ? "\u00A0" : ch}
         </span>
