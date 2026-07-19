@@ -118,6 +118,20 @@ function CityMap() {
       <IncomingCall />
       {!booted && <BootScreen onDone={() => setBooted(true)} />}
       <TopBar />
+      {booted && showBait && (
+        <LandingNudge
+          kind="bait"
+          shift={shift}
+          onDismiss={() => setShowBait(false)}
+        />
+      )}
+      {booted && !showBait && returning && (
+        <LandingNudge
+          kind="desk"
+          shift={shift}
+          onDismiss={() => setReturning(false)}
+        />
+      )}
       {intro && booted && !showBait && (
         <FirstCall
           onDone={() => {
@@ -130,6 +144,7 @@ function CityMap() {
           }}
         />
       )}
+
 
       <main id="main" role="main">
       {/* ── HERO ── full-viewport cinematic. Detective-desk photo washes
