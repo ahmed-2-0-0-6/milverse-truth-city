@@ -84,9 +84,13 @@ function CityMap() {
     // citizens go straight to the desk (they've been baited already).
     setShowBait(!isReturner && !hasSeenLiveBait());
     setShift(currentShift());
+    try {
+      if (sessionStorage.getItem("mv:beacon-dismissed") === "1") setShowBeacon(false);
+    } catch { /* sessionStorage unavailable */ }
     const tick = window.setInterval(() => setShift(currentShift()), 60_000);
     return () => window.clearInterval(tick);
   }, []);
+
 
 
   useEffect(() => {
