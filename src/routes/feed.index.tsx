@@ -124,7 +124,7 @@ function FeedIndex() {
   }));
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <InboxManager />
       <IncomingToast />
       <IncomingCall />
@@ -143,7 +143,8 @@ function FeedIndex() {
         }
         rooted="SCENARIOS ROOTED IN REAL FORWARDS THAT SPREAD IN PAKISTANI CHATS"
       />
-      <main className="mx-auto max-w-5xl px-4 py-8">
+      <main id="main" role="main" className="mx-auto max-w-5xl px-4 sm:px-6 py-8 safe-bottom">
+
         <DistrictIntro
           id="feed"
           chapter="CHAPTER 02"
