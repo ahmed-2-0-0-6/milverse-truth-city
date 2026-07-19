@@ -22,6 +22,20 @@ export function HeroType({ onComplete }: HeroTypeProps) {
     }
   };
 
+  const completeWhenPainted = (el: HTMLElement) => {
+    let frames = 0;
+    const check = () => {
+      frames += 1;
+      const opacity = Number(window.getComputedStyle(el).opacity);
+      if (opacity >= 0.98 || frames >= 30) {
+        complete();
+        return;
+      }
+      window.requestAnimationFrame(check);
+    };
+    window.requestAnimationFrame(check);
+  };
+
   useEffect(() => {
     if (
       typeof window !== "undefined" &&
@@ -53,7 +67,11 @@ export function HeroType({ onComplete }: HeroTypeProps) {
           key={i}
           className={i < n ? "neon-letter" : "opacity-0"}
           style={{ animationDelay: `${i * 40}ms` }}
-          onAnimationEnd={i === TEXT.length - 1 ? complete : undefined}
+          onAnimationEnd={
+            i === TEXT.length - 1
+              ? (event) => completeWhenPainted(event.currentTarget)
+              : undefined
+          }
         >
           {ch === " " ? "\u00A0" : ch}
         </span>
