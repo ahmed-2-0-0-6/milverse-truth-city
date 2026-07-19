@@ -341,7 +341,8 @@ function CaseFiles() {
                     : "Nothing at this tier yet. Clear the tier below and more file in."}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="hub-grid">
+
                   {cases.map((s) => {
                     const done = profile?.history.some(
                       (h) => h.caseId === s.id && h.result === "correct",
