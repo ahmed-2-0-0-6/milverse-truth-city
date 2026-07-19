@@ -195,6 +195,16 @@ export function ScrollStory() {
 
   return (
     <div ref={rootRef} className="scrollstory relative">
+      {/* Sticky detective-desk background — one 3D scene behind every
+          story beat, edge-to-edge, follows the viewport as the reader
+          scrolls through all four beats. */}
+      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
+        <div className="sticky top-0 h-screen w-full">
+          <Suspense fallback={null}>
+            <DetectiveDesk />
+          </Suspense>
+        </div>
+      </div>
       {/* Story beats */}
       {BEATS.map((b, i) => (
         <section
@@ -202,22 +212,13 @@ export function ScrollStory() {
           className={`story-beat relative min-h-[85vh] flex items-center justify-center overflow-hidden px-6 ${b.finale ? "finale-beat" : ""}`}
         >
           <div className="beat-bg absolute inset-0 -z-10" aria-hidden>
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/[0.04] to-transparent" />
-            <div
-              className="absolute inset-0 opacity-30"
+            <div className="absolute inset-0 opacity-20"
               style={{
-                backgroundImage: "radial-gradient(rgba(255,255,255,0.25) 1px, transparent 1px)",
+                backgroundImage: "radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px)",
                 backgroundSize: "3px 3px",
               }}
             />
           </div>
-          {i === 0 && (
-            <div className="absolute inset-0 z-0 pointer-events-none" aria-hidden>
-              <Suspense fallback={null}>
-                <DetectiveDesk />
-              </Suspense>
-            </div>
-          )}
 
           <div className="relative z-10 max-w-4xl text-center">
 
