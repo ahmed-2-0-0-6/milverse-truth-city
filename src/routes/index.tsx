@@ -68,6 +68,8 @@ function CityMap() {
   // container to avoid layout shift on either path.
   const [returning, setReturning] = useState(false);
   const [showBait, setShowBait] = useState(false);
+  const [showBeacon, setShowBeacon] = useState(true);
+
   // THE NIGHT SHIFT — landing recomputes its band every 60s so a session
   // left open across a boundary catches up. Elsewhere band is per-mount.
   const [shift, setShift] = useState<Shift>(() => currentShift());
