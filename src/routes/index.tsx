@@ -270,6 +270,11 @@ function CityMap() {
       </section>
 
 
+      {/* ── THE DETECTIVE'S DESK ── same footprint as the hero, sits
+          directly beneath it so as the citizen scrolls past the headline
+          the desk rises into frame. Pure SVG/CSS; rotates slowly. */}
+      <DetectiveDeskScene />
+
       {/* ── SCROLL STORY ── */}
       <ScrollStory />
 
