@@ -117,11 +117,12 @@ function ClockIn() {
       <div className="stencil text-[10px] text-primary/80 mb-2">// THE SHIFT</div>
       <h1
         id="clockin-title"
-        className="text-4xl sm:text-5xl font-black text-foreground leading-none tracking-tight"
+        className="text-step-5 font-black text-foreground leading-none tracking-tight"
         style={{ fontFamily: '"Bebas Neue", sans-serif' }}
       >
         THE SHIFT.
       </h1>
+
       <p className="mt-4 max-w-xl text-sm text-muted-foreground">
         Five files. Three lives. Falling for a scam costs a life. Calling wolf on a real one costs a life. The combo pays
         for clean, consecutive work. Clock in.
