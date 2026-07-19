@@ -82,23 +82,20 @@ export function InboxManager() {
     let alive = true;
     if (!lite) {
       const dateKey = new Date().toISOString().slice(0, 10);
-      const inbox = loadInbox();
-      if (!inbox.paperRead) {
-        setPaperCard({
-          id: `paper:pending:${dateKey}`,
-          type: "paper",
-          caseId: "paper",
-          route: "/paper",
-          platform: "paper",
-          senderName: "The morning edition is on the desk.",
-          preview: "The paper is here.",
-          arriveAfterSec: 0,
-          editionId: `pending:${dateKey}`,
-          editionNumber: 0,
-          editionDate: dateKey,
-          headline: "The morning edition is on the desk.",
-        });
-      }
+      setPaperCard({
+        id: `paper:pending:${dateKey}`,
+        type: "paper",
+        caseId: "paper",
+        route: "/paper",
+        platform: "paper",
+        senderName: "The morning edition is on the desk.",
+        preview: "The paper is here.",
+        arriveAfterSec: 0,
+        editionId: `pending:${dateKey}`,
+        editionNumber: 0,
+        editionDate: dateKey,
+        headline: "The morning edition is on the desk.",
+      });
     }
     fetchEdition()
       .then((row) => {
