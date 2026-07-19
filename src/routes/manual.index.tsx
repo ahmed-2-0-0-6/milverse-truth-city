@@ -180,7 +180,7 @@ function ManualIndex() {
           </p>
         </EngravedReveal>
 
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
+        <div className="mt-10 hub-grid pt-4">
           {MANUAL_ENTRIES.map((e) => {
             const isUnlocked = unlocked.has(e.id);
             const rec = record.get(e.id);
