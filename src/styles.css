@@ -2924,7 +2924,17 @@ html[data-high-legibility="on"] .cold-tense {
   border: 1px solid rgba(120, 80, 40, 0.35);
   box-shadow: inset 0 0 120px rgba(0,0,0,0.6);
   border-radius: 10px;
+  /* When the class is used as a full-bleed section wash w/ inline bg-image,
+     these keep it correct without needing extra utility classes. */
+  background-size: cover;
+  background-position: center;
 }
+/* Parallax only on pointer-fine (desktop). iOS Safari + Android drop frames
+   with background-attachment: fixed. */
+@media (pointer: fine) and (min-width: 768px) {
+  .corkboard-panel { background-attachment: fixed; }
+}
+
 
 /* ============================================================
    INTERACTIVE DOSSIER — 3D tilt + torch sweep on hover.
