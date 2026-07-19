@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
+import { DetectiveDesk } from "@/components/DetectiveDesk";
 import mirrorArt from "@/assets/district-mirror.jpg";
 import feedArt from "@/assets/district-feed.jpg";
 import studioArt from "@/assets/district-studio.jpg";
@@ -206,6 +207,7 @@ export function ScrollStory() {
                 backgroundSize: "3px 3px",
               }}
             />
+            {i === 0 && <DetectiveDesk />}
           </div>
           <div className="relative max-w-4xl text-center">
             <div className="stencil text-[10px] text-cyan-300/70 mb-6">BEAT · 0{i + 1} / 04</div>
