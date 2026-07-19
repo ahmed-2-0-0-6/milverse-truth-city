@@ -83,8 +83,7 @@ export function InboxManager() {
     if (!lite) {
       const dateKey = new Date().toISOString().slice(0, 10);
       const inbox = loadInbox();
-      const hasAnyPaper = inbox.paperRead || inbox.arrived.some((id) => id.startsWith("paper:"));
-      if (!hasAnyPaper) {
+      if (!inbox.paperRead) {
         setPaperCard({
           id: `paper:pending:${dateKey}`,
           type: "paper",
