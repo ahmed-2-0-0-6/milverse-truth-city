@@ -3354,7 +3354,7 @@ html { scroll-padding-top: 72px; }
   88%  { transform: translate(-1px, -1px) rotate(-0.35deg); }
   100% { opacity: 1; transform: translate(0, 0) rotate(0); }
 }
-.paper-nudge-in { animation: paperDeliver 680ms cubic-bezier(.18,.82,.24,1) both; }
+.paper-nudge-in { animation: none; }
 @media (prefers-reduced-motion: reduce) {
   .paper-nudge-in { animation: none; }
 }
