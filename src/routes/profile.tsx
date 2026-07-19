@@ -129,10 +129,10 @@ function ProfilePage() {
           <div className="relative">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="stencil text-[10px] tracking-[0.3em] text-muted-foreground">
-                  OPERATOR PROFILE
+                <div className="crt-text text-[10px] tracking-[0.3em]">
+                  &gt; OPERATOR PROFILE
                 </div>
-                <div className="mt-1 stencil text-primary text-sm">{callsign}</div>
+                <div className="crt-text mt-1 text-sm">CALLSIGN: {callsign}</div>
                 <h1
                   className="mt-2 text-5xl sm:text-6xl font-black tracking-tight"
                   style={{ fontFamily: '"Bebas Neue", sans-serif' }}
@@ -144,12 +144,12 @@ function ProfilePage() {
                 </div>
               </div>
               <div className="text-right">
-                <div className="stencil text-[9px] tracking-widest text-muted-foreground">XP</div>
+                <div className="crt-text text-[9px] tracking-widest">XP</div>
                 <div
-                  className="text-4xl font-black text-primary tabular-nums"
+                  className="crt-text text-4xl font-black tabular-nums"
                   style={{ fontFamily: '"Bebas Neue", sans-serif' }}
                 >
-                  {xp}
+                  {xp.toString().padStart(4, "0")}
                 </div>
                 {rankInfo.next && (
                   <div className="stencil text-[9px] text-muted-foreground mt-1">
