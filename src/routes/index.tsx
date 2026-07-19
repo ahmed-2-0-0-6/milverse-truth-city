@@ -129,6 +129,7 @@ function CityMap() {
           kind="bait"
           shift={shift}
           onDismiss={() => setShowBait(false)}
+          stack={showBeacon ? 1 : 0}
         />
       )}
       {booted && !showBait && returning && (
@@ -136,8 +137,21 @@ function CityMap() {
           kind="desk"
           shift={shift}
           onDismiss={() => setReturning(false)}
+          stack={showBeacon ? 1 : 0}
         />
       )}
+      {booted && showBeacon && (
+        <LandingNudge
+          kind="beacon"
+          shift={shift}
+          onDismiss={() => {
+            setShowBeacon(false);
+            try { sessionStorage.setItem("mv:beacon-dismissed", "1"); } catch { /* noop */ }
+          }}
+          stack={0}
+        />
+      )}
+
       {intro && booted && !showBait && (
         <FirstCall
           onDone={() => {
