@@ -5,7 +5,7 @@
 // Never returns once dismissed (either choice sets the flag).
 
 import { useEffect, useRef, useState } from "react";
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX, X } from "lucide-react";
 import {
   arrivalTap,
   markSoundIntroSeen,
