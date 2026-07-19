@@ -126,38 +126,37 @@ function CityMap() {
       <IncomingCall />
       {!booted && <BootScreen onDone={() => setBooted(true)} />}
       <TopBar />
-      {booted && (
-        <div
-          className="fixed z-40 bottom-4 left-4 w-[calc(100%-2rem)] sm:w-[22rem] max-h-[80dvh] overflow-y-auto flex flex-col-reverse gap-3 pointer-events-none [&>*]:pointer-events-auto"
-          aria-label="Notifications"
-        >
-          {showBeacon && (
-            <LandingNudge
-              kind="beacon"
-              shift={shift}
-              onDismiss={() => {
-                setShowBeacon(false);
-                try { sessionStorage.setItem("mv:beacon-dismissed", "1"); } catch { /* noop */ }
-              }}
-            />
-          )}
-          {showBait && (
-            <LandingNudge
-              kind="bait"
-              shift={shift}
-              onDismiss={() => setShowBait(false)}
-            />
-          )}
-          {!showBait && returning && (
-            <LandingNudge
-              kind="desk"
-              shift={shift}
-              onDismiss={() => setReturning(false)}
-            />
-          )}
-          <PaperNudge />
-        </div>
-      )}
+      <div
+        className="fixed z-40 bottom-4 left-4 w-[calc(100%-2rem)] sm:w-[22rem] max-h-[80dvh] overflow-y-auto flex flex-col-reverse gap-3 pointer-events-none [&>*]:pointer-events-auto"
+        aria-label="Notifications"
+      >
+        {booted && showBeacon && (
+          <LandingNudge
+            kind="beacon"
+            shift={shift}
+            onDismiss={() => {
+              setShowBeacon(false);
+              try { sessionStorage.setItem("mv:beacon-dismissed", "1"); } catch { /* noop */ }
+            }}
+          />
+        )}
+        {booted && showBait && (
+          <LandingNudge
+            kind="bait"
+            shift={shift}
+            onDismiss={() => setShowBait(false)}
+          />
+        )}
+        {booted && !showBait && returning && (
+          <LandingNudge
+            kind="desk"
+            shift={shift}
+            onDismiss={() => setReturning(false)}
+          />
+        )}
+        <PaperNudge />
+      </div>
+
 
       {intro && booted && !showBait && (
         <FirstCall
