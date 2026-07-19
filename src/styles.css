@@ -3218,5 +3218,3 @@ html[data-high-legibility="on"] .cold-tense {
 @utility safe-top    { padding-top:    max(0.75rem, env(safe-area-inset-top)); }
 
 /* Mobile viewport helper — swap h-screen for h-dvh where mobile chrome clips */
-@utility min-h-dvh { min-height: 100dvh; }
-@utility h-dvh     { height: 100dvh; }
