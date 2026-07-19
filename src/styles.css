@@ -2858,3 +2858,126 @@ html[data-high-legibility="on"] .cold-tense {
 }
 
 
+
+/* ============================================================
+   CRIME SCENE / DETECTIVE OFFICE VIBE — v2 UI upgrade
+   Ashcroft-desk atmosphere, corkboard textures, interactive
+   dossier tilt, evidence-tape hover. Presentation only.
+   ============================================================ */
+
+/* Hero backdrop: night detective office photo, heavily washed
+   into the noir palette so the copy stays legible.  */
+.crime-scene-hero {
+  background-image:
+    radial-gradient(ellipse at 50% 30%, rgba(3, 8, 14, 0.35), rgba(2, 4, 10, 0.92) 70%),
+    linear-gradient(180deg, rgba(2, 4, 10, 0.55) 0%, rgba(2, 4, 10, 0.98) 100%),
+    var(--crime-scene-img, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: saturate(0.85) contrast(1.05);
+}
+.crime-scene-hero::after {
+  content: "";
+  position: absolute; inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 3px);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* Corkboard / evidence-wall panel used behind case grids */
+.corkboard-panel {
+  background:
+    radial-gradient(circle at 20% 30%, rgba(0,0,0,0.35), transparent 55%),
+    radial-gradient(circle at 80% 70%, rgba(0,0,0,0.35), transparent 55%),
+    repeating-radial-gradient(circle at 50% 50%, rgba(120, 80, 40, 0.12) 0 2px, transparent 2px 4px),
+    linear-gradient(135deg, #2a1e14 0%, #1a120c 100%);
+  border: 1px solid rgba(120, 80, 40, 0.35);
+  box-shadow: inset 0 0 120px rgba(0,0,0,0.6);
+  border-radius: 10px;
+}
+
+/* ============================================================
+   INTERACTIVE DOSSIER — 3D tilt + torch sweep on hover.
+   Layers over the existing .dossier styles without breaking them.
+   ============================================================ */
+.dossier { perspective: 1000px; }
+.dossier-live .dossier-body {
+  transform-style: preserve-3d;
+  transition: transform 400ms cubic-bezier(0.2, 0.9, 0.3, 1.05),
+              box-shadow 400ms ease,
+              border-color 300ms ease;
+  will-change: transform;
+}
+.dossier-live:hover .dossier-body {
+  transform: translateY(-4px) rotateX(3deg) rotateY(-2deg);
+  box-shadow:
+    0 20px 40px -12px rgba(0, 0, 0, 0.7),
+    0 6px 12px -4px rgba(0, 0, 0, 0.5),
+    0 0 0 1px color-mix(in oklab, var(--primary) 25%, transparent);
+}
+.dossier-live:active .dossier-body {
+  transform: translateY(-1px) rotateX(1deg) rotateY(-1deg);
+  transition-duration: 120ms;
+}
+
+/* Evidence bag / paper grain — richer texture on the dossier body */
+.dossier-body::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(255, 220, 150, 0.05), transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(80, 200, 255, 0.04), transparent 45%),
+    repeating-linear-gradient(45deg, transparent 0 6px, rgba(255,255,255,0.008) 6px 7px);
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0.9;
+}
+
+/* Yellow hazard tape crossing sealed cards on hover */
+.dossier-locked .dossier-body { position: relative; }
+.dossier-locked .dossier-body::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(
+      -20deg,
+      rgba(245, 200, 40, 0.55) 0 18px,
+      rgba(10, 10, 10, 0.6) 18px 32px
+    );
+  clip-path: polygon(0 42%, 100% 30%, 100% 52%, 0 64%);
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+  mix-blend-mode: normal;
+}
+.dossier-locked:hover .dossier-body::after { opacity: 0.85; }
+
+/* Corner tape strip on unlocked dossiers — like a real folder */
+.dossier-live .dossier-body {
+  position: relative;
+}
+.dossier-live .dossier-body > .relative::before {
+  content: "";
+  position: absolute;
+  top: -14px; left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 90px; height: 22px;
+  background: linear-gradient(180deg, rgba(245, 210, 120, 0.65), rgba(200, 165, 80, 0.55));
+  box-shadow: 0 2px 4px rgba(0,0,0,0.35);
+  opacity: 0;
+  transition: opacity 300ms ease, transform 300ms ease;
+  pointer-events: none;
+  border-radius: 1px;
+}
+.dossier-live:hover .dossier-body > .relative::before {
+  opacity: 0.85;
+  transform: translateX(-50%) rotate(-2deg) translateY(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dossier-live:hover .dossier-body { transform: none; }
+  .dossier-locked:hover .dossier-body::after { opacity: 0.7; }
+  .dossier-live:hover .dossier-body > .relative::before { transition: none; }
+}
