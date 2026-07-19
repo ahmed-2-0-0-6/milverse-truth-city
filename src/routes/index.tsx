@@ -194,27 +194,13 @@ function CityMap() {
               </div>
               <HeroType />
               <p className="mt-4 max-w-xl text-center text-white/80 text-sm sm:text-base">
-                Solve live scam cases. Rank up. Unlock the city.
+                Scammers are working your city. Pick up. Play them. Burn them.
               </p>
 
 
               <div className="mt-8 w-full max-w-[360px]">
-                <Link
-                  to="/mirror"
-                  className="cta-glow flex w-full min-h-[56px] items-center justify-center gap-2 rounded-sm bg-primary px-6 py-3 text-primary-foreground stencil text-sm tracking-widest"
-                  aria-label="Start Case Number 1"
-                >
-                  ▶ START CASE #1
-                </Link>
+                <PlayButton />
                 <StatStrip />
-                <div className="mt-3 text-center">
-                  <a
-                    href="#enter"
-                    className="stencil text-[10px] tracking-widest text-white/60 hover:text-white underline underline-offset-4"
-                  >
-                    I've been here before → City Map
-                  </a>
-                </div>
               </div>
 
               <div className="mt-6 w-full max-w-xl">
