@@ -5,11 +5,13 @@ const TEXT = "TRAIN YOUR TRUST";
 
 type HeroTypeProps = {
   onComplete?: () => void;
+  onFullyTyped?: () => void;
 };
 
-export function HeroType({ onComplete }: HeroTypeProps) {
+export function HeroType({ onComplete, onFullyTyped }: HeroTypeProps) {
   const [n, setN] = useState(0);
   const completedRef = useRef(false);
+  const fullyTypedRef = useRef(false);
 
   const complete = () => {
     if (completedRef.current) return;
@@ -22,6 +24,17 @@ export function HeroType({ onComplete }: HeroTypeProps) {
     }
   };
 
+  const fullyTyped = () => {
+    if (fullyTypedRef.current) return;
+    fullyTypedRef.current = true;
+    onFullyTyped?.();
+    try {
+      window.dispatchEvent(new CustomEvent("milverse:hero-fully-typed"));
+    } catch {
+      /* noop */
+    }
+  };
+
   useEffect(() => {
     if (
       typeof window !== "undefined" &&
@@ -29,11 +42,10 @@ export function HeroType({ onComplete }: HeroTypeProps) {
     ) {
       setN(TEXT.length);
       complete();
+      fullyTyped();
       return;
     }
-    // Fire the "hero-typed" signal ~200ms after the typing animation begins,
-    // so left-side notifications start their slow arrival right after the
-    // headline kicks off (not after it finishes).
+    // Left-side notifications: fire ~200ms after typing starts.
     const signal = window.setTimeout(complete, 200);
     let i = 0;
     const id = window.setInterval(() => {
@@ -41,6 +53,8 @@ export function HeroType({ onComplete }: HeroTypeProps) {
       setN(i);
       if (i >= TEXT.length) {
         window.clearInterval(id);
+        // Right-side newspaper: fire only once the headline is fully typed.
+        fullyTyped();
       }
     }, 60);
     return () => {
@@ -48,6 +62,7 @@ export function HeroType({ onComplete }: HeroTypeProps) {
       window.clearTimeout(signal);
     };
   }, []);
+
 
   return (
     <h1
