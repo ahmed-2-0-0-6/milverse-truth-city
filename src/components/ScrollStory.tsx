@@ -1,6 +1,6 @@
 // LAYER-7 — Scroll-driven story beats. GSAP ScrollTrigger + horizontal districts.
 // Lazy imports GSAP; respects reduced-motion (renders static).
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
 import mirrorArt from "@/assets/district-mirror.jpg";
@@ -209,12 +209,7 @@ export function ScrollStory() {
           </div>
           <div className="relative max-w-4xl text-center">
             <div className="stencil text-[10px] text-cyan-300/70 mb-6">BEAT · 0{i + 1} / 04</div>
-            <h2
-              className="beat-line text-4xl sm:text-6xl md:text-7xl font-black leading-[0.95] tracking-tight text-white"
-              style={{ fontFamily: '"Bebas Neue", "Space Grotesk", sans-serif' }}
-            >
-              {highlight(b.headline)}
-            </h2>
+            <TypedHeadline text={b.headline} />
             <p className="beat-line mt-6 text-base sm:text-lg text-white/60 max-w-xl mx-auto">
               {b.sub}
             </p>
@@ -228,6 +223,7 @@ export function ScrollStory() {
           </div>
         </section>
       ))}
+
 
       {/* MIL triad — judge-proofing */}
       <section className="story-beat relative min-h-[80vh] flex items-center justify-center overflow-hidden px-6 border-y border-white/5">
@@ -481,7 +477,14 @@ function Stat({ label, value }: { label: string; value: number }) {
 }
 
 function highlight(text: string) {
-  // Wrap key words with treatments
+  // Wrap key words with treatments. Multi-word phrases (e.g. "every day")
+  // are matched first so both words get the same colour.
+  const phraseMap: Array<[RegExp, string]> = [
+    [/^every$/i, "word-red"],
+    [/^day[,.]?$/i, "word-red"],
+    [/^family[,.]?$/i, "word-yellow"],
+    [/^message[,.]?$/i, "word-red"],
+  ];
   const map: Record<string, string> = {
     trust: "word-glow",
     fake: "word-glitch",
@@ -492,7 +495,8 @@ function highlight(text: string) {
   };
   return text.split(/(\s+)/).map((tok, i) => {
     const clean = tok.replace(/[^a-zA-Z]/g, "");
-    const cls = map[clean.toLowerCase()] || map[clean];
+    const phraseCls = phraseMap.find(([rx]) => rx.test(tok))?.[1];
+    const cls = phraseCls || map[clean.toLowerCase()] || map[clean];
     if (cls)
       return (
         <span key={i} className={cls}>
@@ -502,3 +506,81 @@ function highlight(text: string) {
     return <span key={i}>{tok}</span>;
   });
 }
+
+// TypedHeadline — per-letter reveal on scroll-in. Keeps highlight() colour
+// treatments (red / yellow / glow) by wrapping each word in its treatment
+// span and each character in a `.beat-letter` with a staggered delay.
+function TypedHeadline({ text }: { text: string }) {
+  const ref = useRef<HTMLHeadingElement>(null);
+  const [typed, setTyped] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setTyped(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setTyped(true);
+            io.disconnect();
+            break;
+          }
+        }
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const nodes = highlight(text);
+  let letterIndex = 0;
+  const STEP_MS = 32;
+
+  const wrapLetters = (str: string) =>
+    Array.from(str).map((ch) => {
+      const delay = `${letterIndex * STEP_MS}ms`;
+      letterIndex += 1;
+      return (
+        <span
+          key={`l${letterIndex}`}
+          className="beat-letter"
+          style={{ ["--letter-delay" as string]: delay }}
+        >
+          {ch === " " ? "\u00A0" : ch}
+        </span>
+      );
+    });
+
+  return (
+    <h2
+      ref={ref}
+      className={`beat-line beat-headline text-4xl sm:text-6xl md:text-7xl font-black leading-[0.95] tracking-tight text-white ${typed ? "typed" : ""}`}
+      style={{ fontFamily: '"Bebas Neue", "Space Grotesk", sans-serif' }}
+      aria-label={text}
+    >
+      {nodes.map((node, i) => {
+        if (typeof node === "string") return <span key={i}>{wrapLetters(node)}</span>;
+        // node is a <span className="word-*">TOK</span>
+        const el = node as ReactElement<{ className?: string; children?: ReactNode }>;
+        const cls = el.props.className ?? "";
+        const child = el.props.children;
+
+        const str = typeof child === "string" ? child : "";
+        return (
+          <span key={i} className={cls}>
+            {wrapLetters(str)}
+          </span>
+        );
+      })}
+    </h2>
+  );
+}
+
