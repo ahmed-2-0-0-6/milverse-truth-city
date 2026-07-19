@@ -187,11 +187,12 @@ function Resume({
       <div className="stencil text-[10px] text-primary/80 mb-2">// SHIFT IN PROGRESS</div>
       <h1
         id="resume-title"
-        className="text-4xl sm:text-5xl font-black text-foreground leading-none tracking-tight"
+        className="text-step-4 font-black text-foreground leading-none tracking-tight"
         style={{ fontFamily: '"Bebas Neue", sans-serif' }}
       >
         SHIFT {Math.min(shift.slot + 1, shift.caseRefs.length)}/{shift.caseRefs.length}
       </h1>
+
 
       <div className="mt-4 flex flex-wrap items-center gap-4 stencil text-[11px] text-muted-foreground tabular-nums">
         <span className="inline-flex items-center gap-1">
