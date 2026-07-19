@@ -1,37 +1,75 @@
 import { useState } from "react";
 import { X, Radio, Phone } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { LiveBait } from "./LiveBait";
 import { CitizenDesk } from "./CitizenDesk";
+import { DailyBeacon } from "@/components/DailyBeacon";
 import type { Shift } from "@/lib/city/shift";
 
-type Kind = "bait" | "desk";
+type Kind = "bait" | "desk" | "beacon";
 
 interface Props {
   kind: Kind;
   shift: Shift;
   onDismiss: () => void;
+  /** Stack offset from bottom in Tailwind spacing units (bait=4, desk=4, beacon stacks above). */
+  stack?: number;
 }
 
 /**
  * Floating bottom-right notification. Never covers the landing hero.
  * Tap to expand into a full sheet; X to dismiss.
  */
-export function LandingNudge({ kind, shift, onDismiss }: Props) {
+export function LandingNudge({ kind, shift, onDismiss, stack = 0 }: Props) {
   const [open, setOpen] = useState(false);
 
   const isBait = kind === "bait";
+  const isBeacon = kind === "beacon";
+
+  // ── Beacon variant: compact, links straight to /drop, no sheet ──
+  if (isBeacon) {
+    const bottomClass =
+      stack === 0 ? "bottom-4" : stack === 1 ? "bottom-24" : "bottom-44";
+    return (
+      <div
+        className={`fixed z-40 ${bottomClass} right-4 left-4 sm:left-auto sm:max-w-sm`}
+        role="region"
+        aria-label="Today's Forward"
+      >
+        <div className="relative rounded-xl border border-primary/40 bg-background/90 backdrop-blur-md elev-3 p-3 pr-10">
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="absolute top-1.5 right-1.5 h-8 w-8 tap inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent"
+            aria-label="Dismiss notification"
+          >
+            <X className="h-4 w-4" aria-hidden />
+          </button>
+          <Link to="/drop" className="block tap" aria-label="Open today's forward">
+            <div className="stencil text-[10px] tracking-widest text-primary/90 mb-1">
+              AAJ KA FORWARD
+            </div>
+            <DailyBeacon />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   const title = isBait ? "INCOMING · UNKNOWN NUMBER" : "THE DESK · YOUR CASELOAD";
   const body = isBait
     ? "A scammer just texted. Catch them out."
     : "Today's drop and the week's paper are waiting.";
   const cta = isBait ? "PICK UP" : "OPEN DESK";
   const Icon = isBait ? Phone : Radio;
+  const bottomClass =
+    stack === 0 ? "bottom-4" : stack === 1 ? "bottom-24" : "bottom-44";
 
   return (
     <>
       <div
-        className="fixed z-40 bottom-4 right-4 left-4 sm:left-auto sm:max-w-sm"
+        className={`fixed z-40 ${bottomClass} right-4 left-4 sm:left-auto sm:max-w-sm`}
         role="region"
         aria-label={title}
       >
@@ -114,3 +152,4 @@ export function LandingNudge({ kind, shift, onDismiss }: Props) {
     </>
   );
 }
+
