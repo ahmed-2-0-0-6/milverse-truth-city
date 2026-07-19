@@ -215,6 +215,7 @@ function CityMap() {
               backgroundSize: "3px 3px",
             }}
           />
+          <LivingCityCanvas />
         </div>
 
         <div className="w-full flex flex-col items-center min-h-[380px] sm:min-h-[460px]">
