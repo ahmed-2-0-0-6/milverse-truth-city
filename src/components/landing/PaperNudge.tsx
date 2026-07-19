@@ -6,6 +6,7 @@ import {
   readLastSeenWeek,
   markSupplementSeen,
 } from "@/lib/paper/supplement";
+} from "@/lib/paper/supplementMeta";
 
 /**
  * Left-side dismissible notification announcing the fresh weekly supplement.

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { X, Radio, Phone } from "lucide-react";
-import { Link } from "@tanstack/react-router";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { LiveBait } from "./LiveBait";
 import { CitizenDesk } from "./CitizenDesk";
@@ -44,12 +43,12 @@ export function LandingNudge({ kind, shift, onDismiss }: Props) {
           >
             <X className="h-4 w-4" aria-hidden />
           </button>
-          <Link to="/drop" className="block tap" aria-label="Open today's forward">
+          <div className="block tap" aria-label="Open today's forward">
             <div className="stencil text-[10px] tracking-widest text-primary/90 mb-1">
               AAJ KA FORWARD
             </div>
-            <DailyBeacon />
-          </Link>
+            <DailyBeacon onNavigate={onDismiss} />
+          </div>
         </div>
       </div>
     );
