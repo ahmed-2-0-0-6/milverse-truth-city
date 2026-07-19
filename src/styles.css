@@ -758,7 +758,12 @@ html[data-force-reduce-motion="on"] .marquee-track {
 /* Hero */
 .hero-type {
   line-height: 0.85;
+  /* Isolate paint: the neon glow won't invalidate ancestor layers,
+     and sibling animations (paper drop, nudges) stay independent. */
+  contain: layout paint;
+  transform: translateZ(0);
 }
+
 @keyframes scroll-hint {
   0%,
   100% {
