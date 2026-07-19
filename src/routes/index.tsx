@@ -24,6 +24,8 @@ import { CitizenDesk } from "@/components/landing/CitizenDesk";
 import { LiveBait, hasSeenLiveBait } from "@/components/landing/LiveBait";
 import { isReturningCitizen } from "@/lib/city/returning";
 import { currentShift, isNightRegister, type Shift } from "@/lib/city/shift";
+import detectiveDeskImg from "@/assets/detective-desk.jpg";
+import corkboardImg from "@/assets/corkboard.jpg";
 
 
 export const Route = createFileRoute("/")({
@@ -130,9 +132,13 @@ function CityMap() {
       )}
 
 
-      {/* ── HERO ── full-viewport cinematic */}
+      {/* ── HERO ── full-viewport cinematic. Detective-desk photo washes
+          under the noir palette on every mode; the 3D city sits on top in
+          cinematic. Gives the site the Ashcroft-office / FBI-field-office
+          vibe requested for v2. */}
       <section
-        className={`hero-frame relative min-h-[100svh] flex flex-col items-center px-4 overflow-hidden ${mode === "cinematic" ? "justify-center" : "justify-start pt-24 sm:pt-28"}`}
+        className={`crime-scene-hero hero-frame relative min-h-[100svh] flex flex-col items-center px-4 overflow-hidden ${mode === "cinematic" ? "justify-center" : "justify-start pt-24 sm:pt-28"}`}
+        style={{ ["--crime-scene-img" as string]: `url(${detectiveDeskImg})` }}
       >
         <div className="absolute inset-0 -z-10">
           {mode === "cinematic" ? (
@@ -223,8 +229,18 @@ function CityMap() {
 
       <Marquee />
 
-      {/* ── EXPLORE THE CITY (interactive map / list) ── */}
-      <section id="enter" className="relative pt-16 pb-6 px-4">
+      {/* ── EXPLORE THE CITY (interactive map / list) ── Corkboard wash
+          under the section so cases feel pinned to an evidence wall. */}
+      <section
+        id="enter"
+        className="relative pt-16 pb-6 px-4"
+        style={{
+          backgroundImage: `linear-gradient(180deg, rgba(2,4,10,0.92), rgba(2,4,10,0.96)), url(${corkboardImg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundAttachment: "fixed",
+        }}
+      >
         <div className="mx-auto max-w-6xl">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px flex-1 max-w-[60px] bg-cyan-400/60" />
