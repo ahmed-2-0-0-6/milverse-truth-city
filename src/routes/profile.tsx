@@ -18,6 +18,8 @@ import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
 import { TheRoad } from "@/components/road/TheRoad";
 
 import { Download, Share2 } from "lucide-react";
+import crtImg from "@/assets/crt-terminal.jpg";
+import evidenceDeskImg from "@/assets/evidence-desk.jpg";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -92,7 +94,15 @@ function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen grain">
+    <div
+      className="min-h-screen grain"
+      style={{
+        backgroundImage: `linear-gradient(180deg, rgba(2,4,10,0.93), rgba(2,4,10,0.98)), url(${evidenceDeskImg})`,
+        backgroundSize: "cover",
+        backgroundAttachment: "fixed",
+        backgroundPosition: "center top",
+      }}
+    >
       <TopBar />
       <main className="mx-auto max-w-3xl px-4 py-10">
         <Link
@@ -108,14 +118,14 @@ function ProfilePage() {
 
 
 
-        <div className="mt-6 rounded-2xl border-2 border-primary/40 bg-card p-6 sm:p-8 relative overflow-hidden">
-          <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage: "radial-gradient(rgba(34,211,238,0.6) 1px, transparent 1px)",
-              backgroundSize: "6px 6px",
-            }}
-          />
+        <div
+          className="crt-panel mt-6 rounded-2xl p-6 sm:p-8"
+          style={{
+            backgroundImage: `linear-gradient(180deg, rgba(0,20,15,0.88), rgba(0,10,8,0.96)), url(${crtImg})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
           <div className="relative">
             <div className="flex items-start justify-between gap-4">
               <div>
