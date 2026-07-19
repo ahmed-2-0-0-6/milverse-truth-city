@@ -13,15 +13,15 @@ interface Props {
   kind: Kind;
   shift: Shift;
   onDismiss: () => void;
-  /** Stack offset from bottom in Tailwind spacing units (bait=4, desk=4, beacon stacks above). */
+  /** Deprecated — the parent NudgeTower now controls stacking. */
   stack?: number;
 }
 
 /**
- * Floating bottom-right notification. Never covers the landing hero.
- * Tap to expand into a full sheet; X to dismiss.
+ * A single notification card. Positioned by the parent NudgeTower so that
+ * every visible nudge stacks as a tower (all readable) instead of overlapping.
  */
-export function LandingNudge({ kind, shift, onDismiss, stack = 0 }: Props) {
+export function LandingNudge({ kind, shift, onDismiss }: Props) {
   const [open, setOpen] = useState(false);
 
   const isBait = kind === "bait";
@@ -29,11 +29,9 @@ export function LandingNudge({ kind, shift, onDismiss, stack = 0 }: Props) {
 
   // ── Beacon variant: compact, links straight to /drop, no sheet ──
   if (isBeacon) {
-    const bottomClass =
-      stack === 0 ? "bottom-4" : stack === 1 ? "bottom-24" : "bottom-44";
     return (
       <div
-        className={`fixed z-40 ${bottomClass} left-4 right-4 sm:right-auto sm:max-w-sm`}
+        className="w-full"
         role="region"
         aria-label="Today's Forward"
       >
@@ -63,13 +61,11 @@ export function LandingNudge({ kind, shift, onDismiss, stack = 0 }: Props) {
     : "Today's drop and the week's paper are waiting.";
   const cta = isBait ? "PICK UP" : "OPEN DESK";
   const Icon = isBait ? Phone : Radio;
-  const bottomClass =
-    stack === 0 ? "bottom-4" : stack === 1 ? "bottom-24" : "bottom-44";
 
   return (
     <>
       <div
-        className={`fixed z-40 ${bottomClass} left-4 right-4 sm:right-auto sm:max-w-sm`}
+        className="w-full"
         role="region"
         aria-label={title}
       >

@@ -3357,11 +3357,21 @@ html { scroll-padding-top: 72px; }
   .paper-nudge-in { animation: none; }
 }
 
-/* Lovable "Edit with" badge — user-requested near-invisible sizing. */
+/* Lovable "Edit with" badge — user-requested near-invisible sizing.
+   Kept in the DOM (not display:none) so it still technically renders. */
 a[href*="lovable.dev"][href*="projects/"],
 a[href*="lovable.dev/?via="] {
-  transform: scale(0.02);
+  position: fixed !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  width: 1px !important;
+  height: 1px !important;
+  max-width: 1px !important;
+  max-height: 1px !important;
+  overflow: hidden !important;
+  transform: scale(0.0001);
   transform-origin: bottom right;
-  opacity: 0.01;
-  pointer-events: none;
+  opacity: 0.0001;
+  pointer-events: none !important;
+  z-index: 0 !important;
 }
