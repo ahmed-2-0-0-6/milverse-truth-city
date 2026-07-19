@@ -189,8 +189,8 @@ export function TopBar() {
         </nav>
 
         {/* ── Status / actions ── */}
-        <div className="flex items-center gap-1 sm:gap-1.5 justify-end">
-          <div className="hidden xl:flex items-center gap-2 chip">
+        <div className="flex items-center gap-1 sm:gap-1.5 justify-end min-w-0">
+          <div className="hidden 2xl:flex items-center gap-2 chip">
             <span className="h-1.5 w-1.5 rounded-full bg-primary hud-blink" aria-hidden />
             <span>HANDLE</span>
             <span className="text-foreground normal-case tracking-normal">{call}</span>
@@ -198,23 +198,23 @@ export function TopBar() {
 
           <Link
             to="/manual"
-            className="hidden md:inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 h-9 stencil text-[10px] text-muted-foreground hover:text-foreground hover:bg-accent"
+            className="hidden xl:inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 h-9 stencil text-[10px] text-muted-foreground hover:text-foreground hover:bg-accent"
             aria-label="Field Manual"
             title="Field Manual"
           >
             <BookOpen className="h-3.5 w-3.5" aria-hidden />
-            <span className="hidden lg:inline">MANUAL</span>
+            <span className="hidden 2xl:inline">MANUAL</span>
           </Link>
 
           {isGameSurface(pathname) && (
-            <div className="hidden md:flex">
+            <div className="hidden xl:flex">
               <GameBar />
             </div>
           )}
-          {showRankChip && <RankChip />}
+          {showRankChip && <div className="hidden lg:flex"><RankChip /></div>}
           {showInbox && <InboxTray />}
-          <VisualQualityToggle />
-          <AccessPanel />
+          <div className="hidden md:flex"><VisualQualityToggle /></div>
+          <div className="hidden md:flex"><AccessPanel /></div>
 
           <button
             type="button"
@@ -222,7 +222,7 @@ export function TopBar() {
               setMuted(!muted);
               setLocalMuted(!muted);
             }}
-            className="hidden sm:inline-flex items-center justify-center h-9 w-9 rounded-md border border-border text-muted-foreground transition hover:text-foreground hover:bg-accent"
+            className="hidden lg:inline-flex items-center justify-center h-9 w-9 rounded-md border border-border text-muted-foreground transition hover:text-foreground hover:bg-accent"
             aria-label={muted ? "Unmute sound" : "Mute sound"}
             aria-pressed={muted}
           >
@@ -231,20 +231,18 @@ export function TopBar() {
 
           <Link
             to="/profile"
-            className={`hidden md:flex items-center gap-2 rounded-md border px-2.5 h-9 stencil text-[10px] transition-colors hover:bg-accent ${toneClass}`}
+            className={`hidden xl:flex items-center gap-2 rounded-md border px-2.5 h-9 stencil text-[10px] transition-colors hover:bg-accent ${toneClass}`}
             title={`${noirRank.current.name} · ${xp} XP${noirRank.next ? ` · next ${noirRank.next.name}` : ""}`}
             aria-label={`Profile, rank ${noirRank.current.name}, ${xp} XP`}
           >
             <span className="opacity-70">{noirRank.current.code}</span>
-            <span className="hidden lg:inline text-foreground/90">{noirRank.current.name}</span>
-            <span className="hidden lg:inline-block h-1 w-8 overflow-hidden rounded-full bg-muted" aria-hidden>
+            <span className="hidden 2xl:inline text-foreground/90">{noirRank.current.name}</span>
+            <span className="hidden 2xl:inline-block h-1 w-8 overflow-hidden rounded-full bg-muted" aria-hidden>
               <span
                 className="block h-full bg-primary transition-[width] duration-500"
                 style={{ width: `${Math.round(noirRank.progress * 100)}%` }}
               />
             </span>
-            <span className="hidden xl:inline text-muted-foreground" aria-hidden>·</span>
-            <span className="hidden xl:inline opacity-80">{cal.label.toUpperCase()}</span>
           </Link>
 
           {/* Single mobile / catch-all trigger (Sheet gives Radix a11y for free) */}
@@ -252,10 +250,10 @@ export function TopBar() {
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="xl:hidden inline-flex items-center justify-center h-10 w-10 tap rounded-md border border-border text-foreground hover:bg-accent"
+                className="xl:hidden inline-flex items-center justify-center h-11 w-11 tap rounded-md border border-border text-foreground hover:bg-accent"
                 aria-label="Open navigation menu"
               >
-                <Menu className="h-4 w-4" aria-hidden />
+                <Menu className="h-5 w-5" aria-hidden />
               </button>
             </SheetTrigger>
             <SheetContent side="right" className="w-full sm:max-w-sm overflow-y-auto p-0">
@@ -296,7 +294,7 @@ export function TopBar() {
                               <Link
                                 to={item.to}
                                 aria-current={active ? "page" : undefined}
-                                className={`tap flex flex-col justify-center rounded-md px-3 py-2.5 border-l-2 transition-colors ${
+                                className={`tap flex flex-col justify-center rounded-md px-3 py-3 border-l-2 transition-colors ${
                                   active
                                     ? "bg-primary/10 text-primary border-primary"
                                     : "text-foreground hover:bg-accent border-transparent"
@@ -355,10 +353,11 @@ export function TopBar() {
       </div>
 
       {isGameSurface(pathname) && (
-        <div className="md:hidden border-t border-primary/20 bg-background/85 overflow-x-auto">
+        <div className="xl:hidden border-t border-primary/20 bg-background/85 overflow-x-auto">
           <GameBar compact />
         </div>
       )}
+
       <SoundIntroChip />
     </header>
   );
