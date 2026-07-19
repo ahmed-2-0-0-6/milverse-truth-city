@@ -113,6 +113,24 @@
     font-family: var(--font-mono);
   }
 
+  /* Global: hide all scrollbars, keep scrolling functional.
+     Applies to every scrollable element on every page. */
+  html {
+    scrollbar-width: none;         /* Firefox */
+    -ms-overflow-style: none;      /* IE / old Edge */
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;      /* WebKit / Blink */
+  }
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
   /* Consistent accessible focus ring for every interactive element that
      doesn't already opt into a custom one. Uses design-system tokens. */
   :where(a, button, [role="button"], input, select, textarea, summary, [tabindex]):focus-visible {
