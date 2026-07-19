@@ -5,7 +5,6 @@ import {
   supplementWeek,
   readLastSeenWeek,
   markSupplementSeen,
-} from "@/lib/paper/supplement";
 } from "@/lib/paper/supplementMeta";
 
 /**
