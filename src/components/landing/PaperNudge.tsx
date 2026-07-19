@@ -9,25 +9,21 @@ import {
 
 /**
  * Left-side dismissible notification announcing the fresh weekly supplement.
- * "Delivered" ~1.2s after mount so it feels like it arrives once the desk
- * finishes loading. Once the current week has been seen or dismissed,
+ * Delivered immediately on mount so the paper is part of the first landing
+ * impression. Once the current week has been seen or dismissed,
  * it stays quiet until the next Sunday rollover.
  */
 export function PaperNudge() {
-  const [ready, setReady] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const week = supplementWeek();
 
   useEffect(() => {
     if (readLastSeenWeek() === week.weekKey) {
       setDismissed(true);
-      return;
     }
-    const t = window.setTimeout(() => setReady(true), 0);
-    return () => window.clearTimeout(t);
   }, [week.weekKey]);
 
-  if (dismissed || !ready) return null;
+  if (dismissed) return null;
 
   const dismiss = () => {
     markSupplementSeen(week.weekKey);
