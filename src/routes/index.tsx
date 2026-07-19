@@ -178,37 +178,24 @@ function CityMap() {
         </div>
 
         <div className="w-full flex flex-col items-center min-h-[380px] sm:min-h-[460px]">
-          {showBait ? (
-            <div className="w-full">
-              <div className="stencil text-[10px] text-destructive/90 mb-4 hud-blink text-center">
-                // INCOMING · UNKNOWN NUMBER · CALL IT
-              </div>
-              <LiveBait onDismiss={() => setShowBait(false)} />
-            </div>
-          ) : returning ? (
-            <CitizenDesk shift={shift} />
-          ) : (
-            <>
-              <div className="stencil text-[10px] text-cyan-300/80 mb-4 hud-blink text-center">
-                {kicker}
-              </div>
-              <HeroType />
-              <p className="mt-4 max-w-xl text-center text-white/80 text-step-0 px-2">
-                Scammers are working your city. Pick up. Play them. Burn them.
-              </p>
+          <div className="stencil text-[10px] text-cyan-300/80 mb-4 hud-blink text-center">
+            {kicker}
+          </div>
+          <HeroType />
+          <p className="mt-4 max-w-xl text-center text-white/80 text-step-0 px-2">
+            Scammers are working your city. Pick up. Play them. Burn them.
+          </p>
 
+          <div className="mt-6 sm:mt-8 w-full max-w-[380px]">
+            <PlayButton />
+            <StatStrip />
+          </div>
 
-              <div className="mt-6 sm:mt-8 w-full max-w-[380px]">
-                <PlayButton />
-                <StatStrip />
-              </div>
-
-              <div className="mt-6 w-full max-w-xl">
-                <DailyBeacon />
-              </div>
-            </>
-          )}
+          <div className="mt-6 w-full max-w-xl">
+            <DailyBeacon />
+          </div>
         </div>
+
 
 
         <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 scroll-hint safe-bottom">
