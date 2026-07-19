@@ -260,10 +260,11 @@ export function TopBar() {
       </div>
 
       {isGameSurface(pathname) && (
-        <div className="xl:hidden border-t border-primary/20 bg-background/85 overflow-x-auto">
+        <div className="xl:hidden overflow-x-auto pointer-events-auto">
           <GameBar compact />
         </div>
       )}
+
 
       <SoundIntroChip />
     </header>
