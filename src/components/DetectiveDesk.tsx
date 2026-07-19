@@ -1073,10 +1073,11 @@ function DeskClutter() {
           <boxGeometry args={[2.4, 0.03, 0.16]} />
           <meshStandardMaterial color="#dcdcdc" metalness={0.95} roughness={0.22} />
         </mesh>
-        <mesh position={[-1.35, 0.02, 0]}>
-          <cylinderGeometry args={[0.12, 0.12, 0.9, 14]} rotation={[0, 0, Math.PI / 2]} />
+        <mesh position={[-1.35, 0.02, 0]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.12, 0.12, 0.9, 14]} />
           <meshStandardMaterial color="#4a2a12" roughness={0.7} />
         </mesh>
+
       </group>
       {/* rolodex */}
       <group position={[-8.5, 0.05, 2]} rotation={[0, 0.5, 0]}>
