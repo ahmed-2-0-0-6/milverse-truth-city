@@ -148,8 +148,9 @@ function ManualIndex() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-8">
+      <main id="main" role="main" className="mx-auto max-w-6xl px-4 sm:px-6 py-8 safe-bottom">
         <div className="flex flex-wrap items-center gap-3">
+
           <Link
             to="/manual/take-it-outside"
             className="inline-flex items-center gap-2 rounded-md border border-primary/50 bg-primary/10 px-3 py-1.5 stencil text-[10px] tracking-widest text-primary hover:bg-primary/20"
