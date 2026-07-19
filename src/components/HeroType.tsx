@@ -23,17 +23,12 @@ export function HeroType({ onComplete }: HeroTypeProps) {
   };
 
   const completeWhenPainted = (el: HTMLElement) => {
-    let frames = 0;
-    const check = () => {
-      frames += 1;
-      const opacity = Number(window.getComputedStyle(el).opacity);
-      if (opacity >= 0.55 || frames >= 12) {
-        complete();
-        return;
-      }
-      window.requestAnimationFrame(check);
-    };
-    window.requestAnimationFrame(check);
+    // Fire ~600-700ms earlier: signal on the very first paint of the last
+    // letter instead of waiting for its glow to ramp up.
+    window.requestAnimationFrame(() => {
+      void el;
+      complete();
+    });
   };
 
   useEffect(() => {
