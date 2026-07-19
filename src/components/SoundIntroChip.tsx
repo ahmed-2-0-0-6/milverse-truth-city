@@ -88,9 +88,17 @@ export function SoundIntroChip() {
       aria-labelledby="sound-intro-title"
       aria-describedby="sound-intro-desc"
       ref={cardRef}
-      className="fixed z-[240] right-3 top-14 sm:right-4 sm:top-16 w-[min(320px,92vw)] rounded-md border border-primary/50 bg-card/95 text-card-foreground shadow-xl backdrop-blur-md"
+      className="fixed z-[240] right-3 top-14 sm:right-4 sm:top-16 w-[min(320px,92vw)] rounded-md border border-primary/50 bg-card/95 text-card-foreground shadow-xl backdrop-blur-md pointer-events-auto"
     >
-      <div className="flex items-start gap-3 px-4 pt-3">
+      <button
+        type="button"
+        onClick={dismiss}
+        aria-label="Close"
+        className="absolute right-1.5 top-1.5 inline-flex h-6 w-6 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
+      <div className="flex items-start gap-3 px-4 pt-3 pr-8">
         <span
           aria-hidden
           className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-primary"
@@ -120,14 +128,24 @@ export function SoundIntroChip() {
         <button
           ref={firstFocusRef}
           type="button"
-          onClick={turnOn}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            turnOn();
+          }}
           className="inline-flex flex-1 items-center justify-center gap-1.5 rounded border border-primary/60 bg-primary/15 px-3 py-1.5 stencil text-[10px] tracking-widest text-primary hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
         >
           <Volume2 className="h-3.5 w-3.5" /> SOUND ON
         </button>
         <button
           type="button"
-          onClick={keepSilent}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            keepSilent();
+          }}
           className="inline-flex flex-1 items-center justify-center gap-1.5 rounded border border-border px-3 py-1.5 stencil text-[10px] tracking-widest text-muted-foreground hover:text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
         >
           <VolumeX className="h-3.5 w-3.5" /> KEEP IT SILENT
