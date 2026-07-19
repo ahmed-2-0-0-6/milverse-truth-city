@@ -3396,3 +3396,10 @@ button[title*="lovable" i] {
   right: 0 !important;
   z-index: 0 !important;
 }
+
+/* Hide the OS cursor site-wide — GlowCursor blue dot replaces it.
+   Keep text-selection cursor available on inputs/textareas for usability. */
+@media (hover: hover) and (pointer: fine) {
+  html, body, * { cursor: none !important; }
+  input, textarea, [contenteditable="true"] { cursor: text !important; }
+}
