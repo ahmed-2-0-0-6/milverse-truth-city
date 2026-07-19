@@ -72,6 +72,8 @@ function CityMap() {
   const [showBait, setShowBait] = useState(false);
   const [showBeacon, setShowBeacon] = useState(true);
   const [heroTyped, setHeroTyped] = useState(false);
+  const [heroFullyTyped, setHeroFullyTyped] = useState(false);
+
 
   // THE NIGHT SHIFT — landing recomputes its band every 60s so a session
   // left open across a boundary catches up. Elsewhere band is per-mount.
@@ -110,6 +112,8 @@ function CityMap() {
   };
 
   const handleHeroTyped = useCallback(() => setHeroTyped(true), []);
+  const handleHeroFullyTyped = useCallback(() => setHeroFullyTyped(true), []);
+
 
   const night = isNightRegister(shift.band);
   const kicker =
@@ -124,7 +128,7 @@ function CityMap() {
 
   return (
     <div className={`noir-landing min-h-dvh relative overflow-x-hidden ${night ? "city-night" : ""}`}>
-      <InboxManager paperDeliveryReady={heroTyped} />
+      <InboxManager paperDeliveryReady={heroFullyTyped} />
       <IncomingToast />
       <IncomingCall />
       <TopBar />
@@ -225,7 +229,7 @@ function CityMap() {
           <div className="stencil text-[10px] text-cyan-300/80 mb-4 hud-blink text-center">
             {kicker}
           </div>
-          <HeroType onComplete={handleHeroTyped} />
+          <HeroType onComplete={handleHeroTyped} onFullyTyped={handleHeroFullyTyped} />
           <p className="mt-4 max-w-xl text-center text-white/80 text-step-0 px-2">
             Scammers are working your city. Pick up. Play them. Burn them.
           </p>

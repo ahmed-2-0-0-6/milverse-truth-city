@@ -2281,13 +2281,15 @@ html[data-force-reduce-motion="on"] .call-pulse {
 
 /* ---------- THE MORNING EDITION (paper thud) ---------- */
 @keyframes paper-thud {
-  0%   { transform: translateY(-24px) rotate(-2deg); opacity: 0; }
-  70%  { transform: translateY(4px)   rotate(-2deg); opacity: 1; }
-  100% { transform: translateY(0)     rotate(-2deg); opacity: 1; }
+  0%   { transform: translateY(-140px) rotate(-6deg); opacity: 0; }
+  60%  { transform: translateY(6px)    rotate(-2deg); opacity: 1; }
+  80%  { transform: translateY(-2px)   rotate(-2deg); opacity: 1; }
+  100% { transform: translateY(0)      rotate(-2deg); opacity: 1; }
 }
 .paper-thud {
-  animation: paper-thud 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: paper-thud 1600ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
+
 @media (prefers-reduced-motion: reduce) {
   .paper-thud { animation: none !important; }
 }
