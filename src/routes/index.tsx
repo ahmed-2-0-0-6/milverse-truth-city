@@ -23,7 +23,6 @@ import { FirstCall } from "@/components/onboarding/FirstCall";
 import { hasSeenLiveBait } from "@/components/landing/liveBaitState";
 import { LandingNudge } from "@/components/landing/LandingNudge";
 import { PaperNudge } from "@/components/landing/PaperNudge";
-import { DetectiveTableBg } from "@/components/landing/DetectiveTableBg";
 
 import { isReturningCitizen } from "@/lib/city/returning";
 import { currentShift, isNightRegister, type Shift } from "@/lib/city/shift";
@@ -231,7 +230,6 @@ function CityMap() {
                     "repeating-linear-gradient(0deg, rgba(255,255,255,0.5) 0 1px, transparent 1px 3px)",
                 }}
               />
-              <DetectiveTableBg />
             </>
           )}
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black" />
