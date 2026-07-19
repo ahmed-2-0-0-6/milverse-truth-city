@@ -65,9 +65,9 @@ function ShiftPage() {
   }, []);
 
   return (
-    <div className="min-h-screen grain">
+    <div className="min-h-dvh grain">
       <TopBar />
-      <main className="mx-auto max-w-3xl px-4 py-6">
+      <main id="main" role="main" className="mx-auto max-w-3xl px-4 sm:px-6 py-6 safe-bottom">
         {expiredNotice && !active && !finished && (
           <p className="mb-4 stencil text-[10px] text-muted-foreground">
             Yesterday's shift expired on the desk. Today's docket is fresh.
@@ -84,6 +84,7 @@ function ShiftPage() {
     </div>
   );
 }
+
 
 /* ─────────────── CLOCK IN ─────────────── */
 
@@ -116,11 +117,12 @@ function ClockIn() {
       <div className="stencil text-[10px] text-primary/80 mb-2">// THE SHIFT</div>
       <h1
         id="clockin-title"
-        className="text-4xl sm:text-5xl font-black text-foreground leading-none tracking-tight"
+        className="text-step-5 font-black text-foreground leading-none tracking-tight"
         style={{ fontFamily: '"Bebas Neue", sans-serif' }}
       >
         THE SHIFT.
       </h1>
+
       <p className="mt-4 max-w-xl text-sm text-muted-foreground">
         Five files. Three lives. Falling for a scam costs a life. Calling wolf on a real one costs a life. The combo pays
         for clean, consecutive work. Clock in.
@@ -185,11 +187,12 @@ function Resume({
       <div className="stencil text-[10px] text-primary/80 mb-2">// SHIFT IN PROGRESS</div>
       <h1
         id="resume-title"
-        className="text-4xl sm:text-5xl font-black text-foreground leading-none tracking-tight"
+        className="text-step-4 font-black text-foreground leading-none tracking-tight"
         style={{ fontFamily: '"Bebas Neue", sans-serif' }}
       >
         SHIFT {Math.min(shift.slot + 1, shift.caseRefs.length)}/{shift.caseRefs.length}
       </h1>
+
 
       <div className="mt-4 flex flex-wrap items-center gap-4 stencil text-[11px] text-muted-foreground tabular-nums">
         <span className="inline-flex items-center gap-1">
@@ -307,11 +310,12 @@ function PunchOut({ shift }: { shift: FinishedShift }) {
       <div className="stencil text-[10px] text-primary/80 mb-2">// SHIFT WORKED</div>
       <h1
         id="punchout-title"
-        className="text-6xl sm:text-8xl font-black text-foreground leading-none tracking-tight shift-tally tabular-nums"
+        className="text-step-6 font-black text-foreground leading-none tracking-tight shift-tally tabular-nums"
         style={{ fontFamily: '"Bebas Neue", sans-serif' }}
       >
         {display}
       </h1>
+
       <div className="mt-2 stencil text-[10px] text-muted-foreground">SHIFT SCORE</div>
 
       <div className="mt-5 grid grid-cols-5 gap-2">

@@ -3228,3 +3228,26 @@ html[data-high-legibility="on"] .cold-tense {
 @utility safe-top    { padding-top:    max(0.75rem, env(safe-area-inset-top)); }
 
 /* Mobile viewport helper — swap h-screen for h-dvh where mobile chrome clips */
+
+/* ────────────────────────────────────────────────────────────
+   UI v3 · scroll & focus polish (play surfaces + global)
+   ──────────────────────────────────────────────────────────── */
+/* Anchored jumps (#mirror-composer, #enter, section IDs) shouldn't slide
+   under the sticky TopBar. Aligns focus rings on skip-links too. */
+html { scroll-padding-top: 72px; }
+:target { scroll-margin-top: 72px; }
+
+/* Global focus-visible ring — Radix + shadcn primitives already have theirs;
+   this catches raw <a>/<button> that were built without an explicit ring. */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* Respect explicit rings on shadcn buttons — those set outline-none + ring */
+[data-radix-collection-item]:focus-visible,
+[role="tab"]:focus-visible,
+[role="radio"]:focus-visible { outline: none; }
+
+/* Long-form transcript / feed cards: keep line-height humane on wide screens */
+.chat-transcript p, .feed-lede { line-height: 1.55; }

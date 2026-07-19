@@ -1139,17 +1139,18 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
               </div>
             )}
 
-            <div className="mt-1.5 flex items-center justify-between font-mono text-[9px] tracking-widest text-white/40">
+            <div className="mt-1.5 flex items-center justify-between font-mono text-[10px] tracking-widest text-white/60">
               <button
                 type="button"
                 onClick={toggleHandMode}
-                className="hover:text-white/70"
+                className="min-h-[32px] inline-flex items-center rounded px-2 -mx-2 hover:text-white/90 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
                 aria-label={handMode === "hand" ? "Switch to typing" : "Switch to the hand"}
               >
                 {handMode === "hand" ? "TYPE INSTEAD ⌨" : "SHOW THE HAND ▤"}
               </button>
               <span title="Every minute they burn on you is a minute stolen from a real victim.">{messages.filter((m) => m.role === "player").length} SENT · LINE HELD</span>
             </div>
+
 
           </div>
         }
@@ -1437,33 +1438,35 @@ function MessageMeta({
   const r = receiptFor(skin, read, stamp);
   return (
     <div
-      className={`flex items-center gap-1 px-1 font-mono text-[9px] text-white/35 ${isPlayer ? "" : "self-start"}`}
+      className={`flex items-center gap-1 px-1 font-mono text-[10px] text-white/55 ${isPlayer ? "" : "self-start"}`}
       aria-hidden
     >
       {isPlayer && !r.showTicks ? (
-        <span className={read ? skin.readColor : "text-white/35"}>{r.text}</span>
+        <span className={read ? skin.readColor : "text-white/55"}>{r.text}</span>
       ) : (
         <span>{stamp}</span>
       )}
       {isPlayer && r.showTicks && (
-        <span className={read ? skin.readColor : "text-white/35"}>{read ? "✓✓" : "✓"}</span>
+        <span className={read ? skin.readColor : "text-white/55"}>{read ? "✓✓" : "✓"}</span>
       )}
     </div>
+
   );
 }
 
 function TypingBubble({ name, skin }: { name: string; skin: ChatSkin }) {
   return (
-    <div className="msg-in flex items-center gap-2">
+    <div className="msg-in flex items-center gap-2" role="status" aria-live="polite">
       <div className={`px-4 py-3 shadow-sm ${skin.inBubble}`}>
         <div className="flex gap-1">
-          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/50" />
-          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/50" />
-          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/50" />
+          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/75" aria-hidden />
+          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/75" aria-hidden />
+          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/75" aria-hidden />
         </div>
       </div>
-      <span className="font-mono text-[10px] text-white/50 tracking-widest">{name} is typing…</span>
+      <span className="font-mono text-[10px] text-white/65 tracking-widest">{name} is typing…</span>
     </div>
+
   );
 }
 
