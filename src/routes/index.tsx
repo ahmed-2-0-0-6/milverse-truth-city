@@ -132,9 +132,13 @@ function CityMap() {
       )}
 
 
-      {/* ── HERO ── full-viewport cinematic */}
+      {/* ── HERO ── full-viewport cinematic. Detective-desk photo washes
+          under the noir palette on every mode; the 3D city sits on top in
+          cinematic. Gives the site the Ashcroft-office / FBI-field-office
+          vibe requested for v2. */}
       <section
-        className={`hero-frame relative min-h-[100svh] flex flex-col items-center px-4 overflow-hidden ${mode === "cinematic" ? "justify-center" : "justify-start pt-24 sm:pt-28"}`}
+        className={`crime-scene-hero hero-frame relative min-h-[100svh] flex flex-col items-center px-4 overflow-hidden ${mode === "cinematic" ? "justify-center" : "justify-start pt-24 sm:pt-28"}`}
+        style={{ ["--crime-scene-img" as string]: `url(${detectiveDeskImg})` }}
       >
         <div className="absolute inset-0 -z-10">
           {mode === "cinematic" ? (
