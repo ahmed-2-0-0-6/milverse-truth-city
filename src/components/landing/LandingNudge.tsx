@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { X, Radio, Phone } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
-import { LiveBait } from "./LiveBait";
-import { CitizenDesk } from "./CitizenDesk";
 import { DailyBeacon } from "@/components/DailyBeacon";
 import type { Shift } from "@/lib/city/shift";
+
+const LiveBait = lazy(() => import("./LiveBait").then((mod) => ({ default: mod.LiveBait })));
+const CitizenDesk = lazy(() => import("./CitizenDesk"));
 
 type Kind = "bait" | "desk" | "beacon";
 
@@ -131,16 +132,18 @@ export function LandingNudge({ kind, shift, onDismiss }: Props) {
           </SheetTitle>
           <SheetDescription className="sr-only">{body}</SheetDescription>
           <div className="mt-3">
-            {isBait ? (
-              <LiveBait
-                onDismiss={() => {
-                  setOpen(false);
-                  onDismiss();
-                }}
-              />
-            ) : (
-              <CitizenDesk shift={shift} />
-            )}
+            <Suspense fallback={<div className="stencil text-[10px] text-muted-foreground">Opening file…</div>}>
+              {isBait ? (
+                <LiveBait
+                  onDismiss={() => {
+                    setOpen(false);
+                    onDismiss();
+                  }}
+                />
+              ) : (
+                <CitizenDesk shift={shift} />
+              )}
+            </Suspense>
           </div>
         </SheetContent>
       </Sheet>
