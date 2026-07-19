@@ -401,7 +401,7 @@ function LampBreath() {
   useFrame(() => {
     if (!ref.current) return;
     const t = performance.now() * 0.0006;
-    ref.current.intensity = 4.2 + Math.sin(t) * 0.35;
+    ref.current.intensity = 9 + Math.sin(t) * 0.7;
   });
   return (
     <spotLight
