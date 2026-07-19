@@ -3251,3 +3251,28 @@ html { scroll-padding-top: 72px; }
 
 /* Long-form transcript / feed cards: keep line-height humane on wide screens */
 .chat-transcript p, .feed-lede { line-height: 1.55; }
+
+/* ────────────────────────────────────────────────────────────
+   UI v3 · hub grid — one responsive card grid across districts.
+   Auto-fills at 280px min so /mirror /feed /manual /citizen etc.
+   share identical rhythm without repeating the utility soup.
+   ──────────────────────────────────────────────────────────── */
+@utility hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+@media (min-width: 1024px) {
+  .hub-grid { gap: 1.25rem; }
+}
+
+/* Hub header row: text truncates, fixed widget on the right survives narrow. */
+@utility hub-header-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+}
+@media (min-width: 640px) {
+  .hub-header-row { display: flex; flex-wrap: wrap; justify-content: space-between; }
+}
