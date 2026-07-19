@@ -224,26 +224,27 @@ function CityMap() {
       <Marquee />
 
       {/* ── EXPLORE THE CITY (interactive map / list) ── Corkboard wash
-          under the section so cases feel pinned to an evidence wall. */}
+          under the section so cases feel pinned to an evidence wall.
+          `bg-fixed` is dropped on mobile via media-safe CSS var to
+          avoid iOS scroll jank. */}
       <section
         id="enter"
-        className="relative pt-16 pb-6 px-4"
+        aria-labelledby="explore-city-heading"
+        className="corkboard-panel relative pt-14 sm:pt-16 pb-6 px-4 sm:px-6"
         style={{
           backgroundImage: `linear-gradient(180deg, rgba(2,4,10,0.92), rgba(2,4,10,0.96)), url(${corkboardImg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundAttachment: "fixed",
         }}
       >
         <div className="mx-auto max-w-6xl">
           <div className="flex items-center gap-3 mb-4">
-            <div className="h-px flex-1 max-w-[60px] bg-cyan-400/60" />
+            <div className="h-px flex-1 max-w-[60px] bg-cyan-400/60" aria-hidden />
             <div className="stencil text-[10px] text-cyan-300">// EXPLORE THE CITY ↓</div>
-            <div className="h-px flex-1 bg-cyan-400/20" />
+            <div className="h-px flex-1 bg-cyan-400/20" aria-hidden />
           </div>
           <div className="flex flex-wrap items-end justify-between gap-3">
             <h2
-              className="text-3xl sm:text-5xl font-black text-white leading-none tracking-tight"
+              id="explore-city-heading"
+              className="text-step-4 font-black text-white leading-none tracking-tight"
               style={{ fontFamily: '"Bebas Neue", sans-serif' }}
             >
               Drag the city. Zoom the quarters. Clear the stations.
@@ -262,43 +263,48 @@ function CityMap() {
           </div>
         </div>
       </section>
+      </main>
 
-      <footer className="mx-auto max-w-6xl px-4 mt-6 border-t border-white/10 pt-6 pb-10 text-center stencil text-[10px] text-white/50 space-y-3">
-        <div className="text-cyan-300/80">
+      <footer
+        role="contentinfo"
+        className="mx-auto max-w-6xl px-4 sm:px-6 mt-6 border-t border-white/10 pt-8 pb-10 safe-bottom text-white/60"
+      >
+        <div className="text-center stencil text-[10px] text-cyan-300/80 mb-5">
           MEDIA &amp; INFORMATION LITERACY · VERIFY, DON'T GUESS · CALIBRATE, DON'T PANIC
         </div>
-        <div>
+        <div className="text-center mb-6">
           <Link
             to="/visit"
-            className="inline-block rounded border border-primary/60 bg-primary/10 px-3 py-1.5 text-primary hover:bg-primary/20"
+            className="tap inline-flex items-center justify-center rounded-md border border-primary/60 bg-primary/10 px-4 py-2 text-primary hover:bg-primary/20 stencil text-[10px] tracking-widest"
           >
-            JUDGES &amp; EDUCATORS: TAKE THE 3-MINUTE VISIT →
+            JUDGES &amp; EDUCATORS · 3-MINUTE VISIT →
           </Link>
         </div>
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-          <Link to="/drop" className="text-primary hover:underline">
-            [F★] AAJ KA FORWARD — DAILY DROP →
+        <nav aria-label="Resources" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-x-4 gap-y-2 text-[11px] font-mono">
+          <Link to="/drop" className="tap flex items-center text-primary hover:underline">
+            <span className="opacity-60 mr-1">[F★]</span> Daily Drop
           </Link>
-          <Link to="/educators" className="text-cyan-300 hover:underline">
-            [F0] FOR EDUCATORS →
+          <Link to="/educators" className="tap flex items-center text-cyan-300 hover:underline">
+            <span className="opacity-60 mr-1">[F0]</span> Educators
           </Link>
-          <Link to="/pilot" className="text-cyan-300 hover:underline">
-            [F1] PILOT MODE — CLASSROOM DASHBOARD →
+          <Link to="/pilot" className="tap flex items-center text-cyan-300 hover:underline">
+            <span className="opacity-60 mr-1">[F1]</span> Pilot Mode
           </Link>
-          <Link to="/kit" className="text-cyan-300 hover:underline">
-            [F2] FIELD KIT — PRINT PACK →
+          <Link to="/kit" className="tap flex items-center text-cyan-300 hover:underline">
+            <span className="opacity-60 mr-1">[F2]</span> Field Kit
           </Link>
-          <Link to="/manual" className="text-cyan-300 hover:underline">
-            [F3] FIELD MANUAL →
+          <Link to="/manual" className="tap flex items-center text-cyan-300 hover:underline">
+            <span className="opacity-60 mr-1">[F3]</span> Field Manual
           </Link>
-        </div>
-        <div className="pt-2 text-white/40 normal-case tracking-normal">
+        </nav>
+        <div className="pt-4 text-center text-[11px] text-white/40">
           No accounts. No tracking. Pilot data is anonymous.
         </div>
       </footer>
     </div>
   );
 }
+
 
 // ── PLAY BUTTON — one big verb-first CTA that always knows the next move.
 function PlayButton() {
