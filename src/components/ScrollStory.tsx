@@ -207,6 +207,7 @@ export function ScrollStory() {
                 backgroundSize: "3px 3px",
               }}
             />
+            {i === 0 && <DetectiveDesk />}
           </div>
           <div className="relative max-w-4xl text-center">
             <div className="stencil text-[10px] text-cyan-300/70 mb-6">BEAT · 0{i + 1} / 04</div>
