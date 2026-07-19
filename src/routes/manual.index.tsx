@@ -106,7 +106,7 @@ function ManualIndex() {
                 THE FIELD MANUAL · MIL CODEX
               </div>
               <h1
-                className="mt-2 text-5xl sm:text-7xl font-black tracking-tight leading-[0.88]"
+                className="mt-2 text-step-6 font-black tracking-tight leading-[0.88]"
                 style={{
                   fontFamily: '"Bebas Neue", "Space Grotesk", sans-serif',
                   textShadow: "0 0 26px oklch(0.82 0.14 195 / 0.35)",
@@ -116,6 +116,7 @@ function ManualIndex() {
                 <br />
                 LEARN THE COUNTER-MOVE.
               </h1>
+
               <p className="mt-4 max-w-2xl text-white/75 leading-relaxed">
                 Files stay redacted until you meet the tactic in play. Then they open. This is your
                 dossier of how deception works — and how to shut it down. MILVERSE never rules on a
