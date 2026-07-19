@@ -193,18 +193,31 @@ export function ScrollStory() {
     };
   }, []);
 
+  // Fixed-viewport desk stays visible whenever the ScrollStory is on screen.
+  const [deskActive, setDeskActive] = useState(false);
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(([e]) => setDeskActive(e.isIntersecting), {
+      threshold: 0,
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div ref={rootRef} className="scrollstory relative">
-      {/* Sticky detective-desk background — one 3D scene behind every
-          story beat, edge-to-edge, follows the viewport as the reader
-          scrolls through all four beats. */}
-      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
-        <div className="sticky top-0 h-screen w-full">
-          <Suspense fallback={null}>
-            <DetectiveDesk />
-          </Suspense>
-        </div>
+      {/* Detective-desk background — one 3D scene fixed to the viewport
+          while any story beat is on screen. Fades in on entry, out on exit. */}
+      <div
+        className={`pointer-events-none fixed inset-0 z-0 transition-opacity duration-700 ${deskActive ? "opacity-100" : "opacity-0"}`}
+        aria-hidden
+      >
+        <Suspense fallback={null}>
+          {deskActive && <DetectiveDesk />}
+        </Suspense>
       </div>
+
       {/* Story beats */}
       {BEATS.map((b, i) => (
         <section
