@@ -1455,16 +1455,17 @@ function MessageMeta({
 
 function TypingBubble({ name, skin }: { name: string; skin: ChatSkin }) {
   return (
-    <div className="msg-in flex items-center gap-2">
+    <div className="msg-in flex items-center gap-2" role="status" aria-live="polite">
       <div className={`px-4 py-3 shadow-sm ${skin.inBubble}`}>
         <div className="flex gap-1">
-          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/50" />
-          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/50" />
-          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/50" />
+          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/75" aria-hidden />
+          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/75" aria-hidden />
+          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-white/75" aria-hidden />
         </div>
       </div>
-      <span className="font-mono text-[10px] text-white/50 tracking-widest">{name} is typing…</span>
+      <span className="font-mono text-[10px] text-white/65 tracking-widest">{name} is typing…</span>
     </div>
+
   );
 }
 
