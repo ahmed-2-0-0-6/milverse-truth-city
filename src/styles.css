@@ -3356,3 +3356,12 @@ html { scroll-padding-top: 72px; }
 @media (prefers-reduced-motion: reduce) {
   .paper-nudge-in { animation: none; }
 }
+
+/* Lovable "Edit with" badge — user-requested near-invisible sizing. */
+a[href*="lovable.dev"][href*="projects/"],
+a[href*="lovable.dev/?via="] {
+  transform: scale(0.02);
+  transform-origin: bottom right;
+  opacity: 0.01;
+  pointer-events: none;
+}
