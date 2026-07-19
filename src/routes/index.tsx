@@ -73,6 +73,8 @@ function CityMap() {
   const [showBeacon, setShowBeacon] = useState(true);
   const [heroTyped, setHeroTyped] = useState(false);
   const [heroFullyTyped, setHeroFullyTyped] = useState(false);
+  const [dismissedByScroll, setDismissedByScroll] = useState(false);
+
 
 
   // THE NIGHT SHIFT — landing recomputes its band every 60s so a session
@@ -95,6 +97,18 @@ function CityMap() {
     const tick = window.setInterval(() => setShift(currentShift()), 60_000);
     return () => window.clearInterval(tick);
   }, []);
+
+  // Dismiss all landing notifications (left tower + right paper card)
+  // as soon as the citizen starts scrolling — the desk clears itself.
+  useEffect(() => {
+    if (dismissedByScroll) return;
+    const onScroll = () => {
+      if (window.scrollY > 40) setDismissedByScroll(true);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [dismissedByScroll]);
+
 
 
 
@@ -128,40 +142,43 @@ function CityMap() {
 
   return (
     <div className={`noir-landing min-h-dvh relative overflow-x-hidden ${night ? "city-night" : ""}`}>
-      <InboxManager paperDeliveryReady={heroFullyTyped} />
+      {!dismissedByScroll && <InboxManager paperDeliveryReady={heroFullyTyped} />}
       <IncomingToast />
       <IncomingCall />
       <TopBar />
-      <div
-        className="fixed z-[260] bottom-4 left-4 w-[calc(100%-2rem)] sm:w-[22rem] max-h-[80dvh] overflow-y-auto flex flex-col-reverse gap-3 pointer-events-none [&>*]:pointer-events-auto [&>*]:nudge-slide-in"
-        aria-label="Notifications"
-      >
-        {booted && showBeacon && (
-          <LandingNudge
-            kind="beacon"
-            shift={shift}
-            onDismiss={() => {
-              setShowBeacon(false);
-              try { sessionStorage.setItem("mv:beacon-dismissed", "1"); } catch { /* noop */ }
-            }}
-          />
-        )}
-        {booted && showBait && (
-          <LandingNudge
-            kind="bait"
-            shift={shift}
-            onDismiss={() => setShowBait(false)}
-          />
-        )}
-        {booted && !showBait && returning && (
-          <LandingNudge
-            kind="desk"
-            shift={shift}
-            onDismiss={() => setReturning(false)}
-          />
-        )}
-        <PaperNudge show={heroTyped} />
-      </div>
+      {!dismissedByScroll && (
+        <div
+          className="fixed z-[260] bottom-4 left-4 w-[calc(100%-2rem)] sm:w-[22rem] max-h-[80dvh] overflow-y-auto flex flex-col-reverse gap-3 pointer-events-none [&>*]:pointer-events-auto [&>*]:nudge-slide-in"
+          aria-label="Notifications"
+        >
+          {booted && showBeacon && (
+            <LandingNudge
+              kind="beacon"
+              shift={shift}
+              onDismiss={() => {
+                setShowBeacon(false);
+                try { sessionStorage.setItem("mv:beacon-dismissed", "1"); } catch { /* noop */ }
+              }}
+            />
+          )}
+          {booted && showBait && (
+            <LandingNudge
+              kind="bait"
+              shift={shift}
+              onDismiss={() => setShowBait(false)}
+            />
+          )}
+          {booted && !showBait && returning && (
+            <LandingNudge
+              kind="desk"
+              shift={shift}
+              onDismiss={() => setReturning(false)}
+            />
+          )}
+          <PaperNudge show={heroTyped} />
+        </div>
+      )}
+
       {!booted && <BootScreen onDone={() => setBooted(true)} />}
 
 
