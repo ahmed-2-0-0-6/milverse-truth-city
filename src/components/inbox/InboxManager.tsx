@@ -80,12 +80,36 @@ export function InboxManager() {
 
     // The Morning Edition — read-only edition fetch via /paper's server fn.
     let alive = true;
+    if (!lite) {
+      const dateKey = new Date().toISOString().slice(0, 10);
+      const inbox = loadInbox();
+      const hasAnyPaper = inbox.paperRead || inbox.arrived.some((id) => id.startsWith("paper:"));
+      if (!hasAnyPaper) {
+        setPaperCard({
+          id: `paper:pending:${dateKey}`,
+          type: "paper",
+          caseId: "paper",
+          route: "/paper",
+          platform: "paper",
+          senderName: "The morning edition is on the desk.",
+          preview: "The paper is here.",
+          arriveAfterSec: 0,
+          editionId: `pending:${dateKey}`,
+          editionNumber: 0,
+          editionDate: dateKey,
+          headline: "The morning edition is on the desk.",
+        });
+      }
+    }
     fetchEdition()
       .then((row) => {
         if (!alive) return;
         const edition = row as unknown as Edition | null;
         const paper = morningEdition(new Date(), edition);
-        if (!paper) return;
+        if (!paper) {
+          setPaperCard(null);
+          return;
+        }
         const alreadyArrived = new Set(loadInbox().arrived).has(paper.id);
         if (lite) {
           // LITE: land it in the tray immediately, no floating card.

@@ -60,7 +60,7 @@ export function PaperDropCard({
   }, [onDismiss]);
 
   const open = () => {
-    markPaperRead(editionId);
+    if (!editionId.startsWith("pending:")) markPaperRead(editionId);
     onDismiss();
     nav({ to: "/paper" });
   };
