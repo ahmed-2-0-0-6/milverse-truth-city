@@ -799,27 +799,12 @@ html[data-force-reduce-motion="on"] .marquee-track {
   filter: blur(0);
 }
 
-/* Section corner ticks (bigger for cinematic hero) */
+/* Section corner ticks removed per design pass */
 .hero-frame::before,
 .hero-frame::after {
-  content: "";
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  border-color: rgba(34, 211, 238, 0.7);
+  content: none;
 }
-.hero-frame::before {
-  top: 12px;
-  left: 12px;
-  border-top: 2px solid;
-  border-left: 2px solid;
-}
-.hero-frame::after {
-  bottom: 12px;
-  right: 12px;
-  border-bottom: 2px solid;
-  border-right: 2px solid;
-}
+
 
 /* Boot logo flicker */
 @keyframes boot-flicker {
