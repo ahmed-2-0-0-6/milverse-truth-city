@@ -185,7 +185,7 @@ function FeedIndex() {
               <div className="mb-3 font-mono text-[11px] tracking-widest text-primary">
                 TIER {tier} · {TIER_NAMES[tier as 1 | 2 | 3]}
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="hub-grid">
                 {cases.map((s) => {
                   const inSeason = !!season && !!s.tacticId && season.tactics.includes(s.tacticId);
                   return (
