@@ -3,8 +3,6 @@ import { Link } from "@tanstack/react-router";
 import { X, Newspaper } from "lucide-react";
 import {
   supplementWeek,
-  readLastSeenWeek,
-  markSupplementSeen,
 } from "@/lib/paper/supplementMeta";
 
 /**
@@ -18,16 +16,36 @@ export function PaperNudge() {
   const week = supplementWeek();
 
   useEffect(() => {
-    if (readLastSeenWeek() === week.weekKey) {
-      setDismissed(true);
+    try {
+      if (sessionStorage.getItem(`milverse.supplement.dismissed.${week.weekKey}`) === "1") {
+        setDismissed(true);
+      }
+    } catch {
+      /* sessionStorage unavailable */
     }
+  }, [week.weekKey]);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      try {
+        if (sessionStorage.getItem(`milverse.supplement.dismissed.${week.weekKey}`) === "1") return;
+      } catch {
+        /* sessionStorage unavailable */
+      }
+      setDismissed(false);
+    }, 0);
+    return () => window.clearTimeout(id);
   }, [week.weekKey]);
 
   if (dismissed) return null;
 
   const dismiss = () => {
-    markSupplementSeen(week.weekKey);
-    setDismissed(true);
+    try {
+      sessionStorage.setItem(`milverse.supplement.dismissed.${week.weekKey}`, "1");
+    } catch {
+      /* sessionStorage unavailable */
+    }
+      setDismissed(true);
   };
 
   return (
