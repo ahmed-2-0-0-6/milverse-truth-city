@@ -180,10 +180,11 @@ function RootComponent() {
             Skip to content
           </a>
           <AssessmentGate />
-          <main id="main">
+          {/* Skip-link target only. Each route provides its own <main> landmark. */}
+          <div id="main" tabIndex={-1} className="outline-none">
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
-          </main>
+          </div>
           <BadgeToast />
           <Toaster />
           <AtmosphereLayer />
