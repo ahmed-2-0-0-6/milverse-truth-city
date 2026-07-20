@@ -11,6 +11,8 @@ import studioArt from "@/assets/district-studio.jpg";
 import archiveArt from "@/assets/district-archive.jpg";
 import cleanroomArt from "@/assets/district-cleanroom.jpg";
 import mirrorVideo from "@/assets/mirror.mp4.asset.json";
+import gothamDeskArt from "@/assets/detective-desk-gotham.jpg";
+
 
 type District = {
   key: string;
@@ -196,16 +198,42 @@ export function ScrollStory() {
 
   return (
     <div ref={rootRef} className="scrollstory relative isolate">
-      {/* Lightweight noir backdrop — replaces the heavy 3D detective desk. */}
+      {/* Gotham detective-desk backdrop — cinematic still, zero WebGL cost. */}
       <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
-        <div
-          className="sticky top-0 h-screen w-full"
-          style={{
-            background:
-              "radial-gradient(1200px 700px at 30% 40%, rgba(255,180,90,0.10), transparent 60%), radial-gradient(900px 600px at 75% 70%, rgba(120,180,255,0.06), transparent 65%), linear-gradient(180deg, #0a0806 0%, #050403 100%)",
-          }}
-        />
+        <div className="sticky top-0 h-screen w-full overflow-hidden">
+          <div
+            className="absolute inset-0 bg-cover bg-center will-change-transform"
+            style={{
+              backgroundImage: `url(${gothamDeskArt})`,
+              filter: "saturate(0.85) contrast(1.05)",
+              transform: "scale(1.05)",
+            }}
+          />
+          {/* Cold Gotham teal wash + vignette */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(120% 80% at 50% 40%, transparent 30%, rgba(3,6,12,0.55) 70%, rgba(0,0,0,0.9) 100%), linear-gradient(180deg, rgba(10,20,35,0.35) 0%, rgba(5,8,14,0.6) 100%)",
+            }}
+          />
+          {/* Subtle bat-signal flicker glow behind the window */}
+          <div
+            className="absolute left-1/2 top-[18%] h-40 w-40 -translate-x-1/2 rounded-full opacity-40 blur-3xl"
+            style={{ background: "radial-gradient(circle, rgba(140,190,255,0.55), transparent 70%)" }}
+          />
+          {/* Film grain */}
+          <div
+            className="absolute inset-0 opacity-[0.08] mix-blend-overlay"
+            style={{
+              backgroundImage:
+                "radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px)",
+              backgroundSize: "3px 3px",
+            }}
+          />
+        </div>
       </div>
+
 
 
 
