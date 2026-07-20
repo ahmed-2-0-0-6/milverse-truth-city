@@ -1000,6 +1000,138 @@ function PauseWhenHidden() {
 // ---------- scene root ----------
 type Props = { className?: string };
 
+// ---------- ashtray + smoldering cigarette (static) ----------
+function Ashtray() {
+  return (
+    <group position={[6.8, 0, -2.4]}>
+      {/* glass dish */}
+      <mesh position={[0, 0.05, 0]}>
+        <cylinderGeometry args={[0.95, 0.8, 0.1, 20]} />
+        <meshPhysicalMaterial color="#1a0e08" roughness={0.15} metalness={0} transmission={0.6} thickness={0.3} ior={1.45} />
+      </mesh>
+      <mesh position={[0, 0.11, 0]}>
+        <cylinderGeometry args={[0.7, 0.7, 0.02, 20]} />
+        <meshStandardMaterial color="#3a2a1c" roughness={0.9} />
+      </mesh>
+      {/* ash pile */}
+      <mesh position={[0.15, 0.13, 0.1]}>
+        <sphereGeometry args={[0.14, 8, 6]} />
+        <meshStandardMaterial color="#4a423c" roughness={1} />
+      </mesh>
+      {/* cigarette */}
+      <mesh position={[0.3, 0.14, 0]} rotation={[0, 0.6, Math.PI / 2 - 0.1]}>
+        <cylinderGeometry args={[0.05, 0.05, 0.9, 8]} />
+        <meshStandardMaterial color="#f4ecd8" roughness={0.9} />
+      </mesh>
+      {/* filter */}
+      <mesh position={[-0.05, 0.14, -0.28]} rotation={[0, 0.6, Math.PI / 2 - 0.1]}>
+        <cylinderGeometry args={[0.055, 0.055, 0.22, 8]} />
+        <meshStandardMaterial color="#c89a4a" roughness={0.95} />
+      </mesh>
+      {/* ember */}
+      <mesh position={[0.7, 0.14, 0.22]}>
+        <sphereGeometry args={[0.055, 8, 6]} />
+        <meshBasicMaterial color="#ff6820" />
+      </mesh>
+      <pointLight position={[0.7, 0.22, 0.22]} color="#ff5a10" intensity={0.35} distance={1.4} decay={2} />
+    </group>
+  );
+}
+
+// ---------- spent brass casings ----------
+function Casings() {
+  const items = [
+    { p: [4.2, 0.06, 3.4] as [number, number, number], r: 0.7 },
+    { p: [4.9, 0.06, 3.05] as [number, number, number], r: -0.2 },
+    { p: [-3.6, 0.06, 4.1] as [number, number, number], r: 1.2 },
+  ];
+  return (
+    <group>
+      {items.map((it, i) => (
+        <group key={i} position={it.p} rotation={[Math.PI / 2, 0, it.r]}>
+          <mesh material={BRASS_HI}>
+            <cylinderGeometry args={[0.11, 0.11, 0.55, 12]} />
+          </mesh>
+          <mesh position={[0, -0.28, 0]} material={BRASS_LO}>
+            <cylinderGeometry args={[0.12, 0.12, 0.04, 12]} />
+          </mesh>
+          <mesh position={[0, -0.31, 0]}>
+            <circleGeometry args={[0.075, 12]} />
+            <meshStandardMaterial color="#241612" roughness={0.6} metalness={0.3} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+// ---------- ink splatter + extra stains on the desk (static decals) ----------
+function DeskDecals() {
+  const rng = seeded(9137);
+  const splats = Array.from({ length: 14 }, (_, i) => ({
+    p: [rng() * 12 - 6, 0.012, rng() * 8 - 2] as [number, number, number],
+    s: 0.08 + rng() * 0.18,
+    o: 0.25 + rng() * 0.4,
+    k: i,
+  }));
+  return (
+    <group>
+      {/* ink pool near typewriter */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[3.4, 0.014, -1.2]}>
+        <circleGeometry args={[0.55, 24]} />
+        <meshBasicMaterial color="#0a0608" transparent opacity={0.75} />
+      </mesh>
+      {/* extra coffee ring */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-4.2, 0.014, -0.6]}>
+        <ringGeometry args={[0.42, 0.5, 24]} />
+        <meshBasicMaterial color="#5a3820" transparent opacity={0.28} />
+      </mesh>
+      {/* micro splatter */}
+      {splats.map(s => (
+        <mesh key={s.k} rotation={[-Math.PI / 2, 0, 0]} position={s.p}>
+          <circleGeometry args={[s.s, 8]} />
+          <meshBasicMaterial color="#0a0608" transparent opacity={s.o} />
+        </mesh>
+      ))}
+      {/* chalk-white grease pencil arrow */}
+      <mesh rotation={[-Math.PI / 2, 0, 0.6]} position={[-1.6, 0.014, 2.4]}>
+        <planeGeometry args={[1.6, 0.06]} />
+        <meshBasicMaterial color="#e8e2d0" transparent opacity={0.55} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0.6 + Math.PI / 4]} position={[-1.0, 0.014, 2.9]}>
+        <planeGeometry args={[0.4, 0.06]} />
+        <meshBasicMaterial color="#e8e2d0" transparent opacity={0.55} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0.6 - Math.PI / 4]} position={[-1.0, 0.014, 2.5]}>
+        <planeGeometry args={[0.4, 0.06]} />
+        <meshBasicMaterial color="#e8e2d0" transparent opacity={0.55} />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- letter opener + wax seal ----------
+function LetterOpener() {
+  return (
+    <group position={[5.6, 0.05, 2.2]} rotation={[0, 0.4, 0]}>
+      {/* blade */}
+      <mesh position={[0, 0.01, 0]} rotation={[Math.PI / 2, 0, 0]} material={BRASS_HI}>
+        <coneGeometry args={[0.12, 1.6, 4]} />
+      </mesh>
+      {/* handle */}
+      <mesh position={[0, 0.03, 0.95]}>
+        <cylinderGeometry args={[0.12, 0.12, 0.7, 12]} />
+        <meshStandardMaterial color="#2a1608" roughness={0.6} metalness={0.2} />
+      </mesh>
+      {/* wax seal beside */}
+      <mesh position={[-0.9, 0.02, -0.4]} rotation={[-Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.28, 0.32, 0.06, 16]} />
+        <meshStandardMaterial color="#8a1418" roughness={0.5} metalness={0.1} emissive="#3a0808" emissiveIntensity={0.25} />
+      </mesh>
+    </group>
+  );
+}
+
 export function DetectiveDesk({ className = "" }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
