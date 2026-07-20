@@ -5129,7 +5129,10 @@ button[title*="lovable" i] {
   .detective-desk .desk-cascade-col.c5 { display: none; }
   .detective-desk .desk-poi { display: none; }
   .detective-desk .desk-decrypt,
-  .detective-desk .desk-call { display: none; }
+  .detective-desk .desk-call,
+  .detective-desk .desk-sketch,
+  .detective-desk .desk-toasts { display: none; }
+  .detective-desk .desk-spot { opacity: 0.5; }
   .detective-desk .desk-strip { height: 24px; }
   .detective-desk .desk-strip-cell { padding: 4px 14px; font-size: 8px; }
 }
