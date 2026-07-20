@@ -1749,6 +1749,69 @@ export function DetectiveDesk({ className = "" }: Props) {
           ))}
         </div>
       </div>
+
+      {/* Directed spotlight sweep — warm halo dollies across 5 focal points */}
+      <div className="desk-spot" aria-hidden="true" />
+
+      {/* Live police sketch — SVG face drawn in real-time, then dissolves */}
+      <div className="desk-sketch" aria-hidden="true">
+        <div className="desk-sketch-head">
+          <span className="desk-sketch-dot" />
+          <span>SKETCH · IN PROGRESS</span>
+          <span className="desk-sketch-tag">FORENSIC</span>
+        </div>
+        <svg className="desk-sketch-svg" viewBox="0 0 160 180">
+          <defs>
+            <linearGradient id="desk-sketch-paper" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#f2e6cf" />
+              <stop offset="1" stopColor="#e6d6b6" />
+            </linearGradient>
+            <pattern id="desk-sketch-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+              <path d="M10 0 L0 0 0 10" fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth="0.5" />
+            </pattern>
+          </defs>
+          <rect width="160" height="180" fill="url(#desk-sketch-paper)" />
+          <rect width="160" height="180" fill="url(#desk-sketch-grid)" />
+          <path className="s s1" d="M 80 24 C 108 24, 122 46, 122 78 C 122 108, 112 140, 80 152 C 48 140, 38 108, 38 78 C 38 46, 52 24, 80 24 Z" fill="none" stroke="#2a1f14" strokeWidth="1.4" strokeLinecap="round" pathLength="1" />
+          <path className="s s2" d="M 52 118 Q 80 138 108 118" fill="none" stroke="#2a1f14" strokeWidth="1.1" pathLength="1" />
+          <path className="s s3" d="M 46 52 Q 60 30 80 30 Q 100 30 116 52 Q 108 44 96 42 Q 82 40 68 44 Q 56 48 46 52 Z" fill="#2a1f14" opacity="0.82" stroke="#2a1f14" strokeWidth="0.6" pathLength="1" />
+          <path className="s s4" d="M 52 72 Q 62 68 72 72" fill="none" stroke="#2a1f14" strokeWidth="1.6" strokeLinecap="round" pathLength="1" />
+          <path className="s s5" d="M 88 72 Q 98 68 108 72" fill="none" stroke="#2a1f14" strokeWidth="1.6" strokeLinecap="round" pathLength="1" />
+          <path className="s s6" d="M 54 84 Q 62 80 72 84 Q 62 90 54 84 Z" fill="none" stroke="#2a1f14" strokeWidth="1.1" pathLength="1" />
+          <circle className="s s7" cx="63" cy="84" r="1.6" fill="#2a1f14" pathLength="1" />
+          <path className="s s8" d="M 88 84 Q 96 80 106 84 Q 96 90 88 84 Z" fill="none" stroke="#2a1f14" strokeWidth="1.1" pathLength="1" />
+          <circle className="s s9" cx="97" cy="84" r="1.6" fill="#2a1f14" pathLength="1" />
+          <path className="s s10" d="M 80 90 L 76 108 Q 80 112 84 108" fill="none" stroke="#2a1f14" strokeWidth="1.2" strokeLinecap="round" pathLength="1" />
+          <path className="s s11" d="M 68 124 Q 80 130 92 124" fill="none" stroke="#2a1f14" strokeWidth="1.3" strokeLinecap="round" pathLength="1" />
+          <path className="s s12" d="M 66 118 Q 72 114 80 116 Q 88 114 94 118" fill="none" stroke="#2a1f14" strokeWidth="1.4" pathLength="1" />
+          <path className="s s13" d="M 46 96 Q 42 108 48 118" fill="none" stroke="rgba(42,31,20,0.4)" strokeWidth="0.9" pathLength="1" />
+          <path className="s s14" d="M 114 96 Q 118 108 112 118" fill="none" stroke="rgba(42,31,20,0.4)" strokeWidth="0.9" pathLength="1" />
+        </svg>
+        <div className="desk-sketch-foot">
+          <span>SUBJECT · UNKNOWN</span>
+          <span className="desk-sketch-conf" />
+        </div>
+      </div>
+
+      {/* Evidence notifications — right-side toast stack */}
+      <div className="desk-toasts" aria-hidden="true">
+        <div className="desk-toast t1">
+          <span className="desk-toast-dot" />
+          <div><b>MATCH · MULE A/C</b><em>••••3391 · JS BANK</em></div>
+        </div>
+        <div className="desk-toast t2">
+          <span className="desk-toast-dot" />
+          <div><b>IP TRACE · KHI/DHA-05</b><em>39.62.14.220 · CBM</em></div>
+        </div>
+        <div className="desk-toast t3">
+          <span className="desk-toast-dot warn" />
+          <div><b>VOICE MATCH · 91.3%</b><em>vs REFERENCE-04</em></div>
+        </div>
+        <div className="desk-toast t4">
+          <span className="desk-toast-dot ok" />
+          <div><b>WIRE HOLD · CLEARED</b><em>128,400 PKR · SBP</em></div>
+        </div>
+      </div>
     </div>
 
 
