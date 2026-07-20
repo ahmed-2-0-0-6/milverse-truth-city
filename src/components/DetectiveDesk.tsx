@@ -761,8 +761,8 @@ function Candle() {
   });
   return (
     <group position={[11.2, 0, -6.9]}>
-      <mesh position={[0, 0.05, 0]} material={BRASS_HI}>
-        <cylinderGeometry args={[0.55, 0.7, 0.1, 20]} />
+      <mesh position={[0, 0.04, 0]} material={BRASS_HI}>
+        <cylinderGeometry args={[1.05, 1.15, 0.08, 24]} />
       </mesh>
       <mesh position={[0, 0.35, 0]} material={BRASS_LO}>
         <cylinderGeometry args={[0.22, 0.28, 0.5, 16]} />
