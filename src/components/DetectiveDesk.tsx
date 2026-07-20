@@ -196,19 +196,14 @@ function Tabletop() {
   }, []);
   return (
     <group>
-      {/* Wall wainscoting (far back), warm indirect */}
-      <mesh position={[0, 6, -22]}>
-        <planeGeometry args={[120, 20]} />
-        <meshStandardMaterial color="#1e120a" roughness={0.95} />
-      </mesh>
-      {/* horizontal chair rail */}
-      <mesh position={[0, 2.4, -21.9]}>
-        <boxGeometry args={[120, 0.25, 0.15]} />
-        <meshStandardMaterial color="#7a4a20" roughness={0.5} metalness={0.3} />
-      </mesh>
       {/* Tabletop plane */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} material={mat}>
         <planeGeometry args={[120, 90]} />
+      </mesh>
+      {/* subtle waxed sheen streak (additive) */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.003, 2]}>
+        <planeGeometry args={[36, 14]} />
+        <meshBasicMaterial color="#ffb066" transparent opacity={0.06} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
       {/* Front desk edge (bevel illusion) */}
       <mesh position={[0, -0.1, 20]}>
@@ -233,6 +228,169 @@ function Tabletop() {
     </group>
   );
 }
+
+// ---------- back wall: damask wallpaper + wainscoting + bookshelf + framed portraits ----------
+function BackWall() {
+  const wallpaper = useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 256;
+    const ctx = c.getContext("2d")!;
+    // deep oxblood base
+    ctx.fillStyle = "#1a0d08";
+    ctx.fillRect(0, 0, 256, 256);
+    // damask motif — subtle gold diamond
+    ctx.strokeStyle = "rgba(180,120,60,0.14)";
+    ctx.lineWidth = 1.2;
+    for (let y = 0; y < 4; y++) {
+      for (let x = 0; x < 4; x++) {
+        const cx = x * 64 + 32, cy = y * 64 + 32;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - 18);
+        ctx.bezierCurveTo(cx + 18, cy - 18, cx + 18, cy + 18, cx, cy + 18);
+        ctx.bezierCurveTo(cx - 18, cy + 18, cx - 18, cy - 18, cx, cy - 18);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(200,150,70,0.18)";
+        ctx.fill();
+      }
+    }
+    const tex = new THREE.CanvasTexture(c);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(10, 3);
+    tex.anisotropy = 4;
+    return tex;
+  }, []);
+
+  const portrait = useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = 128; c.height = 160;
+    const ctx = c.getContext("2d")!;
+    const g = ctx.createRadialGradient(64, 60, 5, 64, 80, 90);
+    g.addColorStop(0, "#5a3818");
+    g.addColorStop(1, "#0a0603");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 128, 160);
+    // silhouette bust
+    ctx.fillStyle = "#0a0503";
+    ctx.beginPath(); ctx.arc(64, 66, 22, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(64, 120, 34, 28, 0, 0, Math.PI * 2); ctx.fill();
+    return new THREE.CanvasTexture(c);
+  }, []);
+
+  const rng = seeded(7);
+  const books = useMemo(() => {
+    const arr: Array<{ x: number; h: number; w: number; c: string }> = [];
+    let x = -14;
+    const palette = ["#3a1a10", "#5a2a12", "#2a1508", "#4a2010", "#1a0d06", "#6a3418"];
+    while (x < 14) {
+      const w = 0.35 + rng() * 0.25;
+      const h = 1.1 + rng() * 0.5;
+      arr.push({ x, h, w, c: palette[Math.floor(rng() * palette.length)] });
+      x += w + 0.02;
+    }
+    return arr;
+  }, [rng]);
+
+  return (
+    <group position={[0, 0, -18]}>
+      {/* wallpaper */}
+      <mesh position={[0, 9, 0]}>
+        <planeGeometry args={[120, 22]} />
+        <meshStandardMaterial map={wallpaper} roughness={0.95} />
+      </mesh>
+      {/* wainscoting bottom */}
+      <mesh position={[0, 1.4, 0.05]}>
+        <planeGeometry args={[120, 2.8]} />
+        <meshStandardMaterial color="#2a1608" roughness={0.85} />
+      </mesh>
+      {/* wainscoting panels */}
+      {Array.from({ length: 14 }).map((_, i) => (
+        <mesh key={i} position={[-32 + i * 5, 1.4, 0.08]}>
+          <planeGeometry args={[4.2, 2.0]} />
+          <meshStandardMaterial color="#3a1e0c" roughness={0.75} />
+        </mesh>
+      ))}
+      {/* chair rail */}
+      <mesh position={[0, 2.85, 0.12]}>
+        <boxGeometry args={[120, 0.22, 0.14]} />
+        <meshStandardMaterial color="#7a4a20" roughness={0.45} metalness={0.35} />
+      </mesh>
+      {/* baseboard */}
+      <mesh position={[0, 0.15, 0.12]}>
+        <boxGeometry args={[120, 0.35, 0.18]} />
+        <meshStandardMaterial color="#5a3418" roughness={0.5} metalness={0.25} />
+      </mesh>
+
+      {/* bookshelf, left */}
+      <group position={[-22, 4.6, 0.4]}>
+        <mesh position={[0, 0, -0.15]}>
+          <boxGeometry args={[14.5, 3.2, 0.4]} />
+          <meshStandardMaterial color="#1a0d06" roughness={0.9} />
+        </mesh>
+        {books.map((b, i) => (
+          <mesh key={i} position={[b.x, 0, 0.1]}>
+            <boxGeometry args={[b.w, b.h, 0.35]} />
+            <meshStandardMaterial color={b.c} roughness={0.85} />
+          </mesh>
+        ))}
+        {/* shelf plank */}
+        <mesh position={[0, -0.75, 0.05]}>
+          <boxGeometry args={[14.5, 0.15, 0.6]} />
+          <meshStandardMaterial color="#3a1e0c" roughness={0.6} />
+        </mesh>
+      </group>
+
+      {/* framed portrait, right */}
+      <group position={[16, 6.2, 0.3]}>
+        {/* frame */}
+        <mesh>
+          <boxGeometry args={[3.6, 4.6, 0.25]} />
+          <meshStandardMaterial color="#8a5a1a" roughness={0.35} metalness={0.85} emissive="#3a1e08" emissiveIntensity={0.35} />
+        </mesh>
+        {/* inner mat */}
+        <mesh position={[0, 0, 0.14]}>
+          <planeGeometry args={[3.0, 4.0]} />
+          <meshStandardMaterial map={portrait} roughness={0.8} />
+        </mesh>
+        {/* frame plaque */}
+        <mesh position={[0, -2.5, 0.14]} material={BRASS_HI}>
+          <boxGeometry args={[1.4, 0.2, 0.06]} />
+        </mesh>
+      </group>
+
+      {/* small framed photo, far left */}
+      <group position={[-12, 6.4, 0.3]} rotation={[0, 0, -0.03]}>
+        <mesh>
+          <boxGeometry args={[2.2, 2.8, 0.2]} />
+          <meshStandardMaterial color="#6a4218" roughness={0.4} metalness={0.7} />
+        </mesh>
+        <mesh position={[0, 0, 0.12]}>
+          <planeGeometry args={[1.7, 2.3]} />
+          <meshStandardMaterial map={portrait} roughness={0.85} />
+        </mesh>
+      </group>
+
+      {/* wall sconce glows (fake — cheap emissive discs) */}
+      {[-6, 6].map((x, i) => (
+        <group key={i} position={[x, 7.4, 0.35]}>
+          <mesh material={BRASS_HI}>
+            <cylinderGeometry args={[0.18, 0.22, 0.4, 12]} />
+          </mesh>
+          <mesh position={[0, 0.35, 0]}>
+            <sphereGeometry args={[0.35, 12, 12]} />
+            <meshBasicMaterial color="#ffcc82" transparent opacity={0.85} />
+          </mesh>
+          {/* halo */}
+          <mesh position={[0, 0.35, 0]}>
+            <sphereGeometry args={[0.9, 12, 12]} />
+            <meshBasicMaterial color="#ff9a3a" transparent opacity={0.14} depthWrite={false} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
 
 // ---------- instanced case files ----------
 function CaseFiles() {
