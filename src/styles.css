@@ -4686,6 +4686,234 @@ button[title*="lovable" i] {
 }
 
 
+/* --- Parallax depth for compositor overlays (driven by --pax/--pay on wrap) --- */
+.detective-desk { --pax: 0; --pay: 0; }
+.detective-desk .desk-coldopen-box,
+.detective-desk .desk-audio,
+.detective-desk .desk-decrypt,
+.detective-desk .desk-call,
+.detective-desk .desk-sonar,
+.detective-desk .desk-poi,
+.detective-desk .desk-cctv,
+.detective-desk .desk-note {
+  will-change: transform;
+  transition: transform 240ms cubic-bezier(.2,.7,.2,1);
+}
+.detective-desk .desk-audio    { transform: translate3d(calc(var(--pax) * -8px),  calc(var(--pay) * -6px), 0); }
+.detective-desk .desk-decrypt  { transform: translate3d(calc(var(--pax) * -10px), calc(var(--pay) * -8px), 0); }
+.detective-desk .desk-call     { transform: translate3d(calc(var(--pax) *  10px), calc(var(--pay) *  8px), 0); }
+.detective-desk .desk-sonar    { transform: translate3d(calc(var(--pax) *  6px),  calc(var(--pay) *  5px), 0); }
+.detective-desk .desk-note     { transform: translate3d(calc(var(--pax) *  12px), calc(var(--pay) *  9px), 0) rotate(-2deg); }
+.detective-desk .desk-poi      { transform: translate3d(calc(var(--pax) * -6px),  calc(var(--pay) * -5px), 0); }
+.detective-desk .desk-cctv     { transform: translate3d(calc(var(--pax) *  3px),  calc(var(--pay) *  3px), 0); }
+
+/* --- Decryption HUD --- */
+.detective-desk .desk-decrypt {
+  position: absolute;
+  left: 20px; top: 62px;
+  z-index: 14; pointer-events: none;
+  min-width: 220px; padding: 10px 12px 11px;
+  background: linear-gradient(180deg, rgba(6,10,14,0.82), rgba(6,10,14,0.65));
+  border: 1px solid rgba(120,200,255,0.28);
+  color: #d6f0ff;
+  font: 700 10px/1.2 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.14em;
+  box-shadow: 0 0 24px rgba(80,150,220,0.14) inset, 0 8px 24px rgba(0,0,0,0.4);
+  opacity: 0; animation: dd-decrypt-in 0.5s ease-out 2.4s forwards;
+}
+@keyframes dd-decrypt-in { to { opacity: 0.94; } }
+.detective-desk .desk-decrypt-head {
+  display: flex; align-items: center; gap: 8px;
+  color: #9fd6ff;
+}
+.detective-desk .desk-decrypt-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #45e0a4; box-shadow: 0 0 8px #45e0a4;
+  animation: dd-decrypt-pulse 1.4s ease-in-out infinite;
+}
+@keyframes dd-decrypt-pulse { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+.detective-desk .desk-decrypt-tag {
+  margin-left: auto; padding: 2px 6px;
+  background: rgba(120,200,255,0.14);
+  border: 1px solid rgba(120,200,255,0.35);
+  color: #b8e4ff; font-size: 8px;
+}
+.detective-desk .desk-decrypt-bar {
+  margin-top: 9px; height: 6px;
+  background: rgba(120,200,255,0.1);
+  border: 1px solid rgba(120,200,255,0.25);
+  overflow: hidden; position: relative;
+}
+.detective-desk .desk-decrypt-bar i {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, #45e0a4, #7fe0ff, #45e0a4);
+  background-size: 200% 100%;
+  width: 0%;
+  animation: dd-decrypt-fill 12s cubic-bezier(.3,.1,.2,1) infinite,
+             dd-decrypt-shine 2s linear infinite;
+}
+@keyframes dd-decrypt-fill {
+  0%   { width: 4%; }
+  70%  { width: 96%; }
+  85%  { width: 96%; }
+  90%  { width: 100%; }
+  100% { width: 4%; }
+}
+@keyframes dd-decrypt-shine {
+  from { background-position: 200% 0; } to { background-position: 0 0; }
+}
+.detective-desk .desk-decrypt-hex {
+  margin-top: 8px; height: 26px; overflow: hidden;
+  position: relative; color: #6fb5df;
+  font-size: 10px; letter-spacing: 0.22em;
+}
+.detective-desk .desk-decrypt-hex::before,
+.detective-desk .desk-decrypt-hex::after {
+  content: attr(data-r1);
+  position: absolute; left: 0; right: 0;
+  animation: dd-decrypt-scroll 1.2s steps(6) infinite;
+}
+.detective-desk .desk-decrypt-hex::after {
+  content: attr(data-r2); top: 13px;
+  animation-delay: 0.6s;
+}
+@keyframes dd-decrypt-scroll {
+  0%   { transform: translateY(0);    opacity: 0.4; }
+  50%  { opacity: 1; }
+  100% { transform: translateY(-13px); opacity: 0.4; }
+}
+.detective-desk .desk-decrypt-status {
+  margin-top: 8px; display: flex; align-items: center; gap: 6px;
+  color: #8fbfd8; font-size: 9px;
+}
+.detective-desk .desk-decrypt-pct::before {
+  content: "0%";
+  color: #d6f0ff;
+  animation: dd-decrypt-count 12s steps(20) infinite;
+}
+@keyframes dd-decrypt-count {
+  0%   { content: "4%"; }   10%  { content: "18%"; }
+  20%  { content: "31%"; }  30%  { content: "44%"; }
+  40%  { content: "57%"; }  50%  { content: "68%"; }
+  60%  { content: "76%"; }  70%  { content: "83%"; }
+  80%  { content: "91%"; }  90%  { content: "97%"; }
+  100% { content: "100%"; }
+}
+
+/* --- Incoming call card --- */
+.detective-desk .desk-call {
+  position: absolute;
+  left: 20px; bottom: 92px;
+  z-index: 15; pointer-events: none;
+  min-width: 220px; padding: 10px 12px;
+  background: linear-gradient(180deg, rgba(20,14,10,0.9), rgba(20,14,10,0.72));
+  border: 1px solid rgba(255,110,80,0.4);
+  color: #f8e5d3;
+  font: 700 10px/1.15 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.14em;
+  box-shadow: 0 0 22px rgba(255,90,60,0.14) inset, 0 8px 24px rgba(0,0,0,0.5);
+  opacity: 0;
+  animation: dd-call-cycle 34s ease-in-out 5s infinite;
+}
+@keyframes dd-call-cycle {
+  0%   { opacity: 0; transform: translate3d(calc(var(--pax) * 10px), calc(var(--pay) * 8px + 8px), 0); }
+  6%   { opacity: 1; transform: translate3d(calc(var(--pax) * 10px), calc(var(--pay) * 8px), 0); }
+  8%,  9%   { transform: translate3d(calc(var(--pax) * 10px - 3px), calc(var(--pay) * 8px), 0); }
+  8.5%,9.5% { transform: translate3d(calc(var(--pax) * 10px + 3px), calc(var(--pay) * 8px), 0); }
+  10%, 11%  { transform: translate3d(calc(var(--pax) * 10px - 2px), calc(var(--pay) * 8px), 0); }
+  30%  { opacity: 1; }
+  36%  { opacity: 0; transform: translate3d(calc(var(--pax) * 10px), calc(var(--pay) * 8px + 8px), 0); }
+  100% { opacity: 0; }
+}
+.detective-desk .desk-call-ring {
+  position: absolute; inset: -6px;
+  border: 2px solid rgba(255,120,80,0.5);
+  border-radius: 4px;
+  opacity: 0;
+  animation: dd-call-ring 34s ease-out 5s infinite;
+}
+@keyframes dd-call-ring {
+  0%, 6%   { opacity: 0; transform: scale(1); }
+  8%       { opacity: 0.9; transform: scale(1); }
+  14%      { opacity: 0; transform: scale(1.08); }
+  16%      { opacity: 0.9; transform: scale(1); }
+  22%      { opacity: 0; transform: scale(1.08); }
+  100%     { opacity: 0; }
+}
+.detective-desk .desk-call-head {
+  display: flex; align-items: center; gap: 8px;
+  color: #ff9070;
+}
+.detective-desk .desk-call-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #ff5a3a; box-shadow: 0 0 10px #ff5a3a;
+  animation: dd-call-blink 0.9s steps(2) infinite;
+}
+@keyframes dd-call-blink { 50% { opacity: 0.2; } }
+.detective-desk .desk-call-time { margin-left: auto; color: #d8b8a0; }
+.detective-desk .desk-call-num {
+  margin-top: 8px;
+  font-family: "Playfair Display", ui-serif, Georgia, serif;
+  font-size: 18px; letter-spacing: 0.16em;
+  color: #ffe5d0;
+}
+.detective-desk .desk-call-meta {
+  margin-top: 4px; color: #b89880; font-size: 8.5px;
+}
+.detective-desk .desk-call-btns {
+  margin-top: 9px; display: flex; gap: 6px;
+}
+.detective-desk .desk-call-btn {
+  flex: 1; text-align: center; padding: 6px 0;
+  border: 1px solid; font-size: 9px;
+}
+.detective-desk .desk-call-btn.accept { color: #45e0a4; border-color: rgba(69,224,164,0.5); background: rgba(69,224,164,0.08); }
+.detective-desk .desk-call-btn.reject { color: #ff6a4a; border-color: rgba(255,106,74,0.5); background: rgba(255,106,74,0.08); }
+
+/* --- Filmstrip timeline --- */
+.detective-desk .desk-strip {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 13; pointer-events: none;
+  height: 34px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.0), rgba(0,0,0,0.85));
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.detective-desk .desk-strip-track {
+  display: flex; gap: 0;
+  height: 100%;
+  width: max-content;
+  animation: dd-strip-scroll 68s linear infinite;
+}
+@keyframes dd-strip-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.detective-desk .desk-strip-cell {
+  position: relative;
+  flex: 0 0 auto;
+  height: 100%;
+  padding: 6px 22px;
+  display: flex; align-items: center;
+  color: #c9b998;
+  font: 700 9px/1 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.22em;
+  border-right: 1px solid rgba(80,60,40,0.6);
+  background: linear-gradient(180deg, rgba(20,14,10,0.6), rgba(10,7,5,0.9));
+}
+.detective-desk .desk-strip-cell em { font-style: normal; }
+.detective-desk .desk-strip-perf {
+  position: absolute; top: 2px; left: 4px;
+  width: 8px; height: 4px;
+  background: rgba(0,0,0,0.7);
+  border: 1px solid rgba(180,150,110,0.35);
+}
+.detective-desk .desk-strip-perf.b { top: auto; bottom: 2px; }
+
+
+
 @media (prefers-reduced-motion: reduce) {
   .detective-desk .desk-cascade-col,
   .detective-desk .desk-poi,
@@ -4700,7 +4928,19 @@ button[title*="lovable" i] {
   .detective-desk .desk-ink-arrow,
   .detective-desk .desk-ink-label,
   .detective-desk .desk-reelcue,
-  .detective-desk .desk-smoke { animation: none; }
+  .detective-desk .desk-smoke,
+  .detective-desk .desk-decrypt,
+  .detective-desk .desk-decrypt-dot,
+  .detective-desk .desk-decrypt-bar i,
+  .detective-desk .desk-decrypt-hex::before,
+  .detective-desk .desk-decrypt-hex::after,
+  .detective-desk .desk-decrypt-pct::before,
+  .detective-desk .desk-call,
+  .detective-desk .desk-call-ring,
+  .detective-desk .desk-call-dot,
+  .detective-desk .desk-strip-track { animation: none; }
+  .detective-desk .desk-call { opacity: 0; }
+  .detective-desk .desk-decrypt { opacity: 0.9; }
   .detective-desk .desk-coldopen { display: none; }
   .detective-desk .desk-ink { opacity: 0.9; }
   .detective-desk .desk-ink-circle,
@@ -4715,4 +4955,8 @@ button[title*="lovable" i] {
   .detective-desk .desk-cascade-col.c4,
   .detective-desk .desk-cascade-col.c5 { display: none; }
   .detective-desk .desk-poi { display: none; }
+  .detective-desk .desk-decrypt,
+  .detective-desk .desk-call { display: none; }
+  .detective-desk .desk-strip { height: 24px; }
+  .detective-desk .desk-strip-cell { padding: 4px 14px; font-size: 8px; }
 }
