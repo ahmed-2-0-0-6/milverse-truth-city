@@ -1356,42 +1356,7 @@ export function DetectiveDesk({ className = "" }: Props) {
       ? [1, 1.25]
       : [1, 1.5];
 
-  // Cursor-follow "reader's light" — updates CSS variables directly (no React re-render).
-  const lightRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = lightRef.current;
-    if (!el || reduced) return;
-    let raf = 0;
-    let tx = 50, ty = 50;
-    const onMove = (e: PointerEvent) => {
-      const wrap = wrapRef.current;
-      if (!wrap) return;
-      const r = wrap.getBoundingClientRect();
-      if (e.clientY < r.top || e.clientY > r.bottom) return;
-      tx = ((e.clientX - r.left) / r.width) * 100;
-      ty = ((e.clientY - r.top) / r.height) * 100;
-      if (!raf) {
-        raf = requestAnimationFrame(() => {
-          const wrap = wrapRef.current;
-          el.style.setProperty("--rx", tx + "%");
-          el.style.setProperty("--ry", ty + "%");
-          // parallax offsets — normalized -1..1, applied to overlay layers
-          if (wrap) {
-            const nx = (tx - 50) / 50;
-            const ny = (ty - 50) / 50;
-            wrap.style.setProperty("--pax", nx.toFixed(3));
-            wrap.style.setProperty("--pay", ny.toFixed(3));
-          }
-          raf = 0;
-        });
-      }
-    };
-    window.addEventListener("pointermove", onMove, { passive: true });
-    return () => {
-      window.removeEventListener("pointermove", onMove);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [reduced]);
+  // Pointer-follow reader's light and parallax removed by request.
 
   // Clock is owned by a leaf component (CctvClock) so the once-per-second
   // tick doesn't re-render the entire 3D tree.
