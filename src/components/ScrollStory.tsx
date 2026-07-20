@@ -77,15 +77,22 @@ const DISTRICTS: District[] = [
 
 const BEATS = [
   {
+    eyebrow: "CASE ARRIVAL",
     headline: "Every day, someone in your family gets a message.",
     sub: "It's already happened this week. Maybe today.",
   },
-  { headline: "It looks real. It sounds real.", sub: "Perfect grammar. Familiar face. Small ask." },
   {
+    eyebrow: "EVIDENCE BOARD",
+    headline: "It looks real. It sounds real.",
+    sub: "Perfect grammar. Familiar face. Small ask.",
+  },
+  {
+    eyebrow: "THE COUNTER-MOVE",
     headline: "Spotting fakes is dying. Verifying is forever.",
     sub: "You can't out-see a machine. You can out-verify one.",
   },
   {
+    eyebrow: "ENTER THE CITY",
     headline: "This is MILVERSE.",
     sub: "Walk in as a target. Walk out as a designer.",
     finale: true,
@@ -253,16 +260,16 @@ export function ScrollStory() {
       {BEATS.map((b, i) => (
         <section
           key={i}
-          className={`story-beat relative min-h-screen flex items-center justify-center overflow-hidden px-6 ${b.finale ? "finale-beat" : ""}`}
+          className={`story-beat relative min-h-screen flex items-center justify-center overflow-hidden px-6 ${BEAT_BACKDROPS[i] ? "story-beat--image" : ""} ${b.finale ? "finale-beat" : ""}`}
         >
-          <div className="beat-bg absolute inset-0 -z-10" aria-hidden>
+          <div className="beat-bg absolute -inset-y-[24vh] inset-x-0 -z-10" aria-hidden>
             {BEAT_BACKDROPS[i] && (
               <>
                 <div
                   className="absolute inset-0 bg-cover bg-center"
                   style={{
                     backgroundImage: `url(${BEAT_BACKDROPS[i]})`,
-                    filter: "saturate(0.85) contrast(1.05)",
+                    filter: "saturate(0.92) contrast(1.12)",
                   }}
                 />
                 <div
@@ -283,13 +290,23 @@ export function ScrollStory() {
           </div>
 
 
-          <div className="relative z-10 max-w-4xl text-center">
+          <div className="beat-copy relative z-10 max-w-5xl text-center">
 
-            <div className="stencil text-[10px] text-cyan-300/70 mb-6">BEAT · 0{i + 1} / 04</div>
+            <div className="beat-overline beat-line mb-7">
+              <span>{b.eyebrow}</span>
+              <span>BEAT · 0{i + 1} / 04</span>
+            </div>
             <TypedHeadline text={b.headline} />
-            <p className="beat-line mt-6 text-base sm:text-lg text-white/60 max-w-xl mx-auto">
+            <p className="beat-line beat-subtitle mt-6 max-w-xl mx-auto">
               {b.sub}
             </p>
+            {BEAT_BACKDROPS[i] && (
+              <div className="beat-line beat-evidence-strip mt-8" aria-hidden>
+                <span>FACE MATCH</span>
+                <span>VOICE CLEAN</span>
+                <span>ASK SMALL</span>
+              </div>
+            )}
             {b.finale && (
               <div className="beat-line mt-10 grid grid-cols-3 gap-4 max-w-xl mx-auto">
                 <Stat label="CASES" value={128} />
