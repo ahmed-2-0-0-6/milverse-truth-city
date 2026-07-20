@@ -87,11 +87,10 @@ export const fetchAssessmentGroup = createServerFn({ method: "GET" })
       _code: data.groupCode,
     });
     if (error) throw new Error(error.message);
-    const { data: phaseRow } = await supabase
-      .from("assessment_phase")
-      .select("phase, updated_at")
-      .eq("group_code", data.groupCode)
-      .maybeSingle();
+    const { data: phaseRows } = await supabase.rpc("get_group_phase", {
+      _code: data.groupCode,
+    });
+    const phaseRow = phaseRows?.[0] ?? null;
     return { entries: rows ?? [], phase: phaseRow ?? { phase: "intake", updated_at: null } };
   });
 
@@ -101,17 +100,17 @@ export const fetchGroupPhase = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const supabase = serverClient();
-    const { data: row, error } = await supabase
-      .from("assessment_phase")
-      .select("phase, updated_at")
-      .eq("group_code", data.groupCode)
-      .maybeSingle();
+    const { data: rows, error } = await supabase.rpc("get_group_phase", {
+      _code: data.groupCode,
+    });
     if (error) throw new Error(error.message);
+    const row = rows?.[0] ?? null;
     return {
       phase: (row?.phase ?? "intake") as "intake" | "exit",
       updatedAt: row?.updated_at ?? null,
     };
   });
+
 
 /** Passcode-gated: flip a group to exit phase (or back to intake). */
 export const setGroupPhase = createServerFn({ method: "POST" })
