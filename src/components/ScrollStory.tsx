@@ -3,6 +3,7 @@
 import { lazy, Suspense, useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
+import { useVisualMode } from "@/lib/visual-quality";
 const DetectiveDesk = lazy(() =>
   import("@/components/DetectiveDesk").then((m) => ({ default: m.DetectiveDesk })),
 );
@@ -194,16 +195,22 @@ export function ScrollStory() {
   }, []);
 
   // Fixed-viewport desk stays visible whenever the ScrollStory is on screen.
+  // Only MOUNT the heavy 3D canvas when the section is actually near the viewport,
+  // and never on LITE mode. Prevents shaders/geometry from running when scrolled away.
+  const { mode } = useVisualMode();
   const [deskActive, setDeskActive] = useState(false);
   useEffect(() => {
     const el = rootRef.current;
     if (!el || !("IntersectionObserver" in window)) return;
     const io = new IntersectionObserver(([e]) => setDeskActive(e.isIntersecting), {
       threshold: 0,
+      rootMargin: "200px 0px",
     });
     io.observe(el);
     return () => io.disconnect();
   }, []);
+
+  const showDesk = mode === "cinematic" && deskActive;
 
   return (
     <div ref={rootRef} className="scrollstory relative isolate">
@@ -211,15 +218,18 @@ export function ScrollStory() {
           acts as the room behind the story beats and never leaks into the
           rest of the page. */}
       <div
-        className={`pointer-events-none absolute inset-0 z-0 ${deskActive ? "opacity-100" : "opacity-0"} transition-opacity duration-700`}
+        className={`pointer-events-none absolute inset-0 z-0 ${showDesk ? "opacity-100" : "opacity-0"} transition-opacity duration-700`}
         aria-hidden
       >
         <div className="sticky top-0 h-screen w-full">
-          <Suspense fallback={null}>
-            <DetectiveDesk />
-          </Suspense>
+          {showDesk ? (
+            <Suspense fallback={null}>
+              <DetectiveDesk />
+            </Suspense>
+          ) : null}
         </div>
       </div>
+
 
 
       {/* Story beats */}
