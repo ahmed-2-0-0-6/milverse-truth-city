@@ -266,7 +266,14 @@ export function ScrollStory() {
             {BEAT_BACKDROPS[i] && (
               <>
                 <div
-                  className="absolute inset-0 bg-cover bg-center"
+                  className="absolute inset-0 bg-cover bg-center opacity-60 blur-sm scale-105"
+                  style={{
+                    backgroundImage: `url(${BEAT_BACKDROPS[i]})`,
+                    filter: "saturate(0.9) contrast(1.06) blur(8px)",
+                  }}
+                />
+                <div
+                  className="absolute inset-0 bg-contain bg-center bg-no-repeat"
                   style={{
                     backgroundImage: `url(${BEAT_BACKDROPS[i]})`,
                     filter: "saturate(0.92) contrast(1.12)",
