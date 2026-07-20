@@ -1882,15 +1882,6 @@ export function DetectiveDesk({ className = "" }: Props) {
         </div>
       </div>
 
-      {/* Top-center clue counter HUD */}
-      <div className="desk-clues" aria-hidden="true">
-        <span className="desk-clues-tag">CASE</span>
-        <span className="desk-clues-id">MV-4471</span>
-        <span className="desk-clues-sep">·</span>
-        <span className="desk-clues-label">CLUES</span>
-        <span className="desk-clues-count" />
-        <span className="desk-clues-total">/07</span>
-      </div>
     </div>
 
 
