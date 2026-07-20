@@ -1,10 +1,9 @@
 // LAYER-1 — WebGL noir detective desk. Presentation only.
 //
 // Rewritten in the NoirCityScene style: one lean scene, minimal useFrame
-// subscriptions (2 total), shader-driven surfaces instead of large 2D
-// canvas repaints, instanced meshes for the file scatter, and hard
-// pause when off-screen or the tab is hidden. Zero per-frame CPU work
-// besides the camera drift and candle flicker.
+// subscriptions (3 total — camera drift, candle flicker, dust rise),
+// shader-driven tabletop, instanced small props, shared materials.
+// Zero per-frame CPU work besides those three loops.
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
@@ -19,53 +18,107 @@ function seeded(seed: number) {
   };
 }
 
-// A single shared "paper" canvas texture: typed lines + red CLASSIFIED
-// stamp. Built once, reused across every case-file mesh via UV offsets.
+// Shared materials — one allocation, reused across every mesh.
+const BRASS_HI = new THREE.MeshStandardMaterial({ color: "#c9a24a", roughness: 0.22, metalness: 0.95 });
+const BRASS_LO = new THREE.MeshStandardMaterial({ color: "#8a6420", roughness: 0.45, metalness: 0.85 });
+const WALNUT   = new THREE.MeshStandardMaterial({ color: "#3a2010", roughness: 0.7,  metalness: 0.1  });
+const BLACK_METAL = new THREE.MeshStandardMaterial({ color: "#141010", roughness: 0.35, metalness: 0.6 });
+const IVORY   = new THREE.MeshStandardMaterial({ color: "#efe6d4", roughness: 0.55, metalness: 0.05 });
+const MANILA  = new THREE.MeshStandardMaterial({ color: "#c8a259", roughness: 0.9,  metalness: 0    });
+const DEEP_RED = new THREE.MeshBasicMaterial({ color: "#a41818" });
+const INK_BLUE = new THREE.MeshStandardMaterial({ color: "#1a2a48", roughness: 0.85 });
+
+// A single shared "paper" canvas atlas: 4 typed-page variants with
+// stamps, tables, photo-strip. Picked per-file via UV offset.
 function buildPaperAtlas() {
   const c = document.createElement("canvas");
   c.width = 1024;
   c.height = 1024;
   const ctx = c.getContext("2d")!;
   const rand = seeded(7);
-  // 4 tile variants in a 2x2 grid so we can pick one per file via UV offset.
+  const titles = ["CASE 041 — NAWAZ", "CASE 108 — MIRPUR", "CASE 217 — LAHORE-N", "CASE 003 — KHI"];
   for (let ty = 0; ty < 2; ty++) {
     for (let tx = 0; tx < 2; tx++) {
       const ox = tx * 512;
       const oy = ty * 512;
-      // aged paper
+      // aged paper base
       const g = ctx.createRadialGradient(ox + 256, oy + 256, 40, ox + 256, oy + 256, 380);
       g.addColorStop(0, "#efe4c8");
       g.addColorStop(0.7, "#d9c69a");
       g.addColorStop(1, "#8a7346");
       ctx.fillStyle = g;
       ctx.fillRect(ox, oy, 512, 512);
+      // coffee ring stain
+      if ((tx + ty) % 3 !== 0) {
+        ctx.strokeStyle = "rgba(90,50,20,0.35)";
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(ox + 400, oy + 80, 42, 0, Math.PI * 2);
+        ctx.stroke();
+      }
       // stains
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < 12; i++) {
         ctx.fillStyle = `rgba(70,40,15,${0.04 + rand() * 0.06})`;
         ctx.beginPath();
-        ctx.arc(ox + rand() * 512, oy + rand() * 512, 20 + rand() * 60, 0, Math.PI * 2);
+        ctx.arc(ox + rand() * 512, oy + rand() * 512, 12 + rand() * 60, 0, Math.PI * 2);
         ctx.fill();
       }
-      // header block
+      // header
       ctx.fillStyle = "#1a120a";
-      ctx.font = "bold 34px monospace";
-      ctx.fillText(["CASE 041", "CASE 108", "CASE 217", "CASE 003"][ty * 2 + tx], ox + 44, oy + 76);
-      ctx.font = "18px monospace";
+      ctx.font = "bold 30px monospace";
+      ctx.fillText(titles[ty * 2 + tx], ox + 44, oy + 74);
+      ctx.font = "16px monospace";
       ctx.fillStyle = "#3a2a18";
-      ctx.fillText("MILVERSE COUNTER-SCAM DESK", ox + 44, oy + 102);
+      ctx.fillText("MILVERSE — COUNTER-SCAM DESK / EYES ONLY", ox + 44, oy + 100);
       // typed lines
       ctx.fillStyle = "#241812";
       for (let l = 0; l < 14; l++) {
-        const y = oy + 150 + l * 22;
+        const y = oy + 138 + l * 22;
         const w = 380 - rand() * 120;
         ctx.fillRect(ox + 44, y, w, 3);
       }
       // redactions
       ctx.fillStyle = "#0a0806";
-      for (let r = 0; r < 3; r++) {
-        ctx.fillRect(ox + 44 + rand() * 200, oy + 180 + rand() * 260, 60 + rand() * 120, 14);
+      for (let r = 0; r < 4; r++) {
+        ctx.fillRect(ox + 44 + rand() * 200, oy + 160 + rand() * 260, 60 + rand() * 120, 12);
       }
-      // CLASSIFIED stamp (only on 2 of 4 variants)
+      // signature scrawl bottom-right
+      ctx.strokeStyle = "#12233f";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(ox + 320, oy + 470);
+      for (let k = 0; k < 40; k++) {
+        ctx.lineTo(ox + 320 + k * 3, oy + 470 + Math.sin(k * 0.6) * 6 - k * 0.2);
+      }
+      ctx.stroke();
+      // tile-specific extra
+      if (tx === 0 && ty === 0) {
+        // table grid
+        ctx.strokeStyle = "#3a2a18";
+        ctx.lineWidth = 1;
+        for (let r = 0; r <= 5; r++) {
+          ctx.beginPath();
+          ctx.moveTo(ox + 44, oy + 340 + r * 22);
+          ctx.lineTo(ox + 460, oy + 340 + r * 22);
+          ctx.stroke();
+        }
+        for (let cc = 0; cc <= 4; cc++) {
+          ctx.beginPath();
+          ctx.moveTo(ox + 44 + cc * 104, oy + 340);
+          ctx.lineTo(ox + 44 + cc * 104, oy + 450);
+          ctx.stroke();
+        }
+      }
+      if (tx === 1 && ty === 1) {
+        // photo strip: 3 dark cells
+        for (let p = 0; p < 3; p++) {
+          ctx.fillStyle = "#0a0f14";
+          ctx.fillRect(ox + 60 + p * 130, oy + 340, 110, 110);
+          ctx.fillStyle = "#3a2a18";
+          ctx.fillRect(ox + 60 + p * 130, oy + 455, 110, 8);
+        }
+      }
+      // CLASSIFIED stamp on half the variants
       if ((tx + ty) % 2 === 0) {
         ctx.save();
         ctx.translate(ox + 320, oy + 380);
@@ -78,6 +131,20 @@ function buildPaperAtlas() {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("CLASSIFIED", 0, 0);
+        ctx.restore();
+      } else {
+        // EVIDENCE stamp variant
+        ctx.save();
+        ctx.translate(ox + 140, oy + 400);
+        ctx.rotate(0.18);
+        ctx.strokeStyle = "rgba(20,40,120,0.8)";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(-90, -26, 180, 52);
+        ctx.fillStyle = "rgba(20,40,120,0.85)";
+        ctx.font = "bold 28px monospace";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("EVIDENCE", 0, 0);
         ctx.restore();
       }
       // torn edge shadow
@@ -92,7 +159,7 @@ function buildPaperAtlas() {
   return tex;
 }
 
-// ---------- desk surface (shader, no big canvas) ----------
+// ---------- desk surface (shader) + wainscoting + blotter ----------
 function Tabletop() {
   const mat = useMemo(() => {
     return new THREE.ShaderMaterial({
@@ -113,14 +180,15 @@ function Tabletop() {
         void main(){
           vec2 p = vUv - 0.5;
           float r = length(p);
-          // radial lamp hotspot
           float hot = smoothstep(0.7, 0.0, r);
-          // wood grain: stretched noise + concentric rings
+          // long-grain walnut
           float grain = noise(vec2(vUv.x*40.0, vUv.y*6.0));
+          float knot  = smoothstep(0.35, 0.0, length(vUv-vec2(0.72,0.31))) * 0.5;
           float rings = 0.5 + 0.5*sin(r*80.0 + noise(vUv*4.0)*6.0);
           vec3 col = mix(uDeep, uWarm, hot);
           col += vec3(0.05, 0.03, 0.015) * grain;
           col += vec3(0.03, 0.02, 0.01) * rings * hot;
+          col -= vec3(0.05, 0.03, 0.015) * knot;
           gl_FragColor = vec4(col, 1.0);
         }
       `,
@@ -128,20 +196,38 @@ function Tabletop() {
   }, []);
   return (
     <group>
-      {/* Massive tabletop that reaches beyond the viewport so no bg shows */}
+      {/* Wall wainscoting (far back), warm indirect */}
+      <mesh position={[0, 6, -22]}>
+        <planeGeometry args={[120, 20]} />
+        <meshStandardMaterial color="#1e120a" roughness={0.95} />
+      </mesh>
+      {/* horizontal chair rail */}
+      <mesh position={[0, 2.4, -21.9]}>
+        <boxGeometry args={[120, 0.25, 0.15]} />
+        <meshStandardMaterial color="#7a4a20" roughness={0.5} metalness={0.3} />
+      </mesh>
+      {/* Tabletop plane */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} material={mat}>
         <planeGeometry args={[120, 90]} />
       </mesh>
-      {/* Dark leather blotter under the central pool of files */}
+      {/* Front desk edge (bevel illusion) */}
+      <mesh position={[0, -0.1, 20]}>
+        <boxGeometry args={[120, 0.4, 0.6]} />
+        <meshStandardMaterial color="#2a160a" roughness={0.6} metalness={0.2} />
+      </mesh>
+      {/* Dark leather blotter */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0.5]}>
         <planeGeometry args={[26, 16]} />
         <meshStandardMaterial color="#1a0d06" roughness={0.9} metalness={0} />
       </mesh>
-      {/* Faint brass corner accents on the blotter */}
+      {/* Manila folder under the scatter (peeking edges) */}
+      <mesh rotation={[-Math.PI / 2, 0, 0.05]} position={[0.4, 0.01, 0.6]} material={MANILA}>
+        <planeGeometry args={[14, 10]} />
+      </mesh>
+      {/* Brass corner rings on blotter */}
       {[[-12.5, -7.5], [12.5, -7.5], [-12.5, 7.5], [12.5, 7.5]].map(([x, z], i) => (
-        <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.008, z + 0.5]}>
-          <ringGeometry args={[0.35, 0.5, 16]} />
-          <meshStandardMaterial color="#a8792a" roughness={0.3} metalness={0.9} />
+        <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.008, z + 0.5]} material={BRASS_HI}>
+          <ringGeometry args={[0.35, 0.5, 20]} />
         </mesh>
       ))}
     </group>
@@ -154,15 +240,14 @@ function CaseFiles() {
   const files = useMemo(() => {
     const rand = seeded(19);
     const arr: { x: number; z: number; r: number; s: number; tile: number }[] = [];
-    // scatter around a clean center pool (radius 4) so the headline stays readable
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < 18; i++) {
       let x = 0, z = 0;
       for (let t = 0; t < 20; t++) {
         x = (rand() - 0.5) * 26;
         z = (rand() - 0.5) * 16;
         if (Math.hypot(x, z * 1.4) > 4.5) break;
       }
-      arr.push({ x, z, r: (rand() - 0.5) * 1.6, s: 0.85 + rand() * 0.5, tile: Math.floor(rand() * 4) });
+      arr.push({ x, z, r: (rand() - 0.5) * 1.6, s: 0.85 + rand() * 0.55, tile: Math.floor(rand() * 4) });
     }
     return arr;
   }, []);
@@ -170,13 +255,12 @@ function CaseFiles() {
   return (
     <group>
       {files.map((f, i) => {
-        // Per-file UV offset selects one of the 4 atlas tiles.
         const tx = f.tile % 2;
         const ty = Math.floor(f.tile / 2);
         return (
           <mesh
             key={i}
-            position={[f.x, 0.02 + (i % 3) * 0.015, f.z]}
+            position={[f.x, 0.02 + (i % 4) * 0.012, f.z]}
             rotation={[-Math.PI / 2, 0, f.r]}
             scale={[f.s * 3, f.s * 3, 1]}
           >
@@ -198,16 +282,64 @@ function CaseFiles() {
   );
 }
 
+// ---------- red push-pins (instanced) ----------
+function Pushpins() {
+  const rand = useMemo(() => seeded(41), []);
+  const pins = useMemo(() => {
+    const arr: [number, number, number][] = [];
+    for (let i = 0; i < 8; i++) {
+      arr.push([(rand() - 0.5) * 22, 0.08 + (i % 3) * 0.012, (rand() - 0.5) * 12]);
+    }
+    return arr;
+  }, [rand]);
+  return (
+    <group>
+      {pins.map((p, i) => (
+        <group key={i} position={p}>
+          <mesh material={DEEP_RED}>
+            <sphereGeometry args={[0.11, 12, 10]} />
+          </mesh>
+          <mesh position={[0, -0.06, 0]} material={BLACK_METAL}>
+            <cylinderGeometry args={[0.02, 0.02, 0.12, 6]} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+// ---------- paper clips (instanced) ----------
+function PaperClips() {
+  const rand = useMemo(() => seeded(53), []);
+  const clips = useMemo(() => {
+    const arr: { p: [number, number, number]; r: number }[] = [];
+    for (let i = 0; i < 5; i++) {
+      arr.push({
+        p: [(rand() - 0.5) * 20, 0.04, (rand() - 0.5) * 10],
+        r: rand() * Math.PI,
+      });
+    }
+    return arr;
+  }, [rand]);
+  return (
+    <group>
+      {clips.map((c, i) => (
+        <mesh key={i} position={c.p} rotation={[-Math.PI / 2, 0, c.r]}>
+          <torusGeometry args={[0.28, 0.03, 6, 20, Math.PI * 1.6]} />
+          <meshStandardMaterial color="#c8ccd2" roughness={0.35} metalness={0.85} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 // ---------- brass magnifier ----------
 function Magnifier() {
   return (
     <group position={[-6, 0.15, 3.2]} rotation={[-Math.PI / 2, 0, 0.4]}>
-      {/* rim */}
-      <mesh>
+      <mesh material={BRASS_HI}>
         <torusGeometry args={[1.1, 0.08, 12, 40]} />
-        <meshStandardMaterial color="#b8892c" roughness={0.3} metalness={0.9} />
       </mesh>
-      {/* glass */}
       <mesh>
         <circleGeometry args={[1.05, 40]} />
         <meshPhysicalMaterial
@@ -219,44 +351,196 @@ function Magnifier() {
           transmission={0.9}
         />
       </mesh>
-      {/* handle */}
       <mesh position={[1.9, 0, 0]}>
         <cylinderGeometry args={[0.08, 0.1, 1.8, 12]} />
         <meshStandardMaterial color="#6a4622" roughness={0.6} metalness={0.3} />
+      </mesh>
+      {/* ferrule */}
+      <mesh position={[1.0, 0, 0]} material={BRASS_LO}>
+        <cylinderGeometry args={[0.11, 0.11, 0.14, 12]} />
       </mesh>
     </group>
   );
 }
 
-// ---------- candle ----------
+// ---------- brass compass ----------
+function Compass() {
+  return (
+    <group position={[7.5, 0.06, 4.5]} rotation={[-Math.PI / 2, 0, 0.3]}>
+      <mesh material={BRASS_HI}>
+        <cylinderGeometry args={[0.85, 0.85, 0.12, 28]} />
+      </mesh>
+      <mesh position={[0, 0.07, 0]}>
+        <circleGeometry args={[0.78, 28]} />
+        <meshStandardMaterial color="#efe1bc" roughness={0.7} />
+      </mesh>
+      {/* needle */}
+      <mesh position={[0, 0.09, 0]} rotation={[0, 0, 0.6]} material={DEEP_RED}>
+        <boxGeometry args={[0.06, 0.02, 1.1]} />
+      </mesh>
+      {/* hinge */}
+      <mesh position={[-0.85, 0.06, 0]} material={BRASS_LO}>
+        <cylinderGeometry args={[0.1, 0.1, 0.22, 12]} />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- stapler ----------
+function Stapler() {
+  return (
+    <group position={[-8, 0.08, 4]} rotation={[0, 0.4, 0]}>
+      <mesh position={[0, 0.08, 0]} material={BLACK_METAL}>
+        <boxGeometry args={[1.6, 0.16, 0.5]} />
+      </mesh>
+      <mesh position={[0, 0.28, 0]} material={INK_BLUE}>
+        <boxGeometry args={[1.5, 0.22, 0.42]} />
+      </mesh>
+      <mesh position={[0.7, 0.28, 0]} material={BRASS_LO}>
+        <cylinderGeometry args={[0.11, 0.11, 0.44, 12]} rotation={[Math.PI / 2, 0, 0]} />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- typewriter (low-poly, silhouette-strong) ----------
+function Typewriter() {
+  const keys = useMemo(() => {
+    const arr: [number, number, number][] = [];
+    for (let r = 0; r < 3; r++) {
+      const n = 10 - r;
+      for (let k = 0; k < n; k++) {
+        arr.push([-1.35 + k * 0.3 + r * 0.15, 0.62 + r * 0.05, 0.55 - r * 0.22]);
+      }
+    }
+    return arr;
+  }, []);
+  return (
+    <group position={[8.5, 0, -5]} rotation={[0, -0.35, 0]}>
+      {/* base */}
+      <mesh position={[0, 0.3, 0]} material={BLACK_METAL}>
+        <boxGeometry args={[3.4, 0.6, 2.4]} />
+      </mesh>
+      {/* hood back */}
+      <mesh position={[0, 0.85, -0.6]} material={BLACK_METAL}>
+        <boxGeometry args={[3.2, 0.5, 1.0]} />
+      </mesh>
+      {/* roller */}
+      <mesh position={[0, 1.15, -0.55]} rotation={[0, 0, Math.PI / 2]} material={IVORY}>
+        <cylinderGeometry args={[0.18, 0.18, 3.0, 20]} />
+      </mesh>
+      {/* paper sheet in roller */}
+      <mesh position={[0, 1.55, -0.55]} rotation={[-0.3, 0, 0]}>
+        <planeGeometry args={[2.6, 1.3]} />
+        <meshStandardMaterial color="#efe4c8" roughness={0.9} side={THREE.DoubleSide} />
+      </mesh>
+      {/* keys */}
+      {keys.map((k, i) => (
+        <mesh key={i} position={k} material={IVORY}>
+          <cylinderGeometry args={[0.08, 0.08, 0.06, 10]} />
+        </mesh>
+      ))}
+      {/* brand plaque */}
+      <mesh position={[0, 0.55, 1.21]} material={BRASS_HI}>
+        <boxGeometry args={[0.9, 0.12, 0.02]} />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- rolodex ----------
+function Rolodex() {
+  const cards = useMemo(() => Array.from({ length: 12 }, (_, i) => i), []);
+  return (
+    <group position={[7.2, 0, -6]} rotation={[0, -0.6, 0]}>
+      {/* base */}
+      <mesh position={[0, 0.15, 0]} material={BLACK_METAL}>
+        <boxGeometry args={[2.4, 0.3, 1.4]} />
+      </mesh>
+      {/* posts */}
+      <mesh position={[-1.05, 0.55, 0]} material={BRASS_LO}>
+        <cylinderGeometry args={[0.05, 0.05, 0.7, 8]} />
+      </mesh>
+      <mesh position={[1.05, 0.55, 0]} material={BRASS_LO}>
+        <cylinderGeometry args={[0.05, 0.05, 0.7, 8]} />
+      </mesh>
+      {/* index cards fanned on axle */}
+      {cards.map((i) => {
+        const a = (i - 6) * 0.12;
+        return (
+          <mesh key={i} position={[0, 0.75, 0]} rotation={[a, 0, 0]}>
+            <planeGeometry args={[1.9, 0.9]} />
+            <meshStandardMaterial color="#efe4c8" roughness={0.9} side={THREE.DoubleSide} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
+// ---------- raccoon paperweight (stylised silhouette) ----------
+function Raccoon() {
+  return (
+    <group position={[3.6, 0, -4.4]} rotation={[0, 0.5, 0]}>
+      {/* body */}
+      <mesh position={[0, 0.35, 0]}>
+        <sphereGeometry args={[0.45, 16, 12]} />
+        <meshStandardMaterial color="#5b5f66" roughness={0.55} metalness={0.4} />
+      </mesh>
+      {/* head */}
+      <mesh position={[0, 0.85, 0.15]}>
+        <sphereGeometry args={[0.32, 16, 12]} />
+        <meshStandardMaterial color="#6a6e75" roughness={0.55} metalness={0.4} />
+      </mesh>
+      {/* mask stripe */}
+      <mesh position={[0, 0.86, 0.42]}>
+        <boxGeometry args={[0.42, 0.14, 0.02]} />
+        <meshStandardMaterial color="#0f0f10" roughness={0.9} />
+      </mesh>
+      {/* ears */}
+      <mesh position={[-0.2, 1.12, 0.05]}>
+        <coneGeometry args={[0.08, 0.16, 8]} />
+        <meshStandardMaterial color="#4a4e55" roughness={0.7} />
+      </mesh>
+      <mesh position={[0.2, 1.12, 0.05]}>
+        <coneGeometry args={[0.08, 0.16, 8]} />
+        <meshStandardMaterial color="#4a4e55" roughness={0.7} />
+      </mesh>
+      {/* brass plaque under */}
+      <mesh position={[0, 0.02, 0]} material={BRASS_HI}>
+        <cylinderGeometry args={[0.55, 0.55, 0.04, 20]} />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- candle (only remaining flicker useFrame) ----------
 function Candle() {
   const flameRef = useRef<THREE.Mesh>(null);
   const lightRef = useRef<THREE.PointLight>(null);
   useFrame((state) => {
     const t = state.clock.elapsedTime;
     const flick = 0.9 + Math.sin(t * 11) * 0.06 + Math.sin(t * 23.3) * 0.04;
-    if (flameRef.current) {
-      flameRef.current.scale.set(flick, 1 + Math.sin(t * 9) * 0.08, flick);
-    }
-    if (lightRef.current) {
-      lightRef.current.intensity = 2.4 * flick;
-    }
+    if (flameRef.current) flameRef.current.scale.set(flick, 1 + Math.sin(t * 9) * 0.08, flick);
+    if (lightRef.current) lightRef.current.intensity = 2.4 * flick;
   });
   return (
     <group position={[6.4, 0, -2.6]}>
-      {/* brass holder */}
-      <mesh position={[0, 0.05, 0]}>
+      <mesh position={[0, 0.05, 0]} material={BRASS_HI}>
         <cylinderGeometry args={[0.55, 0.7, 0.1, 20]} />
-        <meshStandardMaterial color="#a8792a" roughness={0.35} metalness={0.85} />
       </mesh>
-      <mesh position={[0, 0.35, 0]}>
+      <mesh position={[0, 0.35, 0]} material={BRASS_LO}>
         <cylinderGeometry args={[0.22, 0.28, 0.5, 16]} />
-        <meshStandardMaterial color="#8a6420" roughness={0.4} metalness={0.85} />
       </mesh>
       {/* wax */}
       <mesh position={[0, 1.0, 0]}>
         <cylinderGeometry args={[0.24, 0.28, 1.3, 18]} />
         <meshStandardMaterial color="#f2e6c8" roughness={0.7} emissive="#3a2410" emissiveIntensity={0.15} />
+      </mesh>
+      {/* wax drip */}
+      <mesh position={[0.24, 0.75, 0]}>
+        <sphereGeometry args={[0.09, 8, 6]} />
+        <meshStandardMaterial color="#f2e6c8" roughness={0.7} />
       </mesh>
       {/* flame */}
       <mesh ref={flameRef} position={[0, 1.85, 0]}>
@@ -288,19 +572,21 @@ function Photo() {
     const ctx = c.getContext("2d")!;
     ctx.fillStyle = "#e9dcc0";
     ctx.fillRect(0, 0, 256, 320);
-    // photo panel
     const g = ctx.createLinearGradient(0, 0, 0, 240);
     g.addColorStop(0, "#0a0f14");
     g.addColorStop(1, "#1a222c");
     ctx.fillStyle = g;
     ctx.fillRect(18, 18, 220, 240);
-    // silhouette figure
     ctx.fillStyle = "#0a0806";
     ctx.beginPath();
     ctx.arc(128, 130, 32, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillRect(88, 160, 80, 90);
-    // handwriting caption
+    // grain
+    for (let i = 0; i < 240; i++) {
+      ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.05})`;
+      ctx.fillRect(18 + Math.random() * 220, 18 + Math.random() * 240, 1, 1);
+    }
     ctx.fillStyle = "#241812";
     ctx.font = "italic 20px serif";
     ctx.fillText("subject — 03:14", 30, 290);
@@ -309,10 +595,97 @@ function Photo() {
     return t;
   }, []);
   return (
-    <mesh position={[5, 0.08, 3]} rotation={[-Math.PI / 2, 0, -0.3]}>
-      <planeGeometry args={[2.2, 2.75]} />
-      <meshStandardMaterial map={tex} roughness={0.9} />
-    </mesh>
+    <group>
+      <mesh position={[5, 0.08, 3]} rotation={[-Math.PI / 2, 0, -0.3]}>
+        <planeGeometry args={[2.2, 2.75]} />
+        <meshStandardMaterial map={tex} roughness={0.9} />
+      </mesh>
+      {/* red pin holding it down */}
+      <group position={[4.1, 0.12, 2.15]}>
+        <mesh material={DEEP_RED}>
+          <sphereGeometry args={[0.12, 12, 10]} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+// ---------- fountain pen ----------
+function Pen() {
+  return (
+    <group position={[-2, 0.08, 5.2]} rotation={[-Math.PI / 2, 0, 1.15]}>
+      <mesh>
+        <cylinderGeometry args={[0.08, 0.08, 2.4, 12]} />
+        <meshStandardMaterial color="#0e0a08" roughness={0.4} metalness={0.2} />
+      </mesh>
+      <mesh position={[0, 1.35, 0]} material={BRASS_HI}>
+        <coneGeometry args={[0.08, 0.35, 12]} />
+      </mesh>
+      <mesh position={[0, -1.15, 0]} material={BRASS_HI}>
+        <cylinderGeometry args={[0.09, 0.09, 0.15, 12]} />
+      </mesh>
+      {/* clip */}
+      <mesh position={[0.09, 0.5, 0]} material={BRASS_LO}>
+        <boxGeometry args={[0.03, 0.7, 0.04]} />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- coffee cup + saucer + ring ----------
+function Cup() {
+  return (
+    <group position={[-7.5, 0, -3.2]}>
+      {/* saucer */}
+      <mesh position={[0, 0.02, 0]} material={IVORY}>
+        <cylinderGeometry args={[1.2, 1.2, 0.04, 24]} />
+      </mesh>
+      <mesh position={[0, 0.06, 0]}>
+        <cylinderGeometry args={[0.95, 0.85, 0.1, 24]} />
+        <meshStandardMaterial color="#2a1a10" roughness={0.6} metalness={0.1} />
+      </mesh>
+      <mesh position={[0, 0.55, 0]}>
+        <cylinderGeometry args={[0.7, 0.62, 1.0, 24, 1, true]} />
+        <meshStandardMaterial color="#efe6d4" roughness={0.55} side={THREE.DoubleSide} />
+      </mesh>
+      {/* coffee surface */}
+      <mesh position={[0, 1.02, 0]}>
+        <cylinderGeometry args={[0.66, 0.66, 0.02, 24]} />
+        <meshStandardMaterial color="#3a2010" roughness={0.4} emissive="#180a04" emissiveIntensity={0.4} />
+      </mesh>
+      {/* handle */}
+      <mesh position={[0.78, 0.55, 0]} rotation={[0, 0, Math.PI / 2]} material={IVORY}>
+        <torusGeometry args={[0.22, 0.06, 8, 16, Math.PI]} />
+      </mesh>
+      {/* faint ring stain on desk */}
+      <mesh position={[1.6, 0.015, 0.6]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.5, 0.62, 24]} />
+        <meshBasicMaterial color="#5a3820" transparent opacity={0.35} />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- hanging brass lamp shade (visual anchor top-of-frame) ----------
+function Lamp() {
+  return (
+    <group position={[0, 6.5, 0]}>
+      {/* cord */}
+      <mesh position={[0, 1.4, 0]}>
+        <cylinderGeometry args={[0.02, 0.02, 3.0, 6]} />
+        <meshStandardMaterial color="#141010" />
+      </mesh>
+      {/* shade outer */}
+      <mesh material={BRASS_HI}>
+        <coneGeometry args={[1.6, 1.2, 24, 1, true]} />
+      </mesh>
+      {/* shade inner glow */}
+      <mesh position={[0, -0.05, 0]}>
+        <coneGeometry args={[1.55, 1.15, 24, 1, true]} />
+        <meshBasicMaterial color="#ffd190" side={THREE.BackSide} transparent opacity={0.55} />
+      </mesh>
+      <pointLight position={[0, -0.4, 0]} color="#ffcc82" intensity={1.4} distance={22} decay={2} />
+    </group>
   );
 }
 
@@ -348,51 +721,6 @@ function Dust() {
   );
 }
 
-// ---------- fountain pen ----------
-function Pen() {
-  return (
-    <group position={[-2, 0.08, 5.2]} rotation={[-Math.PI / 2, 0, 1.15]}>
-      <mesh>
-        <cylinderGeometry args={[0.08, 0.08, 2.4, 12]} />
-        <meshStandardMaterial color="#0e0a08" roughness={0.4} metalness={0.2} />
-      </mesh>
-      <mesh position={[0, 1.35, 0]}>
-        <coneGeometry args={[0.08, 0.35, 12]} />
-        <meshStandardMaterial color="#c9a24a" roughness={0.25} metalness={0.95} />
-      </mesh>
-      <mesh position={[0, -1.15, 0]}>
-        <cylinderGeometry args={[0.09, 0.09, 0.15, 12]} />
-        <meshStandardMaterial color="#c9a24a" roughness={0.25} metalness={0.95} />
-      </mesh>
-    </group>
-  );
-}
-
-// ---------- coffee cup ----------
-function Cup() {
-  return (
-    <group position={[-7.5, 0, -3.2]}>
-      <mesh position={[0, 0.05, 0]}>
-        <cylinderGeometry args={[0.95, 0.85, 0.1, 24]} />
-        <meshStandardMaterial color="#2a1a10" roughness={0.6} metalness={0.1} />
-      </mesh>
-      <mesh position={[0, 0.55, 0]}>
-        <cylinderGeometry args={[0.7, 0.62, 1.0, 24, 1, true]} />
-        <meshStandardMaterial color="#efe6d4" roughness={0.55} side={THREE.DoubleSide} />
-      </mesh>
-      <mesh position={[0, 1.02, 0]}>
-        <cylinderGeometry args={[0.66, 0.66, 0.02, 24]} />
-        <meshStandardMaterial color="#3a2010" roughness={0.4} emissive="#180a04" emissiveIntensity={0.4} />
-      </mesh>
-      {/* handle */}
-      <mesh position={[0.78, 0.55, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <torusGeometry args={[0.22, 0.06, 8, 16, Math.PI]} />
-        <meshStandardMaterial color="#efe6d4" roughness={0.55} />
-      </mesh>
-    </group>
-  );
-}
-
 // ---------- camera drift ----------
 function CameraRig() {
   const { camera } = useThree();
@@ -410,9 +738,7 @@ function CameraRig() {
 function PauseWhenHidden() {
   const { invalidate } = useThree();
   useEffect(() => {
-    const on = () => {
-      if (!document.hidden) invalidate();
-    };
+    const on = () => { if (!document.hidden) invalidate(); };
     document.addEventListener("visibilitychange", on);
     return () => document.removeEventListener("visibilitychange", on);
   }, [invalidate]);
@@ -485,11 +811,19 @@ export function DetectiveDesk({ className = "" }: Props) {
             <directionalLight position={[0, 12, 6]} intensity={0.6} color="#ffb060" />
             <Tabletop />
             <CaseFiles />
+            <Pushpins />
+            <PaperClips />
             <Photo />
             <Magnifier />
+            <Compass />
+            <Stapler />
+            <Typewriter />
+            <Rolodex />
+            <Raccoon />
             <Pen />
             <Cup />
             <Candle />
+            <Lamp />
             <Dust />
           </Canvas>
         </Suspense>
@@ -498,5 +832,3 @@ export function DetectiveDesk({ className = "" }: Props) {
     </div>
   );
 }
-
-export default DetectiveDesk;
