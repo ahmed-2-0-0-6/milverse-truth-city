@@ -1224,6 +1224,8 @@ export function DetectiveDesk({ className = "" }: Props) {
           </Canvas>
         </Suspense>
       )}
+      <div className="desk-fan-shadow" />
+      <div className="desk-grade" />
       <div className="desk-vignette" />
     </div>
   );
