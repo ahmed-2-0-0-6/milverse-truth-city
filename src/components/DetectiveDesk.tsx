@@ -553,64 +553,162 @@ function Typewriter() {
   );
 }
 
-// ---------- ashtray with cigar + ember + smoke ----------
-function Ashtray() {
+// ---------- brass candlestick with pillar candle, live flame + wax drips ----------
+function Candle() {
+  const flameRef = useRef<THREE.Mesh>(null);
+  const flameLightRef = useRef<THREE.PointLight>(null);
   const smokeRef = useRef<THREE.Points>(null);
-  const geom = useMemo(() => {
+  const glowRef = useRef<THREE.Mesh>(null);
+
+  // wisp of smoke rising from the wick
+  const smokeGeom = useMemo(() => {
     const g = new THREE.BufferGeometry();
-    const n = 40;
+    const n = 22;
     const pos = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 0.4;
-      pos[i * 3 + 1] = 0.6 + Math.random() * 3;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 0.4;
+      pos[i * 3] = (Math.random() - 0.5) * 0.15;
+      pos[i * 3 + 1] = 0.1 + Math.random() * 2.2;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 0.15;
     }
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     return g;
   }, []);
+
+  // procedural wax texture — creamy ivory with faint drip streaks
+  const waxTex = useMemo(
+    () =>
+      canvasTex(256, 512, (ctx) => {
+        const g = ctx.createLinearGradient(0, 0, 0, 512);
+        g.addColorStop(0, "#f5ecd6");
+        g.addColorStop(1, "#e2d3ae");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 256, 512);
+        // faint vertical drip runs
+        for (let i = 0; i < 14; i++) {
+          const x = Math.random() * 256;
+          ctx.fillStyle = `rgba(210,190,150,${0.15 + Math.random() * 0.25})`;
+          ctx.fillRect(x, 40 + Math.random() * 180, 2 + Math.random() * 3, 220 + Math.random() * 180);
+        }
+        // subtle mottling
+        for (let i = 0; i < 400; i++) {
+          ctx.fillStyle = `rgba(120,90,50,${Math.random() * 0.06})`;
+          ctx.fillRect(Math.random() * 256, Math.random() * 512, 1, 1);
+        }
+      }),
+    [],
+  );
+
   useFrame((_, dt) => {
+    const t = performance.now() * 0.001;
+    // flame flicker — scale + slight sway
+    if (flameRef.current) {
+      const flick = 1 + Math.sin(t * 14) * 0.06 + Math.sin(t * 27) * 0.04;
+      flameRef.current.scale.set(flick, 1 + Math.sin(t * 9) * 0.08, flick);
+      flameRef.current.rotation.z = Math.sin(t * 3.2) * 0.05;
+    }
+    if (flameLightRef.current) {
+      flameLightRef.current.intensity = 1.1 + Math.sin(t * 11) * 0.25 + Math.sin(t * 23) * 0.1;
+    }
+    if (glowRef.current) {
+      const m = glowRef.current.material as THREE.MeshBasicMaterial;
+      m.opacity = 0.28 + Math.sin(t * 8) * 0.06;
+    }
+    // smoke drift
     if (!smokeRef.current) return;
     const pos = smokeRef.current.geometry.attributes.position as THREE.BufferAttribute;
     const arr = pos.array as Float32Array;
     for (let i = 0; i < arr.length; i += 3) {
-      arr[i + 1] += dt * 0.4;
-      arr[i] += Math.sin(performance.now() * 0.0005 + i) * dt * 0.12;
-      if (arr[i + 1] > 4.5) {
-        arr[i + 1] = 0.6;
-        arr[i] = (Math.random() - 0.5) * 0.3;
-        arr[i + 2] = (Math.random() - 0.5) * 0.3;
+      arr[i + 1] += dt * 0.35;
+      arr[i] += Math.sin(t + i) * dt * 0.08;
+      if (arr[i + 1] > 3.2) {
+        arr[i + 1] = 0.1;
+        arr[i] = (Math.random() - 0.5) * 0.1;
+        arr[i + 2] = (Math.random() - 0.5) * 0.1;
       }
     }
     pos.needsUpdate = true;
   });
+
   return (
     <group position={[5.5, 0, 7]}>
-      {/* dish */}
+      {/* brass saucer base */}
       <mesh castShadow receiveShadow>
-        <cylinderGeometry args={[1.1, 1.0, 0.22, 32]} />
-        <meshStandardMaterial color="#c48b3a" metalness={0.85} roughness={0.35} />
+        <cylinderGeometry args={[0.95, 1.05, 0.12, 40]} />
+        <meshStandardMaterial color="#d0973f" metalness={0.9} roughness={0.28} />
       </mesh>
-      <mesh position={[0, 0.12, 0]}>
-        <cylinderGeometry args={[0.9, 0.85, 0.06, 32]} />
-        <meshStandardMaterial color="#1a1108" roughness={0.7} />
+      {/* brass stem */}
+      <mesh position={[0, 0.35, 0]} castShadow>
+        <cylinderGeometry args={[0.18, 0.28, 0.5, 24]} />
+        <meshStandardMaterial color="#c48b3a" metalness={0.92} roughness={0.24} />
       </mesh>
-      {/* cigar */}
-      <mesh position={[0.35, 0.24, 0]} rotation={[0, 0, Math.PI / 2 - 0.2]} castShadow>
-        <cylinderGeometry args={[0.09, 0.09, 1.4, 16]} />
-        <meshStandardMaterial color="#4a2a12" roughness={0.9} />
+      {/* brass cup that holds the candle */}
+      <mesh position={[0, 0.7, 0]} castShadow>
+        <cylinderGeometry args={[0.42, 0.34, 0.22, 28]} />
+        <meshStandardMaterial color="#e0a24d" metalness={0.95} roughness={0.22} />
       </mesh>
-      {/* ember */}
-      <mesh position={[1.02, 0.28, 0]}>
-        <sphereGeometry args={[0.09, 12, 12]} />
-        <meshStandardMaterial color="#ff5522" emissive="#ff7733" emissiveIntensity={2} />
+      {/* melted wax pool on cup rim */}
+      <mesh position={[0, 0.82, 0]}>
+        <cylinderGeometry args={[0.44, 0.44, 0.04, 28]} />
+        <meshStandardMaterial color="#f0e2bd" roughness={0.55} />
       </mesh>
-      <pointLight position={[1.02, 0.35, 0]} color="#ff7733" intensity={0.5} distance={2} />
-      <points ref={smokeRef} geometry={geom} position={[1.02, 0, 0]}>
-        <pointsMaterial
-          size={0.32}
-          color="#c9b8a0"
+      {/* pillar candle (used, uneven top) */}
+      <mesh position={[0, 1.55, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.32, 0.34, 1.5, 32]} />
+        <meshStandardMaterial map={waxTex} roughness={0.6} />
+      </mesh>
+      {/* soft translucent glow inside the wax near the top (candle-lit-from-within) */}
+      <mesh position={[0, 2.15, 0]}>
+        <cylinderGeometry args={[0.32, 0.32, 0.35, 32]} />
+        <meshStandardMaterial
+          color="#ffcf88"
+          emissive="#ff9d4a"
+          emissiveIntensity={0.6}
           transparent
-          opacity={0.18}
+          opacity={0.55}
+          roughness={0.4}
+        />
+      </mesh>
+      {/* uneven melted top rim */}
+      <mesh position={[0, 2.32, 0]}>
+        <torusGeometry args={[0.3, 0.05, 8, 24]} />
+        <meshStandardMaterial color="#f4e6c0" roughness={0.5} />
+      </mesh>
+      {/* charred wick */}
+      <mesh position={[0, 2.4, 0]}>
+        <cylinderGeometry args={[0.015, 0.015, 0.14, 8]} />
+        <meshStandardMaterial color="#1a0f08" roughness={1} />
+      </mesh>
+      {/* flame — teardrop */}
+      <mesh ref={flameRef} position={[0, 2.62, 0]}>
+        <sphereGeometry args={[0.11, 16, 16]} />
+        <meshBasicMaterial color="#ffd58a" transparent opacity={0.95} />
+      </mesh>
+      {/* outer flame halo */}
+      <mesh position={[0, 2.62, 0]}>
+        <sphereGeometry args={[0.2, 16, 16]} />
+        <meshBasicMaterial color="#ff8a3a" transparent opacity={0.35} depthWrite={false} />
+      </mesh>
+      {/* pool of warm light around the candle head */}
+      <mesh ref={glowRef} position={[0, 2.62, 0]}>
+        <sphereGeometry args={[0.55, 16, 16]} />
+        <meshBasicMaterial color="#ffb060" transparent opacity={0.28} depthWrite={false} />
+      </mesh>
+      {/* the actual light source */}
+      <pointLight
+        ref={flameLightRef}
+        position={[0, 2.7, 0]}
+        color="#ffb268"
+        intensity={1.2}
+        distance={7}
+        decay={2}
+      />
+      {/* smoke wisp */}
+      <points ref={smokeRef} geometry={smokeGeom} position={[0, 2.7, 0]}>
+        <pointsMaterial
+          size={0.14}
+          color="#d8cbb2"
+          transparent
+          opacity={0.14}
           depthWrite={false}
           sizeAttenuation
         />
@@ -618,6 +716,7 @@ function Ashtray() {
     </group>
   );
 }
+
 
 // ---------- coffee mug + steam ----------
 function CoffeeMug() {
@@ -1103,55 +1202,85 @@ function Room() {
   const wallTex = useMemo(
     () =>
       canvasTex(1024, 1024, (ctx) => {
-        // warm damask wallpaper
+        // deep burgundy → oxblood upper, tobacco lower
         const g = ctx.createLinearGradient(0, 0, 0, 1024);
-        g.addColorStop(0, "#1a0e08");
+        g.addColorStop(0, "#1b0d09");
+        g.addColorStop(0.6, "#1a0e08");
         g.addColorStop(1, "#0a0604");
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, 1024, 1024);
-        // vertical wallpaper stripes
-        for (let x = 0; x < 1024; x += 48) {
-          ctx.fillStyle = `rgba(120,70,30,${0.05 + Math.random() * 0.05})`;
-          ctx.fillRect(x, 0, 2, 1024);
-        }
-        // damask motifs
-        for (let y = 60; y < 1024; y += 120) {
-          for (let x = 60; x < 1024; x += 120) {
-            ctx.strokeStyle = "rgba(180,130,70,0.08)";
-            ctx.lineWidth = 1.2;
+        // art-deco diamond lattice (refined, sparser than damask)
+        ctx.strokeStyle = "rgba(180,130,70,0.055)";
+        ctx.lineWidth = 0.9;
+        const step = 96;
+        for (let y = 0; y < 1024 + step; y += step) {
+          for (let x = 0; x < 1024 + step; x += step) {
             ctx.beginPath();
-            ctx.ellipse(x, y, 22, 12, 0, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.ellipse(x, y, 12, 22, 0, 0, Math.PI * 2);
+            ctx.moveTo(x, y - step / 2);
+            ctx.lineTo(x + step / 2, y);
+            ctx.lineTo(x, y + step / 2);
+            ctx.lineTo(x - step / 2, y);
+            ctx.closePath();
             ctx.stroke();
           }
         }
-        // grime
-        for (let i = 0; i < 400; i++) {
-          ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.15})`;
-          ctx.fillRect(Math.random() * 1024, Math.random() * 1024, Math.random() * 3, Math.random() * 3);
+        // tiny gilt fleur centers
+        ctx.fillStyle = "rgba(200,150,80,0.07)";
+        for (let y = 0; y < 1024; y += step) {
+          for (let x = 0; x < 1024; x += step) {
+            ctx.fillRect(x - 1, y - 1, 2, 2);
+          }
+        }
+        // aged grime
+        for (let i = 0; i < 500; i++) {
+          ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.12})`;
+          ctx.fillRect(Math.random() * 1024, Math.random() * 1024, Math.random() * 2, Math.random() * 2);
         }
       }),
     [],
   );
+
+  // dark walnut wainscoting for the lower third of every wall
+  const wainscotTex = useMemo(
+    () =>
+      canvasTex(1024, 512, (ctx) => {
+        const g = ctx.createLinearGradient(0, 0, 0, 512);
+        g.addColorStop(0, "#2a180c");
+        g.addColorStop(1, "#160b06");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 1024, 512);
+        // recessed panel outlines
+        for (let x = 40; x < 1024; x += 200) {
+          ctx.strokeStyle = "rgba(0,0,0,0.75)";
+          ctx.lineWidth = 3;
+          ctx.strokeRect(x, 60, 160, 380);
+          ctx.strokeStyle = "rgba(200,150,80,0.10)";
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x + 6, 66, 148, 368);
+        }
+        // vertical wood grain
+        for (let i = 0; i < 1600; i++) {
+          ctx.fillStyle = `rgba(210,160,110,${Math.random() * 0.045})`;
+          ctx.fillRect(Math.random() * 1024, Math.random() * 512, 1, 20 + Math.random() * 40);
+        }
+      }),
+    [],
+  );
+
   const floorTex = useMemo(
     () =>
       canvasTex(1024, 1024, (ctx) => {
         ctx.fillStyle = "#0e0805";
         ctx.fillRect(0, 0, 1024, 1024);
-        // plank boards
         for (let y = 0; y < 1024; y += 96) {
           ctx.fillStyle = `rgb(${25 + Math.random() * 12}, ${16 + Math.random() * 8}, ${8 + Math.random() * 6})`;
           ctx.fillRect(0, y, 1024, 88);
-          // seams
           ctx.strokeStyle = "rgba(0,0,0,0.7)";
           ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.moveTo(0, y + 88);
           ctx.lineTo(1024, y + 88);
           ctx.stroke();
-          // random seams within
           for (let x = Math.random() * 200; x < 1024; x += 180 + Math.random() * 200) {
             ctx.beginPath();
             ctx.moveTo(x, y);
@@ -1159,7 +1288,6 @@ function Room() {
             ctx.stroke();
           }
         }
-        // grain
         for (let i = 0; i < 3000; i++) {
           ctx.fillStyle = `rgba(255,200,140,${Math.random() * 0.03})`;
           ctx.fillRect(Math.random() * 1024, Math.random() * 1024, Math.random() * 30 + 10, 1);
@@ -1167,6 +1295,104 @@ function Room() {
       }),
     [],
   );
+
+  // persian-style rug beneath the desk
+  const rugTex = useMemo(
+    () =>
+      canvasTex(1024, 768, (ctx) => {
+        ctx.fillStyle = "#4a1a12";
+        ctx.fillRect(0, 0, 1024, 768);
+        // outer border
+        ctx.strokeStyle = "#2a0f08";
+        ctx.lineWidth = 40;
+        ctx.strokeRect(20, 20, 984, 728);
+        // inner border with gold key pattern
+        ctx.strokeStyle = "#8a6a2a";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(90, 70, 844, 628);
+        ctx.strokeRect(110, 90, 804, 588);
+        // central medallion
+        ctx.strokeStyle = "#a67a30";
+        ctx.lineWidth = 2;
+        for (let r = 40; r < 220; r += 22) {
+          ctx.beginPath();
+          ctx.ellipse(512, 384, r * 1.4, r, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        // corner filigree
+        for (const [cx, cy] of [
+          [200, 180],
+          [824, 180],
+          [200, 588],
+          [824, 588],
+        ]) {
+          ctx.strokeStyle = "#7a5a24";
+          ctx.beginPath();
+          ctx.arc(cx, cy, 55, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(cx, cy, 32, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        // repeating floral motifs
+        for (let i = 0; i < 220; i++) {
+          ctx.fillStyle = `rgba(${180 + Math.random() * 40},${120 + Math.random() * 40},${40 + Math.random() * 40},0.35)`;
+          ctx.beginPath();
+          ctx.arc(120 + Math.random() * 784, 120 + Math.random() * 528, 2 + Math.random() * 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // wear/fade
+        for (let i = 0; i < 900; i++) {
+          ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.14})`;
+          ctx.fillRect(Math.random() * 1024, Math.random() * 768, 2, 2);
+        }
+      }),
+    [],
+  );
+
+  // oil-painting canvases (dark academy landscapes / portraits, abstract)
+  const paintingTex = (seed: number) =>
+    canvasTex(256, 320, (ctx) => {
+      const rand = (i: number) => {
+        const x = Math.sin((seed + i) * 999) * 43758.5453;
+        return x - Math.floor(x);
+      };
+      // dark base
+      const g = ctx.createLinearGradient(0, 0, 0, 320);
+      g.addColorStop(0, "#1a1208");
+      g.addColorStop(0.5, "#2a1a10");
+      g.addColorStop(1, "#0d0704");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 256, 320);
+      // horizon suggestion
+      ctx.fillStyle = "rgba(180,120,60,0.15)";
+      ctx.fillRect(0, 190 + rand(1) * 40, 256, 8);
+      // brush-stroke shapes (loose foliage / figure silhouettes)
+      for (let i = 0; i < 60; i++) {
+        const alpha = 0.08 + rand(i * 3) * 0.12;
+        ctx.fillStyle = `rgba(${120 + rand(i) * 60},${70 + rand(i + 1) * 50},${30 + rand(i + 2) * 30},${alpha})`;
+        ctx.beginPath();
+        ctx.ellipse(
+          rand(i * 7) * 256,
+          40 + rand(i * 11) * 220,
+          6 + rand(i * 13) * 30,
+          3 + rand(i * 17) * 12,
+          rand(i * 19) * Math.PI,
+          0,
+          Math.PI * 2,
+        );
+        ctx.fill();
+      }
+      // varnish highlight
+      const v = ctx.createLinearGradient(0, 0, 256, 320);
+      v.addColorStop(0, "rgba(255,220,160,0.06)");
+      v.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = v;
+      ctx.fillRect(0, 0, 256, 320);
+    });
+
+  const paintings = useMemo(() => [paintingTex(2), paintingTex(7), paintingTex(13), paintingTex(19)], []);
+
   return (
     <group>
       {/* floor */}
@@ -1174,46 +1400,140 @@ function Room() {
         <planeGeometry args={[120, 120]} />
         <meshStandardMaterial map={floorTex} roughness={0.95} />
       </mesh>
-      {/* back wall */}
-      <mesh position={[0, 12, -34]} receiveShadow>
-        <planeGeometry args={[120, 40]} />
+      {/* rug beneath desk */}
+      <mesh position={[0, -3.49, 4]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[38, 28]} />
+        <meshStandardMaterial map={rugTex} roughness={0.9} />
+      </mesh>
+
+      {/* back wall upper (wallpaper) */}
+      <mesh position={[0, 16, -34]} receiveShadow>
+        <planeGeometry args={[120, 32]} />
         <meshStandardMaterial map={wallTex} roughness={0.95} />
       </mesh>
-      {/* side wall left */}
-      <mesh position={[-42, 12, 0]} rotation={[0, Math.PI / 2, 0]}>
-        <planeGeometry args={[120, 40]} />
+      {/* back wall wainscoting (lower) */}
+      <mesh position={[0, 2, -33.9]} receiveShadow>
+        <planeGeometry args={[120, 12]} />
+        <meshStandardMaterial map={wainscotTex} roughness={0.85} />
+      </mesh>
+      {/* crown molding rail */}
+      <mesh position={[0, 8, -33.85]}>
+        <boxGeometry args={[120, 0.35, 0.4]} />
+        <meshStandardMaterial color="#3a2410" roughness={0.6} metalness={0.15} />
+      </mesh>
+      <mesh position={[0, 8.35, -33.83]}>
+        <boxGeometry args={[120, 0.12, 0.5]} />
+        <meshStandardMaterial color="#c48b3a" metalness={0.85} roughness={0.35} />
+      </mesh>
+      {/* baseboard trim */}
+      <mesh position={[0, -3.1, -33.83]}>
+        <boxGeometry args={[120, 0.6, 0.4]} />
+        <meshStandardMaterial color="#1a0f08" roughness={0.9} />
+      </mesh>
+
+      {/* side wall left (mirror same treatment) */}
+      <mesh position={[-42, 16, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[120, 32]} />
         <meshStandardMaterial map={wallTex} roughness={0.95} />
+      </mesh>
+      <mesh position={[-41.9, 2, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[120, 12]} />
+        <meshStandardMaterial map={wainscotTex} roughness={0.85} />
       </mesh>
       {/* side wall right */}
-      <mesh position={[42, 12, 0]} rotation={[0, -Math.PI / 2, 0]}>
-        <planeGeometry args={[120, 40]} />
+      <mesh position={[42, 16, 0]} rotation={[0, -Math.PI / 2, 0]}>
+        <planeGeometry args={[120, 32]} />
         <meshStandardMaterial map={wallTex} roughness={0.95} />
       </mesh>
-      {/* framed photos on back wall */}
-      {[-16, -6, 6, 16].map((x, i) => (
-        <group key={i} position={[x, 10, -33.7]}>
-          <mesh>
-            <planeGeometry args={[4.4, 5.2]} />
-            <meshStandardMaterial color="#c48b3a" metalness={0.7} roughness={0.4} />
+      <mesh position={[41.9, 2, 0]} rotation={[0, -Math.PI / 2, 0]}>
+        <planeGeometry args={[120, 12]} />
+        <meshStandardMaterial map={wainscotTex} roughness={0.85} />
+      </mesh>
+
+      {/* framed oil paintings on back wall — ornate brass frames + inner mat + canvas */}
+      {[-18, -6, 6, 18].map((x, i) => (
+        <group key={i} position={[x, 13, -33.65]}>
+          {/* outer ornate frame */}
+          <mesh castShadow>
+            <planeGeometry args={[5.4, 6.6]} />
+            <meshStandardMaterial color="#8a5a1e" metalness={0.9} roughness={0.35} />
           </mesh>
+          {/* inner frame bevel */}
+          <mesh position={[0, 0, 0.01]}>
+            <planeGeometry args={[4.8, 6]} />
+            <meshStandardMaterial color="#c48b3a" metalness={0.95} roughness={0.28} />
+          </mesh>
+          {/* mat */}
           <mesh position={[0, 0, 0.02]}>
-            <planeGeometry args={[3.8, 4.6]} />
-            <meshStandardMaterial color={i % 2 ? "#1a1a1a" : "#241608"} roughness={0.9} />
+            <planeGeometry args={[4.3, 5.5]} />
+            <meshStandardMaterial color="#1a0f08" roughness={0.9} />
+          </mesh>
+          {/* the painting */}
+          <mesh position={[0, 0, 0.03]}>
+            <planeGeometry args={[3.9, 5.1]} />
+            <meshStandardMaterial map={paintings[i]} roughness={0.75} />
+          </mesh>
+          {/* small brass nameplate */}
+          <mesh position={[0, -3.5, 0.02]}>
+            <planeGeometry args={[1.6, 0.28]} />
+            <meshStandardMaterial color="#d5a04a" metalness={0.9} roughness={0.3} />
           </mesh>
         </group>
       ))}
-      {/* wall lamp glow patches */}
-      <mesh position={[-20, 16, -33.5]}>
-        <circleGeometry args={[4, 32]} />
-        <meshBasicMaterial color="#ffb060" transparent opacity={0.08} />
-      </mesh>
-      <mesh position={[20, 16, -33.5]}>
-        <circleGeometry args={[4, 32]} />
-        <meshBasicMaterial color="#ffb060" transparent opacity={0.08} />
-      </mesh>
+
+      {/* leather-bound bookshelf silhouette against the far left side wall */}
+      <group position={[-41.7, 3, -18]} rotation={[0, Math.PI / 2, 0]}>
+        {/* shelf backing */}
+        <mesh>
+          <planeGeometry args={[14, 12]} />
+          <meshStandardMaterial color="#1c1108" roughness={0.9} />
+        </mesh>
+        {/* shelves */}
+        {[-3.5, -0.5, 2.5, 5.5].map((y, s) => (
+          <group key={s} position={[0, y, 0.02]}>
+            <mesh>
+              <planeGeometry args={[14, 0.25]} />
+              <meshStandardMaterial color="#3a2410" roughness={0.7} />
+            </mesh>
+            {/* books as tiny vertical rectangles with random hues */}
+            {Array.from({ length: 22 }).map((_, b) => {
+              const w = 0.35 + ((b * 37) % 100) / 500;
+              const h = 1.6 + ((b * 53) % 100) / 100;
+              const hue = ["#5a2a1a", "#3a2418", "#6a4020", "#2a1810", "#4a1810", "#3a2a1a"][b % 6];
+              return (
+                <mesh key={b} position={[-6.8 + b * 0.6 + w / 2, h / 2 + 0.15, 0.05]}>
+                  <planeGeometry args={[w, h]} />
+                  <meshStandardMaterial color={hue} roughness={0.85} />
+                </mesh>
+              );
+            })}
+          </group>
+        ))}
+      </group>
+
+      {/* wall sconces — brass cups with warm halo glow flanking the paintings */}
+      {[-26, 26].map((x, i) => (
+        <group key={i} position={[x, 15, -33.6]}>
+          <mesh>
+            <cylinderGeometry args={[0.35, 0.55, 0.9, 20]} />
+            <meshStandardMaterial color="#c48b3a" metalness={0.95} roughness={0.28} />
+          </mesh>
+          <mesh position={[0, 0.5, 0]}>
+            <sphereGeometry args={[0.25, 12, 12]} />
+            <meshBasicMaterial color="#ffcf88" transparent opacity={0.85} />
+          </mesh>
+          {/* halo on wallpaper behind */}
+          <mesh position={[0, 0.5, 0.1]}>
+            <circleGeometry args={[3.2, 40]} />
+            <meshBasicMaterial color="#ffb060" transparent opacity={0.12} depthWrite={false} />
+          </mesh>
+          <pointLight position={[0, 0.5, 1]} color="#ffb060" intensity={0.6} distance={9} decay={2} />
+        </group>
+      ))}
     </group>
   );
 }
+
 
 function DustMotes() {
   const ref = useRef<THREE.Points>(null);
@@ -1385,7 +1705,7 @@ export function DetectiveDesk({ className = "" }: Props) {
             <BusinessCard />
             <EvidenceBag />
             <Typewriter />
-            <Ashtray />
+            <Candle />
           </SpinningDesk>
           <DustMotes />
 
