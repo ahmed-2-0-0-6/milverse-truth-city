@@ -137,11 +137,13 @@ function Tabletop() {
         <planeGeometry args={[26, 16]} />
         <meshStandardMaterial color="#1a0d06" roughness={0.9} metalness={0} />
       </mesh>
-      {/* Brass trim around the blotter */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.008, 0.5]}>
-        <ringGeometry args={[12.6, 13.0, 64]} />
-        <meshStandardMaterial color="#8a6420" roughness={0.35} metalness={0.9} />
-      </mesh>
+      {/* Faint brass corner accents on the blotter */}
+      {[[-12.5, -7.5], [12.5, -7.5], [-12.5, 7.5], [12.5, 7.5]].map(([x, z], i) => (
+        <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.008, z + 0.5]}>
+          <ringGeometry args={[0.35, 0.5, 16]} />
+          <meshStandardMaterial color="#a8792a" roughness={0.3} metalness={0.9} />
+        </mesh>
+      ))}
     </group>
   );
 }
