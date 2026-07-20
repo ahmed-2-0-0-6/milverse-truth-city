@@ -4928,7 +4928,19 @@ button[title*="lovable" i] {
   .detective-desk .desk-ink-arrow,
   .detective-desk .desk-ink-label,
   .detective-desk .desk-reelcue,
-  .detective-desk .desk-smoke { animation: none; }
+  .detective-desk .desk-smoke,
+  .detective-desk .desk-decrypt,
+  .detective-desk .desk-decrypt-dot,
+  .detective-desk .desk-decrypt-bar i,
+  .detective-desk .desk-decrypt-hex::before,
+  .detective-desk .desk-decrypt-hex::after,
+  .detective-desk .desk-decrypt-pct::before,
+  .detective-desk .desk-call,
+  .detective-desk .desk-call-ring,
+  .detective-desk .desk-call-dot,
+  .detective-desk .desk-strip-track { animation: none; }
+  .detective-desk .desk-call { opacity: 0; }
+  .detective-desk .desk-decrypt { opacity: 0.9; }
   .detective-desk .desk-coldopen { display: none; }
   .detective-desk .desk-ink { opacity: 0.9; }
   .detective-desk .desk-ink-circle,
