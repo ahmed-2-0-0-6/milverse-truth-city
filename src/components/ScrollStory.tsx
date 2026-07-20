@@ -12,7 +12,7 @@ import archiveArt from "@/assets/district-archive.jpg";
 import cleanroomArt from "@/assets/district-cleanroom.jpg";
 import mirrorVideo from "@/assets/mirror.mp4.asset.json";
 import gothamDeskArt from "@/assets/detective-desk-gotham.jpg";
-import gothamBoardPortraitArt from "@/assets/detective-board-gotham-portrait.jpg";
+import gothamBoardPortraitArt from "@/assets/detective-board-gotham-wide.jpg";
 
 const BEAT_BACKDROPS: (string | undefined)[] = [
   undefined,
