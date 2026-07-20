@@ -1537,12 +1537,6 @@ export function DetectiveDesk({ className = "" }: Props) {
         <span className="desk-print-label">PRINT · MATCH 87%</span>
       </div>
 
-      {/* Peel-back sticky note — handwritten warning */}
-      <div className="desk-sticky" aria-hidden="true">
-        <span className="desk-sticky-line">DO NOT</span>
-        <span className="desk-sticky-line">TRUST</span>
-        <span className="desk-sticky-line">HIM.</span>
-      </div>
 
       {/* Morse LED — blinks "SOS" then pauses */}
       <div className="desk-morse" aria-hidden="true">
@@ -1584,15 +1578,6 @@ export function DetectiveDesk({ className = "" }: Props) {
 
 
 
-      {/* Sonar sweep — rotating arm with concentric rings + contact blip */}
-      <div className="desk-sonar" aria-hidden="true">
-        <span className="desk-sonar-ring r1" />
-        <span className="desk-sonar-ring r2" />
-        <span className="desk-sonar-ring r3" />
-        <span className="desk-sonar-arm" />
-        <span className="desk-sonar-blip" />
-        <span className="desk-sonar-tag">SWEEP · 3.2 km</span>
-      </div>
 
       {/* Coordinates trace HUD — retargets every ~9s with a glitch */}
       <div className="desk-coords" aria-hidden="true">
