@@ -268,34 +268,24 @@ export function ScrollStory() {
             {BEAT_BACKDROPS[i] && (
               <>
                 <div
-                  className="absolute inset-0 bg-cover bg-center opacity-75 blur-sm scale-105"
+                  className="absolute inset-0 bg-cover bg-center opacity-70 blur-sm scale-105"
                   style={{
                     backgroundImage: `url(${BEAT_BACKDROPS[i]})`,
                     filter: "saturate(0.9) contrast(1.06) blur(8px)",
                   }}
                 />
                 <div
-                  className="absolute inset-y-0 left-0 w-[58%] bg-cover bg-no-repeat"
+                  className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                   style={{
                     backgroundImage: `url(${BEAT_BACKDROPS[i]})`,
-                    backgroundPosition: "left center",
-                    filter: "saturate(0.96) contrast(1.16)",
+                    filter: "saturate(0.96) contrast(1.14)",
                   }}
                 />
-                <div
-                  className="absolute inset-y-0 right-0 w-[58%] bg-cover bg-no-repeat"
-                  style={{
-                    backgroundImage: `url(${BEAT_BACKDROPS[i]})`,
-                    backgroundPosition: "right center",
-                    filter: "saturate(0.92) contrast(1.12)",
-                  }}
-                />
-                <div className="absolute inset-y-0 left-[36%] w-[28%] bg-[radial-gradient(ellipse_at_center,color-mix(in_oklab,var(--background)_24%,transparent),color-mix(in_oklab,var(--background)_76%,transparent)_72%,color-mix(in_oklab,var(--background)_92%,transparent))]" />
                 <div
                   className="absolute inset-0"
                   style={{
                     background:
-                      "radial-gradient(70% 42% at 50% 50%, rgba(3,6,12,0.28) 0%, rgba(3,6,12,0.5) 58%, rgba(0,0,0,0.84) 100%), linear-gradient(180deg, rgba(10,20,35,0.16) 0%, rgba(5,8,14,0.34) 100%)",
+                      "radial-gradient(72% 44% at 50% 52%, rgba(3,6,12,0.2) 0%, rgba(3,6,12,0.44) 58%, rgba(0,0,0,0.82) 100%), linear-gradient(180deg, rgba(10,20,35,0.12) 0%, rgba(5,8,14,0.3) 100%)",
                   }}
                 />
               </>
