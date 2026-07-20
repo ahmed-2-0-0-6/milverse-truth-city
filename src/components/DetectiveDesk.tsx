@@ -127,9 +127,22 @@ function Tabletop() {
     });
   }, []);
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} material={mat}>
-      <planeGeometry args={[60, 40]} />
-    </mesh>
+    <group>
+      {/* Massive tabletop that reaches beyond the viewport so no bg shows */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} material={mat}>
+        <planeGeometry args={[120, 90]} />
+      </mesh>
+      {/* Dark leather blotter under the central pool of files */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0.5]}>
+        <planeGeometry args={[26, 16]} />
+        <meshStandardMaterial color="#1a0d06" roughness={0.9} metalness={0} />
+      </mesh>
+      {/* Brass trim around the blotter */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.008, 0.5]}>
+        <ringGeometry args={[12.6, 13.0, 64]} />
+        <meshStandardMaterial color="#8a6420" roughness={0.35} metalness={0.9} />
+      </mesh>
+    </group>
   );
 }
 
