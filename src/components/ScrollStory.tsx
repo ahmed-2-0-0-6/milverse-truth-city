@@ -12,11 +12,11 @@ import archiveArt from "@/assets/district-archive.jpg";
 import cleanroomArt from "@/assets/district-cleanroom.jpg";
 import mirrorVideo from "@/assets/mirror.mp4.asset.json";
 import gothamDeskArt from "@/assets/detective-desk-gotham.jpg";
-import gothamBoardArt from "@/assets/detective-board-gotham.jpg";
+import gothamBoardPortraitArt from "@/assets/detective-board-gotham-portrait.jpg";
 
 const BEAT_BACKDROPS: (string | undefined)[] = [
   undefined,
-  gothamBoardArt,
+  gothamBoardPortraitArt,
   undefined,
   undefined,
 ];
@@ -77,15 +77,22 @@ const DISTRICTS: District[] = [
 
 const BEATS = [
   {
+    eyebrow: "CASE ARRIVAL",
     headline: "Every day, someone in your family gets a message.",
     sub: "It's already happened this week. Maybe today.",
   },
-  { headline: "It looks real. It sounds real.", sub: "Perfect grammar. Familiar face. Small ask." },
   {
+    eyebrow: "EVIDENCE BOARD",
+    headline: "It looks real. It sounds real.",
+    sub: "Perfect grammar. Familiar face. Small ask.",
+  },
+  {
+    eyebrow: "THE COUNTER-MOVE",
     headline: "Spotting fakes is dying. Verifying is forever.",
     sub: "You can't out-see a machine. You can out-verify one.",
   },
   {
+    eyebrow: "ENTER THE CITY",
     headline: "This is MILVERSE.",
     sub: "Walk in as a target. Walk out as a designer.",
     finale: true,
@@ -146,11 +153,13 @@ export function ScrollStory() {
               toggleActions: "play none none reverse",
             },
           });
-          gsap.to(el.querySelector(".beat-bg"), {
-            yPercent: -20,
-            ease: "none",
-            scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: 0.6 },
-          });
+          if (!el.classList.contains("story-beat--image")) {
+            gsap.to(el.querySelector(".beat-bg"), {
+              yPercent: -20,
+              ease: "none",
+              scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: 0.6 },
+            });
+          }
         });
 
         // Horizontal district gallery
@@ -253,23 +262,30 @@ export function ScrollStory() {
       {BEATS.map((b, i) => (
         <section
           key={i}
-          className={`story-beat relative min-h-screen flex items-center justify-center overflow-hidden px-6 ${b.finale ? "finale-beat" : ""}`}
+          className={`story-beat relative min-h-screen flex items-center justify-center overflow-hidden px-6 ${BEAT_BACKDROPS[i] ? "story-beat--image" : ""} ${b.finale ? "finale-beat" : ""}`}
         >
-          <div className="beat-bg absolute inset-0 -z-10" aria-hidden>
+          <div className="beat-bg pointer-events-none absolute -inset-y-[24vh] inset-x-0 z-[1]" aria-hidden>
             {BEAT_BACKDROPS[i] && (
               <>
                 <div
-                  className="absolute inset-0 bg-cover bg-center"
+                  className="absolute inset-0 bg-cover bg-center opacity-70 blur-sm scale-105"
                   style={{
                     backgroundImage: `url(${BEAT_BACKDROPS[i]})`,
-                    filter: "saturate(0.85) contrast(1.05)",
+                    filter: "saturate(0.9) contrast(1.06) blur(8px)",
+                  }}
+                />
+                <div
+                  className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                  style={{
+                    backgroundImage: `url(${BEAT_BACKDROPS[i]})`,
+                    filter: "saturate(0.96) contrast(1.14)",
                   }}
                 />
                 <div
                   className="absolute inset-0"
                   style={{
                     background:
-                      "radial-gradient(120% 80% at 50% 45%, rgba(3,6,12,0.35) 30%, rgba(3,6,12,0.7) 70%, rgba(0,0,0,0.92) 100%), linear-gradient(180deg, rgba(10,20,35,0.3) 0%, rgba(5,8,14,0.55) 100%)",
+                      "radial-gradient(72% 44% at 50% 52%, rgba(3,6,12,0.2) 0%, rgba(3,6,12,0.44) 58%, rgba(0,0,0,0.82) 100%), linear-gradient(180deg, rgba(10,20,35,0.12) 0%, rgba(5,8,14,0.3) 100%)",
                   }}
                 />
               </>
@@ -283,13 +299,23 @@ export function ScrollStory() {
           </div>
 
 
-          <div className="relative z-10 max-w-4xl text-center">
+          <div className="beat-copy relative z-[2] max-w-5xl text-center">
 
-            <div className="stencil text-[10px] text-cyan-300/70 mb-6">BEAT · 0{i + 1} / 04</div>
+            <div className="beat-overline beat-line mb-7">
+              <span>{b.eyebrow}</span>
+              <span>BEAT · 0{i + 1} / 04</span>
+            </div>
             <TypedHeadline text={b.headline} />
-            <p className="beat-line mt-6 text-base sm:text-lg text-white/60 max-w-xl mx-auto">
+            <p className="beat-line beat-subtitle mt-6 max-w-xl mx-auto">
               {b.sub}
             </p>
+            {BEAT_BACKDROPS[i] && (
+              <div className="beat-line beat-evidence-strip mt-8" aria-hidden>
+                <span>FACE MATCH</span>
+                <span>VOICE CLEAN</span>
+                <span>ASK SMALL</span>
+              </div>
+            )}
             {b.finale && (
               <div className="beat-line mt-10 grid grid-cols-3 gap-4 max-w-xl mx-auto">
                 <Stat label="CASES" value={128} />
@@ -304,10 +330,10 @@ export function ScrollStory() {
 
       {/* MIL triad — judge-proofing */}
       <section className="story-beat relative min-h-[80vh] flex items-center justify-center overflow-hidden px-6 border-y border-white/5">
-        <div className="beat-bg absolute inset-0 -z-10" aria-hidden>
+        <div className="beat-bg pointer-events-none absolute inset-0 z-[1]" aria-hidden>
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/[0.05] to-transparent" />
         </div>
-        <div className="relative max-w-5xl text-center">
+        <div className="relative z-[2] max-w-5xl text-center">
           <div className="stencil text-[10px] text-cyan-300/70 mb-6">THE THESIS</div>
           <h2
             className="beat-line text-3xl sm:text-5xl font-black leading-tight tracking-tight text-white mb-10"
