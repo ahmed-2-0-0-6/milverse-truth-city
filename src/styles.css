@@ -3509,6 +3509,140 @@ button[title*="lovable" i] {
   z-index: 2;
 }
 
+/* Interactive cursor-follow reader's light — updates via CSS vars, GPU-only */
+.detective-desk .desk-reader-light {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  --rx: 50%;
+  --ry: 55%;
+  background: radial-gradient(
+    18vmin 18vmin at var(--rx) var(--ry),
+    rgba(255, 200, 120, 0.35),
+    rgba(255, 170, 80, 0.14) 35%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  transition: background-position 0.15s linear;
+}
+@media (prefers-reduced-motion: reduce) {
+  .detective-desk .desk-reader-light { display: none; }
+}
+
+/* Rainy window on the back wall — SVG streaks + cool light bleed */
+.detective-desk .desk-window {
+  position: absolute;
+  top: 8%; right: 6%;
+  width: 22%; height: 32%;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 0 3px rgba(90, 60, 30, 0.55),
+    inset 0 0 40px rgba(120, 160, 200, 0.18),
+    0 0 60px rgba(80, 130, 180, 0.12);
+  background: linear-gradient(160deg, rgba(30, 50, 80, 0.55), rgba(10, 18, 32, 0.85));
+  pointer-events: none;
+}
+.detective-desk .desk-window::before {
+  /* mullions (cross bars) */
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(to right, transparent 49.5%, rgba(60, 40, 20, 0.85) 49.5%, rgba(60, 40, 20, 0.85) 50.5%, transparent 50.5%),
+    linear-gradient(to bottom, transparent 49.5%, rgba(60, 40, 20, 0.85) 49.5%, rgba(60, 40, 20, 0.85) 50.5%, transparent 50.5%);
+}
+.detective-desk .desk-window-glow {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(80% 60% at 50% 40%, rgba(140, 180, 230, 0.35), transparent 70%),
+    radial-gradient(30% 20% at 20% 20%, rgba(200, 220, 255, 0.6), transparent 70%);
+  animation: dd-lightning 8s ease-in-out infinite;
+}
+@keyframes dd-lightning {
+  0%, 92%, 100% { opacity: 0.75; filter: brightness(1); }
+  93%           { opacity: 1;   filter: brightness(1.9); }
+  94%           { opacity: 0.6; filter: brightness(0.7); }
+  95%           { opacity: 1;   filter: brightness(1.6); }
+  97%           { opacity: 0.8; filter: brightness(1); }
+}
+.detective-desk .desk-rain {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .detective-desk .desk-window-glow { animation: none; }
+  .detective-desk .desk-rain animate { display: none; }
+}
+
+/* Case-file HUD ticker (top-left) — typewriter reveal */
+.detective-desk .desk-hud {
+  position: absolute; top: 3.2%; left: 3%;
+  z-index: 5;
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  padding: 0.35rem 0.7rem;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: rgba(255, 210, 150, 0.9);
+  background: rgba(10, 6, 3, 0.55);
+  border: 1px solid rgba(210, 160, 90, 0.35);
+  border-radius: 2px;
+  box-shadow: 0 0 22px rgba(255, 170, 80, 0.15), inset 0 0 8px rgba(0,0,0,0.5);
+  backdrop-filter: blur(2px);
+  overflow: hidden;
+  max-width: max-content;
+  animation: dd-hud-type 3.5s steps(30, end) 0.4s both;
+  white-space: nowrap;
+}
+.detective-desk .desk-hud-dot {
+  width: 6px; height: 6px; border-radius: 999px;
+  background: #ff5a2a;
+  box-shadow: 0 0 8px #ff5a2a;
+  animation: dd-hud-blink 1.4s ease-in-out infinite;
+}
+.detective-desk .desk-hud-label { opacity: 0.75; }
+.detective-desk .desk-hud-num { color: rgba(255, 230, 190, 1); font-weight: 700; }
+.detective-desk .desk-hud-status { color: rgba(120, 220, 140, 0.9); }
+@keyframes dd-hud-type {
+  from { max-width: 0; }
+  to   { max-width: 320px; }
+}
+@keyframes dd-hud-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.25; }
+}
+
+/* Diagonal CONFIDENTIAL stamp (bottom-right) — worn ink */
+.detective-desk .desk-hud-stamp {
+  position: absolute;
+  right: 3%; bottom: 9%;
+  z-index: 5;
+  padding: 0.35rem 1.1rem;
+  font-family: "Bebas Neue", Impact, sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.35em;
+  color: rgba(190, 30, 30, 0.75);
+  border: 3px solid rgba(190, 30, 30, 0.65);
+  border-radius: 3px;
+  transform: rotate(-12deg);
+  opacity: 0;
+  animation: dd-stamp-hit 0.4s cubic-bezier(0.2, 1.2, 0.4, 1) 1.6s forwards;
+  text-shadow: 0 0 1px rgba(190, 30, 30, 0.6);
+  filter: url(#none);
+  mix-blend-mode: multiply;
+}
+@keyframes dd-stamp-hit {
+  0%   { opacity: 0; transform: rotate(-12deg) scale(1.6); }
+  100% { opacity: 0.85; transform: rotate(-12deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .detective-desk .desk-hud { animation: none; max-width: none; }
+  .detective-desk .desk-hud-dot { animation: none; }
+  .detective-desk .desk-hud-stamp { animation: none; opacity: 0.85; }
+}
+
+
 /* Cinematic film grain overlay — pure CSS, GPU compositor only */
 .detective-desk::after {
   content: "";
