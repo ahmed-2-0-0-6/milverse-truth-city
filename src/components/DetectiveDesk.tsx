@@ -1708,7 +1708,49 @@ export function DetectiveDesk({ className = "" }: Props) {
           filter="url(#desk-smoke-turb)"
         />
       </svg>
+
+      {/* Live decryption HUD — top-left, deterministic loop */}
+      <div className="desk-decrypt" aria-hidden="true">
+        <div className="desk-decrypt-head">
+          <span className="desk-decrypt-dot" />
+          <span>DECRYPTING · AES-256</span>
+          <span className="desk-decrypt-tag">SIGINT</span>
+        </div>
+        <div className="desk-decrypt-bar"><i /></div>
+        <div className="desk-decrypt-hex" data-r1="a3f9 c210 88bd 44e0" data-r2="7b2c 9f01 3a5e d8c4" />
+        <div className="desk-decrypt-status">
+          <span>KEY EXCHANGE OK</span><span>·</span><span>HANDSHAKE</span><span>·</span><span className="desk-decrypt-pct" />
+        </div>
+      </div>
+
+      {/* Incoming call — rotary card, rings on 34s cycle */}
+      <div className="desk-call" aria-hidden="true">
+        <div className="desk-call-ring" />
+        <div className="desk-call-body">
+          <div className="desk-call-head">
+            <span className="desk-call-dot" />
+            <span className="desk-call-label">INCOMING</span>
+            <span className="desk-call-time">00:00</span>
+          </div>
+          <div className="desk-call-num">+92 3•• ••• ••••</div>
+          <div className="desk-call-meta">UNKNOWN CALLER · KARACHI CELL</div>
+          <div className="desk-call-btns">
+            <span className="desk-call-btn accept">ACCEPT</span>
+            <span className="desk-call-btn reject">DECLINE</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Filmstrip timeline — bottom edge, marquee of case moments */}
+      <div className="desk-strip" aria-hidden="true">
+        <div className="desk-strip-track">
+          {["06:14 · CALL INTERCEPT · +92 3•• ••7412","06:31 · SMS · JAZZCASH ALERT","06:47 · WHATSAPP · IMPERSONATION","07:02 · WIRE HOLD · 128,400 PKR","07:19 · IP TRACE · KHI/DHA-05","07:36 · VOICE MATCH · 91%","07:52 · MULE FLAGGED · A/C ••3391","08:07 · WARRANT · PENDING","08:24 · UNIT DISPATCH · TAC-02","08:41 · SUBJECT IN CUSTODY","06:14 · CALL INTERCEPT · +92 3•• ••7412","06:31 · SMS · JAZZCASH ALERT","06:47 · WHATSAPP · IMPERSONATION","07:02 · WIRE HOLD · 128,400 PKR","07:19 · IP TRACE · KHI/DHA-05","07:36 · VOICE MATCH · 91%","07:52 · MULE FLAGGED · A/C ••3391","08:07 · WARRANT · PENDING","08:24 · UNIT DISPATCH · TAC-02","08:41 · SUBJECT IN CUSTODY"].map((s,i)=>(
+            <span key={i} className="desk-strip-cell"><i className="desk-strip-perf" /><i className="desk-strip-perf b" /><em>{s}</em></span>
+          ))}
+        </div>
+      </div>
     </div>
+
 
 
   );
