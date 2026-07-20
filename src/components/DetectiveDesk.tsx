@@ -1464,6 +1464,48 @@ export function DetectiveDesk({ className = "" }: Props) {
         <span className="desk-hud-status">/ ACTIVE</span>
       </div>
       <div className="desk-hud-stamp">CONFIDENTIAL</div>
+
+      {/* Audio intercept — waveform equalizer (compositor-only CSS) */}
+      <div className="desk-intercept" aria-hidden="true">
+        <span className="desk-intercept-rec" />
+        <span className="desk-intercept-label">AUDIO INTERCEPT · CH-07</span>
+        <span className="desk-eq">
+          <i /><i /><i /><i /><i /><i /><i /><i /><i /><i /><i /><i />
+        </span>
+        <span className="desk-intercept-time">00:04:12</span>
+      </div>
+
+      {/* Fingerprint scanner panel — SVG with scan line */}
+      <div className="desk-print" aria-hidden="true">
+        <svg viewBox="0 0 60 72" className="desk-print-svg">
+          <g fill="none" stroke="rgba(255,190,120,0.85)" strokeWidth="1.1" strokeLinecap="round">
+            <path d="M30 6c-11 0-20 9-20 22v8" />
+            <path d="M30 12c-8 0-14 7-14 16v10c0 4-1 8-3 12" />
+            <path d="M30 18c-5 0-9 5-9 11v13c0 5-2 10-5 14" />
+            <path d="M30 24c-3 0-5 3-5 7v14c0 6-2 12-6 17" />
+            <path d="M30 30c-1 0-2 1-2 3v14c0 7-3 14-8 20" />
+            <path d="M30 30c1 0 2 1 2 3v10c0 8 3 15 9 21" />
+            <path d="M30 24c3 0 5 3 5 7v10c0 9 4 17 11 24" />
+            <path d="M30 18c5 0 9 5 9 11v9c0 10 6 20 15 27" />
+            <path d="M30 12c8 0 14 7 14 16v7c0 12 8 23 20 30" />
+          </g>
+          <line className="desk-print-scan" x1="6" y1="0" x2="54" y2="0" stroke="rgba(120,255,190,0.9)" strokeWidth="1.4" />
+        </svg>
+        <span className="desk-print-label">PRINT · MATCH 87%</span>
+      </div>
+
+      {/* Peel-back sticky note — handwritten warning */}
+      <div className="desk-sticky" aria-hidden="true">
+        <span className="desk-sticky-line">DO NOT</span>
+        <span className="desk-sticky-line">TRUST</span>
+        <span className="desk-sticky-line">HIM.</span>
+      </div>
+
+      {/* Morse LED — blinks "SOS" then pauses */}
+      <div className="desk-morse" aria-hidden="true">
+        <span className="desk-morse-led" />
+        <span className="desk-morse-tag">TX · SOS</span>
+      </div>
     </div>
   );
 }
