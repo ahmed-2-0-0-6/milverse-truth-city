@@ -4693,7 +4693,19 @@ button[title*="lovable" i] {
   .detective-desk .desk-poi-num::before,
   .detective-desk .desk-poi-threat-bar i,
   .detective-desk .desk-poi-threat-val,
-  .detective-desk .desk-thunder { animation: none; }
+  .detective-desk .desk-thunder,
+  .detective-desk .desk-coldopen,
+  .detective-desk .desk-ink,
+  .detective-desk .desk-ink-circle,
+  .detective-desk .desk-ink-arrow,
+  .detective-desk .desk-ink-label,
+  .detective-desk .desk-reelcue,
+  .detective-desk .desk-smoke { animation: none; }
+  .detective-desk .desk-coldopen { display: none; }
+  .detective-desk .desk-ink { opacity: 0.9; }
+  .detective-desk .desk-ink-circle,
+  .detective-desk .desk-ink-arrow { stroke-dashoffset: 0; }
+  .detective-desk .desk-ink-label { opacity: 0.95; }
   .detective-desk .desk-poi { opacity: 1; transform: none; }
 }
 
