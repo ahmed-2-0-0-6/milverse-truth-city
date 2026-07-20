@@ -1456,7 +1456,7 @@ export function DetectiveDesk({ className = "" }: Props) {
             <Ashtray />
             <Casings />
             <LetterOpener />
-            <Newspaper />
+            {/* Newspaper removed by request (no news headlines). */}
             <Envelope />
             <Badge />
             <Keyring />
