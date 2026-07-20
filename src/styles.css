@@ -4146,3 +4146,197 @@ button[title*="lovable" i] {
   .detective-desk .desk-poly-svg { height: 20px; }
   .detective-desk .desk-cctv-meta { font-size: 9px; }
 }
+
+/* ============================================================
+   DetectiveDesk — Dispatch scanner, Sonar sweep, Coordinates trace
+   (all compositor-only; no WebGL frame cost)
+   ============================================================ */
+
+/* --- Dispatch scanner marquee (top-center) --- */
+.detective-desk .desk-dispatch {
+  position: absolute; left: 22%; right: 22%; top: 12px;
+  z-index: 6; pointer-events: none;
+  display: flex; align-items: stretch;
+  height: 22px;
+  background: linear-gradient(180deg, rgba(10,6,3,0.78), rgba(6,3,1,0.85));
+  border: 1px solid rgba(255,180,110,0.22);
+  border-radius: 2px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35), 0 0 0 1px rgba(0,0,0,0.5) inset;
+  opacity: 0; animation: dd-cctv-in 0.5s ease-out 2.0s forwards;
+  overflow: hidden;
+}
+.detective-desk .desk-dispatch-band {
+  flex: 0 0 auto;
+  padding: 0 8px;
+  display: inline-flex; align-items: center;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 9.5px; letter-spacing: 0.18em;
+  color: rgba(255,220,180,0.75);
+  background: rgba(255,140,60,0.14);
+  border-right: 1px solid rgba(255,180,110,0.2);
+  white-space: nowrap;
+}
+.detective-desk .desk-dispatch-wrap {
+  position: relative; flex: 1; overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+}
+.detective-desk .desk-dispatch-wrap::after {
+  /* static crackle overlay */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    radial-gradient(rgba(255,255,255,0.18) 1px, transparent 1px);
+  background-size: 2px 2px;
+  mix-blend-mode: overlay;
+  opacity: 0.35;
+  animation: dd-grain 1.6s steps(6) infinite;
+}
+.detective-desk .desk-dispatch-track {
+  display: inline-flex; white-space: nowrap;
+  padding: 0 12px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10.5px; letter-spacing: 0.1em;
+  line-height: 22px;
+  color: rgba(255,220,180,0.9);
+  animation: dd-dispatch-scroll 42s linear infinite;
+  will-change: transform;
+}
+.detective-desk .desk-dispatch-track > span { padding-right: 4px; }
+@keyframes dd-dispatch-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* --- Sonar sweep (middle-left) --- */
+.detective-desk .desk-sonar {
+  position: absolute; left: 3.2%; top: 68%;
+  width: 96px; height: 96px;
+  z-index: 6; pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(120,255,190,0.08) 0%,
+    rgba(120,255,190,0.03) 60%,
+    transparent 100%);
+  border: 1px solid rgba(120,255,190,0.35);
+  box-shadow: 0 0 12px rgba(0,255,180,0.15), 0 0 0 1px rgba(0,0,0,0.55) inset;
+  opacity: 0; animation: dd-cctv-in 0.5s ease-out 2.3s forwards;
+  overflow: hidden;
+}
+.detective-desk .desk-sonar-ring {
+  position: absolute; left: 50%; top: 50%;
+  border: 1px solid rgba(120,255,190,0.55);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  animation: dd-sonar-ring 3.2s ease-out infinite;
+}
+.detective-desk .desk-sonar-ring.r1 { width: 12px; height: 12px; animation-delay: 0s; }
+.detective-desk .desk-sonar-ring.r2 { width: 12px; height: 12px; animation-delay: 1.05s; }
+.detective-desk .desk-sonar-ring.r3 { width: 12px; height: 12px; animation-delay: 2.1s; }
+@keyframes dd-sonar-ring {
+  0%   { width: 8px; height: 8px; opacity: 0.9; }
+  100% { width: 96px; height: 96px; opacity: 0; }
+}
+.detective-desk .desk-sonar-arm {
+  position: absolute; left: 50%; top: 50%;
+  width: 50%; height: 1.5px;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, rgba(120,255,190,0.95), transparent);
+  filter: drop-shadow(0 0 3px rgba(120,255,190,0.7));
+  animation: dd-sonar-spin 3.4s linear infinite;
+}
+@keyframes dd-sonar-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.detective-desk .desk-sonar-blip {
+  position: absolute; left: 68%; top: 34%;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: #7dff9a;
+  box-shadow: 0 0 8px #7dff9a;
+  opacity: 0;
+  animation: dd-sonar-blip 3.4s ease-out infinite;
+}
+@keyframes dd-sonar-blip {
+  0%, 22% { opacity: 0; transform: scale(1); }
+  25%     { opacity: 1; transform: scale(1.4); }
+  60%     { opacity: 0.4; }
+  100%    { opacity: 0; }
+}
+.detective-desk .desk-sonar-tag {
+  position: absolute; left: 0; right: 0; bottom: -14px;
+  text-align: center;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 8.5px; letter-spacing: 0.16em;
+  color: rgba(120,255,190,0.75);
+}
+
+/* --- Coordinates trace HUD (bottom-center, above polygraph) --- */
+.detective-desk .desk-coords {
+  position: absolute; left: 50%; bottom: 6.4rem;
+  transform: translateX(-50%);
+  z-index: 6; pointer-events: none;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 4px 10px;
+  background: rgba(6,3,1,0.72);
+  border: 1px solid rgba(255,180,110,0.22);
+  border-radius: 2px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10.5px; letter-spacing: 0.14em;
+  color: rgba(255,220,180,0.9);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+  opacity: 0; animation: dd-cctv-in 0.5s ease-out 2.7s forwards;
+}
+.detective-desk .desk-coords-key {
+  color: rgba(255,150,70,0.9);
+  border-right: 1px solid rgba(255,180,110,0.25);
+  padding-right: 8px;
+}
+.detective-desk .desk-coords-val {
+  position: relative;
+  display: inline-block;
+  width: 250px; height: 14px; overflow: hidden;
+}
+.detective-desk .desk-coords-val > span {
+  position: absolute; left: 0; top: 0;
+  width: 100%; white-space: nowrap;
+  opacity: 0;
+  animation: dd-coords-cycle 36s steps(1, end) infinite;
+}
+.detective-desk .desk-coords-val > span:nth-child(1) { animation-delay:  0s; }
+.detective-desk .desk-coords-val > span:nth-child(2) { animation-delay:  9s; }
+.detective-desk .desk-coords-val > span:nth-child(3) { animation-delay: 18s; }
+.detective-desk .desk-coords-val > span:nth-child(4) { animation-delay: 27s; }
+@keyframes dd-coords-cycle {
+  0%          { opacity: 0; transform: translateY(-6px); filter: blur(4px); }
+  1%, 3%      { opacity: 0.4; transform: translateY(0);  filter: blur(1.5px); } /* glitch settle */
+  4%, 25%     { opacity: 1; transform: translateY(0);   filter: blur(0); }
+  25.5%, 100% { opacity: 0; filter: blur(4px); }
+}
+.detective-desk .desk-coords-lock {
+  color: rgba(120,255,190,0.9);
+  border-left: 1px solid rgba(255,180,110,0.25);
+  padding-left: 8px;
+  animation: dd-hud-blink 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detective-desk .desk-dispatch-track,
+  .detective-desk .desk-dispatch-wrap::after,
+  .detective-desk .desk-sonar-arm,
+  .detective-desk .desk-sonar-ring,
+  .detective-desk .desk-sonar-blip,
+  .detective-desk .desk-coords-val > span,
+  .detective-desk .desk-coords-lock { animation: none; }
+  .detective-desk .desk-coords-val > span:first-child { opacity: 1; filter: none; }
+}
+
+@media (max-width: 640px) {
+  .detective-desk .desk-dispatch { left: 8%; right: 8%; height: 18px; }
+  .detective-desk .desk-dispatch-band { font-size: 8.5px; padding: 0 6px; }
+  .detective-desk .desk-dispatch-track { font-size: 9px; line-height: 18px; }
+  .detective-desk .desk-sonar { width: 68px; height: 68px; top: 62%; }
+  @keyframes dd-sonar-ring { 100% { width: 68px; height: 68px; opacity: 0; } }
+  .detective-desk .desk-coords { font-size: 9px; padding: 3px 7px; }
+  .detective-desk .desk-coords-val { width: 190px; }
+}

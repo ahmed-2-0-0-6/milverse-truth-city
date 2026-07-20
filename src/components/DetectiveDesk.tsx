@@ -1553,7 +1553,48 @@ export function DetectiveDesk({ className = "" }: Props) {
         <span className="desk-uv-mark">TRUTH · IS · A · WITNESS</span>
         <span className="desk-uv-tag">UV · 365nm</span>
       </div>
+
+      {/* Dispatch scanner — marquee police chatter across the top */}
+      <div className="desk-dispatch" aria-hidden="true">
+        <span className="desk-dispatch-band">DISPATCH · 154.115 MHz</span>
+        <div className="desk-dispatch-wrap">
+          <div className="desk-dispatch-track">
+            <span>10-4 · UNIT 34-BRAVO EN ROUTE · SUSPECT LAST SEEN I.I. CHUNDRIGAR · OVER &nbsp;·&nbsp; </span>
+            <span>ALL POINTS · BE ADVISED · WIRE-FRAUD IN PROGRESS · GRID 07 · REQUEST BACKUP &nbsp;·&nbsp; </span>
+            <span>10-20 CONFIRMED · SIGNAL FIVE · PHONE-SCAM ORIGIN TRACED TO CELL 21A &nbsp;·&nbsp; </span>
+            <span>COPY THAT · MAINTAIN VISUAL · DO NOT ENGAGE · REPEAT · DO NOT ENGAGE &nbsp;·&nbsp; </span>
+            {/* duplicate for seamless loop */}
+            <span>10-4 · UNIT 34-BRAVO EN ROUTE · SUSPECT LAST SEEN I.I. CHUNDRIGAR · OVER &nbsp;·&nbsp; </span>
+            <span>ALL POINTS · BE ADVISED · WIRE-FRAUD IN PROGRESS · GRID 07 · REQUEST BACKUP &nbsp;·&nbsp; </span>
+            <span>10-20 CONFIRMED · SIGNAL FIVE · PHONE-SCAM ORIGIN TRACED TO CELL 21A &nbsp;·&nbsp; </span>
+            <span>COPY THAT · MAINTAIN VISUAL · DO NOT ENGAGE · REPEAT · DO NOT ENGAGE &nbsp;·&nbsp; </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Sonar sweep — rotating arm with concentric rings + contact blip */}
+      <div className="desk-sonar" aria-hidden="true">
+        <span className="desk-sonar-ring r1" />
+        <span className="desk-sonar-ring r2" />
+        <span className="desk-sonar-ring r3" />
+        <span className="desk-sonar-arm" />
+        <span className="desk-sonar-blip" />
+        <span className="desk-sonar-tag">SWEEP · 3.2 km</span>
+      </div>
+
+      {/* Coordinates trace HUD — retargets every ~9s with a glitch */}
+      <div className="desk-coords" aria-hidden="true">
+        <span className="desk-coords-key">TRACE</span>
+        <span className="desk-coords-val">
+          <span>24.8607° N, 67.0011° E · KARACHI</span>
+          <span>33.6844° N, 73.0479° E · ISLAMABAD</span>
+          <span>31.5497° N, 74.3436° E · LAHORE</span>
+          <span>25.3960° N, 68.3578° E · HYDERABAD</span>
+        </span>
+        <span className="desk-coords-lock">LOCK</span>
+      </div>
     </div>
+
 
   );
 }
