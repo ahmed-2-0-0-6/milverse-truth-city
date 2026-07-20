@@ -397,13 +397,25 @@ function CaseFiles() {
   const paper = useMemo(buildPaperAtlas, []);
   const files = useMemo(() => {
     const rand = seeded(19);
+    // Exclusion footprints for large "furniture" props so papers never render
+    // clipping through their base. Radii are generous to cover shadows too.
+    const exclude: { x: number; z: number; r: number }[] = [
+      { x: -8,    z:  4,    r: 2.6 },   // Stapler
+      { x:  8.5,  z: -5,    r: 3.2 },   // Typewriter
+      { x:  7.2,  z: -6,    r: 2.4 },   // Rolodex
+      { x: -11.8, z: -6.8,  r: 2.2 },   // Cup + saucer
+      { x:  11.2, z: -6.9,  r: 1.9 },   // Candle tray
+      { x:  0,    z:  0,    r: 4.5 },   // Center clear zone (magnifier / focus)
+    ];
+    const clear = (x: number, z: number) =>
+      exclude.every(e => Math.hypot(x - e.x, (z - e.z) * 1.4) > e.r);
     const arr: { x: number; z: number; r: number; s: number; tile: number }[] = [];
     for (let i = 0; i < 18; i++) {
       let x = 0, z = 0;
-      for (let t = 0; t < 20; t++) {
+      for (let t = 0; t < 30; t++) {
         x = (rand() - 0.5) * 26;
         z = (rand() - 0.5) * 16;
-        if (Math.hypot(x, z * 1.4) > 4.5) break;
+        if (clear(x, z)) break;
       }
       arr.push({ x, z, r: (rand() - 0.5) * 1.6, s: 0.85 + rand() * 0.55, tile: Math.floor(rand() * 4) });
     }
@@ -995,6 +1007,24 @@ function PauseWhenHidden() {
     return () => document.removeEventListener("visibilitychange", on);
   }, [invalidate]);
   return null;
+}
+
+// Isolated once-per-second clock: owns its own state so the tick
+// never re-renders the parent 3D tree.
+function CctvClock({ reduced }: { reduced: boolean }) {
+  const [clock, setClock] = useState(() => {
+    const d = new Date();
+    return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`;
+  });
+  useEffect(() => {
+    if (reduced) return;
+    const id = window.setInterval(() => {
+      const d = new Date();
+      setClock(`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`);
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [reduced]);
+  return <>{clock}</>;
 }
 
 // ---------- scene root ----------
