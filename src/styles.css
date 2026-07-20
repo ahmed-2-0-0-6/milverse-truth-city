@@ -5324,3 +5324,287 @@ button[title*="lovable" i] {
   .detective-desk .desk-ribbon { transform: scale(0.75); transform-origin: top right; }
   .detective-desk .desk-clues { font-size: 9px; padding: 4px 10px; }
 }
+
+/* ============================================================
+   DETECTIVE DESK — V2 UPGRADES
+   Enhances existing layers with premium polish.
+   Overrides only; no new elements required.
+   ============================================================ */
+
+/* ---- Rain: thicker varied streaks + lightning-lit sheen ---- */
+.detective-desk .desk-rain {
+  filter: drop-shadow(0 0 2px rgba(180, 210, 255, 0.15));
+}
+.detective-desk .desk-rain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      100deg,
+      transparent 0 6px,
+      rgba(180, 210, 255, 0.08) 6px 7px,
+      transparent 7px 14px
+    ),
+    repeating-linear-gradient(
+      104deg,
+      transparent 0 22px,
+      rgba(200, 220, 255, 0.14) 22px 23.5px,
+      transparent 23.5px 46px
+    );
+  mix-blend-mode: screen;
+  opacity: 0.55;
+  animation: dd-rain-drift 1.6s linear infinite;
+  pointer-events: none;
+}
+@keyframes dd-rain-drift {
+  0%   { background-position: 0 0, 0 0; }
+  100% { background-position: -40px 240px, -80px 480px; }
+}
+
+/* Wet glass runoff pool at the bottom of the window */
+.detective-desk .desk-rain::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 22%;
+  background:
+    radial-gradient(ellipse at 25% 100%, rgba(180, 210, 255, 0.18), transparent 60%),
+    radial-gradient(ellipse at 70% 100%, rgba(200, 220, 255, 0.14), transparent 65%),
+    linear-gradient(180deg, transparent, rgba(120, 160, 200, 0.22));
+  mix-blend-mode: screen;
+  filter: blur(1.5px);
+  opacity: 0.85;
+  animation: dd-rain-pool 6s ease-in-out infinite;
+}
+@keyframes dd-rain-pool {
+  0%, 100% { transform: translateY(0); opacity: 0.75; }
+  50%      { transform: translateY(1px); opacity: 0.95; }
+}
+
+/* ---- Flashlight cursor: warm inner core + subtle chromatic ring ---- */
+.detective-desk .desk-flashlight {
+  background:
+    radial-gradient(
+      420px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 232, 190, 0.18) 0%,
+      rgba(255, 200, 140, 0.10) 22%,
+      rgba(180, 140, 90, 0.05) 45%,
+      transparent 68%
+    ),
+    radial-gradient(
+      180px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 244, 220, 0.22) 0%,
+      transparent 70%
+    );
+  mix-blend-mode: soft-light;
+  transition: background 90ms ease-out;
+}
+.detective-desk .desk-flashlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    60px circle at var(--mx, 50%) var(--my, 50%),
+    transparent 0 32px,
+    rgba(200, 140, 90, 0.10) 34px,
+    transparent 42px
+  );
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* ---- Toasts: shimmer sweep on entry + progress underline ---- */
+.detective-desk .desk-toast {
+  position: relative;
+  overflow: hidden;
+}
+.detective-desk .desk-toast::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -60%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.14) 45%,
+    rgba(255, 255, 255, 0.24) 50%,
+    rgba(255, 255, 255, 0.14) 55%,
+    transparent
+  );
+  transform: skewX(-18deg);
+  animation: dd-toast-shine 26s ease-in-out infinite;
+  pointer-events: none;
+}
+.detective-desk .desk-toast.t1::before { animation-delay: 4s; }
+.detective-desk .desk-toast.t2::before { animation-delay: 10.5s; }
+.detective-desk .desk-toast.t3::before { animation-delay: 17s; }
+.detective-desk .desk-toast.t4::before { animation-delay: 22s; }
+@keyframes dd-toast-shine {
+  0%, 12% { left: -60%; }
+  18%     { left: 130%; }
+  100%    { left: 130%; }
+}
+.detective-desk .desk-toast::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: 0;
+  height: 1.5px;
+  width: 0;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+  color: rgba(120, 180, 255, 0.7);
+  animation: dd-toast-progress 26s linear infinite;
+}
+.detective-desk .desk-toast.t1::after { animation-delay: 4s; }
+.detective-desk .desk-toast.t2::after { animation-delay: 10.5s; }
+.detective-desk .desk-toast.t3::after { animation-delay: 17s; color: rgba(255, 176, 64, 0.7); }
+.detective-desk .desk-toast.t4::after { animation-delay: 22s; color: rgba(69, 224, 164, 0.7); }
+@keyframes dd-toast-progress {
+  0%, 12% { width: 0; }
+  30%     { width: 100%; }
+  36%     { width: 100%; opacity: 1; }
+  40%     { width: 100%; opacity: 0; }
+  100%    { width: 100%; opacity: 0; }
+}
+
+/* ---- String web: subtle tension sway + node breathing ---- */
+.detective-desk .desk-web-lines {
+  transform-origin: 50% 50%;
+  animation: dd-web-sway 6s ease-in-out infinite;
+}
+@keyframes dd-web-sway {
+  0%, 100% { transform: rotate(-0.12deg) translateY(0); }
+  50%      { transform: rotate(0.12deg) translateY(-0.8px); }
+}
+.detective-desk .desk-web-nodes circle {
+  animation: dd-web-node-pulse 2.2s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+.detective-desk .desk-web-nodes circle:nth-child(1) { animation-delay: 0s; }
+.detective-desk .desk-web-nodes circle:nth-child(2) { animation-delay: 0.4s; }
+.detective-desk .desk-web-nodes circle:nth-child(3) { animation-delay: 0.8s; }
+.detective-desk .desk-web-nodes circle:nth-child(4) { animation-delay: 1.2s; }
+.detective-desk .desk-web-nodes circle:nth-child(5) { animation-delay: 1.6s; }
+@keyframes dd-web-node-pulse {
+  0%, 100% { transform: scale(1);   filter: drop-shadow(0 0 4px rgba(255, 190, 90, 0.7)); }
+  50%      { transform: scale(1.35); filter: drop-shadow(0 0 9px rgba(255, 210, 120, 0.95)); }
+}
+
+/* ---- Ribbon: gloss shimmer sweep across band ---- */
+.detective-desk .desk-ribbon-band {
+  position: absolute;
+  overflow: hidden;
+}
+.detective-desk .desk-ribbon-band::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -50%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 240, 200, 0.28) 50%,
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: dd-ribbon-shine 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes dd-ribbon-shine {
+  0%, 60% { left: -50%; }
+  80%     { left: 130%; }
+  100%    { left: 130%; }
+}
+
+/* ---- Clue counter: pulse burst when a new clue registers ---- */
+.detective-desk .desk-clues {
+  animation: dd-clue-pulse 26s ease-out infinite;
+}
+@keyframes dd-clue-pulse {
+  0%, 19.9%    { box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 0 12px rgba(200,160,90,0.08); }
+  20%, 20.5%   { box-shadow: 0 2px 20px rgba(255, 90, 74, 0.55), inset 0 0 16px rgba(255,120,90,0.35); }
+  22%          { box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 0 12px rgba(200,160,90,0.08); }
+  44.9%        { box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 0 12px rgba(200,160,90,0.08); }
+  45%, 45.5%   { box-shadow: 0 2px 20px rgba(255, 90, 74, 0.55), inset 0 0 16px rgba(255,120,90,0.35); }
+  47%          { box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 0 12px rgba(200,160,90,0.08); }
+  69.9%        { box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 0 12px rgba(200,160,90,0.08); }
+  70%, 70.5%   { box-shadow: 0 2px 20px rgba(255, 90, 74, 0.55), inset 0 0 16px rgba(255,120,90,0.35); }
+  72%          { box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 0 12px rgba(200,160,90,0.08); }
+  91.9%        { box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 0 12px rgba(200,160,90,0.08); }
+  92%, 92.6%   { box-shadow: 0 2px 24px rgba(127, 227, 140, 0.65), inset 0 0 18px rgba(127,227,140,0.35); }
+  94%, 100%    { box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 0 12px rgba(200,160,90,0.08); }
+}
+
+/* ---- Sonar: crisper ping rings + thicker sweep arm ---- */
+.detective-desk .desk-sonar-ring {
+  border-width: 1.5px !important;
+  box-shadow: 0 0 12px rgba(120, 220, 160, 0.35);
+}
+.detective-desk .desk-sonar-arm {
+  background: conic-gradient(
+    from 0deg,
+    rgba(120, 220, 160, 0.55) 0deg,
+    rgba(120, 220, 160, 0.22) 30deg,
+    transparent 90deg,
+    transparent 360deg
+  ) !important;
+  filter: drop-shadow(0 0 6px rgba(120, 220, 160, 0.4));
+}
+.detective-desk .desk-sonar-blip {
+  box-shadow: 0 0 10px rgba(120, 220, 160, 0.9), 0 0 20px rgba(120, 220, 160, 0.5);
+}
+
+/* ---- Spotlight: subtle chromatic warmth at focal points ---- */
+.detective-desk .desk-spot {
+  filter: saturate(1.15) contrast(1.05);
+}
+
+/* ---- Film grain: add fine flickering scratches ---- */
+.detective-desk .desk-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 49.5%, rgba(255, 240, 220, 0.06) 49.7%, transparent 50%),
+    linear-gradient(90deg, transparent 22.3%, rgba(255, 240, 220, 0.04) 22.5%, transparent 22.7%),
+    linear-gradient(90deg, transparent 78.1%, rgba(255, 240, 220, 0.05) 78.3%, transparent 78.5%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: dd-grain-scratch 7s steps(1, end) infinite;
+  pointer-events: none;
+}
+@keyframes dd-grain-scratch {
+  0%, 12%   { opacity: 0; transform: translateX(0); }
+  12.3%     { opacity: 0.9; transform: translateX(-3px); }
+  12.6%     { opacity: 0; }
+  47%       { opacity: 0; transform: translateX(0); }
+  47.4%     { opacity: 0.8; transform: translateX(4px); }
+  47.7%     { opacity: 0; }
+  82%       { opacity: 0; }
+  82.3%     { opacity: 0.7; transform: translateX(-2px); }
+  82.6%     { opacity: 0; }
+  100%      { opacity: 0; }
+}
+
+/* ---- Reduced-motion / mobile safety ---- */
+@media (prefers-reduced-motion: reduce) {
+  .detective-desk .desk-rain::after,
+  .detective-desk .desk-rain::before,
+  .detective-desk .desk-toast::before,
+  .detective-desk .desk-toast::after,
+  .detective-desk .desk-web-lines,
+  .detective-desk .desk-web-nodes circle,
+  .detective-desk .desk-ribbon-band::after,
+  .detective-desk .desk-clues,
+  .detective-desk .desk-grain::before {
+    animation: none !important;
+  }
+}
+@media (max-width: 720px) {
+  .detective-desk .desk-rain::after,
+  .detective-desk .desk-rain::before,
+  .detective-desk .desk-grain::before { display: none; }
+}
