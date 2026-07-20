@@ -1476,7 +1476,7 @@ export function DetectiveDesk({ className = "" }: Props) {
             <CaseFiles />
             <DeskDecals />
             <Pushpins />
-            <RedString />
+            {/* RedString removed — no red pointers/lines on desk */}
             <PaperClips />
             <Polaroids />
             <Photo />
@@ -1582,23 +1582,8 @@ export function DetectiveDesk({ className = "" }: Props) {
         <span className="desk-uv-tag">UV · 365nm</span>
       </div>
 
-      {/* Dispatch scanner — marquee police chatter across the top */}
-      <div className="desk-dispatch" aria-hidden="true">
-        <span className="desk-dispatch-band">DISPATCH · 154.115 MHz</span>
-        <div className="desk-dispatch-wrap">
-          <div className="desk-dispatch-track">
-            <span>10-4 · UNIT 34-BRAVO EN ROUTE · SUSPECT LAST SEEN I.I. CHUNDRIGAR · OVER &nbsp;·&nbsp; </span>
-            <span>ALL POINTS · BE ADVISED · WIRE-FRAUD IN PROGRESS · GRID 07 · REQUEST BACKUP &nbsp;·&nbsp; </span>
-            <span>10-20 CONFIRMED · SIGNAL FIVE · PHONE-SCAM ORIGIN TRACED TO CELL 21A &nbsp;·&nbsp; </span>
-            <span>COPY THAT · MAINTAIN VISUAL · DO NOT ENGAGE · REPEAT · DO NOT ENGAGE &nbsp;·&nbsp; </span>
-            {/* duplicate for seamless loop */}
-            <span>10-4 · UNIT 34-BRAVO EN ROUTE · SUSPECT LAST SEEN I.I. CHUNDRIGAR · OVER &nbsp;·&nbsp; </span>
-            <span>ALL POINTS · BE ADVISED · WIRE-FRAUD IN PROGRESS · GRID 07 · REQUEST BACKUP &nbsp;·&nbsp; </span>
-            <span>10-20 CONFIRMED · SIGNAL FIVE · PHONE-SCAM ORIGIN TRACED TO CELL 21A &nbsp;·&nbsp; </span>
-            <span>COPY THAT · MAINTAIN VISUAL · DO NOT ENGAGE · REPEAT · DO NOT ENGAGE &nbsp;·&nbsp; </span>
-          </div>
-        </div>
-      </div>
+
+
 
       {/* Sonar sweep — rotating arm with concentric rings + contact blip */}
       <div className="desk-sonar" aria-hidden="true">
@@ -1833,35 +1818,8 @@ export function DetectiveDesk({ className = "" }: Props) {
         </div>
       </div>
 
-      {/* Conspiracy string web — SVG lines connecting anchor pushpins */}
-      <svg
-        className="desk-web"
-        viewBox="0 0 1000 700"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <defs>
-          <filter id="webBlur" x="-2%" y="-2%" width="104%" height="104%">
-            <feGaussianBlur stdDeviation="0.4" />
-          </filter>
-        </defs>
-        <g className="desk-web-lines" filter="url(#webBlur)">
-          <line x1="180" y1="140" x2="520" y2="300" />
-          <line x1="520" y1="300" x2="820" y2="180" />
-          <line x1="520" y1="300" x2="360" y2="560" />
-          <line x1="820" y1="180" x2="680" y2="540" />
-          <line x1="360" y1="560" x2="680" y2="540" />
-          <line x1="180" y1="140" x2="680" y2="540" />
-          <line x1="820" y1="180" x2="360" y2="560" />
-        </g>
-        <g className="desk-web-nodes">
-          <circle cx="180" cy="140" r="4" />
-          <circle cx="520" cy="300" r="5" />
-          <circle cx="820" cy="180" r="4" />
-          <circle cx="360" cy="560" r="4" />
-          <circle cx="680" cy="540" r="4" />
-        </g>
-      </svg>
+
+
 
       {/* Handwritten margin notes — detective's own scribbles */}
       <div className="desk-notes" aria-hidden="true">
