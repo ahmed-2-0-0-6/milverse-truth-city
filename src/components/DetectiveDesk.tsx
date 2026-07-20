@@ -1522,6 +1522,38 @@ export function DetectiveDesk({ className = "" }: Props) {
         <span className="desk-morse-led" />
         <span className="desk-morse-tag">TX · SOS</span>
       </div>
+
+      {/* CCTV viewfinder — corner brackets, crosshair, live REC + timecode */}
+      <div className="desk-cctv" aria-hidden="true">
+        <span className="desk-cctv-b tl" /><span className="desk-cctv-b tr" />
+        <span className="desk-cctv-b bl" /><span className="desk-cctv-b br" />
+        <span className="desk-cctv-cross" />
+        <span className="desk-cctv-scan" />
+        <span className="desk-cctv-meta">
+          <span className="desk-cctv-rec" /> REC · CAM-03 · {clock}
+        </span>
+      </div>
+
+      {/* Polygraph strip — animated pulse line along the bottom */}
+      <div className="desk-poly" aria-hidden="true">
+        <span className="desk-poly-label">STRESS INDEX</span>
+        <svg className="desk-poly-svg" viewBox="0 0 600 40" preserveAspectRatio="none">
+          <path
+            className="desk-poly-path"
+            d="M0 20 L60 20 L70 8 L80 32 L90 20 L160 20 L172 4 L184 36 L196 20 L280 20 L292 12 L304 28 L316 20 L400 20 L412 2 L424 38 L436 20 L520 20 L532 14 L544 26 L556 20 L600 20"
+            fill="none" stroke="rgba(120,255,190,0.9)" strokeWidth="1.4"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+      </div>
+
+      {/* UV Blacklight sweep — auto-cycles; reveals a hidden watermark */}
+      <div className="desk-uv" aria-hidden="true">
+        <span className="desk-uv-bar" />
+        <span className="desk-uv-mark">TRUTH · IS · A · WITNESS</span>
+        <span className="desk-uv-tag">UV · 365nm</span>
+      </div>
     </div>
+
   );
 }
