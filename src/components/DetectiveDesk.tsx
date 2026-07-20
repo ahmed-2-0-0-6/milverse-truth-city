@@ -1132,6 +1132,165 @@ function LetterOpener() {
   );
 }
 
+// ---------- folded newspaper ----------
+function Newspaper() {
+  return (
+    <group position={[-4.6, 0.02, -2.6]} rotation={[-Math.PI / 2, 0, -0.35]}>
+      {/* newsprint */}
+      <mesh>
+        <planeGeometry args={[3.4, 2.2]} />
+        <meshStandardMaterial color="#d8cfb6" roughness={0.95} />
+      </mesh>
+      {/* masthead bar */}
+      <mesh position={[0, 0.9, 0.001]}>
+        <planeGeometry args={[3.0, 0.28]} />
+        <meshBasicMaterial color="#141010" />
+      </mesh>
+      {/* headline block */}
+      <mesh position={[-0.6, 0.4, 0.001]}>
+        <planeGeometry args={[1.6, 0.32]} />
+        <meshBasicMaterial color="#141010" />
+      </mesh>
+      {/* photo */}
+      <mesh position={[0.9, 0.15, 0.001]}>
+        <planeGeometry args={[1.2, 0.9]} />
+        <meshStandardMaterial color="#3a2a20" roughness={0.9} />
+      </mesh>
+      {/* columns (thin bars) */}
+      {[-1.1, -0.5, 0.1, 0.7].map((x, i) => (
+        <mesh key={i} position={[x, -0.55, 0.001]}>
+          <planeGeometry args={[0.5, 0.7]} />
+          <meshBasicMaterial color="#6a5a48" transparent opacity={0.35} />
+        </mesh>
+      ))}
+      {/* fold shadow */}
+      <mesh position={[0, 0, 0.002]}>
+        <planeGeometry args={[3.4, 0.04]} />
+        <meshBasicMaterial color="#000" transparent opacity={0.35} />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- detective badge (five-point brass star) ----------
+function Badge() {
+  const shape = useMemo(() => {
+    const s = new THREE.Shape();
+    const spikes = 5, outer = 0.55, inner = 0.22;
+    for (let i = 0; i < spikes * 2; i++) {
+      const r = i % 2 === 0 ? outer : inner;
+      const a = (i / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
+      const x = Math.cos(a) * r, y = Math.sin(a) * r;
+      if (i === 0) s.moveTo(x, y); else s.lineTo(x, y);
+    }
+    s.closePath();
+    return s;
+  }, []);
+  return (
+    <group position={[6.4, 0.05, 3.4]} rotation={[-Math.PI / 2, 0, 0.4]}>
+      <mesh>
+        <extrudeGeometry args={[shape, { depth: 0.06, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02, bevelSegments: 2 }]} />
+        <meshStandardMaterial color="#d4a848" roughness={0.28} metalness={0.95} emissive="#3a2408" emissiveIntensity={0.25} />
+      </mesh>
+      {/* center disc */}
+      <mesh position={[0, 0, 0.07]}>
+        <cylinderGeometry args={[0.16, 0.16, 0.02, 20]} />
+        <meshStandardMaterial color="#8a6a2a" roughness={0.4} metalness={0.9} />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- key ring with two keys ----------
+function Keyring() {
+  return (
+    <group position={[2.2, 0.05, 3.8]} rotation={[-Math.PI / 2, 0, 0.9]}>
+      {/* ring */}
+      <mesh material={BRASS_LO}>
+        <torusGeometry args={[0.32, 0.04, 8, 20]} />
+      </mesh>
+      {/* key 1 */}
+      <group position={[0.55, 0, 0]}>
+        <mesh material={BRASS_HI}>
+          <cylinderGeometry args={[0.05, 0.05, 0.9, 8]} />
+        </mesh>
+        <mesh position={[0, 0.5, 0]} material={BRASS_HI}>
+          <cylinderGeometry args={[0.2, 0.2, 0.04, 16]} />
+        </mesh>
+        <mesh position={[0, -0.42, 0]} material={BRASS_HI}>
+          <boxGeometry args={[0.14, 0.14, 0.06]} />
+        </mesh>
+      </group>
+      {/* key 2 */}
+      <group position={[0.5, 0, 0]} rotation={[0, 0, 0.3]}>
+        <mesh material={BRASS_LO}>
+          <cylinderGeometry args={[0.045, 0.045, 0.75, 8]} />
+        </mesh>
+        <mesh position={[0, 0.42, 0]} material={BRASS_LO}>
+          <torusGeometry args={[0.16, 0.03, 6, 14]} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+// ---------- postage envelope with stamp + wax stain ----------
+function Envelope() {
+  return (
+    <group position={[-2.2, 0.014, -3.6]} rotation={[-Math.PI / 2, 0, 0.15]}>
+      <mesh>
+        <planeGeometry args={[2.4, 1.4]} />
+        <meshStandardMaterial color="#efe6d4" roughness={0.92} />
+      </mesh>
+      {/* flap triangle (as tri) */}
+      <mesh position={[0, 0, 0.001]}>
+        <planeGeometry args={[2.4, 0.7]} />
+        <meshStandardMaterial color="#e2d6b8" roughness={0.9} />
+      </mesh>
+      {/* stamp */}
+      <mesh position={[0.85, 0.4, 0.002]}>
+        <planeGeometry args={[0.55, 0.42]} />
+        <meshStandardMaterial color="#7a1a1a" roughness={0.7} emissive="#2a0808" emissiveIntensity={0.2} />
+      </mesh>
+      {/* cancellation ring */}
+      <mesh position={[0.85, 0.4, 0.003]}>
+        <ringGeometry args={[0.18, 0.22, 24]} />
+        <meshBasicMaterial color="#141010" transparent opacity={0.7} />
+      </mesh>
+      {/* address lines */}
+      <mesh position={[-0.4, 0.05, 0.002]}>
+        <planeGeometry args={[1.1, 0.05]} />
+        <meshBasicMaterial color="#141010" transparent opacity={0.75} />
+      </mesh>
+      <mesh position={[-0.5, -0.1, 0.002]}>
+        <planeGeometry args={[0.9, 0.05]} />
+        <meshBasicMaterial color="#141010" transparent opacity={0.6} />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- desk front-lip (grounds the table under the camera) ----------
+function DeskLip() {
+  return (
+    <group position={[0, -0.05, 6.4]}>
+      <mesh>
+        <boxGeometry args={[22, 0.35, 0.5]} />
+        <meshStandardMaterial color="#2a160a" roughness={0.55} metalness={0.2} />
+      </mesh>
+      {/* brass drawer pull */}
+      <mesh position={[0, -0.05, 0.28]} rotation={[Math.PI / 2, 0, 0]} material={BRASS_HI}>
+        <torusGeometry args={[0.28, 0.05, 8, 18, Math.PI]} />
+      </mesh>
+      {/* keyhole */}
+      <mesh position={[0, 0.02, 0.28]}>
+        <circleGeometry args={[0.05, 12]} />
+        <meshBasicMaterial color="#050303" />
+      </mesh>
+    </group>
+  );
+}
+
 export function DetectiveDesk({ className = "" }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
