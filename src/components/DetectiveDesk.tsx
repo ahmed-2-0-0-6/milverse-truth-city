@@ -1404,8 +1404,15 @@ export function DetectiveDesk({ className = "" }: Props) {
       className={`detective-desk pointer-events-none absolute inset-0 overflow-hidden ${className}`}
       aria-hidden
     >
-      {/* rain-lit window bleed on back wall */}
+      {/* rain-lit window — night city outside, not the room */}
       <div className="desk-window">
+        {/* City skyline: far haze silhouette, mid buildings, lit windows, street glow */}
+        <div className="desk-window-city">
+          <div className="far" />
+          <div className="mid" />
+          <div className="lights" />
+          <div className="street" />
+        </div>
         <div className="desk-window-glow" />
         <svg className="desk-rain" viewBox="0 0 200 200" preserveAspectRatio="none">
           {Array.from({ length: 22 }, (_, i) => (
