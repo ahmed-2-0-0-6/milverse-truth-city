@@ -3758,11 +3758,11 @@ button[title*="lovable" i] {
 .dd-steam-c { animation: dd-steam-rise 7.2s ease-out infinite 1.8s; }
 
 /* Lamp breathes very slightly — like a bulb on old wiring */
-@keyframes dd-lamp-breath {
+@keyframes dd-lamp-bulb-breath {
   0%,100% { opacity: 0.9; }
   50%     { opacity: 1;   }
 }
-.dd-lamp-breath { animation: dd-lamp-breath 6s ease-in-out infinite; mix-blend-mode: screen; }
+.dd-lamp-breath { animation: dd-lamp-bulb-breath 6s ease-in-out infinite; mix-blend-mode: screen; }
 
 /* Raccoon eyes catch the lamplight once in a while */
 @keyframes dd-eye-blink {
@@ -5317,6 +5317,8 @@ button[title*="lovable" i] {
   .detective-desk .desk-clues-count::before { animation: none !important; }
   .detective-desk .desk-web { opacity: 0.5; }
   .detective-desk .desk-note { opacity: 0.85; }
+  /* Ribbon .rb is display:none by default; reveal a stable state when animation is off */
+  .detective-desk .desk-ribbon-band .rb2 { display: inline !important; }
 }
 @media (max-width: 720px) {
   .detective-desk .desk-notes,
