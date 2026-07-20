@@ -262,7 +262,7 @@ export function ScrollStory() {
           key={i}
           className={`story-beat relative min-h-screen flex items-center justify-center overflow-hidden px-6 ${BEAT_BACKDROPS[i] ? "story-beat--image" : ""} ${b.finale ? "finale-beat" : ""}`}
         >
-          <div className="beat-bg pointer-events-none absolute -inset-y-[24vh] inset-x-0 z-0" aria-hidden>
+          <div className="beat-bg pointer-events-none absolute -inset-y-[24vh] inset-x-0 z-[1]" aria-hidden>
             {BEAT_BACKDROPS[i] && (
               <>
                 <div
@@ -290,7 +290,7 @@ export function ScrollStory() {
           </div>
 
 
-          <div className="beat-copy relative z-10 max-w-5xl text-center">
+          <div className="beat-copy relative z-[2] max-w-5xl text-center">
 
             <div className="beat-overline beat-line mb-7">
               <span>{b.eyebrow}</span>
@@ -321,10 +321,10 @@ export function ScrollStory() {
 
       {/* MIL triad — judge-proofing */}
       <section className="story-beat relative min-h-[80vh] flex items-center justify-center overflow-hidden px-6 border-y border-white/5">
-        <div className="beat-bg pointer-events-none absolute inset-0 z-0" aria-hidden>
+        <div className="beat-bg pointer-events-none absolute inset-0 z-[1]" aria-hidden>
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/[0.05] to-transparent" />
         </div>
-        <div className="relative max-w-5xl text-center">
+        <div className="relative z-[2] max-w-5xl text-center">
           <div className="stencil text-[10px] text-cyan-300/70 mb-6">THE THESIS</div>
           <h2
             className="beat-line text-3xl sm:text-5xl font-black leading-tight tracking-tight text-white mb-10"
