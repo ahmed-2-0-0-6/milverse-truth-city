@@ -870,7 +870,7 @@ function Pen() {
 // ---------- coffee cup + saucer + ring ----------
 function Cup() {
   return (
-    <group position={[-7.5, 0, -3.2]}>
+    <group position={[-11.8, 0, -6.8]}>
       {/* saucer */}
       <mesh position={[0, 0.02, 0]} material={IVORY}>
         <cylinderGeometry args={[1.2, 1.2, 0.04, 24]} />
