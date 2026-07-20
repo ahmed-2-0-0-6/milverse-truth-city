@@ -39,10 +39,10 @@ export function LandingNudge({ kind, shift, onDismiss }: Props) {
           <button
             type="button"
             onClick={onDismiss}
-            className="absolute top-1.5 right-1.5 h-8 w-8 tap inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent"
+            className="absolute top-1 right-1 h-6 w-6 inline-flex items-center justify-center rounded-md text-muted-foreground/70 hover:text-foreground hover:bg-accent/60"
             aria-label="Dismiss notification"
           >
-            <X className="h-4 w-4" aria-hidden />
+            <X className="h-3.5 w-3.5" aria-hidden />
           </button>
           <div className="block tap" aria-label="Open today's forward">
             <div className="stencil text-[10px] tracking-widest text-primary/90 mb-1">
@@ -77,10 +77,10 @@ export function LandingNudge({ kind, shift, onDismiss }: Props) {
           <button
             type="button"
             onClick={onDismiss}
-            className="absolute top-1.5 right-1.5 h-8 w-8 tap inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent"
+            className="absolute top-1 right-1 h-6 w-6 inline-flex items-center justify-center rounded-md text-muted-foreground/70 hover:text-foreground hover:bg-accent/60"
             aria-label="Dismiss notification"
           >
-            <X className="h-4 w-4" aria-hidden />
+            <X className="h-3.5 w-3.5" aria-hidden />
           </button>
           <button
             type="button"
