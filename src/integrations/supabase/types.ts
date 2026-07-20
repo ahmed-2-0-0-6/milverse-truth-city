@@ -468,6 +468,13 @@ export type Database = {
           total: number
         }[]
       }
+      get_group_phase: {
+        Args: { _code: string }
+        Returns: {
+          phase: string
+          updated_at: string
+        }[]
+      }
       get_most_devious_designer: {
         Args: never
         Returns: {
