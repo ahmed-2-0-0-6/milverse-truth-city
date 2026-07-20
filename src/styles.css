@@ -4912,6 +4912,167 @@ button[title*="lovable" i] {
 }
 .detective-desk .desk-strip-perf.b { top: auto; bottom: 2px; }
 
+/* --- Directed spotlight sweep — warm halo dolly across focal points --- */
+.detective-desk .desk-spot {
+  position: absolute; inset: 0;
+  z-index: 9; pointer-events: none;
+  mix-blend-mode: soft-light;
+  background: radial-gradient(180px 140px at var(--sx, 50%) var(--sy, 50%),
+    rgba(255,205,130,0.55) 0%,
+    rgba(255,180,90,0.25) 40%,
+    transparent 72%);
+  animation: dd-spot-sweep 42s cubic-bezier(.5,0,.5,1) infinite;
+}
+@keyframes dd-spot-sweep {
+  0%   { --sx: 22%; --sy: 34%; opacity: 0.85; }   /* badge area */
+  16%  { --sx: 22%; --sy: 34%; opacity: 0.55; }
+  20%  { --sx: 44%; --sy: 62%; opacity: 0.85; }   /* key-ring */
+  36%  { --sx: 44%; --sy: 62%; opacity: 0.55; }
+  40%  { --sx: 70%; --sy: 70%; opacity: 0.85; }   /* ashtray */
+  56%  { --sx: 70%; --sy: 70%; opacity: 0.55; }
+  60%  { --sx: 82%; --sy: 40%; opacity: 0.85; }   /* polaroid */
+  76%  { --sx: 82%; --sy: 40%; opacity: 0.55; }
+  80%  { --sx: 30%; --sy: 24%; opacity: 0.85; }   /* pushpin */
+  96%  { --sx: 30%; --sy: 24%; opacity: 0.55; }
+  100% { --sx: 22%; --sy: 34%; opacity: 0.85; }
+}
+
+/* --- Live police sketch --- */
+.detective-desk .desk-sketch {
+  position: absolute;
+  left: 22px; top: 190px;
+  z-index: 14; pointer-events: none;
+  width: 180px; padding: 10px 10px 12px;
+  background: linear-gradient(180deg, rgba(24,18,12,0.85), rgba(24,18,12,0.7));
+  border: 1px solid rgba(200,160,110,0.35);
+  color: #e8d7b6;
+  font: 700 9.5px/1.15 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.16em;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  opacity: 0;
+  animation: dd-sketch-in 0.5s ease-out 3.2s forwards;
+  transform: rotate(-1.2deg);
+}
+@keyframes dd-sketch-in { to { opacity: 0.96; } }
+.detective-desk .desk-sketch-head {
+  display: flex; align-items: center; gap: 8px;
+  color: #f0d9a8; margin-bottom: 8px;
+}
+.detective-desk .desk-sketch-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #ff8a3a; box-shadow: 0 0 8px #ff8a3a;
+  animation: dd-sketch-dot 1.2s ease-in-out infinite;
+}
+@keyframes dd-sketch-dot { 50% { opacity: 0.35; } }
+.detective-desk .desk-sketch-tag {
+  margin-left: auto; padding: 2px 6px; font-size: 8px;
+  background: rgba(200,160,110,0.14);
+  border: 1px solid rgba(200,160,110,0.35);
+}
+.detective-desk .desk-sketch-svg {
+  width: 100%; height: auto;
+  display: block;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.4);
+  animation: dd-sketch-loop 28s ease-in-out infinite;
+}
+@keyframes dd-sketch-loop {
+  0%, 88%   { opacity: 1; filter: none; }
+  93%       { opacity: 0.15; filter: blur(2px); }
+  95%       { opacity: 1; filter: none; }  /* fresh page */
+  100%      { opacity: 1; }
+}
+.detective-desk .desk-sketch-svg .s {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: dd-sketch-draw 28s linear infinite;
+}
+@keyframes dd-sketch-draw {
+  0%  { stroke-dashoffset: 1; }
+  to  { stroke-dashoffset: 0; }
+}
+.detective-desk .desk-sketch-svg .s1  { animation-duration: 28s; animation-delay: 0s;   }
+.detective-desk .desk-sketch-svg .s2  { animation-duration: 28s; animation-delay: -25s; }
+.detective-desk .desk-sketch-svg .s3  { animation-duration: 28s; animation-delay: -24s; }
+.detective-desk .desk-sketch-svg .s4  { animation-duration: 28s; animation-delay: -22s; }
+.detective-desk .desk-sketch-svg .s5  { animation-duration: 28s; animation-delay: -21.5s; }
+.detective-desk .desk-sketch-svg .s6  { animation-duration: 28s; animation-delay: -20s; }
+.detective-desk .desk-sketch-svg .s7  { animation-duration: 28s; animation-delay: -19.5s; }
+.detective-desk .desk-sketch-svg .s8  { animation-duration: 28s; animation-delay: -19s; }
+.detective-desk .desk-sketch-svg .s9  { animation-duration: 28s; animation-delay: -18.5s; }
+.detective-desk .desk-sketch-svg .s10 { animation-duration: 28s; animation-delay: -17s; }
+.detective-desk .desk-sketch-svg .s11 { animation-duration: 28s; animation-delay: -15s; }
+.detective-desk .desk-sketch-svg .s12 { animation-duration: 28s; animation-delay: -14s; }
+.detective-desk .desk-sketch-svg .s13 { animation-duration: 28s; animation-delay: -12s; }
+.detective-desk .desk-sketch-svg .s14 { animation-duration: 28s; animation-delay: -11.5s; }
+.detective-desk .desk-sketch-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 8px; color: #c9b590; font-size: 8.5px;
+}
+.detective-desk .desk-sketch-conf::before {
+  content: "0%"; color: #f0d9a8;
+  animation: dd-sketch-conf 28s steps(20) infinite;
+}
+@keyframes dd-sketch-conf {
+  0%   { content: "3%"; }   10%  { content: "12%"; }
+  20%  { content: "24%"; }  30%  { content: "38%"; }
+  40%  { content: "49%"; }  50%  { content: "58%"; }
+  60%  { content: "68%"; }  70%  { content: "76%"; }
+  80%  { content: "83%"; }  85%  { content: "88%"; }
+  90%  { content: "91%"; }  95%  { content: "94%"; }
+  100% { content: "3%"; }
+}
+
+/* --- Evidence toast stack (right side) --- */
+.detective-desk .desk-toasts {
+  position: absolute;
+  right: 20px; top: 62px;
+  z-index: 15; pointer-events: none;
+  width: 220px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.detective-desk .desk-toast {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 8px 10px;
+  background: linear-gradient(180deg, rgba(14,18,22,0.9), rgba(14,18,22,0.72));
+  border-left: 3px solid rgba(120,200,255,0.6);
+  border-top: 1px solid rgba(120,200,255,0.18);
+  color: #d8ecff;
+  font: 700 10px/1.2 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+  opacity: 0;
+  transform: translateX(24px);
+}
+.detective-desk .desk-toast b { display: block; color: #eaf4ff; font-size: 10px; }
+.detective-desk .desk-toast em {
+  display: block; margin-top: 3px;
+  font-style: normal; color: #8bb8d8; font-size: 9px; letter-spacing: 0.08em;
+}
+.detective-desk .desk-toast-dot {
+  flex: 0 0 auto;
+  width: 8px; height: 8px; border-radius: 50%;
+  margin-top: 3px;
+  background: #7fd8ff; box-shadow: 0 0 8px #7fd8ff;
+  animation: dd-toast-pulse 1.2s ease-in-out infinite;
+}
+.detective-desk .desk-toast-dot.warn { background: #ffb040; box-shadow: 0 0 8px #ffb040; }
+.detective-desk .desk-toast-dot.ok   { background: #45e0a4; box-shadow: 0 0 8px #45e0a4; }
+.detective-desk .desk-toast.t3 { border-left-color: rgba(255,176,64,0.7); }
+.detective-desk .desk-toast.t4 { border-left-color: rgba(69,224,164,0.7); }
+@keyframes dd-toast-pulse { 50% { opacity: 0.35; } }
+/* Stagger: each toast on a 26s loop, 6.5s apart */
+.detective-desk .desk-toast.t1 { animation: dd-toast 26s ease-in-out 4s   infinite; }
+.detective-desk .desk-toast.t2 { animation: dd-toast 26s ease-in-out 10.5s infinite; }
+.detective-desk .desk-toast.t3 { animation: dd-toast 26s ease-in-out 17s   infinite; }
+.detective-desk .desk-toast.t4 { animation: dd-toast 26s ease-in-out 23.5s infinite; }
+@keyframes dd-toast {
+  0%   { opacity: 0; transform: translateX(24px); }
+  4%   { opacity: 1; transform: translateX(0); }
+  20%  { opacity: 1; transform: translateX(0); }
+  24%  { opacity: 0; transform: translateX(-14px); }
+  100% { opacity: 0; transform: translateX(24px); }
+}
+
 
 
 @media (prefers-reduced-motion: reduce) {
