@@ -44,8 +44,9 @@ export function GlowCursor() {
       <div
         ref={trailRef}
         aria-hidden
-        className="pointer-events-none fixed left-0 top-0 z-[80] h-8 w-8 rounded-full"
+        className="pointer-events-none fixed left-0 top-0 h-8 w-8 rounded-full"
         style={{
+          zIndex: 2147483646,
           background: "radial-gradient(circle, oklch(0.60 0.19 258 / 0.35), transparent 70%)",
           willChange: "transform",
         }}
@@ -53,8 +54,9 @@ export function GlowCursor() {
       <div
         ref={dotRef}
         aria-hidden
-        className="pointer-events-none fixed left-0 top-0 z-[81] h-2 w-2 rounded-full"
+        className="pointer-events-none fixed left-0 top-0 h-2 w-2 rounded-full"
         style={{
+          zIndex: 2147483647,
           background: "oklch(0.60 0.19 258)",
           boxShadow: "0 0 12px oklch(0.60 0.19 258 / 0.9)",
           willChange: "transform",
