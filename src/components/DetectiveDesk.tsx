@@ -396,9 +396,10 @@ function Stapler() {
       <mesh position={[0, 0.28, 0]} material={INK_BLUE}>
         <boxGeometry args={[1.5, 0.22, 0.42]} />
       </mesh>
-      <mesh position={[0.7, 0.28, 0]} material={BRASS_LO}>
-        <cylinderGeometry args={[0.11, 0.11, 0.44, 12]} rotation={[Math.PI / 2, 0, 0]} />
+      <mesh position={[0.7, 0.28, 0]} rotation={[Math.PI / 2, 0, 0]} material={BRASS_LO}>
+        <cylinderGeometry args={[0.11, 0.11, 0.44, 12]} />
       </mesh>
+
     </group>
   );
 }
