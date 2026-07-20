@@ -844,6 +844,23 @@ function Lamp() {
         <meshBasicMaterial color="#ffd190" side={THREE.BackSide} transparent opacity={0.55} />
       </mesh>
       <pointLight position={[0, -0.4, 0]} color="#ffcc82" intensity={1.4} distance={22} decay={2} />
+      {/* hot pool spotlight — one draw, dramatic falloff */}
+      <spotLight
+        position={[0, -0.2, 0]}
+        target-position={[0, -6.5, 0]}
+        angle={0.85}
+        penumbra={0.7}
+        intensity={2.4}
+        color="#ffb46a"
+        distance={18}
+        decay={2}
+        castShadow={false}
+      />
+      {/* volumetric-ish light cone (cheap billboard cone) */}
+      <mesh position={[0, -3.2, 0]}>
+        <coneGeometry args={[3.4, 6.0, 24, 1, true]} />
+        <meshBasicMaterial color="#ffb46a" transparent opacity={0.05} side={THREE.DoubleSide} depthWrite={false} blending={THREE.AdditiveBlending} />
+      </mesh>
     </group>
   );
 }
