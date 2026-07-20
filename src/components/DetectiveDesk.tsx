@@ -1324,12 +1324,74 @@ export function DetectiveDesk({ className = "" }: Props) {
       ? [1, 1.25]
       : [1, 1.5];
 
+  // Cursor-follow "reader's light" — updates CSS variables directly (no React re-render).
+  const lightRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = lightRef.current;
+    if (!el || reduced) return;
+    let raf = 0;
+    let tx = 50, ty = 50;
+    const onMove = (e: PointerEvent) => {
+      const wrap = wrapRef.current;
+      if (!wrap) return;
+      const r = wrap.getBoundingClientRect();
+      if (e.clientY < r.top || e.clientY > r.bottom) return;
+      tx = ((e.clientX - r.left) / r.width) * 100;
+      ty = ((e.clientY - r.top) / r.height) * 100;
+      if (!raf) {
+        raf = requestAnimationFrame(() => {
+          el.style.setProperty("--rx", tx + "%");
+          el.style.setProperty("--ry", ty + "%");
+          raf = 0;
+        });
+      }
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [reduced]);
+
   return (
     <div
       ref={wrapRef}
       className={`detective-desk pointer-events-none absolute inset-0 overflow-hidden ${className}`}
       aria-hidden
     >
+      {/* rain-lit window bleed on back wall */}
+      <div className="desk-window">
+        <div className="desk-window-glow" />
+        <svg className="desk-rain" viewBox="0 0 200 200" preserveAspectRatio="none">
+          {Array.from({ length: 22 }, (_, i) => (
+            <line
+              key={i}
+              x1={(i * 9.3) % 200}
+              y1={-10}
+              x2={((i * 9.3) % 200) - 6}
+              y2={30 + (i % 5) * 8}
+              stroke="rgba(180,210,240,0.35)"
+              strokeWidth="0.6"
+            >
+              <animate
+                attributeName="y1"
+                values="-20;220"
+                dur={`${1.6 + (i % 4) * 0.3}s`}
+                begin={`${(i * 0.11) % 1.5}s`}
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="y2"
+                values="10;250"
+                dur={`${1.6 + (i % 4) * 0.3}s`}
+                begin={`${(i * 0.11) % 1.5}s`}
+                repeatCount="indefinite"
+              />
+            </line>
+          ))}
+        </svg>
+      </div>
+
       <div className="desk-lamp-pool" />
       {visible && (
         <Suspense fallback={null}>
@@ -1389,10 +1451,19 @@ export function DetectiveDesk({ className = "" }: Props) {
         </Suspense>
       )}
       <div className="desk-fan-shadow" />
+      <div ref={lightRef} className="desk-reader-light" />
       <div className="desk-letterbox top" />
       <div className="desk-letterbox bottom" />
       <div className="desk-grade" />
       <div className="desk-vignette" />
+      {/* HUD case-file ticker — typewriter */}
+      <div className="desk-hud">
+        <span className="desk-hud-dot" />
+        <span className="desk-hud-label">CASE FILE</span>
+        <span className="desk-hud-num">#MV-4471</span>
+        <span className="desk-hud-status">/ ACTIVE</span>
+      </div>
+      <div className="desk-hud-stamp">CONFIDENTIAL</div>
     </div>
   );
 }
