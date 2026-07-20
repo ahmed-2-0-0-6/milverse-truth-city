@@ -1340,8 +1340,16 @@ export function DetectiveDesk({ className = "" }: Props) {
       ty = ((e.clientY - r.top) / r.height) * 100;
       if (!raf) {
         raf = requestAnimationFrame(() => {
+          const wrap = wrapRef.current;
           el.style.setProperty("--rx", tx + "%");
           el.style.setProperty("--ry", ty + "%");
+          // parallax offsets — normalized -1..1, applied to overlay layers
+          if (wrap) {
+            const nx = (tx - 50) / 50;
+            const ny = (ty - 50) / 50;
+            wrap.style.setProperty("--pax", nx.toFixed(3));
+            wrap.style.setProperty("--pay", ny.toFixed(3));
+          }
           raf = 0;
         });
       }
