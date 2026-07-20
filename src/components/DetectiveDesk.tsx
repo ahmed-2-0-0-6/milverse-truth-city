@@ -976,16 +976,22 @@ export function DetectiveDesk({ className = "" }: Props) {
               alpha: true,
               stencil: false,
               depth: true,
+              toneMapping: THREE.ACESFilmicToneMapping,
+              toneMappingExposure: 1.05,
             }}
             style={{ background: "transparent" }}
           >
             <PauseWhenHidden />
             <CameraRig />
-            <fog attach="fog" args={["#120904", 26, 60]} />
-            <ambientLight intensity={0.28} color="#6a3a1a" />
-            <hemisphereLight args={["#8a5424", "#000000", 0.35]} />
-            <directionalLight position={[0, 12, 6]} intensity={0.6} color="#ffb060" />
+            <fog attach="fog" args={["#0c0603", 22, 55]} />
+            <ambientLight intensity={0.22} color="#6a3a1a" />
+            <hemisphereLight args={["#8a5424", "#050202", 0.3]} />
+            <directionalLight position={[0, 12, 6]} intensity={0.55} color="#ffb060" />
+            {/* cool rim from behind for silhouette */}
+            <directionalLight position={[-6, 4, -14]} intensity={0.35} color="#4a6a90" />
+            <BackWall />
             <Tabletop />
+
             <CaseFiles />
             <Pushpins />
             <PaperClips />
