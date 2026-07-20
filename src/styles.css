@@ -4955,4 +4955,8 @@ button[title*="lovable" i] {
   .detective-desk .desk-cascade-col.c4,
   .detective-desk .desk-cascade-col.c5 { display: none; }
   .detective-desk .desk-poi { display: none; }
+  .detective-desk .desk-decrypt,
+  .detective-desk .desk-call { display: none; }
+  .detective-desk .desk-strip { height: 24px; }
+  .detective-desk .desk-strip-cell { padding: 4px 14px; font-size: 8px; }
 }
