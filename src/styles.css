@@ -5136,3 +5136,191 @@ button[title*="lovable" i] {
   .detective-desk .desk-strip { height: 24px; }
   .detective-desk .desk-strip-cell { padding: 4px 14px; font-size: 8px; }
 }
+
+/* ============================================================
+   DETECTIVE DESK — CONNECTIVE TISSUE LAYER
+   String web · margin notes · status ribbon · clue counter
+   ============================================================ */
+
+/* ---- Conspiracy string web ---- */
+.detective-desk .desk-web {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 46;
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: desk-web-cycle 14s ease-in-out infinite;
+  transform: translate3d(calc(var(--pax,0px) * 0.6), calc(var(--pay,0px) * 0.6), 0);
+}
+@keyframes desk-web-cycle {
+  0%   { opacity: 0; }
+  15%  { opacity: 0.85; }
+  75%  { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+.detective-desk .desk-web-lines line {
+  stroke: rgba(220, 40, 40, 0.72);
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 3px rgba(220, 40, 40, 0.55));
+  stroke-dasharray: 900;
+  stroke-dashoffset: 900;
+  animation: desk-web-draw 14s ease-in-out infinite;
+}
+.detective-desk .desk-web-lines line:nth-child(1) { animation-delay: 0.0s; }
+.detective-desk .desk-web-lines line:nth-child(2) { animation-delay: 0.5s; }
+.detective-desk .desk-web-lines line:nth-child(3) { animation-delay: 1.0s; }
+.detective-desk .desk-web-lines line:nth-child(4) { animation-delay: 1.5s; }
+.detective-desk .desk-web-lines line:nth-child(5) { animation-delay: 2.0s; }
+.detective-desk .desk-web-lines line:nth-child(6) { animation-delay: 2.5s; }
+.detective-desk .desk-web-lines line:nth-child(7) { animation-delay: 3.0s; }
+@keyframes desk-web-draw {
+  0%   { stroke-dashoffset: 900; }
+  35%  { stroke-dashoffset: 0; }
+  75%  { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -900; }
+}
+.detective-desk .desk-web-nodes circle {
+  fill: rgba(255, 210, 120, 0.95);
+  stroke: rgba(220, 40, 40, 0.9);
+  stroke-width: 1.2;
+  filter: drop-shadow(0 0 4px rgba(255, 190, 90, 0.7));
+}
+
+/* ---- Handwritten margin notes ---- */
+.detective-desk .desk-notes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 48;
+  font-family: 'Caveat', 'Kalam', 'Bradley Hand', cursive;
+  color: rgba(30, 20, 15, 0.86);
+  transform: translate3d(calc(var(--pax,0px) * 1.4), calc(var(--pay,0px) * 1.4), 0);
+}
+.detective-desk .desk-note {
+  position: absolute;
+  font-size: 15px;
+  line-height: 1.05;
+  letter-spacing: 0.2px;
+  padding: 4px 8px;
+  background: linear-gradient(180deg, rgba(255, 244, 210, 0.92), rgba(240, 220, 178, 0.88));
+  border-left: 2px solid rgba(180, 30, 30, 0.55);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), inset 0 0 12px rgba(180, 130, 60, 0.15);
+  opacity: 0;
+  animation: desk-note-in 22s ease-in-out infinite;
+  text-shadow: 0 0 1px rgba(255, 240, 200, 0.4);
+}
+.detective-desk .desk-note.n1 { top: 12%; left: 6%;  transform: rotate(-4deg); animation-delay: 1.2s; }
+.detective-desk .desk-note.n2 { top: 28%; right: 8%; transform: rotate(3deg);  animation-delay: 4.4s; color: rgba(140, 20, 20, 0.9); }
+.detective-desk .desk-note.n3 { top: 54%; left: 4%;  transform: rotate(-2deg); animation-delay: 8.0s; }
+.detective-desk .desk-note.n4 { bottom: 22%; right: 6%; transform: rotate(4deg); animation-delay: 11.8s; }
+.detective-desk .desk-note.n5 { bottom: 8%;  left: 32%; transform: rotate(-3deg); animation-delay: 15.6s; }
+@keyframes desk-note-in {
+  0%   { opacity: 0; transform: translateY(6px) rotate(var(--r, 0deg)); }
+  8%   { opacity: 0.95; }
+  70%  { opacity: 0.95; }
+  85%  { opacity: 0; transform: translateY(-3px) rotate(var(--r, 0deg)); }
+  100% { opacity: 0; }
+}
+
+/* ---- Corner case-status ribbon ---- */
+.detective-desk .desk-ribbon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 190px;
+  height: 190px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 55;
+}
+.detective-desk .desk-ribbon-band {
+  position: absolute;
+  top: 32px;
+  right: -58px;
+  width: 260px;
+  transform: rotate(45deg);
+  background: linear-gradient(90deg, rgba(20,20,25,0.95), rgba(50,20,20,0.95), rgba(20,20,25,0.95));
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(200, 160, 90, 0.35) inset;
+  padding: 6px 0;
+  text-align: center;
+  font-family: 'Special Elite', 'Courier Prime', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: rgba(240, 220, 180, 0.9);
+  text-shadow: 0 0 6px currentColor;
+}
+.detective-desk .desk-ribbon-band .rb {
+  display: none;
+  animation: desk-ribbon-cycle 22s steps(1, end) infinite;
+}
+.detective-desk .desk-ribbon-band .rb1 { color: #7aa9ff; animation-delay: 0s; }
+.detective-desk .desk-ribbon-band .rb2 { color: #ffd27a; animation-delay: 5.5s; }
+.detective-desk .desk-ribbon-band .rb3 { color: #ff5a4a; animation-delay: 11s; text-shadow: 0 0 10px #ff3020; }
+.detective-desk .desk-ribbon-band .rb4 { color: #7fe38c; animation-delay: 16.5s; }
+@keyframes desk-ribbon-cycle {
+  0%, 25% { display: inline; }
+  25.01%, 100% { display: none; }
+}
+
+/* ---- Top-center clue counter ---- */
+.detective-desk .desk-clues {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%) translate3d(calc(var(--pax,0px) * 0.4), 0, 0);
+  z-index: 56;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: linear-gradient(180deg, rgba(18,18,22,0.85), rgba(10,10,14,0.9));
+  border: 1px solid rgba(200, 160, 90, 0.35);
+  border-radius: 2px;
+  font-family: 'Special Elite', 'Courier Prime', monospace;
+  font-size: 10.5px;
+  letter-spacing: 2px;
+  color: rgba(240, 220, 180, 0.85);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(200, 160, 90, 0.08);
+  pointer-events: none;
+}
+.detective-desk .desk-clues-tag { color: rgba(200, 160, 90, 0.7); }
+.detective-desk .desk-clues-id { color: #ffd27a; letter-spacing: 3px; }
+.detective-desk .desk-clues-sep { opacity: 0.4; }
+.detective-desk .desk-clues-label { color: rgba(200, 160, 90, 0.7); }
+.detective-desk .desk-clues-count::before {
+  content: "03";
+  color: #ff5a4a;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(255, 90, 74, 0.5);
+  animation: desk-clues-tick 26s steps(1, end) infinite;
+}
+@keyframes desk-clues-tick {
+  0%   { content: "03"; }
+  20%  { content: "04"; }
+  45%  { content: "05"; }
+  70%  { content: "06"; }
+  92%  { content: "07"; color: #7fe38c; }
+  100% { content: "07"; color: #7fe38c; }
+}
+.detective-desk .desk-clues-total { color: rgba(200, 160, 90, 0.6); }
+
+/* ---- A11y / mobile ---- */
+@media (prefers-reduced-motion: reduce) {
+  .detective-desk .desk-web,
+  .detective-desk .desk-web-lines line,
+  .detective-desk .desk-note,
+  .detective-desk .desk-ribbon-band .rb,
+  .detective-desk .desk-clues-count::before { animation: none !important; }
+  .detective-desk .desk-web { opacity: 0.5; }
+  .detective-desk .desk-note { opacity: 0.85; }
+}
+@media (max-width: 720px) {
+  .detective-desk .desk-notes,
+  .detective-desk .desk-web { display: none; }
+  .detective-desk .desk-ribbon { transform: scale(0.75); transform-origin: top right; }
+  .detective-desk .desk-clues { font-size: 9px; padding: 4px 10px; }
+}
