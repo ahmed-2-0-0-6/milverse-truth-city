@@ -1537,12 +1537,6 @@ export function DetectiveDesk({ className = "" }: Props) {
         <span className="desk-print-label">PRINT · MATCH 87%</span>
       </div>
 
-      {/* Peel-back sticky note — handwritten warning */}
-      <div className="desk-sticky" aria-hidden="true">
-        <span className="desk-sticky-line">DO NOT</span>
-        <span className="desk-sticky-line">TRUST</span>
-        <span className="desk-sticky-line">HIM.</span>
-      </div>
 
       {/* Morse LED — blinks "SOS" then pauses */}
       <div className="desk-morse" aria-hidden="true">
