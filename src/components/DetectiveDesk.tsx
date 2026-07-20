@@ -760,7 +760,7 @@ function Candle() {
     if (lightRef.current) lightRef.current.intensity = 2.4 * flick;
   });
   return (
-    <group position={[6.4, 0, -2.6]}>
+    <group position={[11.2, 0, -6.9]}>
       <mesh position={[0, 0.05, 0]} material={BRASS_HI}>
         <cylinderGeometry args={[0.55, 0.7, 0.1, 20]} />
       </mesh>
