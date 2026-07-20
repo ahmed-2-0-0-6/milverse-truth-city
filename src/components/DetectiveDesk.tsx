@@ -1040,11 +1040,11 @@ function Ashtray() {
 
 // ---------- spent brass casings ----------
 function Casings() {
-  const items = [
+  const items = useMemo(() => ([
     { p: [4.2, 0.06, 3.4] as [number, number, number], r: 0.7 },
     { p: [4.9, 0.06, 3.05] as [number, number, number], r: -0.2 },
     { p: [-3.6, 0.06, 4.1] as [number, number, number], r: 1.2 },
-  ];
+  ]), []);
   return (
     <group>
       {items.map((it, i) => (
@@ -1067,13 +1067,15 @@ function Casings() {
 
 // ---------- ink splatter + extra stains on the desk (static decals) ----------
 function DeskDecals() {
-  const rng = seeded(9137);
-  const splats = Array.from({ length: 14 }, (_, i) => ({
-    p: [rng() * 12 - 6, 0.012, rng() * 8 - 2] as [number, number, number],
-    s: 0.08 + rng() * 0.18,
-    o: 0.25 + rng() * 0.4,
-    k: i,
-  }));
+  const splats = useMemo(() => {
+    const rng = seeded(9137);
+    return Array.from({ length: 14 }, (_, i) => ({
+      p: [rng() * 12 - 6, 0.012, rng() * 8 - 2] as [number, number, number],
+      s: 0.08 + rng() * 0.18,
+      o: 0.25 + rng() * 0.4,
+      k: i,
+    }));
+  }, []);
   return (
     <group>
       {/* ink pool near typewriter */}
