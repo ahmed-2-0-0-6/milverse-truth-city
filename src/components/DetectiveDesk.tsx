@@ -760,9 +760,9 @@ function Candle() {
     if (lightRef.current) lightRef.current.intensity = 2.4 * flick;
   });
   return (
-    <group position={[6.4, 0, -2.6]}>
-      <mesh position={[0, 0.05, 0]} material={BRASS_HI}>
-        <cylinderGeometry args={[0.55, 0.7, 0.1, 20]} />
+    <group position={[11.2, 0, -6.9]}>
+      <mesh position={[0, 0.04, 0]} material={BRASS_HI}>
+        <cylinderGeometry args={[1.05, 1.15, 0.08, 24]} />
       </mesh>
       <mesh position={[0, 0.35, 0]} material={BRASS_LO}>
         <cylinderGeometry args={[0.22, 0.28, 0.5, 16]} />
@@ -870,7 +870,7 @@ function Pen() {
 // ---------- coffee cup + saucer + ring ----------
 function Cup() {
   return (
-    <group position={[-7.5, 0, -3.2]}>
+    <group position={[-11.8, 0, -6.8]}>
       {/* saucer */}
       <mesh position={[0, 0.02, 0]} material={IVORY}>
         <cylinderGeometry args={[1.2, 1.2, 0.04, 24]} />
