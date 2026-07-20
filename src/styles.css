@@ -3484,6 +3484,35 @@ button[title*="lovable" i] {
   z-index: 2;
 }
 
+/* Cinematic film grain overlay — pure CSS, GPU compositor only */
+.detective-desk::after {
+  content: "";
+  position: absolute; inset: -20%;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+  background-image:
+    radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px),
+    radial-gradient(rgba(0,0,0,0.5) 1px, transparent 1px);
+  background-size: 3px 3px, 5px 5px;
+  background-position: 0 0, 1px 2px;
+  animation: dd-grain 1.6s steps(6) infinite;
+  will-change: transform;
+}
+@keyframes dd-grain {
+  0%   { transform: translate3d(0,0,0); }
+  20%  { transform: translate3d(-2%, 1%, 0); }
+  40%  { transform: translate3d(1%, -2%, 0); }
+  60%  { transform: translate3d(-1%, 2%, 0); }
+  80%  { transform: translate3d(2%, -1%, 0); }
+  100% { transform: translate3d(0,0,0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .detective-desk::after { animation: none; }
+}
+
+
 
 /* The whole tabletop very slowly spins in a full circle */
 @keyframes dd-table-spin {

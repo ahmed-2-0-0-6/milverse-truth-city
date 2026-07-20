@@ -441,15 +441,17 @@ function CaseFiles() {
 }
 
 // ---------- red push-pins (instanced) ----------
+const PIN_SEED = 41;
+function generatePins() {
+  const rand = seeded(PIN_SEED);
+  const arr: [number, number, number][] = [];
+  for (let i = 0; i < 8; i++) {
+    arr.push([(rand() - 0.5) * 22, 0.08 + (i % 3) * 0.012, (rand() - 0.5) * 12]);
+  }
+  return arr;
+}
 function Pushpins() {
-  const rand = useMemo(() => seeded(41), []);
-  const pins = useMemo(() => {
-    const arr: [number, number, number][] = [];
-    for (let i = 0; i < 8; i++) {
-      arr.push([(rand() - 0.5) * 22, 0.08 + (i % 3) * 0.012, (rand() - 0.5) * 12]);
-    }
-    return arr;
-  }, [rand]);
+  const pins = useMemo(generatePins, []);
   return (
     <group>
       {pins.map((p, i) => (
@@ -465,6 +467,75 @@ function Pushpins() {
     </group>
   );
 }
+
+// ---------- red conspiracy string (one line-segments draw) ----------
+function RedString() {
+  const geom = useMemo(() => {
+    const pins = generatePins();
+    // route: pin[0] -> pin[3] -> pin[1] -> pin[5] -> pin[2] -> pin[7] -> pin[4] -> pin[6] -> pin[0]
+    const order = [0, 3, 1, 5, 2, 7, 4, 6, 0];
+    const g = new THREE.BufferGeometry();
+    const pts: number[] = [];
+    for (let i = 0; i < order.length - 1; i++) {
+      const a = pins[order[i]], b = pins[order[i + 1]];
+      // slight lift and sag mid-point for realism (2 segments per pair)
+      const mid: [number, number, number] = [
+        (a[0] + b[0]) / 2, Math.max(a[1], b[1]) + 0.02, (a[2] + b[2]) / 2,
+      ];
+      pts.push(a[0], a[1] + 0.05, a[2], mid[0], mid[1], mid[2]);
+      pts.push(mid[0], mid[1], mid[2], b[0], b[1] + 0.05, b[2]);
+    }
+    g.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
+    return g;
+  }, []);
+  return (
+    <lineSegments geometry={geom}>
+      <lineBasicMaterial color="#a01818" transparent opacity={0.85} />
+    </lineSegments>
+  );
+}
+
+// ---------- polaroids scattered ----------
+function Polaroids() {
+  const tex = useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = 128; c.height = 128;
+    const ctx = c.getContext("2d")!;
+    const g = ctx.createRadialGradient(64, 60, 4, 64, 70, 70);
+    g.addColorStop(0, "#3a2a1a"); g.addColorStop(1, "#0a0503");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 128, 128);
+    ctx.fillStyle = "#0a0503";
+    ctx.beginPath(); ctx.arc(64, 58, 18, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(64, 100, 26, 20, 0, 0, Math.PI * 2); ctx.fill();
+    return new THREE.CanvasTexture(c);
+  }, []);
+  const items = useMemo(() => {
+    const r = seeded(91);
+    return Array.from({ length: 3 }).map(() => ({
+      p: [(r() - 0.5) * 18, 0.055 + r() * 0.02, (r() - 0.5) * 10] as [number, number, number],
+      rot: (r() - 0.5) * 1.2,
+    }));
+  }, []);
+  return (
+    <group>
+      {items.map((it, i) => (
+        <group key={i} position={it.p} rotation={[-Math.PI / 2, 0, it.rot]}>
+          {/* white border */}
+          <mesh>
+            <planeGeometry args={[1.6, 1.9]} />
+            <meshStandardMaterial color="#efe6d4" roughness={0.9} />
+          </mesh>
+          {/* photo window */}
+          <mesh position={[0, 0.12, 0.001]}>
+            <planeGeometry args={[1.35, 1.35]} />
+            <meshStandardMaterial map={tex} roughness={0.85} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
 
 // ---------- paper clips (instanced) ----------
 function PaperClips() {
@@ -516,6 +587,11 @@ function Magnifier() {
       {/* ferrule */}
       <mesh position={[1.0, 0, 0]} material={BRASS_LO}>
         <cylinderGeometry args={[0.11, 0.11, 0.14, 12]} />
+      </mesh>
+      {/* caustic hot spot on paper beneath lens */}
+      <mesh position={[0, 0, -0.14]}>
+        <circleGeometry args={[0.75, 24]} />
+        <meshBasicMaterial color="#ffd88a" transparent opacity={0.22} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
     </group>
   );
@@ -994,7 +1070,9 @@ export function DetectiveDesk({ className = "" }: Props) {
 
             <CaseFiles />
             <Pushpins />
+            <RedString />
             <PaperClips />
+            <Polaroids />
             <Photo />
             <Magnifier />
             <Compass />
