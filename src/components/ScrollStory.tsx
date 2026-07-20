@@ -191,21 +191,8 @@ export function ScrollStory() {
     };
   }, []);
 
-  // Fixed-viewport desk stays visible whenever the ScrollStory is on screen.
-  // Only MOUNT the heavy 3D canvas when the section is actually near the viewport,
-  // and never on LITE mode. Prevents shaders/geometry from running when scrolled away.
-  const { mode } = useVisualMode();
-  const [deskActive, setDeskActive] = useState(false);
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el || !("IntersectionObserver" in window)) return;
-    const io = new IntersectionObserver(([e]) => setDeskActive(e.isIntersecting), {
-      threshold: 0,
-      rootMargin: "200px 0px",
-    });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+
+
 
   return (
     <div ref={rootRef} className="scrollstory relative isolate">
