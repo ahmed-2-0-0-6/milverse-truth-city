@@ -1475,8 +1475,7 @@ export function DetectiveDesk({ className = "" }: Props) {
 
             <CaseFiles />
             <DeskDecals />
-            <Pushpins />
-            {/* RedString removed — no red pointers/lines on desk */}
+            {/* Pushpins & RedString removed — no red dots/lines on desk */}
             <PaperClips />
             <Polaroids />
             <Photo />
