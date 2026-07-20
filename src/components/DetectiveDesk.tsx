@@ -1812,6 +1812,65 @@ export function DetectiveDesk({ className = "" }: Props) {
           <div><b>WIRE HOLD · CLEARED</b><em>128,400 PKR · SBP</em></div>
         </div>
       </div>
+
+      {/* Conspiracy string web — SVG lines connecting anchor pushpins */}
+      <svg
+        className="desk-web"
+        viewBox="0 0 1000 700"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <defs>
+          <filter id="webBlur" x="-2%" y="-2%" width="104%" height="104%">
+            <feGaussianBlur stdDeviation="0.4" />
+          </filter>
+        </defs>
+        <g className="desk-web-lines" filter="url(#webBlur)">
+          <line x1="180" y1="140" x2="520" y2="300" />
+          <line x1="520" y1="300" x2="820" y2="180" />
+          <line x1="520" y1="300" x2="360" y2="560" />
+          <line x1="820" y1="180" x2="680" y2="540" />
+          <line x1="360" y1="560" x2="680" y2="540" />
+          <line x1="180" y1="140" x2="680" y2="540" />
+          <line x1="820" y1="180" x2="360" y2="560" />
+        </g>
+        <g className="desk-web-nodes">
+          <circle cx="180" cy="140" r="4" />
+          <circle cx="520" cy="300" r="5" />
+          <circle cx="820" cy="180" r="4" />
+          <circle cx="360" cy="560" r="4" />
+          <circle cx="680" cy="540" r="4" />
+        </g>
+      </svg>
+
+      {/* Handwritten margin notes — detective's own scribbles */}
+      <div className="desk-notes" aria-hidden="true">
+        <span className="desk-note n1">same voice as<br/>MV-4468 ✓</span>
+        <span className="desk-note n2">check alibi ✗</span>
+        <span className="desk-note n3">3rd caller —<br/>accent shift?</span>
+        <span className="desk-note n4">trace → KHI<br/>DHA-05</span>
+        <span className="desk-note n5">$$ moves<br/>Fri 21:40</span>
+      </div>
+
+      {/* Corner case-status ribbon — cycling severity */}
+      <div className="desk-ribbon" aria-hidden="true">
+        <div className="desk-ribbon-band">
+          <span className="rb rb1">COLD</span>
+          <span className="rb rb2">ACTIVE</span>
+          <span className="rb rb3">HOT</span>
+          <span className="rb rb4">RESOLVED</span>
+        </div>
+      </div>
+
+      {/* Top-center clue counter HUD */}
+      <div className="desk-clues" aria-hidden="true">
+        <span className="desk-clues-tag">CASE</span>
+        <span className="desk-clues-id">MV-4471</span>
+        <span className="desk-clues-sep">·</span>
+        <span className="desk-clues-label">CLUES</span>
+        <span className="desk-clues-count" />
+        <span className="desk-clues-total">/07</span>
+      </div>
     </div>
 
 
