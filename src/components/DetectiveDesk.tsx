@@ -1593,6 +1593,49 @@ export function DetectiveDesk({ className = "" }: Props) {
         </span>
         <span className="desk-coords-lock">LOCK</span>
       </div>
+
+      {/* Encrypted data cascade — Matrix-style rain along right edge */}
+      <div className="desk-cascade" aria-hidden="true">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className={`desk-cascade-col c${i}`}>
+            <span>MV-4471</span><span>0xA3F7</span><span>24.86°N</span>
+            <span>67.00°E</span><span>ACK</span><span>0xBE21</span>
+            <span>MV-2189</span><span>03:14:07</span><span>0xDEAD</span>
+            <span>73.04°E</span><span>SIGINT</span><span>0xC0FE</span>
+            <span>MV-0031</span><span>MATCH</span><span>0x9B3C</span>
+            <span>31.54°N</span><span>0xFACE</span><span>MV-1102</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Person of Interest — dossier card cycles through 4 suspects */}
+      <div className="desk-poi" aria-hidden="true">
+        <div className="desk-poi-head">
+          <span className="desk-poi-tag">PERSON OF INTEREST</span>
+          <span className="desk-poi-id">ID · 000-<span className="desk-poi-num">417</span></span>
+        </div>
+        <div className="desk-poi-body">
+          <svg className="desk-poi-mug" viewBox="0 0 40 48">
+            <rect width="40" height="48" fill="rgba(20,10,4,0.85)" />
+            <circle cx="20" cy="18" r="8" fill="rgba(200,170,130,0.55)" />
+            <path d="M4 48 C 6 34, 34 34, 36 48 Z" fill="rgba(200,170,130,0.55)" />
+            <rect x="0" y="22" width="40" height="4" fill="rgba(0,0,0,0.9)" />
+            <rect x="0" y="34" width="40" height="2" fill="rgba(255,220,180,0.35)" />
+          </svg>
+          <div className="desk-poi-lines">
+            <span className="desk-poi-name">ALIAS · "THE VOICE"</span>
+            <span className="desk-poi-meta">CELL 21A · LAHORE</span>
+            <div className="desk-poi-threat">
+              <span className="desk-poi-threat-label">THREAT</span>
+              <span className="desk-poi-threat-bar"><i /></span>
+              <span className="desk-poi-threat-val">HIGH</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Distant lightning — cool-blue full-scene flash, rare */}
+      <div className="desk-thunder" aria-hidden="true" />
     </div>
 
 
