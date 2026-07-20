@@ -3469,15 +3469,17 @@ button[title*="lovable" i] {
 .desk-lamp-pool {
   position: absolute; inset: 0;
   background:
-    radial-gradient(55% 45% at 50% 48%, rgba(255,170,80,0.14), transparent 72%),
-    radial-gradient(120% 90% at 50% 60%, rgba(6,10,18,0.55), rgba(0,0,0,0.92) 82%);
+    radial-gradient(60% 55% at 50% 46%, rgba(255,180,90,0.18), transparent 74%),
+    radial-gradient(140% 110% at 50% 65%, rgba(38,20,10,0.55), rgba(14,7,3,0.95) 88%);
   pointer-events: none;
   z-index: 0;
 }
 /* Vignette on top of the canvas so the headline stays readable */
 .desk-vignette {
   position: absolute; inset: 0;
-  background: radial-gradient(60% 45% at 50% 50%, rgba(0,0,0,0.55), transparent 70%);
+  background:
+    radial-gradient(65% 50% at 50% 45%, rgba(0,0,0,0.55), transparent 72%),
+    linear-gradient(to bottom, transparent 70%, rgba(10,6,3,0.75));
   pointer-events: none;
   z-index: 2;
 }
