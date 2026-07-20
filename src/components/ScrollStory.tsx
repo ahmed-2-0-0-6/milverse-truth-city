@@ -256,6 +256,24 @@ export function ScrollStory() {
           className={`story-beat relative min-h-[85vh] flex items-center justify-center overflow-hidden px-6 ${b.finale ? "finale-beat" : ""}`}
         >
           <div className="beat-bg absolute inset-0 -z-10" aria-hidden>
+            {BEAT_BACKDROPS[i] && (
+              <>
+                <div
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url(${BEAT_BACKDROPS[i]})`,
+                    filter: "saturate(0.85) contrast(1.05)",
+                  }}
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "radial-gradient(120% 80% at 50% 45%, rgba(3,6,12,0.35) 30%, rgba(3,6,12,0.7) 70%, rgba(0,0,0,0.92) 100%), linear-gradient(180deg, rgba(10,20,35,0.3) 0%, rgba(5,8,14,0.55) 100%)",
+                  }}
+                />
+              </>
+            )}
             <div className="absolute inset-0 opacity-20"
               style={{
                 backgroundImage: "radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px)",
@@ -263,6 +281,7 @@ export function ScrollStory() {
               }}
             />
           </div>
+
 
           <div className="relative z-10 max-w-4xl text-center">
 
