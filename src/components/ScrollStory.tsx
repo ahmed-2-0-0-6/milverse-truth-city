@@ -262,7 +262,7 @@ export function ScrollStory() {
           key={i}
           className={`story-beat relative min-h-screen flex items-center justify-center overflow-hidden px-6 ${BEAT_BACKDROPS[i] ? "story-beat--image" : ""} ${b.finale ? "finale-beat" : ""}`}
         >
-          <div className="beat-bg absolute -inset-y-[24vh] inset-x-0 -z-10" aria-hidden>
+          <div className="beat-bg pointer-events-none absolute -inset-y-[24vh] inset-x-0 z-0" aria-hidden>
             {BEAT_BACKDROPS[i] && (
               <>
                 <div
@@ -321,7 +321,7 @@ export function ScrollStory() {
 
       {/* MIL triad — judge-proofing */}
       <section className="story-beat relative min-h-[80vh] flex items-center justify-center overflow-hidden px-6 border-y border-white/5">
-        <div className="beat-bg absolute inset-0 -z-10" aria-hidden>
+        <div className="beat-bg pointer-events-none absolute inset-0 z-0" aria-hidden>
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/[0.05] to-transparent" />
         </div>
         <div className="relative max-w-5xl text-center">
