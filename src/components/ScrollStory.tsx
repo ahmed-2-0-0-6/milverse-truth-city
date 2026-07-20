@@ -1,12 +1,9 @@
 // LAYER-7 — Scroll-driven story beats. GSAP ScrollTrigger + horizontal districts.
 // Lazy imports GSAP; respects reduced-motion (renders static).
-import { lazy, Suspense, useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
-import { useVisualMode } from "@/lib/visual-quality";
-const DetectiveDesk = lazy(() =>
-  import("@/components/DetectiveDesk").then((m) => ({ default: m.DetectiveDesk })),
-);
+
 
 import mirrorArt from "@/assets/district-mirror.jpg";
 import feedArt from "@/assets/district-feed.jpg";
@@ -194,41 +191,22 @@ export function ScrollStory() {
     };
   }, []);
 
-  // Fixed-viewport desk stays visible whenever the ScrollStory is on screen.
-  // Only MOUNT the heavy 3D canvas when the section is actually near the viewport,
-  // and never on LITE mode. Prevents shaders/geometry from running when scrolled away.
-  const { mode } = useVisualMode();
-  const [deskActive, setDeskActive] = useState(false);
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el || !("IntersectionObserver" in window)) return;
-    const io = new IntersectionObserver(([e]) => setDeskActive(e.isIntersecting), {
-      threshold: 0,
-      rootMargin: "200px 0px",
-    });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
 
-  const showDesk = mode === "cinematic" && deskActive;
+
 
   return (
     <div ref={rootRef} className="scrollstory relative isolate">
-      {/* Detective-desk background — sticky within ScrollStory only, so it
-          acts as the room behind the story beats and never leaks into the
-          rest of the page. */}
-      <div
-        className={`pointer-events-none absolute inset-0 z-0 ${showDesk ? "opacity-100" : "opacity-0"} transition-opacity duration-700`}
-        aria-hidden
-      >
-        <div className="sticky top-0 h-screen w-full">
-          {showDesk ? (
-            <Suspense fallback={null}>
-              <DetectiveDesk />
-            </Suspense>
-          ) : null}
-        </div>
+      {/* Lightweight noir backdrop — replaces the heavy 3D detective desk. */}
+      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
+        <div
+          className="sticky top-0 h-screen w-full"
+          style={{
+            background:
+              "radial-gradient(1200px 700px at 30% 40%, rgba(255,180,90,0.10), transparent 60%), radial-gradient(900px 600px at 75% 70%, rgba(120,180,255,0.06), transparent 65%), linear-gradient(180deg, #0a0806 0%, #050403 100%)",
+          }}
+        />
       </div>
+
 
 
 
