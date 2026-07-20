@@ -467,7 +467,7 @@ export function DetectiveDesk({ className = "" }: Props) {
           <Canvas
             dpr={dpr}
             frameloop={visible && !reduced ? "always" : "demand"}
-            camera={{ position: [0, 11, 17], fov: 42 }}
+            camera={{ position: [0, 9, 15], fov: 54 }}
             gl={{
               antialias: false,
               powerPreference: "low-power",
@@ -479,14 +479,16 @@ export function DetectiveDesk({ className = "" }: Props) {
           >
             <PauseWhenHidden />
             <CameraRig />
-            <fog attach="fog" args={["#0a0603", 18, 42]} />
-            <ambientLight intensity={0.25} color="#6a3a1a" />
+            <fog attach="fog" args={["#120904", 26, 60]} />
+            <ambientLight intensity={0.28} color="#6a3a1a" />
             <hemisphereLight args={["#8a5424", "#000000", 0.35]} />
             <directionalLight position={[0, 12, 6]} intensity={0.6} color="#ffb060" />
             <Tabletop />
             <CaseFiles />
             <Photo />
             <Magnifier />
+            <Pen />
+            <Cup />
             <Candle />
             <Dust />
           </Canvas>
