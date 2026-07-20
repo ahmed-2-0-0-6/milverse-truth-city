@@ -151,30 +151,6 @@ function CityMap() {
           className="fixed z-[260] bottom-4 left-4 w-[calc(100%-2rem)] sm:w-[22rem] max-h-[80dvh] overflow-y-auto flex flex-col-reverse gap-3 pointer-events-none [&>*]:pointer-events-auto [&>*]:nudge-slide-in"
           aria-label="Notifications"
         >
-          {booted && showBeacon && (
-            <LandingNudge
-              kind="beacon"
-              shift={shift}
-              onDismiss={() => {
-                setShowBeacon(false);
-                try { sessionStorage.setItem("mv:beacon-dismissed", "1"); } catch { /* noop */ }
-              }}
-            />
-          )}
-          {booted && showBait && (
-            <LandingNudge
-              kind="bait"
-              shift={shift}
-              onDismiss={() => setShowBait(false)}
-            />
-          )}
-          {booted && !showBait && returning && (
-            <LandingNudge
-              kind="desk"
-              shift={shift}
-              onDismiss={() => setReturning(false)}
-            />
-          )}
           <PaperNudge show={heroTyped} />
         </div>
       )}
