@@ -4340,3 +4340,236 @@ button[title*="lovable" i] {
   .detective-desk .desk-coords { font-size: 9px; padding: 3px 7px; }
   .detective-desk .desk-coords-val { width: 190px; }
 }
+
+/* ============================================================
+   DetectiveDesk — Data cascade, POI dossier, Thunder flash
+   (all compositor-only; no WebGL frame cost)
+   ============================================================ */
+
+/* --- Encrypted data cascade (right edge) --- */
+.detective-desk .desk-cascade {
+  position: absolute; top: 0; bottom: 0; right: 0;
+  width: 92px;
+  z-index: 3; pointer-events: none;
+  overflow: hidden;
+  mix-blend-mode: screen;
+  opacity: 0.55;
+  mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+}
+.detective-desk .desk-cascade-col {
+  position: absolute; top: -100%;
+  width: 14px;
+  display: flex; flex-direction: column; align-items: center;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 9.5px; line-height: 1.55;
+  color: rgba(120,255,190,0.85);
+  text-shadow: 0 0 4px rgba(0,255,180,0.55);
+  animation: dd-cascade-fall linear infinite;
+  will-change: transform;
+}
+.detective-desk .desk-cascade-col span {
+  opacity: 0.55;
+}
+.detective-desk .desk-cascade-col span:nth-child(3n) { color: rgba(255,220,180,0.75); opacity: 0.9; }
+.detective-desk .desk-cascade-col span:nth-child(5n) { opacity: 0.3; }
+.detective-desk .desk-cascade-col.c0 { left:  4px; animation-duration: 14s; animation-delay:  0s; }
+.detective-desk .desk-cascade-col.c1 { left: 20px; animation-duration: 18s; animation-delay: -3s; }
+.detective-desk .desk-cascade-col.c2 { left: 36px; animation-duration: 12s; animation-delay: -6s; }
+.detective-desk .desk-cascade-col.c3 { left: 52px; animation-duration: 20s; animation-delay: -1s; }
+.detective-desk .desk-cascade-col.c4 { left: 68px; animation-duration: 15s; animation-delay: -8s; }
+.detective-desk .desk-cascade-col.c5 { left: 84px; animation-duration: 17s; animation-delay: -4s; }
+@keyframes dd-cascade-fall {
+  from { transform: translateY(0);    }
+  to   { transform: translateY(220%); }
+}
+
+/* --- Person of Interest dossier card --- */
+.detective-desk .desk-poi {
+  position: absolute; right: 108px; top: 30%;
+  width: 190px;
+  z-index: 6; pointer-events: none;
+  background: linear-gradient(180deg, rgba(24,14,6,0.92), rgba(10,6,3,0.92));
+  border: 1px solid rgba(255,180,110,0.35);
+  border-radius: 3px;
+  box-shadow: 0 12px 26px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.5) inset;
+  opacity: 0;
+  transform: translateX(20px);
+  animation: dd-poi-cycle 22s cubic-bezier(0.2,0.9,0.3,1) infinite;
+  animation-delay: 3s;
+}
+.detective-desk .desk-poi-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 8px;
+  border-bottom: 1px solid rgba(255,180,110,0.22);
+  background: rgba(255,140,60,0.14);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 9px; letter-spacing: 0.18em;
+  color: rgba(255,220,180,0.9);
+}
+.detective-desk .desk-poi-tag { color: rgba(255,150,70,1); }
+.detective-desk .desk-poi-num {
+  display: inline-block; min-width: 28px;
+  color: rgba(120,255,190,0.9);
+  animation: dd-poi-num 22s steps(1, end) infinite 3s;
+}
+@keyframes dd-poi-num {
+  0%, 24%   { content: "417"; }
+  25%, 49%  { content: "902"; }
+  50%, 74%  { content: "633"; }
+  75%, 100% { content: "058"; }
+}
+.detective-desk .desk-poi-body {
+  display: flex; gap: 8px;
+  padding: 8px;
+}
+.detective-desk .desk-poi-mug {
+  flex: 0 0 40px; width: 40px; height: 48px;
+  border: 1px solid rgba(255,180,110,0.35);
+  border-radius: 2px;
+  filter: grayscale(1) contrast(1.05);
+}
+.detective-desk .desk-poi-lines {
+  flex: 1; display: flex; flex-direction: column; justify-content: space-between;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 9.5px; letter-spacing: 0.08em;
+  color: rgba(255,220,180,0.9);
+  min-width: 0;
+}
+.detective-desk .desk-poi-name {
+  font-family: "Bebas Neue", Impact, sans-serif;
+  font-size: 13px; letter-spacing: 0.12em;
+  color: rgba(255,150,70,1);
+  animation: dd-poi-name 22s steps(1, end) infinite 3s;
+}
+.detective-desk .desk-poi-meta { color: rgba(255,220,180,0.6); font-size: 8.5px; }
+.detective-desk .desk-poi-threat {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 8.5px;
+}
+.detective-desk .desk-poi-threat-label { color: rgba(255,220,180,0.6); }
+.detective-desk .desk-poi-threat-bar {
+  flex: 1; height: 4px; border-radius: 2px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+.detective-desk .desk-poi-threat-bar i {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, #ffb050, #ff3a2a);
+  transform-origin: left;
+  animation: dd-poi-threat 22s ease-out infinite 3s;
+}
+.detective-desk .desk-poi-threat-val {
+  color: #ff3a2a; font-weight: 700;
+  animation: dd-poi-threat-val 22s steps(1, end) infinite 3s;
+}
+@keyframes dd-poi-cycle {
+  0%          { opacity: 0; transform: translateX(24px); }
+  4%, 22%     { opacity: 1; transform: translateX(0);    }
+  26%, 28%    { opacity: 0; transform: translateX(-8px); }
+  29%         { opacity: 0; transform: translateX(24px); }
+  33%, 47%    { opacity: 1; transform: translateX(0);    }
+  51%, 53%    { opacity: 0; transform: translateX(-8px); }
+  54%         { opacity: 0; transform: translateX(24px); }
+  58%, 72%    { opacity: 1; transform: translateX(0);    }
+  76%, 78%    { opacity: 0; transform: translateX(-8px); }
+  79%         { opacity: 0; transform: translateX(24px); }
+  83%, 97%    { opacity: 1; transform: translateX(0);    }
+  100%        { opacity: 0; transform: translateX(-8px); }
+}
+@keyframes dd-poi-name {
+  0%, 24%   { content: ""; }
+  /* Names are rendered via ::before below because ::content on span is nonstandard */
+}
+/* Actual cycling names via ::before pseudos */
+.detective-desk .desk-poi-name::before {
+  content: 'ALIAS · "THE VOICE"';
+  animation: dd-poi-name-a 22s steps(1, end) infinite 3s;
+}
+@keyframes dd-poi-name-a {
+  0%, 24%   { content: 'ALIAS · "THE VOICE"'; }
+  25%, 49%  { content: 'ALIAS · "GHOST BOOKER"'; }
+  50%, 74%  { content: 'ALIAS · "AUNTIE-CARD"'; }
+  75%, 100% { content: 'ALIAS · "COURIER-9"'; }
+}
+.detective-desk .desk-poi-num::before {
+  content: '417';
+  animation: dd-poi-num-a 22s steps(1, end) infinite 3s;
+}
+@keyframes dd-poi-num-a {
+  0%, 24%   { content: '417'; }
+  25%, 49%  { content: '902'; }
+  50%, 74%  { content: '633'; }
+  75%, 100% { content: '058'; }
+}
+.detective-desk .desk-poi-name, .detective-desk .desk-poi-num {
+  color: transparent; /* hide the real text; show only pseudo */
+}
+.detective-desk .desk-poi-name::before, .detective-desk .desk-poi-num::before {
+  color: initial;
+}
+.detective-desk .desk-poi-name { color: rgba(255,150,70,1); }
+.detective-desk .desk-poi-name::before { color: rgba(255,150,70,1); }
+.detective-desk .desk-poi-num { color: rgba(120,255,190,0.9); }
+.detective-desk .desk-poi-num::before { color: rgba(120,255,190,0.9); }
+/* actual text nodes still there for a11y; visually hidden via 0 font-size wouldn't work — keep them, pseudo overlays */
+.detective-desk .desk-poi-name, .detective-desk .desk-poi-num { position: relative; font-size: 0; }
+.detective-desk .desk-poi-name::before, .detective-desk .desk-poi-num::before {
+  font-size: 13px;
+}
+.detective-desk .desk-poi-num::before { font-size: 9px; }
+
+@keyframes dd-poi-threat {
+  0%   { transform: scaleX(0.2); }
+  20%  { transform: scaleX(0.95); }
+  25%, 49% { transform: scaleX(0.65); }
+  50%, 74% { transform: scaleX(0.85); }
+  75%, 100%{ transform: scaleX(0.55); }
+}
+@keyframes dd-poi-threat-val {
+  0%, 24%   { color: #ff3a2a; }
+  25%, 49%  { color: #ffb050; }
+  50%, 74%  { color: #ff3a2a; }
+  75%, 100% { color: #ffd070; }
+}
+
+/* --- Distant thunder flash --- */
+.detective-desk .desk-thunder {
+  position: absolute; inset: 0;
+  z-index: 8; pointer-events: none;
+  background: radial-gradient(120% 100% at 30% 25%,
+    rgba(140,180,255,0.7) 0%,
+    rgba(100,150,255,0.28) 30%,
+    transparent 60%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: dd-thunder 17s ease-out infinite;
+}
+@keyframes dd-thunder {
+  0%, 88%   { opacity: 0; }
+  89%       { opacity: 0.85; }
+  90%       { opacity: 0.05; }
+  90.4%     { opacity: 0.7; }
+  91%       { opacity: 0; }
+  95%       { opacity: 0.3; }
+  95.5%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detective-desk .desk-cascade-col,
+  .detective-desk .desk-poi,
+  .detective-desk .desk-poi-name::before,
+  .detective-desk .desk-poi-num::before,
+  .detective-desk .desk-poi-threat-bar i,
+  .detective-desk .desk-poi-threat-val,
+  .detective-desk .desk-thunder { animation: none; }
+  .detective-desk .desk-poi { opacity: 1; transform: none; }
+}
+
+@media (max-width: 640px) {
+  .detective-desk .desk-cascade { width: 60px; }
+  .detective-desk .desk-cascade-col.c3,
+  .detective-desk .desk-cascade-col.c4,
+  .detective-desk .desk-cascade-col.c5 { display: none; }
+  .detective-desk .desk-poi { display: none; }
+}
