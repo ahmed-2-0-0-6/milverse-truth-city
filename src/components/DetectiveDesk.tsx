@@ -553,64 +553,162 @@ function Typewriter() {
   );
 }
 
-// ---------- ashtray with cigar + ember + smoke ----------
-function Ashtray() {
+// ---------- brass candlestick with pillar candle, live flame + wax drips ----------
+function Candle() {
+  const flameRef = useRef<THREE.Mesh>(null);
+  const flameLightRef = useRef<THREE.PointLight>(null);
   const smokeRef = useRef<THREE.Points>(null);
-  const geom = useMemo(() => {
+  const glowRef = useRef<THREE.Mesh>(null);
+
+  // wisp of smoke rising from the wick
+  const smokeGeom = useMemo(() => {
     const g = new THREE.BufferGeometry();
-    const n = 40;
+    const n = 22;
     const pos = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 0.4;
-      pos[i * 3 + 1] = 0.6 + Math.random() * 3;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 0.4;
+      pos[i * 3] = (Math.random() - 0.5) * 0.15;
+      pos[i * 3 + 1] = 0.1 + Math.random() * 2.2;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 0.15;
     }
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     return g;
   }, []);
+
+  // procedural wax texture — creamy ivory with faint drip streaks
+  const waxTex = useMemo(
+    () =>
+      canvasTex(256, 512, (ctx) => {
+        const g = ctx.createLinearGradient(0, 0, 0, 512);
+        g.addColorStop(0, "#f5ecd6");
+        g.addColorStop(1, "#e2d3ae");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 256, 512);
+        // faint vertical drip runs
+        for (let i = 0; i < 14; i++) {
+          const x = Math.random() * 256;
+          ctx.fillStyle = `rgba(210,190,150,${0.15 + Math.random() * 0.25})`;
+          ctx.fillRect(x, 40 + Math.random() * 180, 2 + Math.random() * 3, 220 + Math.random() * 180);
+        }
+        // subtle mottling
+        for (let i = 0; i < 400; i++) {
+          ctx.fillStyle = `rgba(120,90,50,${Math.random() * 0.06})`;
+          ctx.fillRect(Math.random() * 256, Math.random() * 512, 1, 1);
+        }
+      }),
+    [],
+  );
+
   useFrame((_, dt) => {
+    const t = performance.now() * 0.001;
+    // flame flicker — scale + slight sway
+    if (flameRef.current) {
+      const flick = 1 + Math.sin(t * 14) * 0.06 + Math.sin(t * 27) * 0.04;
+      flameRef.current.scale.set(flick, 1 + Math.sin(t * 9) * 0.08, flick);
+      flameRef.current.rotation.z = Math.sin(t * 3.2) * 0.05;
+    }
+    if (flameLightRef.current) {
+      flameLightRef.current.intensity = 1.1 + Math.sin(t * 11) * 0.25 + Math.sin(t * 23) * 0.1;
+    }
+    if (glowRef.current) {
+      const m = glowRef.current.material as THREE.MeshBasicMaterial;
+      m.opacity = 0.28 + Math.sin(t * 8) * 0.06;
+    }
+    // smoke drift
     if (!smokeRef.current) return;
     const pos = smokeRef.current.geometry.attributes.position as THREE.BufferAttribute;
     const arr = pos.array as Float32Array;
     for (let i = 0; i < arr.length; i += 3) {
-      arr[i + 1] += dt * 0.4;
-      arr[i] += Math.sin(performance.now() * 0.0005 + i) * dt * 0.12;
-      if (arr[i + 1] > 4.5) {
-        arr[i + 1] = 0.6;
-        arr[i] = (Math.random() - 0.5) * 0.3;
-        arr[i + 2] = (Math.random() - 0.5) * 0.3;
+      arr[i + 1] += dt * 0.35;
+      arr[i] += Math.sin(t + i) * dt * 0.08;
+      if (arr[i + 1] > 3.2) {
+        arr[i + 1] = 0.1;
+        arr[i] = (Math.random() - 0.5) * 0.1;
+        arr[i + 2] = (Math.random() - 0.5) * 0.1;
       }
     }
     pos.needsUpdate = true;
   });
+
   return (
     <group position={[5.5, 0, 7]}>
-      {/* dish */}
+      {/* brass saucer base */}
       <mesh castShadow receiveShadow>
-        <cylinderGeometry args={[1.1, 1.0, 0.22, 32]} />
-        <meshStandardMaterial color="#c48b3a" metalness={0.85} roughness={0.35} />
+        <cylinderGeometry args={[0.95, 1.05, 0.12, 40]} />
+        <meshStandardMaterial color="#d0973f" metalness={0.9} roughness={0.28} />
       </mesh>
-      <mesh position={[0, 0.12, 0]}>
-        <cylinderGeometry args={[0.9, 0.85, 0.06, 32]} />
-        <meshStandardMaterial color="#1a1108" roughness={0.7} />
+      {/* brass stem */}
+      <mesh position={[0, 0.35, 0]} castShadow>
+        <cylinderGeometry args={[0.18, 0.28, 0.5, 24]} />
+        <meshStandardMaterial color="#c48b3a" metalness={0.92} roughness={0.24} />
       </mesh>
-      {/* cigar */}
-      <mesh position={[0.35, 0.24, 0]} rotation={[0, 0, Math.PI / 2 - 0.2]} castShadow>
-        <cylinderGeometry args={[0.09, 0.09, 1.4, 16]} />
-        <meshStandardMaterial color="#4a2a12" roughness={0.9} />
+      {/* brass cup that holds the candle */}
+      <mesh position={[0, 0.7, 0]} castShadow>
+        <cylinderGeometry args={[0.42, 0.34, 0.22, 28]} />
+        <meshStandardMaterial color="#e0a24d" metalness={0.95} roughness={0.22} />
       </mesh>
-      {/* ember */}
-      <mesh position={[1.02, 0.28, 0]}>
-        <sphereGeometry args={[0.09, 12, 12]} />
-        <meshStandardMaterial color="#ff5522" emissive="#ff7733" emissiveIntensity={2} />
+      {/* melted wax pool on cup rim */}
+      <mesh position={[0, 0.82, 0]}>
+        <cylinderGeometry args={[0.44, 0.44, 0.04, 28]} />
+        <meshStandardMaterial color="#f0e2bd" roughness={0.55} />
       </mesh>
-      <pointLight position={[1.02, 0.35, 0]} color="#ff7733" intensity={0.5} distance={2} />
-      <points ref={smokeRef} geometry={geom} position={[1.02, 0, 0]}>
-        <pointsMaterial
-          size={0.32}
-          color="#c9b8a0"
+      {/* pillar candle (used, uneven top) */}
+      <mesh position={[0, 1.55, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.32, 0.34, 1.5, 32]} />
+        <meshStandardMaterial map={waxTex} roughness={0.6} />
+      </mesh>
+      {/* soft translucent glow inside the wax near the top (candle-lit-from-within) */}
+      <mesh position={[0, 2.15, 0]}>
+        <cylinderGeometry args={[0.32, 0.32, 0.35, 32]} />
+        <meshStandardMaterial
+          color="#ffcf88"
+          emissive="#ff9d4a"
+          emissiveIntensity={0.6}
           transparent
-          opacity={0.18}
+          opacity={0.55}
+          roughness={0.4}
+        />
+      </mesh>
+      {/* uneven melted top rim */}
+      <mesh position={[0, 2.32, 0]}>
+        <torusGeometry args={[0.3, 0.05, 8, 24]} />
+        <meshStandardMaterial color="#f4e6c0" roughness={0.5} />
+      </mesh>
+      {/* charred wick */}
+      <mesh position={[0, 2.4, 0]}>
+        <cylinderGeometry args={[0.015, 0.015, 0.14, 8]} />
+        <meshStandardMaterial color="#1a0f08" roughness={1} />
+      </mesh>
+      {/* flame — teardrop */}
+      <mesh ref={flameRef} position={[0, 2.62, 0]}>
+        <sphereGeometry args={[0.11, 16, 16]} />
+        <meshBasicMaterial color="#ffd58a" transparent opacity={0.95} />
+      </mesh>
+      {/* outer flame halo */}
+      <mesh position={[0, 2.62, 0]}>
+        <sphereGeometry args={[0.2, 16, 16]} />
+        <meshBasicMaterial color="#ff8a3a" transparent opacity={0.35} depthWrite={false} />
+      </mesh>
+      {/* pool of warm light around the candle head */}
+      <mesh ref={glowRef} position={[0, 2.62, 0]}>
+        <sphereGeometry args={[0.55, 16, 16]} />
+        <meshBasicMaterial color="#ffb060" transparent opacity={0.28} depthWrite={false} />
+      </mesh>
+      {/* the actual light source */}
+      <pointLight
+        ref={flameLightRef}
+        position={[0, 2.7, 0]}
+        color="#ffb268"
+        intensity={1.2}
+        distance={7}
+        decay={2}
+      />
+      {/* smoke wisp */}
+      <points ref={smokeRef} geometry={smokeGeom} position={[0, 2.7, 0]}>
+        <pointsMaterial
+          size={0.14}
+          color="#d8cbb2"
+          transparent
+          opacity={0.14}
           depthWrite={false}
           sizeAttenuation
         />
@@ -618,6 +716,7 @@ function Ashtray() {
     </group>
   );
 }
+
 
 // ---------- coffee mug + steam ----------
 function CoffeeMug() {
