@@ -1363,19 +1363,8 @@ export function DetectiveDesk({ className = "" }: Props) {
     };
   }, [reduced]);
 
-  // Live CCTV timecode — real wall clock, tiny state, updates once/sec
-  const [clock, setClock] = useState(() => {
-    const d = new Date();
-    return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`;
-  });
-  useEffect(() => {
-    if (reduced) return;
-    const id = window.setInterval(() => {
-      const d = new Date();
-      setClock(`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`);
-    }, 1000);
-    return () => window.clearInterval(id);
-  }, [reduced]);
+  // Clock is owned by a leaf component (CctvClock) so the once-per-second
+  // tick doesn't re-render the entire 3D tree.
 
 
 
@@ -1540,7 +1529,7 @@ export function DetectiveDesk({ className = "" }: Props) {
         <span className="desk-cctv-cross" />
         <span className="desk-cctv-scan" />
         <span className="desk-cctv-meta">
-          <span className="desk-cctv-rec" /> REC · CAM-03 · {clock}
+          <span className="desk-cctv-rec" /> REC · CAM-03 · <CctvClock reduced={reduced} />
         </span>
       </div>
 
