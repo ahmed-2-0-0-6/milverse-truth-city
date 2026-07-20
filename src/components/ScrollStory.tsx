@@ -3,6 +3,7 @@
 import { lazy, Suspense, useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
+import { useVisualMode } from "@/lib/visual-quality";
 const DetectiveDesk = lazy(() =>
   import("@/components/DetectiveDesk").then((m) => ({ default: m.DetectiveDesk })),
 );
