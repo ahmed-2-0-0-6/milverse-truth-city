@@ -12,6 +12,14 @@ import archiveArt from "@/assets/district-archive.jpg";
 import cleanroomArt from "@/assets/district-cleanroom.jpg";
 import mirrorVideo from "@/assets/mirror.mp4.asset.json";
 import gothamDeskArt from "@/assets/detective-desk-gotham.jpg";
+import gothamBoardArt from "@/assets/detective-board-gotham.jpg";
+
+const BEAT_BACKDROPS: (string | undefined)[] = [
+  undefined,
+  gothamBoardArt,
+  undefined,
+  undefined,
+];
 
 
 type District = {
