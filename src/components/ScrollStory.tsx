@@ -253,7 +253,7 @@ export function ScrollStory() {
       {BEATS.map((b, i) => (
         <section
           key={i}
-          className={`story-beat relative min-h-[85vh] flex items-center justify-center overflow-hidden px-6 ${b.finale ? "finale-beat" : ""}`}
+          className={`story-beat relative min-h-screen flex items-center justify-center overflow-hidden px-6 ${b.finale ? "finale-beat" : ""}`}
         >
           <div className="beat-bg absolute inset-0 -z-10" aria-hidden>
             {BEAT_BACKDROPS[i] && (
