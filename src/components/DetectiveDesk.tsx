@@ -348,16 +348,61 @@ function Dust() {
   );
 }
 
+// ---------- fountain pen ----------
+function Pen() {
+  return (
+    <group position={[-2, 0.08, 5.2]} rotation={[-Math.PI / 2, 0, 1.15]}>
+      <mesh>
+        <cylinderGeometry args={[0.08, 0.08, 2.4, 12]} />
+        <meshStandardMaterial color="#0e0a08" roughness={0.4} metalness={0.2} />
+      </mesh>
+      <mesh position={[0, 1.35, 0]}>
+        <coneGeometry args={[0.08, 0.35, 12]} />
+        <meshStandardMaterial color="#c9a24a" roughness={0.25} metalness={0.95} />
+      </mesh>
+      <mesh position={[0, -1.15, 0]}>
+        <cylinderGeometry args={[0.09, 0.09, 0.15, 12]} />
+        <meshStandardMaterial color="#c9a24a" roughness={0.25} metalness={0.95} />
+      </mesh>
+    </group>
+  );
+}
+
+// ---------- coffee cup ----------
+function Cup() {
+  return (
+    <group position={[-7.5, 0, -3.2]}>
+      <mesh position={[0, 0.05, 0]}>
+        <cylinderGeometry args={[0.95, 0.85, 0.1, 24]} />
+        <meshStandardMaterial color="#2a1a10" roughness={0.6} metalness={0.1} />
+      </mesh>
+      <mesh position={[0, 0.55, 0]}>
+        <cylinderGeometry args={[0.7, 0.62, 1.0, 24, 1, true]} />
+        <meshStandardMaterial color="#efe6d4" roughness={0.55} side={THREE.DoubleSide} />
+      </mesh>
+      <mesh position={[0, 1.02, 0]}>
+        <cylinderGeometry args={[0.66, 0.66, 0.02, 24]} />
+        <meshStandardMaterial color="#3a2010" roughness={0.4} emissive="#180a04" emissiveIntensity={0.4} />
+      </mesh>
+      {/* handle */}
+      <mesh position={[0.78, 0.55, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <torusGeometry args={[0.22, 0.06, 8, 16, Math.PI]} />
+        <meshStandardMaterial color="#efe6d4" roughness={0.55} />
+      </mesh>
+    </group>
+  );
+}
+
 // ---------- camera drift ----------
 function CameraRig() {
   const { camera } = useThree();
   const t0 = useRef(performance.now());
   useFrame(() => {
     const t = (performance.now() - t0.current) * 0.00008;
-    camera.position.x = Math.sin(t) * 1.6;
-    camera.position.z = 17 + Math.cos(t * 0.7) * 0.6;
-    camera.position.y = 11 + Math.sin(t * 0.5) * 0.4;
-    camera.lookAt(0, 0.4, 0);
+    camera.position.x = Math.sin(t) * 1.4;
+    camera.position.z = 15 + Math.cos(t * 0.7) * 0.5;
+    camera.position.y = 9 + Math.sin(t * 0.5) * 0.35;
+    camera.lookAt(0, 0.2, 0);
   });
   return null;
 }
