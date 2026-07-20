@@ -20,7 +20,7 @@ import {
   type TrustProfile,
 } from "@/lib/mirror/profile";
 import { isMuted, setMuted } from "@/lib/mirror/audio";
-import { VisualQualityToggle } from "@/components/VisualQualityToggle";
+
 import { SoundIntroChip } from "@/components/SoundIntroChip";
 import { AccessPanel } from "@/components/AccessPanel";
 import { loadUnlocked } from "@/lib/manual/state";
@@ -247,9 +247,8 @@ export function TopBar() {
                     {muted ? <VolumeX className="h-4 w-4" aria-hidden /> : <Volume2 className="h-4 w-4" aria-hidden />}
                     {muted ? "Unmute sound" : "Mute sound"}
                   </button>
-                  <div className="px-2 pt-1">
-                    <VisualQualityToggle />
-                  </div>
+
+
 
                 </div>
               </nav>
