@@ -1544,29 +1544,6 @@ export function DetectiveDesk({ className = "" }: Props) {
         <span className="desk-morse-tag">TX · SOS</span>
       </div>
 
-      {/* CCTV viewfinder — corner brackets, crosshair, live REC + timecode */}
-      <div className="desk-cctv" aria-hidden="true">
-        <span className="desk-cctv-b tl" /><span className="desk-cctv-b tr" />
-        <span className="desk-cctv-b bl" /><span className="desk-cctv-b br" />
-        <span className="desk-cctv-cross" />
-        <span className="desk-cctv-scan" />
-        <span className="desk-cctv-meta">
-          <span className="desk-cctv-rec" /> REC · CAM-03 · <CctvClock reduced={reduced} />
-        </span>
-      </div>
-
-      {/* Polygraph strip — animated pulse line along the bottom */}
-      <div className="desk-poly" aria-hidden="true">
-        <span className="desk-poly-label">STRESS INDEX</span>
-        <svg className="desk-poly-svg" viewBox="0 0 600 40" preserveAspectRatio="none">
-          <path
-            className="desk-poly-path"
-            d="M0 20 L60 20 L70 8 L80 32 L90 20 L160 20 L172 4 L184 36 L196 20 L280 20 L292 12 L304 28 L316 20 L400 20 L412 2 L424 38 L436 20 L520 20 L532 14 L544 26 L556 20 L600 20"
-            fill="none" stroke="rgba(120,255,190,0.9)" strokeWidth="1.4"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-      </div>
 
       {/* UV Blacklight sweep — auto-cycles; reveals a hidden watermark */}
       <div className="desk-uv" aria-hidden="true">
@@ -1605,31 +1582,6 @@ export function DetectiveDesk({ className = "" }: Props) {
         ))}
       </div>
 
-      {/* Person of Interest — dossier card cycles through 4 suspects */}
-      <div className="desk-poi" aria-hidden="true">
-        <div className="desk-poi-head">
-          <span className="desk-poi-tag">PERSON OF INTEREST</span>
-          <span className="desk-poi-id">ID · 000-<span className="desk-poi-num">417</span></span>
-        </div>
-        <div className="desk-poi-body">
-          <svg className="desk-poi-mug" viewBox="0 0 40 48">
-            <rect width="40" height="48" fill="rgba(20,10,4,0.85)" />
-            <circle cx="20" cy="18" r="8" fill="rgba(200,170,130,0.55)" />
-            <path d="M4 48 C 6 34, 34 34, 36 48 Z" fill="rgba(200,170,130,0.55)" />
-            <rect x="0" y="22" width="40" height="4" fill="rgba(0,0,0,0.9)" />
-            <rect x="0" y="34" width="40" height="2" fill="rgba(255,220,180,0.35)" />
-          </svg>
-          <div className="desk-poi-lines">
-            <span className="desk-poi-name">ALIAS · "THE VOICE"</span>
-            <span className="desk-poi-meta">CELL 21A · LAHORE</span>
-            <div className="desk-poi-threat">
-              <span className="desk-poi-threat-label">THREAT</span>
-              <span className="desk-poi-threat-bar"><i /></span>
-              <span className="desk-poi-threat-val">HIGH</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Distant lightning — cool-blue full-scene flash, rare */}
       <div className="desk-thunder" aria-hidden="true" />
@@ -1782,37 +1734,6 @@ export function DetectiveDesk({ className = "" }: Props) {
         </div>
       </div>
 
-      {/* Evidence notifications — right-side toast stack */}
-      <div className="desk-toasts" aria-hidden="true">
-        <div className="desk-toast t1">
-          <span className="desk-toast-dot" />
-          <div><b>MATCH · MULE A/C</b><em>••••3391 · JS BANK</em></div>
-        </div>
-        <div className="desk-toast t2">
-          <span className="desk-toast-dot" />
-          <div><b>IP TRACE · KHI/DHA-05</b><em>39.62.14.220 · CBM</em></div>
-        </div>
-        <div className="desk-toast t3">
-          <span className="desk-toast-dot warn" />
-          <div><b>VOICE MATCH · 91.3%</b><em>vs REFERENCE-04</em></div>
-        </div>
-        <div className="desk-toast t4">
-          <span className="desk-toast-dot ok" />
-          <div><b>WIRE HOLD · CLEARED</b><em>128,400 PKR · SBP</em></div>
-        </div>
-      </div>
-
-
-
-
-      {/* Handwritten margin notes — detective's own scribbles */}
-      <div className="desk-notes" aria-hidden="true">
-        <span className="desk-note n1">same voice as<br/>MV-4468 ✓</span>
-        <span className="desk-note n2">check alibi ✗</span>
-        <span className="desk-note n3">3rd caller —<br/>accent shift?</span>
-        <span className="desk-note n4">trace → KHI<br/>DHA-05</span>
-        <span className="desk-note n5">$$ moves<br/>Fri 21:40</span>
-      </div>
 
       {/* Corner case-status ribbon — cycling severity */}
       <div className="desk-ribbon" aria-hidden="true">
