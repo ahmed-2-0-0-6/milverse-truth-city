@@ -1,13 +1,7 @@
-// LAYER-1 — WebGL noir city hero, optimized.
-// Same vibe (moody skyline, drifting camera, warm/cyan window glints, rain)
-// with a fraction of the runtime cost:
-//   - Buildings: single InstancedMesh (was 120 meshes) with one shared
-//     material that reads instanced attributes for window pattern + tint.
-//   - Rain: CSS overlay (was 800 points updated on the CPU every frame).
-//   - Frameloop: "demand" with a slow rAF invalidate — camera drifts at
-//     ~30fps of GPU work instead of maxing the refresh rate.
+// LAYER-1 — WebGL noir city hero (three.js via r3f). Lazy-loaded.
+// Runs behind the interactive 2D map as atmosphere. Pauses when tab hidden.
 
-import { Canvas, useFrame, useThree, extend } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 
@@ -19,140 +13,118 @@ function seeded(seed: number) {
   };
 }
 
-// One shared shader material for every building. Reads instanced attributes:
-//   aSize   (vec3) — building dimensions, used to scale UV window grid
-//   aSeed   (float) — per-building RNG seed for on/off windows
-//   aLit    (float) — warm vs cyan tint
-class BuildingMaterial extends THREE.ShaderMaterial {
-  constructor() {
-    super({
-      transparent: true,
-      uniforms: {},
-      vertexShader: `
-        attribute vec3 aSize;
-        attribute float aSeed;
-        attribute float aLit;
-        varying vec2 vUv;
-        varying float vSeed;
-        varying float vLit;
-        varying vec3 vSize;
-        varying vec3 vLocal;
-        void main() {
-          vUv = uv;
-          vSeed = aSeed;
-          vLit = aLit;
-          vSize = aSize;
-          vLocal = position;
-          vec4 mv = modelViewMatrix * instanceMatrix * vec4(position, 1.0);
-          gl_Position = projectionMatrix * mv;
-        }
-      `,
-      fragmentShader: `
-        varying vec2 vUv;
-        varying float vSeed;
-        varying float vLit;
-        varying vec3 vSize;
-        varying vec3 vLocal;
-        float rnd(vec2 p){ return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453); }
-        void main() {
-          // Base facade — near-black.
-          vec3 base = vec3(0.02, 0.028, 0.045);
-          // Only draw window glow on the "front" faces (z close to +size/2)
-          // to mimic the old planeGeometry overlay without a second mesh.
-          float front = step(vSize.z * 0.5 - 0.02, vLocal.z);
-          // Window grid in local UV space, biased toward the top of the building.
-          vec2 cells = vec2(6.0, 12.0);
-          vec2 cid = floor(vUv * cells);
-          float on = step(0.55, rnd(cid + vSeed));
-          vec2 g = fract(vUv * cells);
-          float m = step(0.35, g.x) * step(g.x, 0.75) * step(0.55, g.y) * step(g.y, 0.85);
-          vec3 warm = vec3(0.96, 0.72, 0.26);
-          vec3 cyan = vec3(0.13, 0.83, 0.93);
-          vec3 lit = mix(cyan, warm, step(0.55, vLit));
-          float win = m * on * front;
-          vec3 col = base + lit * 1.4 * win;
-          gl_FragColor = vec4(col, 1.0);
-        }
-      `,
-    });
-  }
-}
-extend({ BuildingMaterial });
-
 function Buildings() {
-  const meshRef = useRef<THREE.InstancedMesh>(null);
-  const COUNT = 90;
-
-  const { positions, sizes, seeds, lits } = useMemo(() => {
-    const rand = seeded(42);
-    const positions: THREE.Matrix4[] = [];
-    const sizes = new Float32Array(COUNT * 3);
-    const seeds = new Float32Array(COUNT);
-    const lits = new Float32Array(COUNT);
-    const m = new THREE.Matrix4();
-    for (let i = 0; i < COUNT; i++) {
-      const w = 1 + rand() * 2.5;
-      const d = 1 + rand() * 2.5;
-      const h = 2 + rand() * 14;
-      const x = (rand() - 0.5) * 80;
-      const z = (rand() - 0.5) * 80;
-      m.compose(
-        new THREE.Vector3(x, h / 2, z),
-        new THREE.Quaternion(),
-        new THREE.Vector3(w, h, d),
-      );
-      positions.push(m.clone());
-      sizes[i * 3] = w;
-      sizes[i * 3 + 1] = h;
-      sizes[i * 3 + 2] = d;
-      seeds[i] = rand() * 100;
-      lits[i] = rand();
+  const rand = useMemo(() => seeded(42), []);
+  const buildings = useMemo(() => {
+    const arr: { x: number; z: number; w: number; d: number; h: number; lit: number }[] = [];
+    for (let i = 0; i < 120; i++) {
+      arr.push({
+        x: (rand() - 0.5) * 80,
+        z: (rand() - 0.5) * 80,
+        w: 1 + rand() * 2.5,
+        d: 1 + rand() * 2.5,
+        h: 2 + rand() * 14,
+        lit: rand(),
+      });
     }
-    return { positions, sizes, seeds, lits };
-  }, []);
-
-  useEffect(() => {
-    const mesh = meshRef.current;
-    if (!mesh) return;
-    for (let i = 0; i < COUNT; i++) mesh.setMatrixAt(i, positions[i]);
-    mesh.instanceMatrix.needsUpdate = true;
-    const geom = mesh.geometry as THREE.BufferGeometry;
-    geom.setAttribute("aSize", new THREE.InstancedBufferAttribute(sizes, 3));
-    geom.setAttribute("aSeed", new THREE.InstancedBufferAttribute(seeds, 1));
-    geom.setAttribute("aLit", new THREE.InstancedBufferAttribute(lits, 1));
-  }, [positions, sizes, seeds, lits]);
-
-  const material = useMemo(() => new BuildingMaterial(), []);
+    return arr;
+  }, [rand]);
 
   return (
-    <instancedMesh ref={meshRef} args={[undefined, undefined, COUNT]} material={material}>
-      <boxGeometry args={[1, 1, 1]} />
-    </instancedMesh>
+    <group>
+      {buildings.map((b, i) => (
+        <group key={i} position={[b.x, b.h / 2, b.z]}>
+          <mesh castShadow={false} receiveShadow={false}>
+            <boxGeometry args={[b.w, b.h, b.d]} />
+            <meshStandardMaterial color="#05070d" roughness={0.9} metalness={0.1} />
+          </mesh>
+          {/* window glow strip */}
+          <mesh position={[0, 0, b.d / 2 + 0.01]}>
+            <planeGeometry args={[b.w * 0.9, b.h * 0.9]} />
+            <shaderMaterial
+              transparent
+              uniforms={{
+                uColor: { value: new THREE.Color(b.lit > 0.55 ? "#f5b942" : "#22d3ee") },
+                uSeed: { value: b.lit * 100 },
+              }}
+              vertexShader={`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`}
+              fragmentShader={`
+                varying vec2 vUv; uniform vec3 uColor; uniform float uSeed;
+                float grid(vec2 uv, vec2 cells){
+                  vec2 g = fract(uv*cells);
+                  float m = step(0.35,g.x)*step(g.x,0.75)*step(0.55,g.y)*step(g.y,0.85);
+                  return m;
+                }
+                float rnd(vec2 p){ return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453); }
+                void main(){
+                  vec2 cells = vec2(6.0, 12.0);
+                  vec2 cid = floor(vUv*cells);
+                  float on = step(0.55, rnd(cid+uSeed));
+                  float m = grid(vUv, cells) * on;
+                  gl_FragColor = vec4(uColor*1.4, m*0.9);
+                }
+              `}
+            />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+function Rain() {
+  const ref = useRef<THREE.Points>(null);
+  const geom = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    const n = 800;
+    const pos = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+      pos[i * 3] = (Math.random() - 0.5) * 100;
+      pos[i * 3 + 1] = Math.random() * 40;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 100;
+    }
+    g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    return g;
+  }, []);
+  useFrame((_, dt) => {
+    if (!ref.current) return;
+    const pos = ref.current.geometry.attributes.position as THREE.BufferAttribute;
+    const arr = pos.array as Float32Array;
+    for (let i = 0; i < arr.length; i += 3) {
+      arr[i + 1] -= dt * 22;
+      if (arr[i + 1] < 0) arr[i + 1] = 40;
+    }
+    pos.needsUpdate = true;
+  });
+  return (
+    <points ref={ref} geometry={geom}>
+      <pointsMaterial size={0.06} color="#4a6a9a" transparent opacity={0.5} />
+    </points>
   );
 }
 
 function CameraRig() {
-  const { camera, invalidate } = useThree();
+  const { camera } = useThree();
   const t0 = useRef(performance.now());
-  // Throttle to ~30fps of camera work.
+  useFrame(() => {
+    const t = (performance.now() - t0.current) * 0.0001;
+    camera.position.x = Math.sin(t) * 22;
+    camera.position.z = 28 + Math.cos(t) * 8;
+    camera.position.y = 10 + Math.sin(t * 0.6) * 2;
+    camera.lookAt(0, 4, 0);
+  });
+  return null;
+}
+
+function PauseWhenHidden() {
+  const { gl, invalidate } = useThree();
   useEffect(() => {
-    let raf = 0;
-    let last = 0;
-    const tick = (now: number) => {
-      if (now - last > 33) {
-        const t = (now - t0.current) * 0.0001;
-        camera.position.x = Math.sin(t) * 22;
-        camera.position.z = 28 + Math.cos(t) * 8;
-        camera.position.y = 10 + Math.sin(t * 0.6) * 2;
-        camera.lookAt(0, 4, 0);
-        invalidate();
-        last = now;
-      }
-      raf = requestAnimationFrame(tick);
+    const on = () => {
+      if (!document.hidden) invalidate();
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [camera, invalidate]);
+    document.addEventListener("visibilitychange", on);
+    return () => document.removeEventListener("visibilitychange", on);
+  }, [gl, invalidate]);
   return null;
 }
 
@@ -170,55 +142,32 @@ export default function NoirCityScene() {
 
   const dpr: [number, number] =
     typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches
-      ? [1, 1.2]
-      : [1, 1.6];
+      ? [1, 1.5]
+      : [1, 2];
 
   return (
     <div ref={wrapRef} className="absolute inset-0" aria-hidden>
       <Canvas
         dpr={dpr}
-        frameloop={visible ? "demand" : "never"}
+        frameloop={visible ? "always" : "never"}
         camera={{ position: [0, 10, 30], fov: 55 }}
         gl={{ antialias: false, powerPreference: "low-power", alpha: true }}
         style={{ background: "transparent" }}
       >
+        <PauseWhenHidden />
         <CameraRig />
         <fog attach="fog" args={["#04060a", 20, 90]} />
         <ambientLight intensity={0.15} />
         <directionalLight position={[10, 30, 10]} intensity={0.25} color="#4a7cff" />
         <hemisphereLight args={["#22d3ee", "#0a0f1a", 0.15]} />
         <Buildings />
+        <Rain />
         {/* ground */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
           <planeGeometry args={[200, 200]} />
           <meshStandardMaterial color="#02040a" roughness={0.6} metalness={0.4} />
         </mesh>
       </Canvas>
-      {/* CSS rain overlay — cheaper than 800 CPU-updated points. */}
-      <div className="noir-rain pointer-events-none absolute inset-0" aria-hidden />
-      <style>{`
-        .noir-rain {
-          background-image:
-            repeating-linear-gradient(
-              105deg,
-              rgba(120,160,220,0.18) 0px,
-              rgba(120,160,220,0.18) 1px,
-              transparent 1px,
-              transparent 6px
-            );
-          mix-blend-mode: screen;
-          opacity: .35;
-          animation: noirRain 0.9s linear infinite;
-          will-change: background-position;
-        }
-        @keyframes noirRain {
-          0%   { background-position: 0 0; }
-          100% { background-position: -60px 200px; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .noir-rain { animation: none; }
-        }
-      `}</style>
     </div>
   );
 }
