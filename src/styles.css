@@ -4555,6 +4555,137 @@ button[title*="lovable" i] {
   95.5%, 100% { opacity: 0; }
 }
 
+/* --- Cold-open title card (one-shot) --- */
+.detective-desk .desk-coldopen {
+  position: absolute; inset: 0;
+  z-index: 22; pointer-events: none;
+  display: grid; place-items: center;
+  background: radial-gradient(60% 50% at 50% 50%, rgba(0,0,0,0.72), rgba(0,0,0,0.95));
+  opacity: 0;
+  animation: dd-coldopen-veil 3.6s ease-out 0.05s forwards;
+}
+.detective-desk .desk-coldopen-box {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 26px 42px;
+  border: 1px solid rgba(220,180,120,0.35);
+  background: rgba(10,8,6,0.55);
+  box-shadow: 0 0 60px rgba(255,180,90,0.12) inset, 0 20px 60px rgba(0,0,0,0.6);
+  transform: scale(0.98);
+  animation: dd-coldopen-box 3.6s ease-out 0.05s forwards;
+}
+.detective-desk .desk-coldopen-eye {
+  font: 700 10px/1 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.28em;
+  color: #ff5a3a;
+  text-shadow: 0 0 6px rgba(255,90,60,0.6);
+}
+.detective-desk .desk-coldopen-title {
+  font: 900 42px/1 "Playfair Display", ui-serif, Georgia, serif;
+  letter-spacing: 0.24em;
+  color: #f5e5c8;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.6), 0 0 22px rgba(255,180,90,0.2);
+  clip-path: inset(0 100% 0 0);
+  animation: dd-coldopen-reveal 1.2s cubic-bezier(.2,.7,.2,1) 0.25s forwards;
+}
+.detective-desk .desk-coldopen-sub {
+  font: 700 12px/1 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.32em;
+  color: #d8c9a8;
+}
+.detective-desk .desk-coldopen-rule {
+  width: 80%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(220,180,120,0.6), transparent);
+}
+.detective-desk .desk-coldopen-foot {
+  font: 600 9px/1 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.4em;
+  color: rgba(220,190,140,0.65);
+}
+@keyframes dd-coldopen-veil {
+  0%   { opacity: 0; }
+  8%   { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+@keyframes dd-coldopen-box {
+  0%   { transform: scale(0.98); filter: blur(6px); }
+  15%  { transform: scale(1);    filter: blur(0); }
+  70%  { transform: scale(1);    filter: blur(0); }
+  100% { transform: scale(1.03); filter: blur(3px); opacity: 0; }
+}
+@keyframes dd-coldopen-reveal {
+  to { clip-path: inset(0 0 0 0); }
+}
+
+/* --- Ink annotation — hand-drawn circle, arrow, label --- */
+.detective-desk .desk-ink {
+  position: absolute;
+  left: 6%; bottom: 20%;
+  width: 240px; height: 144px;
+  z-index: 11; pointer-events: none;
+  opacity: 0;
+  animation: dd-ink-appear 0.01s linear 1.8s forwards;
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.4));
+}
+.detective-desk .desk-ink-circle {
+  stroke-dasharray: 1; stroke-dashoffset: 1;
+  animation: dd-ink-draw 0.9s cubic-bezier(.6,.1,.3,1) 1.9s forwards;
+}
+.detective-desk .desk-ink-arrow {
+  stroke-dasharray: 1; stroke-dashoffset: 1;
+  animation: dd-ink-draw 0.5s cubic-bezier(.6,.1,.3,1) 2.75s forwards;
+}
+.detective-desk .desk-ink-label {
+  opacity: 0;
+  animation: dd-ink-label 0.35s ease-out 3.15s forwards;
+}
+@keyframes dd-ink-appear { to { opacity: 0.92; } }
+@keyframes dd-ink-draw   { to { stroke-dashoffset: 0; } }
+@keyframes dd-ink-label  { to { opacity: 0.95; } }
+
+/* --- Cigarette-burn reel-change cues (one-shot) --- */
+.detective-desk .desk-reelcue {
+  position: absolute;
+  top: 22px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,240,220,0.95) 0%, rgba(255,180,90,0.7) 45%, transparent 70%);
+  mix-blend-mode: screen;
+  z-index: 21; pointer-events: none;
+  opacity: 0;
+  filter: blur(0.4px);
+}
+.detective-desk .desk-reelcue.a {
+  right: 68px;
+  animation: dd-reelcue 0.22s ease-out 4.2s 1;
+}
+.detective-desk .desk-reelcue.b {
+  right: 34px;
+  animation: dd-reelcue 0.22s ease-out 4.42s 1;
+}
+@keyframes dd-reelcue {
+  0%   { opacity: 0; transform: scale(0.7); }
+  30%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.15); }
+}
+
+/* --- Ashtray smoke plume --- */
+.detective-desk .desk-smoke {
+  position: absolute;
+  right: 18%; bottom: 24%;
+  width: 44px; height: 170px;
+  z-index: 10; pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.55;
+  animation: dd-smoke-drift 9s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+@keyframes dd-smoke-drift {
+  0%, 100% { transform: translateX(0) scaleY(1);      opacity: 0.5; }
+  50%      { transform: translateX(6px) scaleY(1.06); opacity: 0.7; }
+}
+
+
 @media (prefers-reduced-motion: reduce) {
   .detective-desk .desk-cascade-col,
   .detective-desk .desk-poi,
@@ -4562,7 +4693,19 @@ button[title*="lovable" i] {
   .detective-desk .desk-poi-num::before,
   .detective-desk .desk-poi-threat-bar i,
   .detective-desk .desk-poi-threat-val,
-  .detective-desk .desk-thunder { animation: none; }
+  .detective-desk .desk-thunder,
+  .detective-desk .desk-coldopen,
+  .detective-desk .desk-ink,
+  .detective-desk .desk-ink-circle,
+  .detective-desk .desk-ink-arrow,
+  .detective-desk .desk-ink-label,
+  .detective-desk .desk-reelcue,
+  .detective-desk .desk-smoke { animation: none; }
+  .detective-desk .desk-coldopen { display: none; }
+  .detective-desk .desk-ink { opacity: 0.9; }
+  .detective-desk .desk-ink-circle,
+  .detective-desk .desk-ink-arrow { stroke-dashoffset: 0; }
+  .detective-desk .desk-ink-label { opacity: 0.95; }
   .detective-desk .desk-poi { opacity: 1; transform: none; }
 }
 

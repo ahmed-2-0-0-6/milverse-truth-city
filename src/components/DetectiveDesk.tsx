@@ -1636,6 +1636,70 @@ export function DetectiveDesk({ className = "" }: Props) {
 
       {/* Distant lightning — cool-blue full-scene flash, rare */}
       <div className="desk-thunder" aria-hidden="true" />
+
+      {/* Cold-open title card — one-shot cinematic on mount */}
+      <div className="desk-coldopen" aria-hidden="true">
+        <div className="desk-coldopen-box">
+          <span className="desk-coldopen-eye">◉ EYES ONLY</span>
+          <span className="desk-coldopen-title">SECTION 7</span>
+          <span className="desk-coldopen-sub">CASE FILE · MV-4471</span>
+          <span className="desk-coldopen-rule" />
+          <span className="desk-coldopen-foot">MILVERSE COUNTER-SCAM DIVISION</span>
+        </div>
+      </div>
+
+      {/* Ink annotation — red circle + arrow + label drawn on with pen scratch */}
+      <svg className="desk-ink" viewBox="0 0 400 240" aria-hidden="true">
+        <circle
+          className="desk-ink-circle"
+          cx="120" cy="120" r="52"
+          fill="none" stroke="#d0261a" strokeWidth="2.4"
+          strokeLinecap="round"
+          pathLength="1"
+        />
+        <path
+          className="desk-ink-arrow"
+          d="M 200 80 Q 235 110, 210 148 L 195 132 M 210 148 L 226 138"
+          fill="none" stroke="#d0261a" strokeWidth="2.2"
+          strokeLinecap="round" strokeLinejoin="round"
+          pathLength="1"
+        />
+        <text
+          className="desk-ink-label"
+          x="248" y="76"
+          fill="#d0261a"
+          fontFamily='"Caveat", cursive'
+          fontSize="26" fontWeight="700"
+          transform="rotate(-4 248 76)"
+        >SUSPECT ↗</text>
+      </svg>
+
+      {/* Cigarette-burn reel-change cues (top-right, one-shot) */}
+      <span className="desk-reelcue a" aria-hidden="true" />
+      <span className="desk-reelcue b" aria-hidden="true" />
+
+      {/* Ashtray smoke plume — drifting SVG ribbon with turbulence */}
+      <svg className="desk-smoke" viewBox="0 0 60 200" aria-hidden="true">
+        <defs>
+          <filter id="desk-smoke-turb" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02 0.06" numOctaves="2" seed="7">
+              <animate attributeName="baseFrequency" dur="14s" values="0.02 0.06;0.03 0.08;0.02 0.06" repeatCount="indefinite" />
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" scale="8" />
+          </filter>
+          <linearGradient id="desk-smoke-grad" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stopColor="rgba(220,210,200,0.55)" />
+            <stop offset="0.55" stopColor="rgba(220,210,200,0.18)" />
+            <stop offset="1" stopColor="rgba(220,210,200,0)" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M30 200 C 34 160, 26 140, 30 110 C 34 80, 22 60, 30 20"
+          stroke="url(#desk-smoke-grad)" strokeWidth="14"
+          fill="none" strokeLinecap="round"
+          filter="url(#desk-smoke-turb)"
+        />
+      </svg>
     </div>
 
 
