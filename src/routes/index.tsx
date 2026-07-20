@@ -219,21 +219,7 @@ function CityMap() {
         </div>
 
         <div className="w-full flex flex-col items-center min-h-[380px] sm:min-h-[460px]">
-          <div className="stencil text-[10px] text-cyan-300/80 mb-4 hud-blink text-center">
-            {kicker}
-          </div>
           <HeroType onComplete={handleHeroTyped} onFullyTyped={handleHeroFullyTyped} />
-          <p className="mt-4 max-w-xl text-center text-white/80 text-step-0 px-2">
-            Scammers are working your city. Pick up. Play them. Burn them.
-          </p>
-
-          <div className="mt-6 sm:mt-8 w-full max-w-[380px]">
-            <PlayButton />
-            <StatStrip />
-          </div>
-
-
-
         </div>
 
 
