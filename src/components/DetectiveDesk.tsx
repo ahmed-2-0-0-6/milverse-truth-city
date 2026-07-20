@@ -1219,18 +1219,6 @@ export function DetectiveDesk({ className = "" }: Props) {
             <Casings />
             <LetterOpener />
             <Candle />
-            <PaperClips />
-            <Polaroids />
-            <Photo />
-            <Magnifier />
-            <Compass />
-            <Stapler />
-            <Typewriter />
-            <Rolodex />
-            <Raccoon />
-            <Pen />
-            <Cup />
-            <Candle />
             <Lamp />
             <Dust />
           </Canvas>
