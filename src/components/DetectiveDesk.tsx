@@ -1502,20 +1502,12 @@ export function DetectiveDesk({ className = "" }: Props) {
           </Canvas>
         </Suspense>
       )}
-      <div className="desk-fan-shadow" />
-      <div ref={lightRef} className="desk-reader-light" />
       <div className="desk-letterbox top" />
       <div className="desk-letterbox bottom" />
       <div className="desk-grade" />
       <div className="desk-vignette" />
-      {/* HUD case-file ticker — typewriter */}
-      <div className="desk-hud">
-        <span className="desk-hud-dot" />
-        <span className="desk-hud-label">CASE FILE</span>
-        <span className="desk-hud-num">#MV-4471</span>
-        <span className="desk-hud-status">/ ACTIVE</span>
-      </div>
       <div className="desk-hud-stamp">CONFIDENTIAL</div>
+
 
       {/* Audio intercept — waveform equalizer (compositor-only CSS) */}
       <div className="desk-intercept" aria-hidden="true">
@@ -1890,15 +1882,6 @@ export function DetectiveDesk({ className = "" }: Props) {
         </div>
       </div>
 
-      {/* Top-center clue counter HUD */}
-      <div className="desk-clues" aria-hidden="true">
-        <span className="desk-clues-tag">CASE</span>
-        <span className="desk-clues-id">MV-4471</span>
-        <span className="desk-clues-sep">·</span>
-        <span className="desk-clues-label">CLUES</span>
-        <span className="desk-clues-count" />
-        <span className="desk-clues-total">/07</span>
-      </div>
     </div>
 
 
