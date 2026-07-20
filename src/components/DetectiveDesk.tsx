@@ -1353,6 +1353,22 @@ export function DetectiveDesk({ className = "" }: Props) {
     };
   }, [reduced]);
 
+  // Live CCTV timecode — real wall clock, tiny state, updates once/sec
+  const [clock, setClock] = useState(() => {
+    const d = new Date();
+    return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`;
+  });
+  useEffect(() => {
+    if (reduced) return;
+    const id = window.setInterval(() => {
+      const d = new Date();
+      setClock(`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`);
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [reduced]);
+
+
+
   return (
     <div
       ref={wrapRef}
