@@ -588,6 +588,11 @@ function Magnifier() {
       <mesh position={[1.0, 0, 0]} material={BRASS_LO}>
         <cylinderGeometry args={[0.11, 0.11, 0.14, 12]} />
       </mesh>
+      {/* caustic hot spot on paper beneath lens */}
+      <mesh position={[0, 0, -0.14]}>
+        <circleGeometry args={[0.75, 24]} />
+        <meshBasicMaterial color="#ffd88a" transparent opacity={0.22} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
     </group>
   );
 }
