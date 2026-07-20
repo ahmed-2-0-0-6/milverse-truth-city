@@ -1340,8 +1340,8 @@ export function DetectiveDesk({ className = "" }: Props) {
 
   const dpr: [number, number] =
     typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches
-      ? [1, 1.4]
-      : [1, 1.8];
+      ? [1, 1.1]
+      : [1, 1.4];
 
   return (
     <div
@@ -1355,7 +1355,7 @@ export function DetectiveDesk({ className = "" }: Props) {
           dpr={dpr}
           frameloop={visible && !reduced ? "always" : "demand"}
           camera={{ position: [0, 20, 22], fov: 55 }}
-          gl={{ antialias: true, powerPreference: "low-power", alpha: true }}
+          gl={{ antialias: false, powerPreference: "low-power", alpha: true, stencil: false, depth: true }}
           style={{ background: "transparent" }}
         >
           <PauseWhenHidden />
