@@ -672,12 +672,15 @@ function ThesisBackdrop() {
       {/* top/bottom headline tickers removed per request */}
 
 
-      {/* corner brackets */}
+      {/* Spotlit MIL industry terms — drift in from the corners, never cross the center */}
+      <SpotlitTerms />
+
       {/* corner brackets */}
       <div className="absolute top-4 left-4 h-6 w-6 border-l border-t border-cyan-300/40" />
       <div className="absolute top-4 right-4 h-6 w-6 border-r border-t border-cyan-300/40" />
       <div className="absolute bottom-4 left-4 h-6 w-6 border-l border-b border-cyan-300/40" />
       <div className="absolute bottom-4 right-4 h-6 w-6 border-r border-b border-cyan-300/40" />
+
 
     </div>
   );
