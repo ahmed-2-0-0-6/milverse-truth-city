@@ -686,32 +686,108 @@ function ThesisBackdrop() {
   );
 }
 
-type PillColor = "cyan" | "amber" | "rose" | "lime" | "violet" | "sky";
+type PillColor = "cyan" | "amber" | "rose" | "lime" | "violet" | "sky" | "pink" | "red" | "yellow" | "white";
+type PillIcon = "ig" | "yt" | "tt" | "sc" | "tv" | "np" | "radio" | "mic" | "cam";
+
+const PillGlyph = ({ icon }: { icon: PillIcon }) => {
+  const s = { width: 14, height: 14, display: "block" } as const;
+  switch (icon) {
+    case "ig":
+      return (
+        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="3" width="18" height="18" rx="5" />
+          <circle cx="12" cy="12" r="4" />
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+        </svg>
+      );
+    case "yt":
+      return (
+        <svg viewBox="0 0 24 24" style={s} fill="currentColor">
+          <path d="M23 7.5a3 3 0 0 0-2.1-2.1C19 5 12 5 12 5s-7 0-8.9.4A3 3 0 0 0 1 7.5C.6 9.4.6 12 .6 12s0 2.6.4 4.5A3 3 0 0 0 3.1 18.6C5 19 12 19 12 19s7 0 8.9-.4A3 3 0 0 0 23 16.5c.4-1.9.4-4.5.4-4.5s0-2.6-.4-4.5zM9.75 15.5v-7l6 3.5-6 3.5z"/>
+        </svg>
+      );
+    case "tt":
+      return (
+        <svg viewBox="0 0 24 24" style={s} fill="currentColor">
+          <path d="M16.5 3a5.5 5.5 0 0 0 4.5 4.5v3a8.5 8.5 0 0 1-4.5-1.3v6.6a6.2 6.2 0 1 1-6.2-6.2c.34 0 .67.03 1 .08v3.15a3.1 3.1 0 1 0 2.2 2.97V3h3z"/>
+        </svg>
+      );
+    case "sc":
+      return (
+        <svg viewBox="0 0 24 24" style={s} fill="currentColor">
+          <path d="M12 2c3.2 0 5 2.4 5 5.4 0 1.4-.2 3-.2 3 .5.2 1-.4 1.6-.4.5 0 1.4.3 1.4 1 0 1.4-3 1.6-3.4 2.6-.1.4 1 2.4 2.7 3.1.6.3 1.5.4 1.5 1 0 1-2 1.3-2.3 1.6-.2.2 0 1.4-.7 1.6-.8.2-2-.7-3.4-.4-1.3.3-2.3 2-4.2 2-1.9 0-2.8-1.7-4.2-2-1.4-.3-2.6.6-3.4.4-.7-.2-.5-1.4-.7-1.6-.3-.3-2.3-.6-2.3-1.6 0-.6.9-.7 1.5-1 1.7-.7 2.8-2.7 2.7-3.1-.4-1-3.4-1.2-3.4-2.6 0-.7.9-1 1.4-1 .6 0 1.1.6 1.6.4 0 0-.2-1.6-.2-3C7 4.4 8.8 2 12 2z"/>
+        </svg>
+      );
+    case "tv":
+      return (
+        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <rect x="2.5" y="5" width="19" height="13" rx="2" />
+          <path d="M8 21h8M8 2l4 3 4-3" />
+        </svg>
+      );
+    case "np":
+      return (
+        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M4 5h13v14H4z" />
+          <path d="M17 8h3v9a2 2 0 0 1-2 2h-1" />
+          <path d="M7 9h7M7 12h7M7 15h4" strokeLinecap="round" />
+        </svg>
+      );
+    case "radio":
+      return (
+        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="2.5" y="8" width="19" height="12" rx="2" />
+          <circle cx="16" cy="14" r="3" />
+          <path d="M6 12v4M7 4l10-2" strokeLinecap="round" />
+        </svg>
+      );
+    case "mic":
+      return (
+        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <rect x="9" y="3" width="6" height="12" rx="3" />
+          <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+        </svg>
+      );
+    case "cam":
+      return (
+        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M3 7h4l2-2h6l2 2h4v12H3z" />
+          <circle cx="12" cy="13" r="4" />
+        </svg>
+      );
+  }
+};
+
 const SPOTLIT_TERMS: Array<{
   text: string;
   side: "l" | "r";
   left: string;
   delay: string;
   color: PillColor;
+  icon: PillIcon;
 }> = [
-  // LEFT gutter (0-28%)
-  { text: "BREAKING: source unverified",    side: "l", left: "3%",  delay: "0s",    color: "rose"   },
-  { text: "EDIT BAY: cut for time",         side: "l", left: "15%", delay: "1.4s",  color: "amber"  },
-  { text: "CHYRON: 'EXCLUSIVE'",            side: "l", left: "5%",  delay: "2.8s",  color: "cyan"   },
-  { text: "B-ROLL: stock footage",          side: "l", left: "18%", delay: "4.2s",  color: "violet" },
-  { text: "TELEPROMPTER: on-message",       side: "l", left: "2%",  delay: "5.6s",  color: "sky"    },
-  { text: "LOWER THIRD: 'expert says'",     side: "l", left: "12%", delay: "7s",    color: "lime"   },
-  { text: "COLOR GRADE: mood = fear",       side: "l", left: "7%",  delay: "8.4s",  color: "amber"  },
-  { text: "SOUND STAGE: laugh track",       side: "l", left: "20%", delay: "9.8s",  color: "cyan"   },
-  // RIGHT gutter (72-100%)
-  { text: "HEADLINE: rage-bait",            side: "r", left: "75%", delay: "0.7s",  color: "rose"   },
-  { text: "BYLINE: anonymous",              side: "r", left: "86%", delay: "2.1s",  color: "sky"    },
-  { text: "PRESS KIT: talking points",      side: "r", left: "72%", delay: "3.5s",  color: "violet" },
-  { text: "DATELINE: geolocation faked",    side: "r", left: "82%", delay: "4.9s",  color: "amber"  },
-  { text: "GREEN SCREEN: never on site",    side: "r", left: "76%", delay: "6.3s",  color: "lime"   },
-  { text: "NEWS WIRE: paid placement",      side: "r", left: "88%", delay: "7.7s",  color: "cyan"   },
-  { text: "SEGMENT: sponsored",             side: "r", left: "74%", delay: "9.1s",  color: "rose"   },
-  { text: "ARCHIVE: 6 years old",           side: "r", left: "84%", delay: "10.5s", color: "sky"    },
+  // LEFT gutter
+  { text: "TIKTOK: 'trending sound'",         side: "l", left: "3%",  delay: "0s",    color: "pink",   icon: "tt"    },
+  { text: "BREAKING: source unverified",      side: "l", left: "16%", delay: "1.2s",  color: "rose",   icon: "tv"    },
+  { text: "INSTAGRAM: reel resurfaced",       side: "l", left: "5%",  delay: "2.4s",  color: "pink",   icon: "ig"    },
+  { text: "CHYRON: 'EXCLUSIVE'",              side: "l", left: "18%", delay: "3.6s",  color: "cyan",   icon: "tv"    },
+  { text: "YOUTUBE: clipped out of context",  side: "l", left: "2%",  delay: "4.8s",  color: "red",    icon: "yt"    },
+  { text: "B-ROLL: stock footage",            side: "l", left: "14%", delay: "6s",    color: "violet", icon: "cam"   },
+  { text: "SNAPCHAT: 24h receipt",            side: "l", left: "6%",  delay: "7.2s",  color: "yellow", icon: "sc"    },
+  { text: "TELEPROMPTER: on-message",         side: "l", left: "20%", delay: "8.4s",  color: "sky",    icon: "mic"   },
+  { text: "COLOR GRADE: mood = fear",         side: "l", left: "8%",  delay: "9.6s",  color: "amber",  icon: "cam"   },
+  { text: "RADIO: caller was staged",         side: "l", left: "17%", delay: "10.8s", color: "lime",   icon: "radio" },
+  // RIGHT gutter
+  { text: "YOUTUBE SHORTS: auto-caption lie", side: "r", left: "74%", delay: "0.6s",  color: "red",    icon: "yt"    },
+  { text: "HEADLINE: rage-bait",              side: "r", left: "86%", delay: "1.8s",  color: "rose",   icon: "np"    },
+  { text: "INSTAGRAM: filter deepfake",       side: "r", left: "72%", delay: "3s",    color: "pink",   icon: "ig"    },
+  { text: "BYLINE: anonymous",                side: "r", left: "84%", delay: "4.2s",  color: "sky",    icon: "np"    },
+  { text: "TIKTOK: creator paid to post",     side: "r", left: "76%", delay: "5.4s",  color: "pink",   icon: "tt"    },
+  { text: "DATELINE: geolocation faked",      side: "r", left: "88%", delay: "6.6s",  color: "amber",  icon: "tv"    },
+  { text: "SNAPCHAT: story stitched",         side: "r", left: "73%", delay: "7.8s",  color: "yellow", icon: "sc"    },
+  { text: "NEWS WIRE: paid placement",        side: "r", left: "85%", delay: "9s",    color: "cyan",   icon: "np"    },
+  { text: "SEGMENT: sponsored",               side: "r", left: "77%", delay: "10.2s", color: "violet", icon: "tv"    },
+  { text: "ARCHIVE: 6 years old",             side: "r", left: "82%", delay: "11.4s", color: "sky",    icon: "np"    },
 ];
 
 function SpotlitTerms() {
@@ -728,6 +804,9 @@ function SpotlitTerms() {
             animationDelay: t.delay,
           }}
         >
+          <span className="thesis-term-icon" aria-hidden>
+            <PillGlyph icon={t.icon} />
+          </span>
           {t.text}
         </div>
       ))}
