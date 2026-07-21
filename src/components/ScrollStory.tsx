@@ -853,28 +853,34 @@ const SPOTLIT_TERMS: Array<{
   color: PillColor;
   icon: PillIcon;
 }> = [
-  // LEFT gutter
-  { text: "TIKTOK: 'trending sound'",         side: "l", left: "3%",  delay: "0s",    color: "pink",   icon: "tt"    },
+  // LEFT gutter (bumped inward from 2-3% → 5-6% so pills stay fully on-screen)
+  { text: "TIKTOK: 'trending sound'",         side: "l", left: "6%",  delay: "0s",    color: "pink",   icon: "tt"    },
   { text: "BREAKING: source unverified",      side: "l", left: "16%", delay: "1.2s",  color: "rose",   icon: "tv"    },
-  { text: "INSTAGRAM: reel resurfaced",       side: "l", left: "5%",  delay: "2.4s",  color: "pink",   icon: "ig"    },
+  { text: "INSTAGRAM: reel resurfaced",       side: "l", left: "8%",  delay: "2.4s",  color: "pink",   icon: "ig"    },
   { text: "CHYRON: 'EXCLUSIVE'",              side: "l", left: "18%", delay: "3.6s",  color: "cyan",   icon: "tv"    },
-  { text: "YOUTUBE: clipped out of context",  side: "l", left: "2%",  delay: "4.8s",  color: "red",    icon: "yt"    },
+  { text: "YOUTUBE: clipped out of context",  side: "l", left: "5%",  delay: "4.8s",  color: "red",    icon: "yt"    },
   { text: "B-ROLL: stock footage",            side: "l", left: "14%", delay: "6s",    color: "violet", icon: "cam"   },
-  { text: "SNAPCHAT: 24h receipt",            side: "l", left: "6%",  delay: "7.2s",  color: "yellow", icon: "sc"    },
+  { text: "SNAPCHAT: 24h receipt",            side: "l", left: "7%",  delay: "7.2s",  color: "yellow", icon: "sc"    },
   { text: "TELEPROMPTER: on-message",         side: "l", left: "20%", delay: "8.4s",  color: "sky",    icon: "mic"   },
+  { text: "GPT: hallucinated a source",       side: "l", left: "10%", delay: "9s",    color: "green",  icon: "gpt"   },
   { text: "COLOR GRADE: mood = fear",         side: "l", left: "8%",  delay: "9.6s",  color: "amber",  icon: "cam"   },
   { text: "RADIO: caller was staged",         side: "l", left: "17%", delay: "10.8s", color: "lime",   icon: "radio" },
+  { text: "REDDIT: brigaded thread",          side: "l", left: "12%", delay: "5.4s",  color: "amber",  icon: "reddit"},
+  { text: "DISCORD: server leak",             side: "l", left: "19%", delay: "2s",    color: "violet", icon: "discord"},
   // RIGHT gutter
   { text: "YOUTUBE SHORTS: auto-caption lie", side: "r", left: "74%", delay: "0.6s",  color: "red",    icon: "yt"    },
   { text: "HEADLINE: rage-bait",              side: "r", left: "86%", delay: "1.8s",  color: "rose",   icon: "np"    },
   { text: "INSTAGRAM: filter deepfake",       side: "r", left: "72%", delay: "3s",    color: "pink",   icon: "ig"    },
   { text: "BYLINE: anonymous",                side: "r", left: "84%", delay: "4.2s",  color: "sky",    icon: "np"    },
   { text: "TIKTOK: creator paid to post",     side: "r", left: "76%", delay: "5.4s",  color: "pink",   icon: "tt"    },
-  { text: "DATELINE: geolocation faked",      side: "r", left: "88%", delay: "6.6s",  color: "amber",  icon: "tv"    },
+  { text: "DATELINE: geolocation faked",      side: "r", left: "82%", delay: "6.6s",  color: "amber",  icon: "tv"    },
   { text: "SNAPCHAT: story stitched",         side: "r", left: "73%", delay: "7.8s",  color: "yellow", icon: "sc"    },
-  { text: "NEWS WIRE: paid placement",        side: "r", left: "85%", delay: "9s",    color: "cyan",   icon: "np"    },
+  { text: "NEWS WIRE: paid placement",        side: "r", left: "80%", delay: "9s",    color: "cyan",   icon: "np"    },
   { text: "SEGMENT: sponsored",               side: "r", left: "77%", delay: "10.2s", color: "violet", icon: "tv"    },
   { text: "ARCHIVE: 6 years old",             side: "r", left: "82%", delay: "11.4s", color: "sky",    icon: "np"    },
+  { text: "X: viral quote-tweet",             side: "r", left: "75%", delay: "4.5s",  color: "white",  icon: "x"     },
+  { text: "FACEBOOK: group repost",           side: "r", left: "78%", delay: "8.4s",  color: "sky",    icon: "fb"    },
+  { text: "GPT: synthetic 'expert'",          side: "r", left: "72%", delay: "1.2s",  color: "green",  icon: "gpt"   },
 ];
 
 function SpotlitTerms() {
