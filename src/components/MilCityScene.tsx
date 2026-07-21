@@ -139,12 +139,12 @@ export function MilCityScene() {
       g.fillStyle = fogA; g.fillRect(0, 0, W, H);
 
       // Horizon glow (city bounce light)
-      const hz = g.createLinearGradient(0, H * 0.55, 0, H * 0.88);
+      const hz = g.createLinearGradient(0, H * 0.38, 0, H * 0.72);
       hz.addColorStop(0, "transparent");
       hz.addColorStop(0.7, "rgba(255,170,110,0.10)");
       hz.addColorStop(1, "rgba(255,170,110,0.22)");
       g.fillStyle = hz;
-      g.fillRect(0, H * 0.55, W, H * 0.35);
+      g.fillRect(0, H * 0.38, W, H * 0.34);
 
       bakedSky = c;
     }
