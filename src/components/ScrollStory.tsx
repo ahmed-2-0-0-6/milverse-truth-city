@@ -17,7 +17,7 @@ import gothamCrimeSceneArt from "@/assets/detective-crime-scene-gotham.jpg";
 import gothamRooftopArt from "@/assets/detective-rooftop-gotham.jpg";
 
 const BEAT_BACKDROPS: (string | undefined)[] = [
-  gothamDeskArt,
+  undefined,
   gothamBoardPortraitArt,
   gothamCrimeSceneArt,
   gothamRooftopArt,
