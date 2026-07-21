@@ -564,81 +564,8 @@ export function MilCityScene() {
         ctx.restore();
       }
 
-      // Helicopter with volumetric searchlight cone
-      const heliX = ((T * 22) % (W + 200)) - 100;
-      const heliY = H * 0.26 + Math.sin(T * 0.7) * 10;
-      // Cone
-      ctx.save();
-      ctx.globalCompositeOperation = "screen";
-      const coneAngle = Math.PI / 2 + Math.sin(T * 0.9) * 0.55;
-      const coneLen = 320;
-      ctx.translate(heliX, heliY);
-      ctx.rotate(coneAngle - Math.PI / 2);
-      const cone = ctx.createLinearGradient(0, 0, 0, coneLen);
-      cone.addColorStop(0, "rgba(255,245,220,0.4)");
-      cone.addColorStop(0.6, "rgba(255,220,180,0.08)");
-      cone.addColorStop(1, "transparent");
-      ctx.fillStyle = cone;
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(-58, coneLen);
-      ctx.lineTo(58, coneLen);
-      ctx.closePath();
-      ctx.fill();
-      // Bright core
-      ctx.fillStyle = "rgba(255,255,240,0.6)";
-      ctx.beginPath();
-      ctx.arc(0, 0, 3, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-      // Body
-      ctx.fillStyle = "rgba(10,15,22,0.98)";
-      ctx.beginPath(); ctx.ellipse(heliX, heliY, 11, 4, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillRect(heliX + 8, heliY - 1, 10, 1.5);
-      // Rotor blur (spinning line with alpha)
-      ctx.save();
-      ctx.strokeStyle = "rgba(150,160,180,0.35)";
-      ctx.lineWidth = 0.8;
-      const rotorPhase = T * 40;
-      for (let i = 0; i < 3; i++) {
-        const a = rotorPhase + (i * Math.PI * 2) / 3;
-        ctx.beginPath();
-        ctx.moveTo(heliX + Math.cos(a) * 16, heliY - 5 + Math.sin(a) * 2);
-        ctx.lineTo(heliX - Math.cos(a) * 16, heliY - 5 - Math.sin(a) * 2);
-        ctx.stroke();
-      }
-      ctx.restore();
-      // Nav lights
-      const bl = 0.5 + 0.5 * Math.sin(T * 6);
-      ctx.fillStyle = `rgba(248,113,113,${0.4 + 0.6 * bl})`;
-      ctx.beginPath(); ctx.arc(heliX - 9, heliY, 1.3, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = `rgba(103,232,249,${0.4 + 0.6 * (1 - bl)})`;
-      ctx.beginPath(); ctx.arc(heliX + 9, heliY, 1.3, 0, Math.PI * 2); ctx.fill();
+      // (Helicopter and blimp removed — read as toys at this scale.)
 
-      // Blimp
-      const blimpX = W - ((T * 5) % (W + 200)) + 100;
-      const blimpY = H * 0.14 + Math.sin(T * 0.4) * 4;
-      ctx.save();
-      ctx.translate(blimpX, blimpY);
-      ctx.fillStyle = "rgba(200,215,230,0.92)";
-      ctx.beginPath(); ctx.ellipse(0, 0, 40, 11, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = "rgba(30,40,55,0.9)";
-      ctx.fillRect(-8, 9, 16, 4);
-      // Fins
-      ctx.beginPath();
-      ctx.moveTo(36, 0); ctx.lineTo(46, -6); ctx.lineTo(46, 6); ctx.closePath(); ctx.fill();
-      // Belly banner
-      ctx.fillStyle = "rgba(5,10,20,0.9)";
-      ctx.fillRect(-36, 16, 72, 12);
-      ctx.strokeStyle = "rgba(103,232,249,0.5)"; ctx.lineWidth = 0.5;
-      ctx.strokeRect(-36, 16, 72, 12);
-      ctx.font = `700 9px "IBM Plex Mono", ui-monospace, monospace`;
-      ctx.fillStyle = `rgba(103,232,249,${0.6 + 0.4 * Math.sin(T * 2)})`;
-      ctx.textBaseline = "middle";
-      const t2 = "· VERIFY · SIGNAL · TRUTH ·";
-      const t2w = ctx.measureText(t2).width;
-      ctx.fillText(t2, -t2w / 2, 22);
-      ctx.restore();
 
       // Wet street reflection on foreground road
       ctx.save();
