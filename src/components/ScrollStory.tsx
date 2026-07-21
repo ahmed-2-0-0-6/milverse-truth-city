@@ -328,10 +328,11 @@ export function ScrollStory() {
 
 
       {/* MIL triad — judge-proofing */}
-      <section className="story-beat relative min-h-[80vh] flex items-center justify-center overflow-hidden px-6 border-y border-white/5">
+      <section className="story-beat thesis-beat relative min-h-[80vh] flex items-center justify-center overflow-hidden px-6 border-y border-white/5">
         <div className="beat-bg pointer-events-none absolute inset-0 z-[1]" aria-hidden>
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/[0.05] to-transparent" />
+          <ThesisBackdrop />
         </div>
+
         <div className="relative z-[2] max-w-5xl text-center">
           <div className="stencil text-[10px] text-cyan-300/70 mb-6">THE THESIS</div>
           <h2
