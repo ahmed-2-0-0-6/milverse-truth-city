@@ -270,7 +270,8 @@ export function ScrollStory() {
           key={i}
           className={`story-beat relative min-h-screen flex items-center justify-center overflow-hidden px-6 ${BEAT_BACKDROPS[i] ? "story-beat--image" : ""} ${b.finale ? "finale-beat" : ""}`}
         >
-          <div className="beat-bg pointer-events-none absolute -inset-y-[24vh] inset-x-0 z-[1]" aria-hidden>
+          <div className={`beat-bg pointer-events-none absolute z-[1] ${b.finale ? "inset-0" : "-inset-y-[24vh] inset-x-0"}`} aria-hidden>
+
             {BEAT_BACKDROPS[i] && (
               <>
                 <div
