@@ -746,10 +746,11 @@ function ThesisBackdrop() {
               id: "eleven", x: 970, y: 490, size: 42, color: "#FFFFFF",
               d: "M9 3v18H5V3zm10 0v18h-4V3z",
             },
-
+          ];
           return brands.map((b) => {
             const s = b.size ?? 46;
-            const needsDisc = b.id === "tt" || b.id === "x" || b.id === "wiki";
+            const needsDisc = b.id === "tt" || b.id === "x" || b.id === "wiki" || b.id === "twitch" || b.id === "canva" || b.id === "gemini" || b.id === "eleven";
+
             return (
               <g key={b.id} transform={`translate(${b.x} ${b.y})`}>
                 {needsDisc && (
