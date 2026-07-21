@@ -5815,3 +5815,68 @@ button[title*="lovable" i] {
   .detective-desk .desk-rain::before,
   .detective-desk .desk-grain::before { display: none; }
 }
+
+/* ── THESIS backdrop — MIL 101 collage (cameras, spots, rings, tickers) */
+.thesis-backdrop { --_c: 34,211,238; }
+.thesis-spot {
+  position: absolute;
+  top: -20%;
+  width: 60%;
+  height: 140%;
+  pointer-events: none;
+  filter: blur(24px);
+  opacity: 0.45;
+  mix-blend-mode: screen;
+}
+.thesis-spot-a {
+  left: -10%;
+  background: conic-gradient(from 60deg at 50% 0%, transparent 0deg, rgba(34,211,238,0.35) 12deg, transparent 24deg);
+  animation: thesis-sweep-a 11s ease-in-out infinite;
+  transform-origin: 50% 0%;
+}
+.thesis-spot-b {
+  right: -10%;
+  background: conic-gradient(from 300deg at 50% 0%, transparent 0deg, rgba(245,185,66,0.28) 12deg, transparent 24deg);
+  animation: thesis-sweep-b 13s ease-in-out infinite;
+  transform-origin: 50% 0%;
+}
+@keyframes thesis-sweep-a {
+  0%,100% { transform: rotate(-14deg); }
+  50%     { transform: rotate(18deg); }
+}
+@keyframes thesis-sweep-b {
+  0%,100% { transform: rotate(12deg); }
+  50%     { transform: rotate(-16deg); }
+}
+.thesis-ring {
+  transform-origin: 200px 200px;
+  animation: thesis-ring-pulse 4s ease-out infinite;
+  opacity: 0;
+}
+@keyframes thesis-ring-pulse {
+  0%   { transform: scale(0.6); opacity: 0.9; }
+  70%  { opacity: 0.15; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+.thesis-rec-dot {
+  width: 8px; height: 8px; border-radius: 999px;
+  background: #ef4444;
+  box-shadow: 0 0 10px rgba(239,68,68,0.9);
+  animation: thesis-rec-blink 1.2s steps(1,end) infinite;
+}
+@keyframes thesis-rec-blink {
+  0%,60% { opacity: 1; }
+  61%,100% { opacity: 0.15; }
+}
+.thesis-ticker {
+  animation: thesis-ticker-move 40s linear infinite;
+  letter-spacing: 0.3em;
+}
+.thesis-ticker-rev { animation-direction: reverse; animation-duration: 55s; }
+@keyframes thesis-ticker-move {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .thesis-spot, .thesis-ring, .thesis-ticker, .thesis-rec-dot { animation: none; }
+}
