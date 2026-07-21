@@ -254,7 +254,7 @@ export function MilCityScene() {
       if (tallest) {
         if (!tallest.antenna) tallest.antenna = { h: 80, struts: 5, blink: 0, ring: true };
         else { tallest.antenna.h = Math.max(tallest.antenna.h, 80); tallest.antenna.ring = true; }
-        mainAnt = { x: tallest.x + tallest.w / 2, y: H * 0.9 - tallest.h - tallest.antenna.h };
+        mainAnt = { x: tallest.x + tallest.w / 2, y: H * 0.72 - tallest.h - tallest.antenna.h };
       }
 
       // Antennas + struts baked as silhouette
