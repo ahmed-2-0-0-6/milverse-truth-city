@@ -310,13 +310,6 @@ export function ScrollStory() {
             <p className="beat-line beat-subtitle mt-6 max-w-xl mx-auto">
               {b.sub}
             </p>
-            {BEAT_BACKDROPS[i] && (
-              <div className="beat-line beat-evidence-strip mt-8" aria-hidden>
-                <span>FACE MATCH</span>
-                <span>VOICE CLEAN</span>
-                <span>ASK SMALL</span>
-              </div>
-            )}
             {b.finale && (
               <div className="beat-line mt-10 grid grid-cols-3 gap-4 max-w-xl mx-auto">
                 <Stat label="CASES" value={128} />
