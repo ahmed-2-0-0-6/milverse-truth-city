@@ -236,26 +236,8 @@ export function MilCityScene() {
           // Silhouette
           buildingSilhouette(g, b, L.yBase);
 
-          // Base windows (baked). Grid respects layer scale.
-          const cell = L.z === 2 ? 10 : L.z === 1 ? 8 : 6;
-          const cols = Math.max(2, Math.floor(w / cell));
-          const rows = Math.max(3, Math.floor(h / cell));
-          const winW = Math.max(1, (w / cols) * 0.55);
-          const winH = Math.max(1, (h / rows) * 0.55);
-          for (let ry = 0; ry < rows; ry++) {
-            for (let cx = 0; cx < cols; cx++) {
-              if (Math.random() > L.density) continue;
-              const wx = b.x + cx * (w / cols) + ((w / cols) - winW) / 2;
-              const wy = (L.yBase - h) + ry * (h / rows) + ((h / rows) - winH) / 2;
+          // (Base windows removed — read as flat teal stripes at this scale.)
 
-              const hue = R(L.hueRange[0], L.hueRange[1]) + (Math.random() < 0.15 ? 180 : 0);
-              const base = R(0.25, L.z === 2 ? 0.85 : L.z === 1 ? 0.6 : 0.4);
-              // Baked base tone (dim)
-              g.fillStyle = `hsla(${hue}, 75%, 62%, ${base * 0.55})`;
-              g.fillRect(wx, wy, winW, winH);
-              windowsByLayer[L.z].push({ x: wx, y: wy, w: winW, h: winH, hue, base, phase: R(0, Math.PI * 2), layer: L.z });
-            }
-          }
 
           x += w + R(-2, 6);
         }
