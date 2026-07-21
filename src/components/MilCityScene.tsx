@@ -225,28 +225,9 @@ export function MilCityScene() {
           }
           if (L.z === 2 && Math.random() < 0.2) b.spire = R(30, 70);
           if (L.z >= 1 && Math.random() < 0.35) b.watertank = true;
-          if (L.z === 2 && Math.random() < 0.4) {
-            const bw = R(w * 0.45, w * 0.85);
-            const bh = R(18, 34);
-            b.billboard = {
-              x: (w - bw) / 2, y: h * R(0.25, 0.5),
-              w: bw, h: bh,
-              hue: CHOICE([180, 320, 40, 200, 0]),
-              text: CHOICE(NEON_WORDS),
-              phase: R(0, Math.PI * 2),
-            };
-          }
-          if (L.z >= 1 && !b.billboard && Math.random() < 0.35) {
-            const mw = R(w * 0.4, w * 0.75);
-            const mh = R(h * 0.2, h * 0.4);
-            b.matrix = {
-              x: R(w * 0.1, w - mw - w * 0.05),
-              y: R(h * 0.15, h * 0.55),
-              w: mw, h: mh,
-              hue: CHOICE([180, 200, 320, 260, 40]),
-              phase: R(0, Math.PI * 2),
-            };
-          }
+          // (billboards + dot-matrix facades removed — didn't read as real
+          //  city elements at this scale)
+
           if (L.z >= 1 && Math.random() < 0.55) {
             b.crown = { hue: CHOICE([200, 40, 180, 320]), phase: R(0, Math.PI * 2) };
           }
