@@ -331,7 +331,7 @@ export function ScrollStory() {
 
       {/* MIL triad — judge-proofing */}
       <section className="story-beat thesis-beat relative min-h-[100dvh] py-24 flex items-center justify-center overflow-hidden px-6 border-y border-white/5">
-        <div className="beat-bg pointer-events-none absolute -inset-y-[24vh] inset-x-0 z-[1]" aria-hidden>
+        <div className="beat-bg pointer-events-none absolute inset-0 z-[1]" aria-hidden>
           <ThesisBackdrop />
         </div>
 
