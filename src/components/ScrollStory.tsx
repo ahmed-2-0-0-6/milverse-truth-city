@@ -643,54 +643,60 @@ function ThesisBackdrop() {
             <circle cx="50" cy="44" r="10" />
           </g>
 
-          {/* Tiny social platform glyphs — same blueprint line-art as the cameras.
-              Kept small (~28u) and scattered in the outer gutters so the center
-              MEDIA / INFORMATION / LITERACY cards stay clear. */}
-          {/* Instagram — left upper */}
-          <g transform="translate(250 60)">
-            <rect x="0" y="0" width="28" height="28" rx="7" />
-            <circle cx="14" cy="14" r="7" />
-            <circle cx="22" cy="6" r="1.4" />
+          {/* Tiny social platform glyphs — recognizable brand marks, blueprint stroke.
+              Scattered in the outer gutters so the MEDIA/INFO/LITERACY cards stay clear. */}
+          {/* Instagram — left upper (nudged inward so it's fully on screen) */}
+          <g transform="translate(300 70)">
+            <rect x="0" y="0" width="44" height="44" rx="11" />
+            <circle cx="22" cy="22" r="11" />
+            <circle cx="35" cy="9" r="2.4" fill="rgba(200,230,255,0.9)" stroke="none" />
           </g>
           {/* Reddit — left upper-mid */}
-          <g transform="translate(330 180)">
-            <circle cx="14" cy="16" r="12" />
-            <circle cx="14" cy="4" r="2" />
-            <line x1="14" y1="6" x2="14" y2="10" />
-            <circle cx="9" cy="15" r="1.4" />
-            <circle cx="19" cy="15" r="1.4" />
-            <path d="M9 20 q5 3 10 0" strokeLinecap="round" />
+          <g transform="translate(340 200)">
+            <circle cx="22" cy="24" r="18" />
+            <circle cx="22" cy="6" r="3" />
+            <line x1="22" y1="9" x2="22" y2="15" />
+            <circle cx="14" cy="22" r="2.4" fill="rgba(200,230,255,0.9)" stroke="none" />
+            <circle cx="30" cy="22" r="2.4" fill="rgba(200,230,255,0.9)" stroke="none" />
+            <path d="M13 30 q9 5 18 0" strokeLinecap="round" />
+            <circle cx="6" cy="18" r="3" />
+            <circle cx="38" cy="18" r="3" />
           </g>
           {/* YouTube — left mid */}
-          <g transform="translate(240 340)">
-            <rect x="0" y="0" width="32" height="22" rx="5" />
-            <path d="M13 6 L22 11 L13 16 Z" />
+          <g transform="translate(260 360)">
+            <rect x="0" y="0" width="50" height="34" rx="8" />
+            <path d="M20 9 L34 17 L20 25 Z" fill="rgba(200,230,255,0.9)" stroke="none" />
           </g>
           {/* TikTok — left low */}
-          <g transform="translate(270 620)">
-            <path d="M14 2 v18 a6 6 0 1 1 -6 -6" strokeLinecap="round" />
-            <path d="M14 2 a6 6 0 0 0 6 6" strokeLinecap="round" />
+          <g transform="translate(300 620)">
+            <path d="M22 3 v22 a9 9 0 1 1 -9 -9" strokeLinecap="round" />
+            <path d="M22 3 a9 9 0 0 0 9 9" strokeLinecap="round" />
           </g>
           {/* Snapchat — right upper */}
-          <g transform="translate(900 60)">
-            <path d="M14 2 c5 0 8 3 8 8 v4 c0 2 3 3 5 4 -2 2 -5 2 -6 3 0 2 1 3 1 4 -2 1 -4 0 -6 1 -1 1 -1 2 -2 2 -1 0 -1 -1 -2 -2 -2 -1 -4 0 -6 -1 0 -1 1 -2 1 -4 -1 -1 -4 -1 -6 -3 2 -1 5 -2 5 -4 v-4 c0 -5 3 -8 8 -8 z" />
+          <g transform="translate(880 70)">
+            <path d="M22 3 c8 0 12 5 12 12 v6 c0 3 5 4 8 6 -3 3 -8 3 -9 4 0 3 1 4 1 6 -3 1 -6 0 -9 1 -1 1 -1 3 -3 3 -2 0 -2 -2 -3 -3 -3 -1 -6 0 -9 -1 0 -2 1 -3 1 -6 -1 -1 -6 -1 -9 -4 3 -2 8 -3 8 -6 v-6 c0 -7 4 -12 12 -12 z" />
           </g>
           {/* Facebook — right upper-mid */}
-          <g transform="translate(860 180)">
-            <circle cx="14" cy="14" r="12" />
-            <path d="M16 8 h2 M16 8 c-2 0 -3 1 -3 3 v3 h-2 v3 h2 v6" strokeLinecap="round" />
+          <g transform="translate(860 190)">
+            <circle cx="22" cy="22" r="18" />
+            <path d="M26 12 h4 M26 12 c-3 0 -5 2 -5 5 v5 h-4 v4 h4 v10" strokeLinecap="round" />
           </g>
-          {/* X — right mid */}
-          <g transform="translate(930 340)">
-            <rect x="0" y="0" width="28" height="28" rx="4" />
-            <line x1="6" y1="6" x2="22" y2="22" />
-            <line x1="22" y1="6" x2="6" y2="22" />
+          {/* X / Twitter — right mid */}
+          <g transform="translate(920 340)">
+            <rect x="0" y="0" width="44" height="44" rx="8" />
+            <line x1="10" y1="10" x2="34" y2="34" strokeWidth="2.4" />
+            <line x1="34" y1="10" x2="10" y2="34" strokeWidth="2.4" />
           </g>
           {/* Discord — right low */}
-          <g transform="translate(880 620)">
-            <path d="M4 6 c4 -2 8 -3 12 -3 4 0 8 1 12 3 3 6 4 12 3 18 -3 2 -6 3 -9 4 l-2 -3 c2 -1 4 -1 6 -2 -6 3 -14 3 -20 0 2 1 4 1 6 2 l-2 3 c-3 -1 -6 -2 -9 -4 -1 -6 0 -12 3 -18 z" />
-            <circle cx="11" cy="14" r="2" />
-            <circle cx="21" cy="14" r="2" />
+          <g transform="translate(870 610)">
+            <path d="M6 9 c6 -3 12 -4 18 -4 6 0 12 1 18 4 4 9 5 18 4 27 -4 3 -9 4 -13 5 l-3 -4 c3 -1 6 -2 9 -3 -9 4 -20 4 -28 0 3 1 6 2 9 3 l-3 4 c-4 -1 -9 -2 -13 -5 -1 -9 0 -18 4 -27 z" />
+            <circle cx="17" cy="21" r="3" fill="rgba(200,230,255,0.9)" stroke="none" />
+            <circle cx="31" cy="21" r="3" fill="rgba(200,230,255,0.9)" stroke="none" />
+          </g>
+          {/* GPT / knot — right mid-lower */}
+          <g transform="translate(1080 480)">
+            <circle cx="22" cy="22" r="18" />
+            <path d="M22 6 a10 10 0 0 1 10 10 M22 6 a10 10 0 0 0 -10 10 M6 22 a10 10 0 0 1 10 -10 M6 22 a10 10 0 0 0 10 10 M22 38 a10 10 0 0 0 10 -10 M22 38 a10 10 0 0 1 -10 -10 M38 22 a10 10 0 0 0 -10 -10 M38 22 a10 10 0 0 1 -10 10" strokeWidth="1.4" />
           </g>
         </g>
       </svg>
