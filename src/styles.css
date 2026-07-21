@@ -5877,6 +5877,74 @@ button[title*="lovable" i] {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
-@media (prefers-reduced-motion: reduce) {
-  .thesis-spot, .thesis-ring, .thesis-ticker, .thesis-rec-dot { animation: none; }
+
+/* Spotlit industry terms drifting in from the corners */
+.thesis-term {
+  position: absolute;
+  font-family: "Bebas Neue", "Space Grotesk", sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: rgba(220,240,255,0.85);
+  text-shadow:
+    0 0 18px rgba(34,211,238,0.55),
+    0 0 40px rgba(34,211,238,0.25);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 12px rgba(0,0,0,0.6));
 }
+.thesis-term::before {
+  content: "";
+  position: absolute;
+  inset: -14px -20px;
+  background: radial-gradient(ellipse at center, rgba(34,211,238,0.18), transparent 70%);
+  z-index: -1;
+  border-radius: 40%;
+}
+.thesis-term-amber {
+  color: rgba(255,236,190,0.9);
+  text-shadow: 0 0 18px rgba(245,185,66,0.55), 0 0 40px rgba(245,185,66,0.22);
+}
+.thesis-term-amber::before {
+  background: radial-gradient(ellipse at center, rgba(245,185,66,0.16), transparent 70%);
+}
+.thesis-term-l { animation: thesis-term-in-l 9s ease-in-out infinite; }
+.thesis-term-r { animation: thesis-term-in-r 9s ease-in-out infinite; }
+@keyframes thesis-term-in-l {
+  0%   { transform: translateX(-40px); opacity: 0; }
+  15%  { opacity: 0.95; }
+  55%  { transform: translateX(0);     opacity: 0.9; }
+  85%  { opacity: 0; }
+  100% { transform: translateX(20px);  opacity: 0; }
+}
+@keyframes thesis-term-in-r {
+  0%   { transform: translateX(40px);  opacity: 0; }
+  15%  { opacity: 0.95; }
+  55%  { transform: translateX(0);     opacity: 0.9; }
+  85%  { opacity: 0; }
+  100% { transform: translateX(-20px); opacity: 0; }
+}
+/* Narrow beam spotlight backing each term */
+.thesis-beam {
+  position: absolute;
+  width: 320px;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(34,211,238,0), rgba(34,211,238,0.7), rgba(34,211,238,0));
+  opacity: 0;
+  animation: thesis-beam-pulse 9s ease-in-out infinite;
+  filter: blur(1px);
+}
+.thesis-beam-amber {
+  background: linear-gradient(90deg, rgba(245,185,66,0), rgba(245,185,66,0.7), rgba(245,185,66,0));
+}
+@keyframes thesis-beam-pulse {
+  0%,100% { opacity: 0; transform: scaleX(0.4); }
+  20%,70% { opacity: 0.7; transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thesis-spot, .thesis-ring, .thesis-ticker, .thesis-rec-dot,
+  .thesis-term-l, .thesis-term-r, .thesis-beam { animation: none; }
+  .thesis-term { opacity: 0.7; }
+}
+
