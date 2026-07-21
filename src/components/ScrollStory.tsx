@@ -330,7 +330,7 @@ export function ScrollStory() {
 
 
       {/* MIL triad — judge-proofing */}
-      <section className="story-beat thesis-beat relative min-h-[80vh] flex items-center justify-center overflow-hidden px-6 border-y border-white/5">
+      <section className="story-beat thesis-beat relative min-h-screen flex items-center justify-center overflow-hidden px-6 border-y border-white/5">
         <div className="beat-bg pointer-events-none absolute inset-0 z-[1]" aria-hidden>
           <ThesisBackdrop />
         </div>
@@ -584,26 +584,8 @@ function ThesisBackdrop() {
       <div className="thesis-spot thesis-spot-a" />
       <div className="thesis-spot thesis-spot-b" />
 
-      {/* concentric broadcast rings from top-right antenna */}
-      <svg
-        className="absolute -top-24 -right-24 h-[520px] w-[520px] opacity-40"
-        viewBox="0 0 400 400"
-        fill="none"
-      >
-        <g stroke="rgb(34,211,238)" strokeWidth="1">
-          <circle cx="200" cy="200" r="60" className="thesis-ring" style={{ animationDelay: "0s" }} />
-          <circle cx="200" cy="200" r="110" className="thesis-ring" style={{ animationDelay: "1s" }} />
-          <circle cx="200" cy="200" r="160" className="thesis-ring" style={{ animationDelay: "2s" }} />
-          <circle cx="200" cy="200" r="210" className="thesis-ring" style={{ animationDelay: "3s" }} />
-        </g>
-        {/* antenna mast */}
-        <g stroke="rgba(34,211,238,0.6)" strokeWidth="1.5" fill="none">
-          <line x1="200" y1="200" x2="200" y2="120" />
-          <line x1="200" y1="130" x2="185" y2="115" />
-          <line x1="200" y1="130" x2="215" y2="115" />
-          <circle cx="200" cy="200" r="4" fill="rgb(34,211,238)" />
-        </g>
-      </svg>
+      {/* broadcast rings + antenna removed per request */}
+
 
       {/* SVG icon collage — cameras, mic, satellite, film reel, tv, newspaper */}
       <svg className="absolute inset-0 h-full w-full opacity-[0.14]" viewBox="0 0 1200 700" fill="none">
@@ -616,20 +598,14 @@ function ThesisBackdrop() {
             <circle cx="60" cy="55" r="12" />
             <circle cx="100" cy="30" r="3" />
           </g>
-          {/* Microphone — mid-left */}
+          {/* Microphone — mid-left (U-arc base removed) */}
           <g transform="translate(60 380) rotate(-14)">
             <rect x="0" y="0" width="26" height="70" rx="13" />
-            <path d="M-8 40 a21 21 0 0 0 42 0" />
             <line x1="13" y1="70" x2="13" y2="110" />
             <line x1="0" y1="110" x2="26" y2="110" />
           </g>
-          {/* Satellite dish — bottom-left */}
-          <g transform="translate(140 540)">
-            <path d="M0 40 A50 50 0 0 1 100 40 L50 40 Z" />
-            <line x1="50" y1="40" x2="50" y2="75" />
-            <line x1="30" y1="80" x2="70" y2="80" />
-            <circle cx="55" cy="18" r="3" />
-          </g>
+          {/* satellite dish / lamp removed per request */}
+
           {/* Film reel — top-right */}
           <g transform="translate(1000 100)">
             <circle cx="60" cy="60" r="55" />
@@ -693,13 +669,8 @@ function ThesisBackdrop() {
         <span>REC · MIL 101</span>
       </div>
 
-      {/* headline stencils drifting behind */}
-      <div className="thesis-ticker stencil text-[11px] text-cyan-300/40 absolute top-[14%] left-0 whitespace-nowrap">
-        MISINFORMATION · DISINFORMATION · MALINFORMATION · VERIFY · LATERAL READ · REVERSE IMAGE · SOURCE · CONTEXT ·
-      </div>
-      <div className="thesis-ticker thesis-ticker-rev stencil text-[11px] text-amber-300/30 absolute bottom-[12%] left-0 whitespace-nowrap">
-        DEEPFAKE · CHEAPFAKE · CLICKBAIT · ASTROTURF · SOCK PUPPET · OUT-OF-CONTEXT · SELECTIVE EDIT ·
-      </div>
+      {/* top/bottom headline tickers removed per request */}
+
 
       {/* corner brackets */}
       {/* corner brackets */}
