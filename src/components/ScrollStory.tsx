@@ -688,7 +688,7 @@ function ThesisBackdrop() {
             },
             // X (formerly Twitter) — white
             {
-              id: "x", x: 918, y: 335, size: 46, color: "#FFFFFF",
+              id: "x", x: 1090, y: 260, size: 46, color: "#FFFFFF",
               d: "M18.9 1.7h3.4l-7.4 8.5L23.6 22h-6.8l-5.3-6.9L5.4 22H2l7.9-9-8.4-11.3h7l4.8 6.3ZM17.7 20h1.9L6.4 3.7H4.3Z",
             },
             // Discord — blurple
