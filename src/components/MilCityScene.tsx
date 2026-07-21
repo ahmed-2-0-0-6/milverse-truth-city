@@ -456,68 +456,8 @@ export function MilCityScene() {
       }
       ctx.restore();
 
-      // Neon billboards
-      for (const b of buildings) {
-        if (!b.billboard) continue;
-        const yBase = b.layer === 0 ? H * 0.65 : b.layer === 1 ? H * 0.76 : H * 0.9;
-        const bx = b.x + b.billboard.x;
-        const by = (yBase - b.h) + b.billboard.y;
-        const bw = b.billboard.w, bh = b.billboard.h;
-        const hue = b.billboard.hue;
-        const pulse = 0.75 + 0.25 * Math.sin(T * 1.6 + b.billboard.phase);
-        // Panel bloom
-        ctx.save();
-        ctx.globalCompositeOperation = "screen";
-        const bg = ctx.createRadialGradient(bx + bw / 2, by + bh / 2, 0, bx + bw / 2, by + bh / 2, Math.max(bw, bh));
-        bg.addColorStop(0, `hsla(${hue}, 100%, 60%, ${0.35 * pulse})`);
-        bg.addColorStop(1, "transparent");
-        ctx.fillStyle = bg;
-        ctx.fillRect(bx - bw * 0.4, by - bh * 0.8, bw * 1.8, bh * 2.6);
-        ctx.restore();
-        // Panel
-        ctx.fillStyle = `hsla(${hue}, 60%, 12%, 0.9)`;
-        ctx.fillRect(bx, by, bw, bh);
-        ctx.strokeStyle = `hsla(${hue}, 100%, 70%, ${0.55 * pulse})`;
-        ctx.lineWidth = 0.8;
-        ctx.strokeRect(bx + 0.5, by + 0.5, bw - 1, bh - 1);
-        // Text
-        const fs = Math.max(8, Math.floor(bh * 0.55));
-        ctx.font = `800 ${fs}px "IBM Plex Mono", ui-monospace, monospace`;
-        ctx.textBaseline = "middle";
-        const text = b.billboard.text;
-        const tw = ctx.measureText(text).width;
-        ctx.fillStyle = `hsla(${hue}, 100%, 82%, ${pulse})`;
-        ctx.fillText(text, bx + (bw - tw) / 2, by + bh / 2 + 1);
-        // Scanline
-        const scan = ((T * 0.6 + b.billboard.phase) % 1);
-        ctx.fillStyle = `hsla(${hue}, 100%, 90%, 0.18)`;
-        ctx.fillRect(bx, by + scan * bh, bw, 1);
-      }
+      // (Neon billboards and dot-matrix news facades removed)
 
-      // Dot-matrix news facades
-      for (const b of buildings) {
-        if (!b.matrix) continue;
-        const yBase = b.layer === 0 ? H * 0.65 : b.layer === 1 ? H * 0.76 : H * 0.9;
-        const mx = b.x + b.matrix.x;
-        const my = (yBase - b.h) + b.matrix.y;
-        const mw = b.matrix.w, mh = b.matrix.h;
-        const hue = b.matrix.hue;
-        // Backing
-        ctx.fillStyle = `hsla(${hue}, 60%, 6%, 0.85)`;
-        ctx.fillRect(mx, my, mw, mh);
-        // Rolling bars
-        const bars = 12;
-        for (let i = 0; i < bars; i++) {
-          const p = (T * 0.7 + b.matrix.phase + i / bars) % 1;
-          const a = 0.10 + 0.4 * Math.sin(p * Math.PI);
-          ctx.fillStyle = `hsla(${hue}, 100%, 60%, ${a})`;
-          ctx.fillRect(mx, my + (i / bars) * mh, mw, (mh / bars) * 0.55);
-        }
-        // Scan sweep
-        const scanY = my + ((T * 40 + b.matrix.phase * 20) % mh);
-        ctx.fillStyle = `hsla(${hue}, 100%, 85%, 0.35)`;
-        ctx.fillRect(mx, scanY, mw, 1.5);
-      }
 
       // Rooftop crown lights (colored strips atop tall buildings)
       for (const b of buildings) {
