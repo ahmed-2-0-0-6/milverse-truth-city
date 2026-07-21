@@ -700,7 +700,12 @@ function ThesisBackdrop() {
       </div>
 
       {/* corner brackets */}
-      <div className="absolute inset-6 pointer-events-none border border-cyan-300/10" style={{ clipPath: "polygon(0 0, 40px 0, 40px 2px, 2px 2px, 2px 40px, 0 40px, 0 100%, 40px 100%, 40px calc(100% - 2px), 2px calc(100% - 2px), 2px calc(100% - 40px), 0 calc(100% - 40px), 0 0, 100% 0, 100% 40px, calc(100% - 2px) 40px, calc(100% - 2px) 2px, calc(100% - 40px) 2px, calc(100% - 40px) 0, 100% 0, 100% 100%, calc(100% - 40px) 100%, calc(100% - 40px) calc(100% - 2px), calc(100% - 2px) calc(100% - 2px), calc(100% - 2px) calc(100% - 40px), 100% calc(100% - 40px))" } as never} />
+      {/* corner brackets */}
+      <div className="absolute top-4 left-4 h-6 w-6 border-l border-t border-cyan-300/40" />
+      <div className="absolute top-4 right-4 h-6 w-6 border-r border-t border-cyan-300/40" />
+      <div className="absolute bottom-4 left-4 h-6 w-6 border-l border-b border-cyan-300/40" />
+      <div className="absolute bottom-4 right-4 h-6 w-6 border-r border-b border-cyan-300/40" />
+
     </div>
   );
 }
