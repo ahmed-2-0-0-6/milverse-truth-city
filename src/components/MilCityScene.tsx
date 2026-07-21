@@ -260,7 +260,7 @@ export function MilCityScene() {
       // Antennas + struts baked as silhouette
       for (const b of buildings) {
         if (!b.antenna) continue;
-        const yBase = b.layer === 0 ? H * 0.65 : b.layer === 1 ? H * 0.76 : H * 0.9;
+        const yBase = b.layer === 0 ? H * 0.52 : b.layer === 1 ? H * 0.61 : H * 0.72;
         const ax = b.x + b.w / 2;
         const ay = yBase - b.h;
         g.strokeStyle = "#02050a";
@@ -275,7 +275,7 @@ export function MilCityScene() {
       }
 
       // River band (between mid and near skyline)
-      const riverY = H * 0.78;
+      const riverY = H * 0.62;
       const riverH = H * 0.06;
       const riverGrd = g.createLinearGradient(0, riverY, 0, riverY + riverH);
       riverGrd.addColorStop(0, "#020408");
@@ -306,7 +306,7 @@ export function MilCityScene() {
       }
 
       // Foreground road / rooftop bar
-      const roadY = H * 0.92;
+      const roadY = H * 0.735;
       const roadGrd = g.createLinearGradient(0, roadY, 0, H);
       roadGrd.addColorStop(0, "#020407");
       roadGrd.addColorStop(0.5, "#04080f");
@@ -326,24 +326,24 @@ export function MilCityScene() {
       // Rooftop clutter silhouettes on foreground
       // Left satellite dish
       g.fillStyle = "#02060b";
-      g.beginPath(); g.arc(W * 0.06, H * 0.935, 14, Math.PI, 0); g.closePath(); g.fill();
-      g.fillRect(W * 0.06 - 0.5, H * 0.935, 1, 18);
+      g.beginPath(); g.arc(W * 0.06, H * 0.75, 14, Math.PI, 0); g.closePath(); g.fill();
+      g.fillRect(W * 0.06 - 0.5, H * 0.75, 1, 18);
       // Right press camera on tripod
       g.fillStyle = "#02060b";
-      g.fillRect(W * 0.905 - 10, H * 0.925, 20, 10);
-      g.fillRect(W * 0.905 + 6, H * 0.921, 8, 6);
+      g.fillRect(W * 0.905 - 10, H * 0.74, 20, 10);
+      g.fillRect(W * 0.905 + 6, H * 0.737, 8, 6);
       g.strokeStyle = "#02060b"; g.lineWidth = 1.6;
       g.beginPath();
-      g.moveTo(W * 0.905 - 6, H * 0.935); g.lineTo(W * 0.905 - 10, H * 0.96);
-      g.moveTo(W * 0.905,     H * 0.935); g.lineTo(W * 0.905,      H * 0.96);
-      g.moveTo(W * 0.905 + 6, H * 0.935); g.lineTo(W * 0.905 + 10, H * 0.96);
+      g.moveTo(W * 0.905 - 6, H * 0.75); g.lineTo(W * 0.905 - 10, H * 0.77);
+      g.moveTo(W * 0.905,     H * 0.75); g.lineTo(W * 0.905,      H * 0.77);
+      g.moveTo(W * 0.905 + 6, H * 0.75); g.lineTo(W * 0.905 + 10, H * 0.77);
       g.stroke();
 
       bakedCity = c;
 
       // Cars
       cars = [];
-      const laneYs = [H * 0.935, H * 0.955, H * 0.975];
+      const laneYs = [H * 0.75, H * 0.765, H * 0.78];
       for (let i = 0; i < 26; i++) {
         cars.push({
           lane: IR(0, laneYs.length - 1),
@@ -387,7 +387,7 @@ export function MilCityScene() {
       if (bakedCity) ctx.drawImage(bakedCity, 0, 0, W, H);
 
       // Water reflection: flip a slice of the baked city into the river band
-      const riverY = H * 0.78;
+      const riverY = H * 0.62;
       const riverH = H * 0.06;
       if (bakedCity) {
         ctx.save();
@@ -444,7 +444,7 @@ export function MilCityScene() {
       // Rooftop crown lights (colored strips atop tall buildings)
       for (const b of buildings) {
         if (!b.crown) continue;
-        const yBase = b.layer === 0 ? H * 0.65 : b.layer === 1 ? H * 0.76 : H * 0.9;
+        const yBase = b.layer === 0 ? H * 0.52 : b.layer === 1 ? H * 0.61 : H * 0.72;
         const cy = yBase - b.h;
         const a = 0.5 + 0.5 * Math.sin(T * 1.4 + b.crown.phase);
         ctx.fillStyle = `hsla(${b.crown.hue}, 100%, 65%, ${0.4 + 0.4 * a})`;
@@ -454,7 +454,7 @@ export function MilCityScene() {
       // Antenna aviation blinks + signal rings + data packets
       for (const b of buildings) {
         if (!b.antenna) continue;
-        const yBase = b.layer === 0 ? H * 0.65 : b.layer === 1 ? H * 0.76 : H * 0.9;
+        const yBase = b.layer === 0 ? H * 0.52 : b.layer === 1 ? H * 0.61 : H * 0.72;
         const ax = b.x + b.w / 2;
         const ay = yBase - b.h - b.antenna.h;
         const blink = 0.5 + 0.5 * Math.sin(T * 3 + b.antenna.blink);
@@ -504,7 +504,7 @@ export function MilCityScene() {
       ctx.restore();
 
       // Cars on foreground road with head/tail lights
-      const laneYs = ((cars as unknown as { laneYs: number[] }).laneYs) || [H * 0.935, H * 0.955, H * 0.975];
+      const laneYs = ((cars as unknown as { laneYs: number[] }).laneYs) || [H * 0.75, H * 0.765, H * 0.78];
       for (const car of cars) {
         car.x += car.speed * car.dir * dt;
         if (car.dir === 1 && car.x > W + 60) car.x = -60;
@@ -552,7 +552,7 @@ export function MilCityScene() {
       // Wet street reflection on foreground road
       ctx.save();
       ctx.globalCompositeOperation = "screen";
-      const roadY = H * 0.92;
+      const roadY = H * 0.735;
       const wet = ctx.createLinearGradient(0, roadY, 0, H);
       wet.addColorStop(0, "rgba(80,120,180,0.05)");
       wet.addColorStop(1, "rgba(30,60,100,0.15)");
