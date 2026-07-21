@@ -5908,21 +5908,15 @@ button[title*="lovable" i] {
 .thesis-term-amber::before {
   background: radial-gradient(ellipse at center, rgba(245,185,66,0.16), transparent 70%);
 }
-.thesis-term-l { animation: thesis-term-in-l 9s ease-in-out infinite; }
-.thesis-term-r { animation: thesis-term-in-r 9s ease-in-out infinite; }
-@keyframes thesis-term-in-l {
-  0%   { transform: translateX(-40px); opacity: 0; }
-  15%  { opacity: 0.95; }
-  55%  { transform: translateX(0);     opacity: 0.9; }
-  85%  { opacity: 0; }
-  100% { transform: translateX(20px);  opacity: 0; }
-}
-@keyframes thesis-term-in-r {
-  0%   { transform: translateX(40px);  opacity: 0; }
-  15%  { opacity: 0.95; }
-  55%  { transform: translateX(0);     opacity: 0.9; }
-  85%  { opacity: 0; }
-  100% { transform: translateX(-20px); opacity: 0; }
+.thesis-term-l,
+.thesis-term-r { animation: thesis-term-rise 11s linear infinite; will-change: transform, opacity; }
+@keyframes thesis-term-rise {
+  0%   { transform: translateY(30vh);   opacity: 0; }
+  12%  { opacity: 0; }
+  28%  { transform: translateY(0);      opacity: 0.95; }
+  60%  { transform: translateY(-35vh);  opacity: 0.6; }
+  85%  { transform: translateY(-70vh);  opacity: 0.15; }
+  100% { transform: translateY(-95vh);  opacity: 0; }
 }
 /* Narrow beam spotlight backing each term */
 .thesis-beam {
