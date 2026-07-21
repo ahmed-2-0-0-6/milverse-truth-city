@@ -215,90 +215,16 @@ export function ScrollStory() {
 
   return (
     <div ref={rootRef} className="scrollstory relative isolate">
-      {/* Gotham detective-desk backdrop — sticks to viewport across the whole ScrollStory. */}
-      <div
-        className="pointer-events-none sticky top-0 left-0 z-0 h-screen w-full overflow-hidden"
-        style={{ marginBottom: "-100vh" }}
-        aria-hidden
-      >
-        <div
-          className="absolute inset-0 bg-cover bg-center will-change-transform"
-          style={{
-            backgroundImage: `url(${gothamDeskArt})`,
-            filter: "saturate(0.85) contrast(1.05)",
-            transform: "scale(1.05)",
-          }}
-        />
-        {/* Cold Gotham teal wash + vignette */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(120% 80% at 50% 40%, transparent 30%, rgba(3,6,12,0.55) 70%, rgba(0,0,0,0.9) 100%), linear-gradient(180deg, rgba(10,20,35,0.35) 0%, rgba(5,8,14,0.6) 100%)",
-          }}
-        />
-        {/* Subtle bat-signal flicker glow behind the window */}
-        <div
-          className="absolute left-1/2 top-[18%] h-40 w-40 -translate-x-1/2 rounded-full opacity-40 blur-3xl"
-          style={{ background: "radial-gradient(circle, rgba(140,190,255,0.55), transparent 70%)" }}
-        />
-        {/* Film grain */}
-        <div
-          className="absolute inset-0 opacity-[0.08] mix-blend-overlay"
-          style={{
-            backgroundImage:
-              "radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px)",
-            backgroundSize: "3px 3px",
-          }}
-        />
-      </div>
-
-
-
-
-
-
       {/* Story beats */}
       {BEATS.map((b, i) => (
         <section
           key={i}
-          className={`story-beat relative min-h-screen flex items-center justify-center overflow-hidden px-6 ${BEAT_BACKDROPS[i] ? "story-beat--image" : ""} ${b.finale ? "finale-beat" : ""}`}
+          className={`story-beat relative min-h-screen flex items-center justify-center overflow-hidden px-6 ${b.finale ? "finale-beat" : ""}`}
         >
-          <div className="beat-bg pointer-events-none absolute -inset-y-[24vh] inset-x-0 z-[1]" aria-hidden>
-            {BEAT_BACKDROPS[i] && (
-              <>
-                <div
-                  className="absolute inset-0 bg-cover bg-center opacity-70 blur-sm scale-105"
-                  style={{
-                    backgroundImage: `url(${BEAT_BACKDROPS[i]})`,
-                    filter: "saturate(0.9) contrast(1.06) blur(8px)",
-                  }}
-                />
-                <div
-                  className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                  style={{
-                    backgroundImage: `url(${BEAT_BACKDROPS[i]})`,
-                    filter: "saturate(0.96) contrast(1.14)",
-                  }}
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "radial-gradient(72% 44% at 50% 52%, rgba(3,6,12,0.2) 0%, rgba(3,6,12,0.44) 58%, rgba(0,0,0,0.82) 100%), linear-gradient(180deg, rgba(10,20,35,0.12) 0%, rgba(5,8,14,0.3) 100%)",
-                  }}
-                />
-              </>
-            )}
-            <div className="absolute inset-0 opacity-20"
-              style={{
-                backgroundImage: "radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px)",
-                backgroundSize: "3px 3px",
-              }}
-            />
+          <div className="beat-bg pointer-events-none absolute inset-0 z-[1]" aria-hidden>
+            {BEAT_FX[i] && <BeatFX variant={BEAT_FX[i]!} />}
             {i === 3 && <BroadcastCityFX />}
           </div>
-
 
           <div className="beat-copy relative z-[2] max-w-5xl text-center">
 
