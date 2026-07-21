@@ -341,19 +341,31 @@ export function MilCityScene() {
 
       bakedCity = c;
 
-      // Cars
+      // Cars — 4 lanes filling the full foreground road, each lane one direction
+      // to prevent head-on collisions. Cars in the same lane are spaced evenly.
       cars = [];
-      const laneYs = [H * 0.75, H * 0.765, H * 0.78];
-      for (let i = 0; i < 26; i++) {
-        cars.push({
-          lane: IR(0, laneYs.length - 1),
-          x: R(-100, W + 100),
-          dir: Math.random() < 0.5 ? 1 : -1,
-          speed: R(40, 140),
-        });
+      const roadTop = H * 0.735;
+      const roadBot = H;
+      const laneCount = 4;
+      const laneStep = (roadBot - roadTop) / (laneCount + 1);
+      const laneYs: number[] = [];
+      for (let i = 0; i < laneCount; i++) laneYs.push(roadTop + laneStep * (i + 1));
+      const perLane = 6;
+      for (let li = 0; li < laneCount; li++) {
+        const dir: 1 | -1 = li % 2 === 0 ? 1 : -1;
+        const speed = R(50, 110);
+        const gap = (W + 200) / perLane;
+        for (let k = 0; k < perLane; k++) {
+          cars.push({
+            lane: li,
+            x: -100 + k * gap + R(-8, 8),
+            dir,
+            speed,
+          });
+        }
       }
-      // Encode lane Ys via closure
       (cars as unknown as { laneYs?: number[] } & Car[]).laneYs = laneYs;
+
     }
 
     let raf = 0;
