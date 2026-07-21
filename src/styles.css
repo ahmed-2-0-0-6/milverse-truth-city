@@ -5878,36 +5878,44 @@ button[title*="lovable" i] {
   100% { transform: translateX(-50%); }
 }
 
-/* Spotlit industry terms drifting in from the corners */
+/* Notification-pill industry terms rising from bottom */
 .thesis-term {
   position: absolute;
-  font-family: "Bebas Neue", "Space Grotesk", sans-serif;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-  color: rgba(220,240,255,0.85);
-  text-shadow:
-    0 0 18px rgba(34,211,238,0.55),
-    0 0 40px rgba(34,211,238,0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 8px 12px;
+  font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(230,240,255,0.95);
+  background: rgba(10,14,22,0.82);
+  border: 1px solid rgba(120,140,170,0.28);
+  border-radius: 10px;
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 0 22px var(--pill-glow, rgba(34,211,238,0.28));
+  backdrop-filter: blur(6px);
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  filter: drop-shadow(0 2px 12px rgba(0,0,0,0.6));
 }
 .thesis-term::before {
   content: "";
-  position: absolute;
-  inset: -14px -20px;
-  background: radial-gradient(ellipse at center, rgba(34,211,238,0.18), transparent 70%);
-  z-index: -1;
-  border-radius: 40%;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--pill-dot, #22d3ee);
+  box-shadow: 0 0 10px var(--pill-dot, #22d3ee), 0 0 18px var(--pill-dot, #22d3ee);
+  flex: 0 0 auto;
 }
-.thesis-term-amber {
-  color: rgba(255,236,190,0.9);
-  text-shadow: 0 0 18px rgba(245,185,66,0.55), 0 0 40px rgba(245,185,66,0.22);
-}
-.thesis-term-amber::before {
-  background: radial-gradient(ellipse at center, rgba(245,185,66,0.16), transparent 70%);
-}
+.thesis-term-cyan  { --pill-dot: #22d3ee; --pill-glow: rgba(34,211,238,0.35); }
+.thesis-term-amber { --pill-dot: #f5b942; --pill-glow: rgba(245,185,66,0.35); }
+.thesis-term-rose  { --pill-dot: #fb7185; --pill-glow: rgba(251,113,133,0.35); }
+.thesis-term-lime  { --pill-dot: #a3e635; --pill-glow: rgba(163,230,53,0.30); }
+.thesis-term-violet{ --pill-dot: #a78bfa; --pill-glow: rgba(167,139,250,0.32); }
+.thesis-term-sky   { --pill-dot: #60a5fa; --pill-glow: rgba(96,165,250,0.32); }
 .thesis-term-l,
 .thesis-term-r { animation: thesis-term-rise 11s linear infinite; will-change: transform, opacity; }
 @keyframes thesis-term-rise {
