@@ -749,7 +749,7 @@ function ThesisBackdrop() {
           ];
           return brands.map((b) => {
             const s = b.size ?? 46;
-            const needsDisc = b.id === "tt" || b.id === "x" || b.id === "wiki" || b.id === "twitch" || b.id === "canva" || b.id === "gemini" || b.id === "eleven";
+            const needsDisc = b.id === "tt" || b.id === "x" || b.id === "twitch" || b.id === "canva" || b.id === "gemini" || b.id === "eleven";
 
             return (
               <g key={b.id} transform={`translate(${b.x} ${b.y})`}>
