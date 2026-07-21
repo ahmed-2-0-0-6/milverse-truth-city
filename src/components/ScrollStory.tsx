@@ -13,11 +13,12 @@ import cleanroomArt from "@/assets/district-cleanroom.jpg";
 import mirrorVideo from "@/assets/mirror.mp4.asset.json";
 import gothamDeskArt from "@/assets/detective-desk-gotham.jpg";
 import gothamBoardPortraitArt from "@/assets/detective-board-gotham-wide.jpg";
+import gothamCrimeSceneArt from "@/assets/detective-crime-scene-gotham.jpg";
 
 const BEAT_BACKDROPS: (string | undefined)[] = [
   undefined,
   gothamBoardPortraitArt,
-  undefined,
+  gothamCrimeSceneArt,
   undefined,
 ];
 
