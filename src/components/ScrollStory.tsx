@@ -687,7 +687,6 @@ function ThesisBackdrop() {
 }
 
 const SPOTLIT_TERMS: Array<{
-const SPOTLIT_TERMS: Array<{
   text: string;
   side: "l" | "r";
   left: string;
