@@ -668,7 +668,7 @@ function ThesisBackdrop() {
             },
             // YouTube — red
             {
-              id: "yt", x: 258, y: 358, size: 50, color: "#FF0000",
+              id: "yt", x: 110, y: 300, size: 50, color: "#FF0000",
               d: "M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8ZM9.75 15.6V8.4L15.9 12Z",
             },
             // TikTok — white (with dark backdrop for legibility)
