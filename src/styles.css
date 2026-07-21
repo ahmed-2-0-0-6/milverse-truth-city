@@ -5920,6 +5920,7 @@ button[title*="lovable" i] {
 .thesis-term-red    { --pill-dot: #ef4444; --pill-glow: rgba(239,68,68,0.40); }
 .thesis-term-yellow { --pill-dot: #facc15; --pill-glow: rgba(250,204,21,0.38); }
 .thesis-term-white  { --pill-dot: #f8fafc; --pill-glow: rgba(248,250,252,0.30); }
+.thesis-term-green  { --pill-dot: #10a37f; --pill-glow: rgba(16,163,127,0.38); }
 .thesis-term-l,
 .thesis-term-r { animation: thesis-term-rise 11s linear infinite; will-change: transform, opacity; }
 @keyframes thesis-term-rise {
