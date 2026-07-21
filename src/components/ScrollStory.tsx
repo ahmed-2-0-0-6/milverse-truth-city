@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "
 import { useNavigate } from "@tanstack/react-router";
 import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
 import { BroadcastCityFX } from "@/components/BroadcastCityFX";
+import { BeatFX } from "@/components/BeatFX";
 
 
 import mirrorArt from "@/assets/district-mirror.jpg";
@@ -12,16 +13,12 @@ import studioArt from "@/assets/district-studio.jpg";
 import archiveArt from "@/assets/district-archive.jpg";
 import cleanroomArt from "@/assets/district-cleanroom.jpg";
 import mirrorVideo from "@/assets/mirror.mp4.asset.json";
-import gothamDeskArt from "@/assets/detective-desk-gotham.jpg";
-import gothamBoardPortraitArt from "@/assets/detective-board-gotham-wide.jpg";
-import gothamCrimeSceneArt from "@/assets/detective-crime-scene-gotham.jpg";
-import gothamRooftopArt from "@/assets/detective-rooftop-gotham.jpg";
 
-const BEAT_BACKDROPS: (string | undefined)[] = [
-  undefined,
-  gothamBoardPortraitArt,
-  gothamCrimeSceneArt,
-  gothamRooftopArt,
+const BEAT_FX: (("arrival" | "board" | "counter") | undefined)[] = [
+  "arrival",
+  "board",
+  "counter",
+  undefined, // finale uses BroadcastCityFX
 ];
 
 
