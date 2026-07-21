@@ -158,7 +158,7 @@ export function ScrollStory() {
               toggleActions: "play none none reverse",
             },
           });
-          if (!el.classList.contains("story-beat--image") && !el.classList.contains("finale-beat")) {
+          if (!el.classList.contains("story-beat--image") && !el.classList.contains("finale-beat") && !el.classList.contains("thesis-beat")) {
             gsap.to(el.querySelector(".beat-bg"), {
               yPercent: -20,
               ease: "none",
