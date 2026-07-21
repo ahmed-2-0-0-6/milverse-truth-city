@@ -158,13 +158,14 @@ export function ScrollStory() {
               toggleActions: "play none none reverse",
             },
           });
-          if (!el.classList.contains("story-beat--image")) {
+          if (!el.classList.contains("story-beat--image") && !el.classList.contains("finale-beat")) {
             gsap.to(el.querySelector(".beat-bg"), {
               yPercent: -20,
               ease: "none",
               scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: 0.6 },
             });
           }
+
         });
 
         // Horizontal district gallery
