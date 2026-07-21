@@ -221,7 +221,7 @@ export function MilCityScene() {
             yTop: L.yBase - h,
           };
           if (L.z >= 1 && h > (L.z === 2 ? 260 : 180) && Math.random() < 0.5) {
-            b.antenna = { h: R(30, 70), struts: IR(3, 5), blink: R(0, Math.PI * 2), ring: L.z === 2 && Math.random() < 0.55 };
+            b.antenna = { h: R(30, 70), struts: IR(3, 5), blink: R(0, Math.PI * 2), ring: false };
           }
           if (L.z === 2 && Math.random() < 0.2) b.spire = R(30, 70);
           if (L.z >= 1 && Math.random() < 0.35) b.watertank = true;
