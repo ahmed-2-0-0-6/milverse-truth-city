@@ -672,13 +672,76 @@ function ThesisBackdrop() {
       {/* top/bottom headline tickers removed per request */}
 
 
-      {/* corner brackets */}
+      {/* Spotlit MIL industry terms — drift in from the corners, never cross the center */}
+      <SpotlitTerms />
+
       {/* corner brackets */}
       <div className="absolute top-4 left-4 h-6 w-6 border-l border-t border-cyan-300/40" />
       <div className="absolute top-4 right-4 h-6 w-6 border-r border-t border-cyan-300/40" />
       <div className="absolute bottom-4 left-4 h-6 w-6 border-l border-b border-cyan-300/40" />
       <div className="absolute bottom-4 right-4 h-6 w-6 border-r border-b border-cyan-300/40" />
 
+
+    </div>
+  );
+}
+
+const SPOTLIT_TERMS: Array<{
+  text: string;
+  side: "l" | "r";
+  top: string;
+  offset: string;
+  size: string;
+  delay: string;
+  amber?: boolean;
+}> = [
+  // LEFT column — kept within ~0-24% width
+  { text: "BROADCAST",     side: "l", top: "10%", offset: "2%",  size: "34px", delay: "0s" },
+  { text: "EDIT BAY",      side: "l", top: "22%", offset: "5%",  size: "22px", delay: "1.4s", amber: true },
+  { text: "LOWER THIRD",   side: "l", top: "34%", offset: "1%",  size: "20px", delay: "2.8s" },
+  { text: "B-ROLL",        side: "l", top: "46%", offset: "6%",  size: "28px", delay: "4.1s", amber: true },
+  { text: "CHYRON",        side: "l", top: "58%", offset: "2%",  size: "24px", delay: "5.4s" },
+  { text: "TELEPROMPTER",  side: "l", top: "70%", offset: "3%",  size: "22px", delay: "6.7s" },
+  { text: "SOUND STAGE",   side: "l", top: "82%", offset: "1%",  size: "26px", delay: "8s", amber: true },
+  // RIGHT column — kept within ~76-100% width
+  { text: "COLOR GRADE",   side: "r", top: "14%", offset: "3%",  size: "26px", delay: "0.7s" },
+  { text: "GREEN SCREEN",  side: "r", top: "26%", offset: "1%",  size: "22px", delay: "2.1s", amber: true },
+  { text: "PRESS KIT",     side: "r", top: "38%", offset: "5%",  size: "24px", delay: "3.5s" },
+  { text: "BYLINE",        side: "r", top: "50%", offset: "2%",  size: "30px", delay: "4.8s" },
+  { text: "DATELINE",      side: "r", top: "62%", offset: "6%",  size: "22px", delay: "6.1s", amber: true },
+  { text: "NEWS WIRE",     side: "r", top: "74%", offset: "1%",  size: "26px", delay: "7.4s" },
+  { text: "HEADLINE",      side: "r", top: "86%", offset: "3%",  size: "32px", delay: "8.7s" },
+];
+
+function SpotlitTerms() {
+  return (
+    <div className="pointer-events-none absolute inset-0 hidden md:block" aria-hidden>
+      {SPOTLIT_TERMS.map((t, i) => {
+        const sideStyle =
+          t.side === "l" ? { left: t.offset } : { right: t.offset };
+        const beamStyle =
+          t.side === "l"
+            ? { left: t.offset, transformOrigin: "left center" }
+            : { right: t.offset, transformOrigin: "right center" };
+        return (
+          <div key={i} style={{ position: "absolute", top: t.top, ...sideStyle }}>
+            <div
+              className={`thesis-beam ${t.amber ? "thesis-beam-amber" : ""}`}
+              style={{ ...beamStyle, top: "50%", animationDelay: t.delay, position: "absolute", left: 0, right: 0 }}
+            />
+            <div
+              className={`thesis-term ${t.side === "l" ? "thesis-term-l" : "thesis-term-r"} ${t.amber ? "thesis-term-amber" : ""}`}
+              style={{
+                fontSize: t.size,
+                animationDelay: t.delay,
+                position: "relative",
+              }}
+            >
+              {t.text}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
