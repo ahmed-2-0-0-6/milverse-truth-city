@@ -197,9 +197,9 @@ export function MilCityScene() {
       windowsByLayer = [[], [], []];
 
       const layerDefs: { z: Layer; yBase: number; minW: number; maxW: number; minH: number; maxH: number; hueRange: [number, number]; density: number }[] = [
-        { z: 0, yBase: H * 0.65, minW: 24, maxW: 60,  minH: 60,  maxH: 160, hueRange: [190, 215], density: 0.32 },
-        { z: 1, yBase: H * 0.76, minW: 42, maxW: 100, minH: 140, maxH: 280, hueRange: [30, 55],   density: 0.48 },
-        { z: 2, yBase: H * 0.9,  minW: 70, maxW: 170, minH: 220, maxH: 420, hueRange: [200, 220], density: 0.6 },
+        { z: 0, yBase: H * 0.48, minW: 24, maxW: 60,  minH: 60,  maxH: 160, hueRange: [190, 215], density: 0.32 },
+        { z: 1, yBase: H * 0.58, minW: 42, maxW: 100, minH: 140, maxH: 280, hueRange: [30, 55],   density: 0.48 },
+        { z: 2, yBase: H * 0.72, minW: 70, maxW: 170, minH: 220, maxH: 420, hueRange: [200, 220], density: 0.6 },
       ];
 
       for (const L of layerDefs) {
