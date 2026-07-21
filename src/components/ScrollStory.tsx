@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
-import { BroadcastCityFX } from "@/components/BroadcastCityFX";
+import { MilCityScene } from "@/components/MilCityScene";
 
 
 import mirrorArt from "@/assets/district-mirror.jpg";
@@ -21,8 +21,10 @@ const BEAT_BACKDROPS: (string | undefined)[] = [
   undefined,
   gothamBoardPortraitArt,
   gothamCrimeSceneArt,
-  gothamRooftopArt,
+  undefined, // beat 4 uses live <MilCityScene />
 ];
+// Keep reference so lint doesn't complain if the rooftop asset lingers.
+void gothamRooftopArt;
 
 
 type District = {
@@ -299,7 +301,7 @@ export function ScrollStory() {
                 backgroundSize: "3px 3px",
               }}
             />
-            {i === 3 && <BroadcastCityFX />}
+            {i === 3 && <MilCityScene />}
           </div>
 
 
