@@ -642,8 +642,59 @@ function ThesisBackdrop() {
             <circle cx="50" cy="44" r="18" />
             <circle cx="50" cy="44" r="10" />
           </g>
+
+          {/* Tiny social platform glyphs — same blueprint line-art as the cameras.
+              Kept small (~28u) and scattered in the outer gutters so the center
+              MEDIA / INFORMATION / LITERACY cards stay clear. */}
+          {/* Instagram — left upper */}
+          <g transform="translate(250 60)">
+            <rect x="0" y="0" width="28" height="28" rx="7" />
+            <circle cx="14" cy="14" r="7" />
+            <circle cx="22" cy="6" r="1.4" />
+          </g>
+          {/* Reddit — left upper-mid */}
+          <g transform="translate(330 180)">
+            <circle cx="14" cy="16" r="12" />
+            <circle cx="14" cy="4" r="2" />
+            <line x1="14" y1="6" x2="14" y2="10" />
+            <circle cx="9" cy="15" r="1.4" />
+            <circle cx="19" cy="15" r="1.4" />
+            <path d="M9 20 q5 3 10 0" strokeLinecap="round" />
+          </g>
+          {/* YouTube — left mid */}
+          <g transform="translate(240 340)">
+            <rect x="0" y="0" width="32" height="22" rx="5" />
+            <path d="M13 6 L22 11 L13 16 Z" />
+          </g>
+          {/* TikTok — left low */}
+          <g transform="translate(270 620)">
+            <path d="M14 2 v18 a6 6 0 1 1 -6 -6" strokeLinecap="round" />
+            <path d="M14 2 a6 6 0 0 0 6 6" strokeLinecap="round" />
+          </g>
+          {/* Snapchat — right upper */}
+          <g transform="translate(900 60)">
+            <path d="M14 2 c5 0 8 3 8 8 v4 c0 2 3 3 5 4 -2 2 -5 2 -6 3 0 2 1 3 1 4 -2 1 -4 0 -6 1 -1 1 -1 2 -2 2 -1 0 -1 -1 -2 -2 -2 -1 -4 0 -6 -1 0 -1 1 -2 1 -4 -1 -1 -4 -1 -6 -3 2 -1 5 -2 5 -4 v-4 c0 -5 3 -8 8 -8 z" />
+          </g>
+          {/* Facebook — right upper-mid */}
+          <g transform="translate(860 180)">
+            <circle cx="14" cy="14" r="12" />
+            <path d="M16 8 h2 M16 8 c-2 0 -3 1 -3 3 v3 h-2 v3 h2 v6" strokeLinecap="round" />
+          </g>
+          {/* X — right mid */}
+          <g transform="translate(930 340)">
+            <rect x="0" y="0" width="28" height="28" rx="4" />
+            <line x1="6" y1="6" x2="22" y2="22" />
+            <line x1="22" y1="6" x2="6" y2="22" />
+          </g>
+          {/* Discord — right low */}
+          <g transform="translate(880 620)">
+            <path d="M4 6 c4 -2 8 -3 12 -3 4 0 8 1 12 3 3 6 4 12 3 18 -3 2 -6 3 -9 4 l-2 -3 c2 -1 4 -1 6 -2 -6 3 -14 3 -20 0 2 1 4 1 6 2 l-2 3 c-3 -1 -6 -2 -9 -4 -1 -6 0 -12 3 -18 z" />
+            <circle cx="11" cy="14" r="2" />
+            <circle cx="21" cy="14" r="2" />
+          </g>
         </g>
       </svg>
+
 
       {/* dot grid */}
       <div
