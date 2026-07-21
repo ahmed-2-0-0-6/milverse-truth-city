@@ -341,19 +341,31 @@ export function MilCityScene() {
 
       bakedCity = c;
 
-      // Cars
+      // Cars — 4 lanes filling the full foreground road, each lane one direction
+      // to prevent head-on collisions. Cars in the same lane are spaced evenly.
       cars = [];
-      const laneYs = [H * 0.75, H * 0.765, H * 0.78];
-      for (let i = 0; i < 26; i++) {
-        cars.push({
-          lane: IR(0, laneYs.length - 1),
-          x: R(-100, W + 100),
-          dir: Math.random() < 0.5 ? 1 : -1,
-          speed: R(40, 140),
-        });
+      const roadTop = H * 0.735;
+      const roadBot = H;
+      const laneCount = 4;
+      const laneStep = (roadBot - roadTop) / (laneCount + 1);
+      const laneYs: number[] = [];
+      for (let i = 0; i < laneCount; i++) laneYs.push(roadTop + laneStep * (i + 1));
+      const perLane = 6;
+      for (let li = 0; li < laneCount; li++) {
+        const dir: 1 | -1 = li % 2 === 0 ? 1 : -1;
+        const speed = R(50, 110);
+        const gap = (W + 200) / perLane;
+        for (let k = 0; k < perLane; k++) {
+          cars.push({
+            lane: li,
+            x: -100 + k * gap + R(-8, 8),
+            dir,
+            speed,
+          });
+        }
       }
-      // Encode lane Ys via closure
       (cars as unknown as { laneYs?: number[] } & Car[]).laneYs = laneYs;
+
     }
 
     let raf = 0;
@@ -504,7 +516,7 @@ export function MilCityScene() {
       ctx.restore();
 
       // Cars on foreground road with head/tail lights
-      const laneYs = ((cars as unknown as { laneYs: number[] }).laneYs) || [H * 0.75, H * 0.765, H * 0.78];
+      const laneYs = ((cars as unknown as { laneYs: number[] }).laneYs) || [H * 0.78, H * 0.83, H * 0.88, H * 0.93];
       for (const car of cars) {
         car.x += car.speed * car.dir * dt;
         if (car.dir === 1 && car.x > W + 60) car.x = -60;
@@ -512,14 +524,14 @@ export function MilCityScene() {
         const y = laneYs[car.lane];
         ctx.save();
         ctx.globalCompositeOperation = "screen";
-        // Head/tail light streak
-        const isNear = car.lane === laneYs.length - 1;
-        const len = isNear ? 32 : car.lane === 1 ? 22 : 14;
-        const wid = isNear ? 2 : 1.2;
+        // Nearer lanes (bottom) render bigger/brighter
+        const depth = car.lane / (laneYs.length - 1 || 1); // 0 far → 1 near
+        const len = 14 + depth * 26;
+        const wid = 1 + depth * 1.6;
         const hue = car.dir === 1 ? 45 : 0;
         const front = car.x + (car.dir === 1 ? len : -len);
         const grd = ctx.createLinearGradient(car.x, y, front, y);
-        grd.addColorStop(0, `hsla(${hue}, 100%, 65%, ${isNear ? 0.9 : 0.6})`);
+        grd.addColorStop(0, `hsla(${hue}, 100%, 65%, ${0.5 + depth * 0.4})`);
         grd.addColorStop(1, "transparent");
         ctx.fillStyle = grd;
         ctx.fillRect(Math.min(car.x, front), y - wid / 2, len, wid);
@@ -528,6 +540,7 @@ export function MilCityScene() {
         ctx.fillRect(car.x - 1, y - wid / 2, 2, wid);
         ctx.restore();
       }
+
 
       // Bridge deck traffic — small warm streaks
       if (bridge) {
