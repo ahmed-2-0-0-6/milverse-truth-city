@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
+import { BroadcastCityFX } from "@/components/BroadcastCityFX";
 
 
 import mirrorArt from "@/assets/district-mirror.jpg";
@@ -298,6 +299,7 @@ export function ScrollStory() {
                 backgroundSize: "3px 3px",
               }}
             />
+            {i === 3 && <BroadcastCityFX />}
           </div>
 
 
