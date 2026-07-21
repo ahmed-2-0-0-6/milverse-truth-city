@@ -750,7 +750,34 @@ function ThesisBackdrop() {
 
           return brands.map((b) => {
             const s = b.size ?? 46;
-            const needsDisc = b.id === "tt" || b.id === "x" || b.id === "twitch" || b.id === "canva" || b.id === "gemini" || b.id === "eleven";
+            const needsDisc = b.id === "tt" || b.id === "x" || b.id === "twitch" || b.id === "gemini" || b.id === "eleven";
+
+            // Canva — accurate mark: teal gradient disc + white bold C
+            if (b.id === "canva") {
+              return (
+                <g key={b.id} transform={`translate(${b.x} ${b.y})`}>
+                  <defs>
+                    <radialGradient id="canvaGrad" cx="0.3" cy="0.3" r="0.9">
+                      <stop offset="0" stopColor="#7D2AE7" />
+                      <stop offset="0.55" stopColor="#00C4CC" />
+                      <stop offset="1" stopColor="#01F1A9" />
+                    </radialGradient>
+                  </defs>
+                  <circle cx={s / 2} cy={s / 2} r={s / 2} fill="url(#canvaGrad)" />
+                  <text
+                    x={s / 2}
+                    y={s / 2 + s * 0.16}
+                    textAnchor="middle"
+                    fontFamily="Georgia, 'Times New Roman', serif"
+                    fontWeight={700}
+                    fontSize={s * 0.62}
+                    fill="#FFFFFF"
+                  >
+                    C
+                  </text>
+                </g>
+              );
+            }
 
             return (
               <g key={b.id} transform={`translate(${b.x} ${b.y})`}>
@@ -763,6 +790,7 @@ function ThesisBackdrop() {
               </g>
             );
           });
+
         })()}
       </svg>
 
