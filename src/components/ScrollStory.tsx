@@ -686,30 +686,32 @@ function ThesisBackdrop() {
   );
 }
 
+type PillColor = "cyan" | "amber" | "rose" | "lime" | "violet" | "sky";
 const SPOTLIT_TERMS: Array<{
   text: string;
   side: "l" | "r";
   left: string;
-  size: string;
   delay: string;
-  amber?: boolean;
+  color: PillColor;
 }> = [
-  // LEFT gutter (0-30%)
-  { text: "BROADCAST",     side: "l", left: "4%",  size: "34px", delay: "0s" },
-  { text: "EDIT BAY",      side: "l", left: "14%", size: "22px", delay: "1.6s", amber: true },
-  { text: "LOWER THIRD",   side: "l", left: "2%",  size: "20px", delay: "3.2s" },
-  { text: "B-ROLL",        side: "l", left: "20%", size: "28px", delay: "4.8s", amber: true },
-  { text: "CHYRON",        side: "l", left: "8%",  size: "24px", delay: "6.4s" },
-  { text: "TELEPROMPTER",  side: "l", left: "16%", size: "22px", delay: "8s" },
-  { text: "SOUND STAGE",   side: "l", left: "3%",  size: "26px", delay: "9.6s", amber: true },
-  // RIGHT gutter (70-100%)
-  { text: "COLOR GRADE",   side: "r", left: "74%", size: "26px", delay: "0.8s" },
-  { text: "GREEN SCREEN",  side: "r", left: "84%", size: "22px", delay: "2.4s", amber: true },
-  { text: "PRESS KIT",     side: "r", left: "72%", size: "24px", delay: "4s" },
-  { text: "BYLINE",        side: "r", left: "88%", size: "30px", delay: "5.6s" },
-  { text: "DATELINE",      side: "r", left: "76%", size: "22px", delay: "7.2s", amber: true },
-  { text: "NEWS WIRE",     side: "r", left: "82%", size: "26px", delay: "8.8s" },
-  { text: "HEADLINE",      side: "r", left: "70%", size: "32px", delay: "10.4s" },
+  // LEFT gutter (0-28%)
+  { text: "BREAKING: source unverified",    side: "l", left: "3%",  delay: "0s",    color: "rose"   },
+  { text: "EDIT BAY: cut for time",         side: "l", left: "15%", delay: "1.4s",  color: "amber"  },
+  { text: "CHYRON: 'EXCLUSIVE'",            side: "l", left: "5%",  delay: "2.8s",  color: "cyan"   },
+  { text: "B-ROLL: stock footage",          side: "l", left: "18%", delay: "4.2s",  color: "violet" },
+  { text: "TELEPROMPTER: on-message",       side: "l", left: "2%",  delay: "5.6s",  color: "sky"    },
+  { text: "LOWER THIRD: 'expert says'",     side: "l", left: "12%", delay: "7s",    color: "lime"   },
+  { text: "COLOR GRADE: mood = fear",       side: "l", left: "7%",  delay: "8.4s",  color: "amber"  },
+  { text: "SOUND STAGE: laugh track",       side: "l", left: "20%", delay: "9.8s",  color: "cyan"   },
+  // RIGHT gutter (72-100%)
+  { text: "HEADLINE: rage-bait",            side: "r", left: "75%", delay: "0.7s",  color: "rose"   },
+  { text: "BYLINE: anonymous",              side: "r", left: "86%", delay: "2.1s",  color: "sky"    },
+  { text: "PRESS KIT: talking points",      side: "r", left: "72%", delay: "3.5s",  color: "violet" },
+  { text: "DATELINE: geolocation faked",    side: "r", left: "82%", delay: "4.9s",  color: "amber"  },
+  { text: "GREEN SCREEN: never on site",    side: "r", left: "76%", delay: "6.3s",  color: "lime"   },
+  { text: "NEWS WIRE: paid placement",      side: "r", left: "88%", delay: "7.7s",  color: "cyan"   },
+  { text: "SEGMENT: sponsored",             side: "r", left: "74%", delay: "9.1s",  color: "rose"   },
+  { text: "ARCHIVE: 6 years old",           side: "r", left: "84%", delay: "10.5s", color: "sky"    },
 ];
 
 function SpotlitTerms() {
@@ -718,11 +720,11 @@ function SpotlitTerms() {
       {SPOTLIT_TERMS.map((t, i) => (
         <div
           key={i}
-          className={`thesis-term ${t.side === "l" ? "thesis-term-l" : "thesis-term-r"} ${t.amber ? "thesis-term-amber" : ""}`}
+          className={`thesis-term thesis-term-${t.color} ${t.side === "l" ? "thesis-term-l" : "thesis-term-r"}`}
           style={{
             left: t.left,
             bottom: "-10%",
-            fontSize: t.size,
+            fontSize: "13px",
             animationDelay: t.delay,
           }}
         >
