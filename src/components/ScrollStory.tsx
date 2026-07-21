@@ -743,48 +743,78 @@ function ThesisBackdrop() {
   );
 }
 
-type PillColor = "cyan" | "amber" | "rose" | "lime" | "violet" | "sky" | "pink" | "red" | "yellow" | "white";
-type PillIcon = "ig" | "yt" | "tt" | "sc" | "tv" | "np" | "radio" | "mic" | "cam";
+type PillColor = "cyan" | "amber" | "rose" | "lime" | "violet" | "sky" | "pink" | "red" | "yellow" | "white" | "green";
+type PillIcon = "ig" | "yt" | "tt" | "sc" | "tv" | "np" | "radio" | "mic" | "cam" | "gpt" | "x" | "fb" | "reddit" | "discord";
 
 const PillGlyph = ({ icon }: { icon: PillIcon }) => {
-  const s = { width: 14, height: 14, display: "block" } as const;
+  const s = { width: 18, height: 18, display: "block" } as const;
   switch (icon) {
     case "ig":
       return (
-        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="2">
-          <rect x="3" y="3" width="18" height="18" rx="5" />
-          <circle cx="12" cy="12" r="4" />
-          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="5.5" />
+          <circle cx="12" cy="12" r="4.2" />
+          <circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none" />
         </svg>
       );
     case "yt":
       return (
         <svg viewBox="0 0 24 24" style={s} fill="currentColor">
-          <path d="M23 7.5a3 3 0 0 0-2.1-2.1C19 5 12 5 12 5s-7 0-8.9.4A3 3 0 0 0 1 7.5C.6 9.4.6 12 .6 12s0 2.6.4 4.5A3 3 0 0 0 3.1 18.6C5 19 12 19 12 19s7 0 8.9-.4A3 3 0 0 0 23 16.5c.4-1.9.4-4.5.4-4.5s0-2.6-.4-4.5zM9.75 15.5v-7l6 3.5-6 3.5z"/>
+          <path d="M23.5 7.2a3 3 0 0 0-2.1-2.1C19.5 4.5 12 4.5 12 4.5s-7.5 0-9.4.6A3 3 0 0 0 .5 7.2C0 9.1 0 12 0 12s0 2.9.5 4.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1c.5-1.9.5-4.8.5-4.8s0-2.9-.5-4.8zM9.6 15.6V8.4L15.8 12l-6.2 3.6z" />
         </svg>
       );
     case "tt":
       return (
         <svg viewBox="0 0 24 24" style={s} fill="currentColor">
-          <path d="M16.5 3a5.5 5.5 0 0 0 4.5 4.5v3a8.5 8.5 0 0 1-4.5-1.3v6.6a6.2 6.2 0 1 1-6.2-6.2c.34 0 .67.03 1 .08v3.15a3.1 3.1 0 1 0 2.2 2.97V3h3z"/>
+          <path d="M16.6 2h-3.2v13.3a3 3 0 1 1-3-3c.3 0 .5 0 .8.1V9.1a6.4 6.4 0 1 0 5.4 6.3V9.2a7.6 7.6 0 0 0 4.5 1.5V7.5a4.6 4.6 0 0 1-4.5-5.5z" />
         </svg>
       );
     case "sc":
       return (
         <svg viewBox="0 0 24 24" style={s} fill="currentColor">
-          <path d="M12 2c3.2 0 5 2.4 5 5.4 0 1.4-.2 3-.2 3 .5.2 1-.4 1.6-.4.5 0 1.4.3 1.4 1 0 1.4-3 1.6-3.4 2.6-.1.4 1 2.4 2.7 3.1.6.3 1.5.4 1.5 1 0 1-2 1.3-2.3 1.6-.2.2 0 1.4-.7 1.6-.8.2-2-.7-3.4-.4-1.3.3-2.3 2-4.2 2-1.9 0-2.8-1.7-4.2-2-1.4-.3-2.6.6-3.4.4-.7-.2-.5-1.4-.7-1.6-.3-.3-2.3-.6-2.3-1.6 0-.6.9-.7 1.5-1 1.7-.7 2.8-2.7 2.7-3.1-.4-1-3.4-1.2-3.4-2.6 0-.7.9-1 1.4-1 .6 0 1.1.6 1.6.4 0 0-.2-1.6-.2-3C7 4.4 8.8 2 12 2z"/>
+          <path d="M12 1.6c3.7 0 5.9 2.7 5.9 6 0 1.3-.1 2.7-.1 3 .3.1.9.2 1.5.2.7 0 1.5-.3 1.5.4 0 .8-1.7 1.1-2.6 1.4-.5.2-.2.9.4 1.9.9 1.4 2.5 2.4 4 2.7.6.1.5.9-.2 1.2-1.2.6-2.5.5-2.9 1-.2.3.1 1.3-.6 1.5-.8.2-1.9-.6-3.4-.3-1.6.3-2.8 1.9-4.5 1.9s-2.9-1.6-4.5-1.9c-1.5-.3-2.6.5-3.4.3-.7-.2-.4-1.2-.6-1.5-.4-.5-1.7-.4-2.9-1-.7-.3-.8-1.1-.2-1.2 1.5-.3 3.1-1.3 4-2.7.6-1 .9-1.7.4-1.9-.9-.3-2.6-.6-2.6-1.4 0-.7.8-.4 1.5-.4.6 0 1.2-.1 1.5-.2 0-.3-.1-1.7-.1-3 0-3.3 2.2-6 5.9-6z" />
+        </svg>
+      );
+    case "x":
+      return (
+        <svg viewBox="0 0 24 24" style={s} fill="currentColor">
+          <path d="M18.9 2H22l-7.2 8.2L23 22h-6.6l-5.2-6.8L5.2 22H2.1l7.7-8.8L1.4 2H8.1l4.7 6.2L18.9 2zm-1.2 18h1.8L7 4h-2l12.7 16z" />
+        </svg>
+      );
+    case "fb":
+      return (
+        <svg viewBox="0 0 24 24" style={s} fill="currentColor">
+          <path d="M22 12a10 10 0 1 0-11.5 9.9v-7H8v-2.9h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.3 0-1.7.8-1.7 1.6V12H16l-.4 2.9h-2.1v7A10 10 0 0 0 22 12z" />
+        </svg>
+      );
+    case "reddit":
+      return (
+        <svg viewBox="0 0 24 24" style={s} fill="currentColor">
+          <path d="M22 12.1a2.1 2.1 0 0 0-3.6-1.5 10.4 10.4 0 0 0-5.5-1.7l1-4.4 3 .7a1.5 1.5 0 1 0 .2-1L13.5 3l-1.3 5.6a10.4 10.4 0 0 0-5.6 1.7 2.1 2.1 0 1 0-2.3 3.4 4 4 0 0 0 0 .7c0 3.4 4 6.2 8.7 6.2s8.7-2.8 8.7-6.2a4 4 0 0 0-.1-.7 2.1 2.1 0 0 0 .4-1.6zM7 13.5a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0zm8.3 4a5.6 5.6 0 0 1-3.3.9 5.6 5.6 0 0 1-3.3-.9.5.5 0 1 1 .6-.7 4.7 4.7 0 0 0 2.7.7 4.7 4.7 0 0 0 2.7-.7.5.5 0 1 1 .6.7zm-.4-2.5a1.5 1.5 0 1 1 1.5-1.5 1.5 1.5 0 0 1-1.5 1.5z" />
+        </svg>
+      );
+    case "discord":
+      return (
+        <svg viewBox="0 0 24 24" style={s} fill="currentColor">
+          <path d="M20.3 4.5A18 18 0 0 0 16 3l-.2.4a16 16 0 0 1 3.8 1.2A14.6 14.6 0 0 0 12 3.5a14.6 14.6 0 0 0-7.5 1.1A16 16 0 0 1 8.2 3.4L8 3a18 18 0 0 0-4.3 1.5C1 8.8.2 13 .6 17.1a18 18 0 0 0 5.5 2.8l1.1-1.5a11.6 11.6 0 0 1-1.8-.9l.5-.3a13 13 0 0 0 12.2 0l.5.3a11.6 11.6 0 0 1-1.8.9l1.1 1.5a18 18 0 0 0 5.5-2.8c.5-4.7-.5-8.9-3.1-12.6zM8.5 14.6a2 2 0 1 1 2-2 2 2 0 0 1-2 2zm7 0a2 2 0 1 1 2-2 2 2 0 0 1-2 2z" />
+        </svg>
+      );
+    case "gpt":
+      return (
+        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20.5 10a4.4 4.4 0 0 0-.4-3.6 4.5 4.5 0 0 0-4.8-2.1A4.5 4.5 0 0 0 7.7 5.9a4.4 4.4 0 0 0-3 2.1 4.5 4.5 0 0 0 .6 5.3 4.4 4.4 0 0 0 .4 3.6 4.5 4.5 0 0 0 4.8 2.1 4.5 4.5 0 0 0 7.6-1.6 4.4 4.4 0 0 0 3-2.1 4.5 4.5 0 0 0-.6-5.3zM12 20a3.4 3.4 0 0 1-2.2-.8l.1-.1 3.7-2.2a.6.6 0 0 0 .3-.5v-5.3l1.6.9v4.5A3.4 3.4 0 0 1 12 20z" />
         </svg>
       );
     case "tv":
       return (
-        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-          <rect x="2.5" y="5" width="19" height="13" rx="2" />
-          <path d="M8 21h8M8 2l4 3 4-3" />
+        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="2.5" y="6" width="19" height="13" rx="2" />
+          <path d="M8 22h8M8 2l4 3 4-3" />
         </svg>
       );
     case "np":
       return (
-        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="2">
+        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round">
           <path d="M4 5h13v14H4z" />
           <path d="M17 8h3v9a2 2 0 0 1-2 2h-1" />
           <path d="M7 9h7M7 12h7M7 15h4" strokeLinecap="round" />
@@ -792,7 +822,7 @@ const PillGlyph = ({ icon }: { icon: PillIcon }) => {
       );
     case "radio":
       return (
-        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="2">
+        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round">
           <rect x="2.5" y="8" width="19" height="12" rx="2" />
           <circle cx="16" cy="14" r="3" />
           <path d="M6 12v4M7 4l10-2" strokeLinecap="round" />
@@ -800,14 +830,14 @@ const PillGlyph = ({ icon }: { icon: PillIcon }) => {
       );
     case "mic":
       return (
-        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <rect x="9" y="3" width="6" height="12" rx="3" />
           <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
         </svg>
       );
     case "cam":
       return (
-        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="2">
+        <svg viewBox="0 0 24 24" style={s} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round">
           <path d="M3 7h4l2-2h6l2 2h4v12H3z" />
           <circle cx="12" cy="13" r="4" />
         </svg>
