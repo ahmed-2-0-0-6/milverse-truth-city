@@ -17,8 +17,8 @@ type Building = {
   antenna?: { h: number; struts: number; blink: number; ring?: boolean };
   spire?: number;
   watertank?: boolean;
-  billboard?: { x: number; y: number; w: number; h: number; hue: number; text: string; phase: number };
-  matrix?: { x: number; y: number; w: number; h: number; hue: number; phase: number };
+
+
   crown?: { hue: number; phase: number }; // rooftop crown lights
 };
 
@@ -32,7 +32,7 @@ const SKY = {
   glow: "#3a3040",
 };
 
-const NEON_WORDS = ["MIL", "TRUTH", "VERIFY", "LIVE 24", "PRESS", "SIGNAL", "FACT", "★ NEWS ★"];
+
 
 export function MilCityScene() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -225,28 +225,9 @@ export function MilCityScene() {
           }
           if (L.z === 2 && Math.random() < 0.2) b.spire = R(30, 70);
           if (L.z >= 1 && Math.random() < 0.35) b.watertank = true;
-          if (L.z === 2 && Math.random() < 0.4) {
-            const bw = R(w * 0.45, w * 0.85);
-            const bh = R(18, 34);
-            b.billboard = {
-              x: (w - bw) / 2, y: h * R(0.25, 0.5),
-              w: bw, h: bh,
-              hue: CHOICE([180, 320, 40, 200, 0]),
-              text: CHOICE(NEON_WORDS),
-              phase: R(0, Math.PI * 2),
-            };
-          }
-          if (L.z >= 1 && !b.billboard && Math.random() < 0.35) {
-            const mw = R(w * 0.4, w * 0.75);
-            const mh = R(h * 0.2, h * 0.4);
-            b.matrix = {
-              x: R(w * 0.1, w - mw - w * 0.05),
-              y: R(h * 0.15, h * 0.55),
-              w: mw, h: mh,
-              hue: CHOICE([180, 200, 320, 260, 40]),
-              phase: R(0, Math.PI * 2),
-            };
-          }
+          // (billboards + dot-matrix facades removed — didn't read as real
+          //  city elements at this scale)
+
           if (L.z >= 1 && Math.random() < 0.55) {
             b.crown = { hue: CHOICE([200, 40, 180, 320]), phase: R(0, Math.PI * 2) };
           }
@@ -261,20 +242,12 @@ export function MilCityScene() {
           const rows = Math.max(3, Math.floor(h / cell));
           const winW = Math.max(1, (w / cols) * 0.55);
           const winH = Math.max(1, (h / rows) * 0.55);
-          const skipZone = b.billboard || b.matrix;
           for (let ry = 0; ry < rows; ry++) {
             for (let cx = 0; cx < cols; cx++) {
               if (Math.random() > L.density) continue;
               const wx = b.x + cx * (w / cols) + ((w / cols) - winW) / 2;
               const wy = (L.yBase - h) + ry * (h / rows) + ((h / rows) - winH) / 2;
-              // Skip windows behind billboard/matrix panels
-              if (skipZone) {
-                const sx = b.x + (b.billboard?.x ?? b.matrix!.x);
-                const sy = (L.yBase - h) + (b.billboard?.y ?? b.matrix!.y);
-                const sw = b.billboard?.w ?? b.matrix!.w;
-                const sh = b.billboard?.h ?? b.matrix!.h;
-                if (wx > sx - 2 && wx < sx + sw + 2 && wy > sy - 2 && wy < sy + sh + 2) continue;
-              }
+
               const hue = R(L.hueRange[0], L.hueRange[1]) + (Math.random() < 0.15 ? 180 : 0);
               const base = R(0.25, L.z === 2 ? 0.85 : L.z === 1 ? 0.6 : 0.4);
               // Baked base tone (dim)
@@ -483,68 +456,8 @@ export function MilCityScene() {
       }
       ctx.restore();
 
-      // Neon billboards
-      for (const b of buildings) {
-        if (!b.billboard) continue;
-        const yBase = b.layer === 0 ? H * 0.65 : b.layer === 1 ? H * 0.76 : H * 0.9;
-        const bx = b.x + b.billboard.x;
-        const by = (yBase - b.h) + b.billboard.y;
-        const bw = b.billboard.w, bh = b.billboard.h;
-        const hue = b.billboard.hue;
-        const pulse = 0.75 + 0.25 * Math.sin(T * 1.6 + b.billboard.phase);
-        // Panel bloom
-        ctx.save();
-        ctx.globalCompositeOperation = "screen";
-        const bg = ctx.createRadialGradient(bx + bw / 2, by + bh / 2, 0, bx + bw / 2, by + bh / 2, Math.max(bw, bh));
-        bg.addColorStop(0, `hsla(${hue}, 100%, 60%, ${0.35 * pulse})`);
-        bg.addColorStop(1, "transparent");
-        ctx.fillStyle = bg;
-        ctx.fillRect(bx - bw * 0.4, by - bh * 0.8, bw * 1.8, bh * 2.6);
-        ctx.restore();
-        // Panel
-        ctx.fillStyle = `hsla(${hue}, 60%, 12%, 0.9)`;
-        ctx.fillRect(bx, by, bw, bh);
-        ctx.strokeStyle = `hsla(${hue}, 100%, 70%, ${0.55 * pulse})`;
-        ctx.lineWidth = 0.8;
-        ctx.strokeRect(bx + 0.5, by + 0.5, bw - 1, bh - 1);
-        // Text
-        const fs = Math.max(8, Math.floor(bh * 0.55));
-        ctx.font = `800 ${fs}px "IBM Plex Mono", ui-monospace, monospace`;
-        ctx.textBaseline = "middle";
-        const text = b.billboard.text;
-        const tw = ctx.measureText(text).width;
-        ctx.fillStyle = `hsla(${hue}, 100%, 82%, ${pulse})`;
-        ctx.fillText(text, bx + (bw - tw) / 2, by + bh / 2 + 1);
-        // Scanline
-        const scan = ((T * 0.6 + b.billboard.phase) % 1);
-        ctx.fillStyle = `hsla(${hue}, 100%, 90%, 0.18)`;
-        ctx.fillRect(bx, by + scan * bh, bw, 1);
-      }
+      // (Neon billboards and dot-matrix news facades removed)
 
-      // Dot-matrix news facades
-      for (const b of buildings) {
-        if (!b.matrix) continue;
-        const yBase = b.layer === 0 ? H * 0.65 : b.layer === 1 ? H * 0.76 : H * 0.9;
-        const mx = b.x + b.matrix.x;
-        const my = (yBase - b.h) + b.matrix.y;
-        const mw = b.matrix.w, mh = b.matrix.h;
-        const hue = b.matrix.hue;
-        // Backing
-        ctx.fillStyle = `hsla(${hue}, 60%, 6%, 0.85)`;
-        ctx.fillRect(mx, my, mw, mh);
-        // Rolling bars
-        const bars = 12;
-        for (let i = 0; i < bars; i++) {
-          const p = (T * 0.7 + b.matrix.phase + i / bars) % 1;
-          const a = 0.10 + 0.4 * Math.sin(p * Math.PI);
-          ctx.fillStyle = `hsla(${hue}, 100%, 60%, ${a})`;
-          ctx.fillRect(mx, my + (i / bars) * mh, mw, (mh / bars) * 0.55);
-        }
-        // Scan sweep
-        const scanY = my + ((T * 40 + b.matrix.phase * 20) % mh);
-        ctx.fillStyle = `hsla(${hue}, 100%, 85%, 0.35)`;
-        ctx.fillRect(mx, scanY, mw, 1.5);
-      }
 
       // Rooftop crown lights (colored strips atop tall buildings)
       for (const b of buildings) {
@@ -651,81 +564,8 @@ export function MilCityScene() {
         ctx.restore();
       }
 
-      // Helicopter with volumetric searchlight cone
-      const heliX = ((T * 22) % (W + 200)) - 100;
-      const heliY = H * 0.26 + Math.sin(T * 0.7) * 10;
-      // Cone
-      ctx.save();
-      ctx.globalCompositeOperation = "screen";
-      const coneAngle = Math.PI / 2 + Math.sin(T * 0.9) * 0.55;
-      const coneLen = 320;
-      ctx.translate(heliX, heliY);
-      ctx.rotate(coneAngle - Math.PI / 2);
-      const cone = ctx.createLinearGradient(0, 0, 0, coneLen);
-      cone.addColorStop(0, "rgba(255,245,220,0.4)");
-      cone.addColorStop(0.6, "rgba(255,220,180,0.08)");
-      cone.addColorStop(1, "transparent");
-      ctx.fillStyle = cone;
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(-58, coneLen);
-      ctx.lineTo(58, coneLen);
-      ctx.closePath();
-      ctx.fill();
-      // Bright core
-      ctx.fillStyle = "rgba(255,255,240,0.6)";
-      ctx.beginPath();
-      ctx.arc(0, 0, 3, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-      // Body
-      ctx.fillStyle = "rgba(10,15,22,0.98)";
-      ctx.beginPath(); ctx.ellipse(heliX, heliY, 11, 4, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillRect(heliX + 8, heliY - 1, 10, 1.5);
-      // Rotor blur (spinning line with alpha)
-      ctx.save();
-      ctx.strokeStyle = "rgba(150,160,180,0.35)";
-      ctx.lineWidth = 0.8;
-      const rotorPhase = T * 40;
-      for (let i = 0; i < 3; i++) {
-        const a = rotorPhase + (i * Math.PI * 2) / 3;
-        ctx.beginPath();
-        ctx.moveTo(heliX + Math.cos(a) * 16, heliY - 5 + Math.sin(a) * 2);
-        ctx.lineTo(heliX - Math.cos(a) * 16, heliY - 5 - Math.sin(a) * 2);
-        ctx.stroke();
-      }
-      ctx.restore();
-      // Nav lights
-      const bl = 0.5 + 0.5 * Math.sin(T * 6);
-      ctx.fillStyle = `rgba(248,113,113,${0.4 + 0.6 * bl})`;
-      ctx.beginPath(); ctx.arc(heliX - 9, heliY, 1.3, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = `rgba(103,232,249,${0.4 + 0.6 * (1 - bl)})`;
-      ctx.beginPath(); ctx.arc(heliX + 9, heliY, 1.3, 0, Math.PI * 2); ctx.fill();
+      // (Helicopter and blimp removed — read as toys at this scale.)
 
-      // Blimp
-      const blimpX = W - ((T * 5) % (W + 200)) + 100;
-      const blimpY = H * 0.14 + Math.sin(T * 0.4) * 4;
-      ctx.save();
-      ctx.translate(blimpX, blimpY);
-      ctx.fillStyle = "rgba(200,215,230,0.92)";
-      ctx.beginPath(); ctx.ellipse(0, 0, 40, 11, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = "rgba(30,40,55,0.9)";
-      ctx.fillRect(-8, 9, 16, 4);
-      // Fins
-      ctx.beginPath();
-      ctx.moveTo(36, 0); ctx.lineTo(46, -6); ctx.lineTo(46, 6); ctx.closePath(); ctx.fill();
-      // Belly banner
-      ctx.fillStyle = "rgba(5,10,20,0.9)";
-      ctx.fillRect(-36, 16, 72, 12);
-      ctx.strokeStyle = "rgba(103,232,249,0.5)"; ctx.lineWidth = 0.5;
-      ctx.strokeRect(-36, 16, 72, 12);
-      ctx.font = `700 9px "IBM Plex Mono", ui-monospace, monospace`;
-      ctx.fillStyle = `rgba(103,232,249,${0.6 + 0.4 * Math.sin(T * 2)})`;
-      ctx.textBaseline = "middle";
-      const t2 = "· VERIFY · SIGNAL · TRUTH ·";
-      const t2w = ctx.measureText(t2).width;
-      ctx.fillText(t2, -t2w / 2, 22);
-      ctx.restore();
 
       // Wet street reflection on foreground road
       ctx.save();
