@@ -17,8 +17,8 @@ type Building = {
   antenna?: { h: number; struts: number; blink: number; ring?: boolean };
   spire?: number;
   watertank?: boolean;
-  billboard?: { x: number; y: number; w: number; h: number; hue: number; text: string; phase: number };
-  matrix?: { x: number; y: number; w: number; h: number; hue: number; phase: number };
+
+
   crown?: { hue: number; phase: number }; // rooftop crown lights
 };
 
@@ -32,7 +32,7 @@ const SKY = {
   glow: "#3a3040",
 };
 
-const NEON_WORDS = ["MIL", "TRUTH", "VERIFY", "LIVE 24", "PRESS", "SIGNAL", "FACT", "★ NEWS ★"];
+
 
 export function MilCityScene() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
