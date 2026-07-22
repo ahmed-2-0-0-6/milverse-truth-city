@@ -491,27 +491,16 @@ export function ScrollStory() {
               className={`district-card block w-full relative h-screen overflow-hidden rounded-none border-0 text-left ${isSubmerging ? "submerging" : ""}`}
               style={{ ["--glow" as string]: d.glow }}
             >
-              {d.video ? (
-                <video
-                  src={d.video}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-              ) : (
-                <img
-                  src={d.art}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  width={1536}
-                  height={1024}
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
+              <img
+                src={d.art}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                width={1920}
+                height={1080}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
 
-              )}
               <DistrictLiveFX district={d.key as DistrictKey} intensity="soft" />
               <div
                 className="absolute inset-0 pointer-events-none scanlines-live opacity-25"
