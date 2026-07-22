@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "
 import { useNavigate } from "@tanstack/react-router";
 import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
 import { MilCityScene } from "@/components/MilCityScene";
+import { LazyVideo } from "@/components/LazyVideo";
 
 
 import mirrorArt from "@/assets/district-mirror.jpg";
@@ -398,12 +399,9 @@ export function ScrollStory() {
                 }}
               >
                 {d.video ? (
-                  <video
+                  <LazyVideo
                     src={d.video}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
+                    poster={d.art}
                     className="absolute inset-0 h-full w-full object-cover kenburns"
                   />
                 ) : (
