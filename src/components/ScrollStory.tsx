@@ -31,7 +31,7 @@ type District = {
   label: string;
   tag: string;
   art: string;
-  video?: string;
+  
   href: string;
   glow: string;
 };
