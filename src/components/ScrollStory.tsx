@@ -12,6 +12,10 @@ import studioArt from "@/assets/district-studio.jpg";
 import archiveArt from "@/assets/district-archive.jpg";
 import cleanroomArt from "@/assets/district-cleanroom.jpg";
 import mirrorVideo from "@/assets/mirror.mp4.asset.json";
+import feedVideo from "@/assets/district-feed.mp4.asset.json";
+import studioVideo from "@/assets/district-studio.mp4.asset.json";
+import archiveVideo from "@/assets/district-archive.mp4.asset.json";
+import cleanroomVideo from "@/assets/district-cleanroom.mp4.asset.json";
 import gothamDeskArt from "@/assets/detective-desk-gotham.jpg";
 import gothamBoardPortraitArt from "@/assets/detective-board-gotham-wide.jpg";
 import gothamCrimeSceneArt from "@/assets/detective-crime-scene-gotham.jpg";
@@ -51,6 +55,7 @@ const DISTRICTS: District[] = [
     label: "THE FEED",
     tag: "Judge real-world posts — true, false, or misleading?",
     art: feedArt,
+    video: feedVideo.url,
     href: "/feed",
     glow: "245,185,66",
   },
@@ -59,6 +64,7 @@ const DISTRICTS: District[] = [
     label: "THE STUDIO",
     tag: "Design the attack yourself — teach by authoring.",
     art: studioArt,
+    video: studioVideo.url,
     href: "/studio",
     glow: "245,185,66",
   },
@@ -67,6 +73,7 @@ const DISTRICTS: District[] = [
     label: "THE ARCHIVE",
     tag: "Revisit closed cases — build the pattern memory.",
     art: archiveArt,
+    video: archiveVideo.url,
     href: "/archive",
     glow: "34,211,238",
   },
@@ -75,6 +82,7 @@ const DISTRICTS: District[] = [
     label: "CLEAN ROOM",
     tag: "Calibrate confidence — know when you know.",
     art: cleanroomArt,
+    video: cleanroomVideo.url,
     href: "/devintel",
     glow: "34,211,238",
   },
