@@ -2,7 +2,7 @@
 // Lazy imports GSAP; respects reduced-motion (renders static).
 import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
+
 import { MilCityScene } from "@/components/MilCityScene";
 
 
