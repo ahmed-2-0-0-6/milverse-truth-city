@@ -383,7 +383,7 @@ export function ScrollStory() {
                 type="button"
                 onClick={() => submerge(d.href, d.key)}
                 aria-label={`Enter ${d.label}`}
-                className={`district-card group relative shrink-0 w-screen h-[88vh] rounded-sm overflow-hidden border border-white/10 text-left transition-all duration-500 ${isSubmerging ? "submerging" : ""} ${dimmed ? "opacity-20 scale-95" : ""}`}
+                className={`district-card group relative shrink-0 w-screen h-screen rounded-none overflow-hidden border-0 text-left transition-all duration-500 ${isSubmerging ? "submerging" : ""} ${dimmed ? "opacity-20 scale-95" : ""}`}
                 style={{
                   boxShadow: `0 30px 80px -20px rgba(${d.glow},0.45)`,
                   ["--glow" as string]: d.glow,
@@ -492,8 +492,8 @@ export function ScrollStory() {
       </div>
 
       {/* Mobile district stack */}
-      <div className="px-4 py-12 space-y-4 max-w-2xl mx-auto">
-        <div className="stencil text-[10px] text-cyan-300/70 text-center">THE DISTRICTS</div>
+      <div className="space-y-0">
+        <div className="stencil text-[10px] text-cyan-300/70 text-center py-4">THE DISTRICTS</div>
         {DISTRICTS.map((d) => {
           const isSubmerging = submerging === d.key;
           return (
@@ -501,7 +501,7 @@ export function ScrollStory() {
               key={d.key}
               type="button"
               onClick={() => submerge(d.href, d.key)}
-              className={`district-card block w-full relative aspect-[16/10] overflow-hidden rounded-sm border border-white/10 text-left ${isSubmerging ? "submerging" : ""}`}
+              className={`district-card block w-full relative h-screen overflow-hidden rounded-none border-0 text-left ${isSubmerging ? "submerging" : ""}`}
               style={{ ["--glow" as string]: d.glow }}
             >
               {d.video ? (
