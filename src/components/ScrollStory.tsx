@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "
 import { useNavigate } from "@tanstack/react-router";
 import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
 import { MilCityScene } from "@/components/MilCityScene";
-import { LazyVideo } from "@/components/LazyVideo";
 
 
 import mirrorArt from "@/assets/district-mirror.jpg";
