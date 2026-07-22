@@ -399,12 +399,9 @@ export function ScrollStory() {
                 }}
               >
                 {d.video ? (
-                  <video
+                  <LazyVideo
                     src={d.video}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
+                    poster={d.art}
                     className="absolute inset-0 h-full w-full object-cover kenburns"
                   />
                 ) : (
