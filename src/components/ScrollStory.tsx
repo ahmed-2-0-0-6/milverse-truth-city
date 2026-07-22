@@ -383,7 +383,7 @@ export function ScrollStory() {
                 type="button"
                 onClick={() => submerge(d.href, d.key)}
                 aria-label={`Enter ${d.label}`}
-                className={`district-card group relative shrink-0 w-screen h-[88vh] rounded-sm overflow-hidden border border-white/10 text-left transition-all duration-500 ${isSubmerging ? "submerging" : ""} ${dimmed ? "opacity-20 scale-95" : ""}`}
+                className={`district-card group relative shrink-0 w-screen h-screen rounded-none overflow-hidden border-0 text-left transition-all duration-500 ${isSubmerging ? "submerging" : ""} ${dimmed ? "opacity-20 scale-95" : ""}`}
                 style={{
                   boxShadow: `0 30px 80px -20px rgba(${d.glow},0.45)`,
                   ["--glow" as string]: d.glow,
