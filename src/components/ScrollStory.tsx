@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "
 import { useNavigate } from "@tanstack/react-router";
 import { DistrictLiveFX, type DistrictKey } from "@/components/DistrictLiveFX";
 import { MilCityScene } from "@/components/MilCityScene";
-import { LazyVideo } from "@/components/LazyVideo";
 
 
 import mirrorArt from "@/assets/district-mirror.jpg";
@@ -12,11 +11,6 @@ import feedArt from "@/assets/district-feed.jpg";
 import studioArt from "@/assets/district-studio.jpg";
 import archiveArt from "@/assets/district-archive.jpg";
 import cleanroomArt from "@/assets/district-cleanroom.jpg";
-import mirrorVideo from "@/assets/district-mirror.mp4.asset.json";
-import feedVideo from "@/assets/district-feed.mp4.asset.json";
-import studioVideo from "@/assets/district-studio.mp4.asset.json";
-import archiveVideo from "@/assets/district-archive.mp4.asset.json";
-import cleanroomVideo from "@/assets/district-cleanroom.mp4.asset.json";
 import gothamDeskArt from "@/assets/detective-desk-gotham.jpg";
 import gothamBoardPortraitArt from "@/assets/detective-board-gotham-wide.jpg";
 import gothamCrimeSceneArt from "@/assets/detective-crime-scene-gotham.jpg";
@@ -37,7 +31,7 @@ type District = {
   label: string;
   tag: string;
   art: string;
-  video?: string;
+  
   href: string;
   glow: string;
 };
@@ -47,7 +41,6 @@ const DISTRICTS: District[] = [
     label: "THE MIRROR",
     tag: "Judge messages aimed at you — real family, or someone wearing them?",
     art: mirrorArt,
-    video: mirrorVideo.url,
     href: "/mirror",
     glow: "34,211,238",
   },
@@ -56,7 +49,6 @@ const DISTRICTS: District[] = [
     label: "THE FEED",
     tag: "Judge real-world posts — true, false, or misleading?",
     art: feedArt,
-    video: feedVideo.url,
     href: "/feed",
     glow: "245,185,66",
   },
@@ -65,7 +57,6 @@ const DISTRICTS: District[] = [
     label: "THE STUDIO",
     tag: "Design the attack yourself — teach by authoring.",
     art: studioArt,
-    video: studioVideo.url,
     href: "/studio",
     glow: "245,185,66",
   },
@@ -74,7 +65,6 @@ const DISTRICTS: District[] = [
     label: "THE ARCHIVE",
     tag: "Revisit closed cases — build the pattern memory.",
     art: archiveArt,
-    video: archiveVideo.url,
     href: "/archive",
     glow: "34,211,238",
   },
@@ -83,7 +73,6 @@ const DISTRICTS: District[] = [
     label: "CLEAN ROOM",
     tag: "Calibrate confidence — know when you know.",
     art: cleanroomArt,
-    video: cleanroomVideo.url,
     href: "/devintel",
     glow: "34,211,238",
   },
@@ -398,24 +387,16 @@ export function ScrollStory() {
                   ["--glow" as string]: d.glow,
                 }}
               >
-                {d.video ? (
-                  <LazyVideo
-                    src={d.video}
-                    poster={d.art}
-                    className="absolute inset-0 h-full w-full object-cover kenburns"
-                  />
-                ) : (
-                  <img
-                    src={d.art}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                    width={1536}
-                    height={1024}
-                    className="absolute inset-0 h-full w-full object-cover kenburns"
-                  />
+                <img
+                  src={d.art}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  width={1920}
+                  height={1080}
+                  className="absolute inset-0 h-full w-full object-cover kenburns"
+                />
 
-                )}
                 <DistrictLiveFX district={d.key as DistrictKey} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                 <div
@@ -510,27 +491,16 @@ export function ScrollStory() {
               className={`district-card block w-full relative h-screen overflow-hidden rounded-none border-0 text-left ${isSubmerging ? "submerging" : ""}`}
               style={{ ["--glow" as string]: d.glow }}
             >
-              {d.video ? (
-                <video
-                  src={d.video}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-              ) : (
-                <img
-                  src={d.art}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  width={1536}
-                  height={1024}
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
+              <img
+                src={d.art}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                width={1920}
+                height={1080}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
 
-              )}
               <DistrictLiveFX district={d.key as DistrictKey} intensity="soft" />
               <div
                 className="absolute inset-0 pointer-events-none scanlines-live opacity-25"
