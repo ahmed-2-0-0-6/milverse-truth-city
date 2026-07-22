@@ -372,7 +372,7 @@ export function ScrollStory() {
         </div>
         <div
           ref={trackRef}
-          className="flex gap-6 pl-8 pr-8 h-screen items-center will-change-transform"
+          className="flex gap-0 h-screen items-center will-change-transform"
         >
           {DISTRICTS.map((d) => {
             const isSubmerging = submerging === d.key;
