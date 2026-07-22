@@ -501,7 +501,7 @@ export function ScrollStory() {
               key={d.key}
               type="button"
               onClick={() => submerge(d.href, d.key)}
-              className={`district-card block w-full relative aspect-[16/10] overflow-hidden rounded-sm border border-white/10 text-left ${isSubmerging ? "submerging" : ""}`}
+              className={`district-card block w-full relative h-screen overflow-hidden rounded-none border-0 text-left ${isSubmerging ? "submerging" : ""}`}
               style={{ ["--glow" as string]: d.glow }}
             >
               {d.video ? (
