@@ -492,8 +492,8 @@ export function ScrollStory() {
       </div>
 
       {/* Mobile district stack */}
-      <div className="px-4 py-12 space-y-4 max-w-2xl mx-auto">
-        <div className="stencil text-[10px] text-cyan-300/70 text-center">THE DISTRICTS</div>
+      <div className="space-y-0">
+        <div className="stencil text-[10px] text-cyan-300/70 text-center py-4">THE DISTRICTS</div>
         {DISTRICTS.map((d) => {
           const isSubmerging = submerging === d.key;
           return (
