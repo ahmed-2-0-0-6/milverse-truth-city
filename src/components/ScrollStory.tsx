@@ -11,7 +11,7 @@ import feedArt from "@/assets/district-feed.jpg";
 import studioArt from "@/assets/district-studio.jpg";
 import archiveArt from "@/assets/district-archive.jpg";
 import cleanroomArt from "@/assets/district-cleanroom.jpg";
-import mirrorVideo from "@/assets/mirror.mp4.asset.json";
+import mirrorVideo from "@/assets/district-mirror.mp4.asset.json";
 import feedVideo from "@/assets/district-feed.mp4.asset.json";
 import studioVideo from "@/assets/district-studio.mp4.asset.json";
 import archiveVideo from "@/assets/district-archive.mp4.asset.json";
