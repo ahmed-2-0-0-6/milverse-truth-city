@@ -1,9 +1,11 @@
 {
   "version": 1,
-  "asset_id": "08dd859a-96cc-4023-af69-c70070f1da05",
+  "asset_id": "b404e835-3f42-4b07-ae6e-557cdcd7c8ba",
   "project_id": "b1bda37d-f290-471e-8242-1f3cfcf0f7d7",
-  "url": "/__l5e/assets-v1/08dd859a-96cc-4023-af69-c70070f1da05/mirror.mp4",
+  "url": "/__l5e/assets-v1/b404e835-3f42-4b07-ae6e-557cdcd7c8ba/mirror.mp4",
+  "r2_key": "a/v1/b1bda37d-f290-471e-8242-1f3cfcf0f7d7/b404e835-3f42-4b07-ae6e-557cdcd7c8ba/mirror.mp4",
   "original_filename": "mirror.mp4",
-  "size": 10040602,
-  "created_at": "2026-07-22T20:51:57Z"
+  "size": 7401923,
+  "content_type": "video/mp4",
+  "created_at": "2026-07-22T20:59:39Z"
 }
