@@ -387,24 +387,16 @@ export function ScrollStory() {
                   ["--glow" as string]: d.glow,
                 }}
               >
-                {d.video ? (
-                  <LazyVideo
-                    src={d.video}
-                    poster={d.art}
-                    className="absolute inset-0 h-full w-full object-cover kenburns"
-                  />
-                ) : (
-                  <img
-                    src={d.art}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                    width={1536}
-                    height={1024}
-                    className="absolute inset-0 h-full w-full object-cover kenburns"
-                  />
+                <img
+                  src={d.art}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  width={1920}
+                  height={1080}
+                  className="absolute inset-0 h-full w-full object-cover kenburns"
+                />
 
-                )}
                 <DistrictLiveFX district={d.key as DistrictKey} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                 <div
