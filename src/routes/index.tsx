@@ -167,7 +167,7 @@ function CityMap() {
       <section
         aria-label="MILVERSE opening"
         className={`crime-scene-hero hero-frame relative min-h-[100svh] flex flex-col items-center px-4 sm:px-6 overflow-hidden ${mode === "cinematic" ? "justify-center" : "justify-start pt-20 sm:pt-24 md:pt-28"}`}
-        style={{ ["--crime-scene-img" as string]: `url(${detectiveDeskImg})` }}
+      >
       >
         <div className="absolute inset-0 -z-10">
           {mode === "cinematic" ? (
