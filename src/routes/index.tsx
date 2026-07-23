@@ -3,12 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import { CityWorld } from "@/components/CityWorld";
 import { CityList } from "@/components/CityList";
-import { ChevronDown, ArrowRight, Flame } from "lucide-react";
-import { resolveNextAction, type NextAction } from "@/lib/city/nextAction";
-import { loadProfile } from "@/lib/mirror/profile";
-import { readDailyStatus } from "@/lib/daily/profile";
-import { loadUnlocked } from "@/lib/manual/state";
-import { computeXp, rankFromXp, RANKS } from "@/lib/ranks";
+import { ChevronDown } from "lucide-react";
 import { CityHero3D } from "@/components/city3d/CityHero3D";
 import { BootScreen } from "@/components/BootScreen";
 import { HeroType } from "@/components/HeroType";
@@ -26,7 +21,7 @@ import { PaperNudge } from "@/components/landing/PaperNudge";
 
 import { isReturningCitizen } from "@/lib/city/returning";
 import { currentShift, isNightRegister, type Shift } from "@/lib/city/shift";
-import detectiveDeskImg from "@/assets/detective-desk.jpg";
+
 import corkboardImg from "@/assets/corkboard.jpg";
 
 
@@ -172,7 +167,6 @@ function CityMap() {
       <section
         aria-label="MILVERSE opening"
         className={`crime-scene-hero hero-frame relative min-h-[100svh] flex flex-col items-center px-4 sm:px-6 overflow-hidden ${mode === "cinematic" ? "justify-center" : "justify-start pt-20 sm:pt-24 md:pt-28"}`}
-        style={{ ["--crime-scene-img" as string]: `url(${detectiveDeskImg})` }}
       >
         <div className="absolute inset-0 -z-10">
           {mode === "cinematic" ? (
@@ -311,90 +305,6 @@ function CityMap() {
 }
 
 
-// ── PLAY BUTTON — one big verb-first CTA that always knows the next move.
-function PlayButton() {
-  const [action, setAction] = useState<NextAction | null>(null);
-  useEffect(() => {
-    const push = () => setAction(resolveNextAction(new Date()));
-    push();
-    const events = [
-      "milverse:profile",
-      "milverse:manual",
-      "milverse:retests",
-      "milverse:boss",
-      "storage",
-    ];
-    events.forEach((e) => window.addEventListener(e, push));
-    return () => events.forEach((e) => window.removeEventListener(e, push));
-  }, []);
 
-  if (!action) {
-    // SSR / pre-hydration: safe deterministic fallback (matches branch 1).
-    return (
-      <Link
-        to="/mirror"
-        className="cta-glow flex w-full max-w-[360px] min-h-[56px] flex-col items-center justify-center gap-1 rounded-sm bg-primary px-6 py-3 text-primary-foreground stencil"
-      >
-        <span className="text-sm tracking-widest">START →</span>
-      </Link>
-    );
-  }
-
-  const params = action.params ?? {};
-  const accessible = `${action.label}. ${action.sublabel}.`;
-  return (
-    <Link
-      to={action.to as string}
-      params={params as never}
-      aria-label={accessible}
-      className="cta-glow flex w-full min-h-[56px] max-w-[360px] flex-col items-center justify-center gap-1 rounded-sm bg-primary px-6 py-3 text-primary-foreground stencil"
-    >
-      <span className="inline-flex items-center gap-2 text-sm tracking-widest">
-        {action.label} <ArrowRight className="h-3.5 w-3.5" />
-      </span>
-      <span className="text-[10px] tracking-wider text-primary-foreground/80 normal-case truncate max-w-full">
-        {action.sublabel}
-      </span>
-    </Link>
-  );
-}
-
-// ── STAT STRIP — LVL · STREAK · CASES. Zeros are a challenge, not an absence.
-function StatStrip() {
-  const [stats, setStats] = useState<{ lvl: number; streak: number; cases: number } | null>(null);
-  useEffect(() => {
-    const push = () => {
-      const p = loadProfile();
-      const xp = computeXp(p, loadUnlocked().size, p.publishedCount ?? 0);
-      const idx = RANKS.findIndex((r) => r.id === rankFromXp(xp).current.id);
-      const daily = readDailyStatus();
-      setStats({ lvl: idx + 1, streak: daily.streak, cases: p.casesPlayed });
-    };
-    push();
-    ["milverse:profile", "milverse:manual", "storage"].forEach((e) =>
-      window.addEventListener(e, push),
-    );
-    return () =>
-      ["milverse:profile", "milverse:manual", "storage"].forEach((e) =>
-        window.removeEventListener(e, push),
-      );
-  }, []);
-
-  const s = stats ?? { lvl: 1, streak: 0, cases: 0 };
-  return (
-    <div className="mt-3 flex items-center justify-center gap-3 stencil text-[10px] text-white/70">
-      <span className="tabular-nums">LVL {s.lvl}</span>
-      <span aria-hidden className="text-white/25">·</span>
-      <span className="inline-flex items-center gap-1 tabular-nums">
-        <Flame className="h-3 w-3" /> STREAK {s.streak}
-      </span>
-      <span aria-hidden className="text-white/25">·</span>
-      <span className="tabular-nums">CASES {s.cases}</span>
-    </div>
-  );
-}
-
-// The old three-slide Intro was replaced by <FirstCall />
-// (src/components/onboarding/FirstCall.tsx) — verb-first onboarding.
 
 
