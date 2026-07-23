@@ -484,3 +484,85 @@ export function clockTense() {
   o.start(t);
   o.stop(t + 0.09);
 }
+
+/** Subtle tactile phone key tap sound for CitizenOS. */
+export function phoneKeyTap() {
+  if (!guard()) return;
+  const c = getCtx();
+  if (!c) return;
+  const t = c.currentTime;
+  const o = c.createOscillator();
+  o.type = "sine";
+  o.frequency.setValueAtTime(600, t);
+  o.frequency.exponentialRampToValueAtTime(200, t + 0.025);
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.04, t + 0.004);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.025);
+  o.connect(g).connect(c.destination);
+  o.start(t);
+  o.stop(t + 0.03);
+}
+
+/** Low tension Boss reveal alert. */
+export function bossRevealAlert() {
+  if (!guard()) return;
+  const c = getCtx();
+  if (!c) return;
+  const t = c.currentTime;
+  const o = c.createOscillator();
+  o.type = "sawtooth";
+  o.frequency.setValueAtTime(110, t);
+  o.frequency.exponentialRampToValueAtTime(55, t + 0.4);
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.08, t + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.4);
+  const flt = c.createBiquadFilter();
+  flt.type = "lowpass";
+  flt.frequency.setValueAtTime(400, t);
+  flt.frequency.exponentialRampToValueAtTime(120, t + 0.4);
+  o.connect(flt).connect(g).connect(c.destination);
+  o.start(t);
+  o.stop(t + 0.42);
+}
+
+/** Short ascending chime for correct checkpoint exam answers. */
+export function correctChime() {
+  if (!guard()) return;
+  const c = getCtx();
+  if (!c) return;
+  const t = c.currentTime;
+  const o = c.createOscillator();
+  o.type = "sine";
+  o.frequency.setValueAtTime(523, t);
+  o.frequency.setValueAtTime(659, t + 0.08);
+  o.frequency.setValueAtTime(784, t + 0.16);
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.06, t + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+  o.connect(g).connect(c.destination);
+  o.start(t);
+  o.stop(t + 0.3);
+}
+
+/** Short low buzz for wrong checkpoint exam answers. */
+export function wrongBuzz() {
+  if (!guard()) return;
+  const c = getCtx();
+  if (!c) return;
+  const t = c.currentTime;
+  const o = c.createOscillator();
+  o.type = "square";
+  o.frequency.setValueAtTime(180, t);
+  o.frequency.exponentialRampToValueAtTime(120, t + 0.15);
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.05, t + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+  o.connect(g).connect(c.destination);
+  o.start(t);
+  o.stop(t + 0.2);
+}
+

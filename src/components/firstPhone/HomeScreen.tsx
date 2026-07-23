@@ -2,7 +2,8 @@ import { LESSONS } from "@/lib/firstPhone/lessons";
 import { getWallpaper } from "./wallpapers";
 import type { FirstPhoneState } from "@/lib/firstPhone/profile";
 import { isLessonUnlocked } from "@/lib/firstPhone/profile";
-import { Lock, Check, ShieldCheck, Target } from "lucide-react";
+import { Lock, Check, ShieldCheck, Target, Wifi, Signal, BatteryMedium } from "lucide-react";
+import { phoneKeyTap } from "@/lib/mirror/audio";
 
 // Domain-specific mini glyphs per lesson tactic — one per lesson.
 const APP_ICONS: Record<number, string> = {
@@ -102,7 +103,7 @@ export function HomeScreen({ state, onOpenLesson, onOpenLicense, onOpenSpotIt }:
             return (
               <li key={l.n} data-tour={l.n === 1 ? "lesson1" : undefined}>
                 <button
-                  onClick={() => unlocked && onOpenLesson(l.n)}
+                  onClick={() => { if (unlocked) { phoneKeyTap(); onOpenLesson(l.n); } }}
                   disabled={!unlocked}
                   aria-label={`Lesson ${l.n}: ${l.title}${complete ? " (completed)" : unlocked ? "" : " (locked)"}`}
                   className="group w-full flex flex-col items-center gap-1.5 text-white focus-visible:outline-none"

@@ -305,11 +305,17 @@
   background-position:
     0 0,
     1px 1px;
-  animation: atmo-grain-shift 1.6s steps(6) infinite;
-  mix-blend-mode: overlay;
+  animation: atmo-grain-shift 2.4s steps(4) infinite;
+  transform: translateZ(0);
+  will-change: transform;
+  pointer-events: none;
+  contain: strict;
 }
 .atmo-vignette {
   background: radial-gradient(ellipse at center, transparent 55%, oklch(0 0 0 / 0.35) 100%);
+  transform: translateZ(0);
+  pointer-events: none;
+  contain: strict;
 }
 @keyframes atmo-flicker {
   0%,
@@ -332,6 +338,10 @@
     radial-gradient(ellipse at 20% 30%, oklch(0.82 0.14 195 / 0.25), transparent 45%),
     radial-gradient(ellipse at 80% 70%, oklch(0.75 0.15 70 / 0.2), transparent 45%);
   animation: atmo-flicker 7s infinite;
+  transform: translateZ(0);
+  will-change: opacity;
+  pointer-events: none;
+  contain: strict;
 }
 
 /* LAYER-4 — magnetic/pulsing CTA glow */
@@ -454,6 +464,17 @@ html[data-force-reduce-motion="on"] .marquee-track {
   text-shadow:
     0 0 12px rgba(245, 185, 66, 0.6),
     0 0 32px rgba(245, 185, 66, 0.3);
+}
+
+/* Dyslexia-Friendly Accessibility Styles */
+html[data-dyslexic-font="on"] body,
+html[data-dyslexic-font="on"] p,
+html[data-dyslexic-font="on"] span,
+html[data-dyslexic-font="on"] button,
+html[data-dyslexic-font="on"] div {
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.12em !important;
+  line-height: 1.8 !important;
 }
 
 /* Per-letter typewriter reveal for beat headlines. Letters start hidden;
@@ -5953,5 +5974,57 @@ button[title*="lovable" i] {
   .thesis-spot, .thesis-ring, .thesis-ticker, .thesis-rec-dot,
   .thesis-term-l, .thesis-term-r, .thesis-beam { animation: none; }
   .thesis-term { opacity: 0.7; }
+}
+
+/* Global Performance & Rendering Optimizations */
+img, video {
+  content-visibility: auto;
+}
+img[loading="lazy"] {
+  decoding: async;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+/* Universal Adaptive & Responsive Screen Scaling */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Background Image & Media Responsiveness */
+[style*="background-image"] {
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Full responsive media scaling */
+img, video, canvas, svg {
+  max-width: 100%;
+}
+
+/* Background images inside container wrappers */
+.hero-bg, .district-hero img, .district-header img, .bg-full-screen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+/* Screen aspect ratio media queries for mobile, tablet, desktop & 4K ultra-wide screens */
+@media (min-width: 2560px) {
+  .max-w-6xl {
+    max-width: 1800px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .safe-top {
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+  }
 }
 

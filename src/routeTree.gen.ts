@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WallRouteImport } from './routes/wall'
 import { Route as VisitRouteImport } from './routes/visit'
+import { Route as TeacherAcademyRouteImport } from './routes/teacher-academy'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as StandoffRouteImport } from './routes/standoff'
 import { Route as ShiftRouteImport } from './routes/shift'
@@ -23,18 +24,22 @@ import { Route as PilotRouteImport } from './routes/pilot'
 import { Route as PaperRouteImport } from './routes/paper'
 import { Route as MarketRouteImport } from './routes/market'
 import { Route as KitRouteImport } from './routes/kit'
+import { Route as HomeschoolRouteImport } from './routes/homeschool'
 import { Route as FirstPhoneRouteImport } from './routes/first-phone'
 import { Route as FamilyRouteImport } from './routes/family'
 import { Route as EducatorsRouteImport } from './routes/educators'
+import { Route as EarlyYearsRouteImport } from './routes/early-years'
 import { Route as DropRouteImport } from './routes/drop'
 import { Route as DoubleRouteImport } from './routes/double'
 import { Route as DevintelRouteImport } from './routes/devintel'
+import { Route as CommunityRouteImport } from './routes/community'
 import { Route as CityHallRouteImport } from './routes/city-hall'
 import { Route as CharterRouteImport } from './routes/charter'
 import { Route as BoardRouteImport } from './routes/board'
 import { Route as AssessmentRouteImport } from './routes/assessment'
 import { Route as ArenaRouteImport } from './routes/arena'
 import { Route as ArchiveRouteImport } from './routes/archive'
+import { Route as AiLiteracyRouteImport } from './routes/ai-literacy'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MirrorIndexRouteImport } from './routes/mirror.index'
 import { Route as ManualIndexRouteImport } from './routes/manual.index'
@@ -57,6 +62,11 @@ const WallRoute = WallRouteImport.update({
 const VisitRoute = VisitRouteImport.update({
   id: '/visit',
   path: '/visit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeacherAcademyRoute = TeacherAcademyRouteImport.update({
+  id: '/teacher-academy',
+  path: '/teacher-academy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StudioRoute = StudioRouteImport.update({
@@ -119,6 +129,11 @@ const KitRoute = KitRouteImport.update({
   path: '/kit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HomeschoolRoute = HomeschoolRouteImport.update({
+  id: '/homeschool',
+  path: '/homeschool',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FirstPhoneRoute = FirstPhoneRouteImport.update({
   id: '/first-phone',
   path: '/first-phone',
@@ -134,6 +149,11 @@ const EducatorsRoute = EducatorsRouteImport.update({
   path: '/educators',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EarlyYearsRoute = EarlyYearsRouteImport.update({
+  id: '/early-years',
+  path: '/early-years',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DropRoute = DropRouteImport.update({
   id: '/drop',
   path: '/drop',
@@ -147,6 +167,11 @@ const DoubleRoute = DoubleRouteImport.update({
 const DevintelRoute = DevintelRouteImport.update({
   id: '/devintel',
   path: '/devintel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityRoute = CommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CityHallRoute = CityHallRouteImport.update({
@@ -177,6 +202,11 @@ const ArenaRoute = ArenaRouteImport.update({
 const ArchiveRoute = ArchiveRouteImport.update({
   id: '/archive',
   path: '/archive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiLiteracyRoute = AiLiteracyRouteImport.update({
+  id: '/ai-literacy',
+  path: '/ai-literacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -247,18 +277,22 @@ const ApiPublicTelemetryRoute = ApiPublicTelemetryRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-literacy': typeof AiLiteracyRoute
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
   '/assessment': typeof AssessmentRoute
   '/board': typeof BoardRoute
   '/charter': typeof CharterRoute
   '/city-hall': typeof CityHallRoute
+  '/community': typeof CommunityRoute
   '/devintel': typeof DevintelRoute
   '/double': typeof DoubleRoute
   '/drop': typeof DropRoute
+  '/early-years': typeof EarlyYearsRoute
   '/educators': typeof EducatorsRoute
   '/family': typeof FamilyRoute
   '/first-phone': typeof FirstPhoneRoute
+  '/homeschool': typeof HomeschoolRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
   '/paper': typeof PaperRouteWithChildren
@@ -271,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/shift': typeof ShiftRoute
   '/standoff': typeof StandoffRoute
   '/studio': typeof StudioRoute
+  '/teacher-academy': typeof TeacherAcademyRoute
   '/visit': typeof VisitRoute
   '/wall': typeof WallRoute
   '/archive/submit': typeof ArchiveSubmitRoute
@@ -288,18 +323,22 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-literacy': typeof AiLiteracyRoute
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
   '/assessment': typeof AssessmentRoute
   '/board': typeof BoardRoute
   '/charter': typeof CharterRoute
   '/city-hall': typeof CityHallRoute
+  '/community': typeof CommunityRoute
   '/devintel': typeof DevintelRoute
   '/double': typeof DoubleRoute
   '/drop': typeof DropRoute
+  '/early-years': typeof EarlyYearsRoute
   '/educators': typeof EducatorsRoute
   '/family': typeof FamilyRoute
   '/first-phone': typeof FirstPhoneRoute
+  '/homeschool': typeof HomeschoolRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
   '/paper': typeof PaperRouteWithChildren
@@ -312,6 +351,7 @@ export interface FileRoutesByTo {
   '/shift': typeof ShiftRoute
   '/standoff': typeof StandoffRoute
   '/studio': typeof StudioRoute
+  '/teacher-academy': typeof TeacherAcademyRoute
   '/visit': typeof VisitRoute
   '/wall': typeof WallRoute
   '/archive/submit': typeof ArchiveSubmitRoute
@@ -330,18 +370,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-literacy': typeof AiLiteracyRoute
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
   '/assessment': typeof AssessmentRoute
   '/board': typeof BoardRoute
   '/charter': typeof CharterRoute
   '/city-hall': typeof CityHallRoute
+  '/community': typeof CommunityRoute
   '/devintel': typeof DevintelRoute
   '/double': typeof DoubleRoute
   '/drop': typeof DropRoute
+  '/early-years': typeof EarlyYearsRoute
   '/educators': typeof EducatorsRoute
   '/family': typeof FamilyRoute
   '/first-phone': typeof FirstPhoneRoute
+  '/homeschool': typeof HomeschoolRoute
   '/kit': typeof KitRoute
   '/market': typeof MarketRoute
   '/paper': typeof PaperRouteWithChildren
@@ -354,6 +398,7 @@ export interface FileRoutesById {
   '/shift': typeof ShiftRoute
   '/standoff': typeof StandoffRoute
   '/studio': typeof StudioRoute
+  '/teacher-academy': typeof TeacherAcademyRoute
   '/visit': typeof VisitRoute
   '/wall': typeof WallRoute
   '/archive/submit': typeof ArchiveSubmitRoute
@@ -373,18 +418,22 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ai-literacy'
     | '/archive'
     | '/arena'
     | '/assessment'
     | '/board'
     | '/charter'
     | '/city-hall'
+    | '/community'
     | '/devintel'
     | '/double'
     | '/drop'
+    | '/early-years'
     | '/educators'
     | '/family'
     | '/first-phone'
+    | '/homeschool'
     | '/kit'
     | '/market'
     | '/paper'
@@ -397,6 +446,7 @@ export interface FileRouteTypes {
     | '/shift'
     | '/standoff'
     | '/studio'
+    | '/teacher-academy'
     | '/visit'
     | '/wall'
     | '/archive/submit'
@@ -414,18 +464,22 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ai-literacy'
     | '/archive'
     | '/arena'
     | '/assessment'
     | '/board'
     | '/charter'
     | '/city-hall'
+    | '/community'
     | '/devintel'
     | '/double'
     | '/drop'
+    | '/early-years'
     | '/educators'
     | '/family'
     | '/first-phone'
+    | '/homeschool'
     | '/kit'
     | '/market'
     | '/paper'
@@ -438,6 +492,7 @@ export interface FileRouteTypes {
     | '/shift'
     | '/standoff'
     | '/studio'
+    | '/teacher-academy'
     | '/visit'
     | '/wall'
     | '/archive/submit'
@@ -455,18 +510,22 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/ai-literacy'
     | '/archive'
     | '/arena'
     | '/assessment'
     | '/board'
     | '/charter'
     | '/city-hall'
+    | '/community'
     | '/devintel'
     | '/double'
     | '/drop'
+    | '/early-years'
     | '/educators'
     | '/family'
     | '/first-phone'
+    | '/homeschool'
     | '/kit'
     | '/market'
     | '/paper'
@@ -479,6 +538,7 @@ export interface FileRouteTypes {
     | '/shift'
     | '/standoff'
     | '/studio'
+    | '/teacher-academy'
     | '/visit'
     | '/wall'
     | '/archive/submit'
@@ -497,18 +557,22 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiLiteracyRoute: typeof AiLiteracyRoute
   ArchiveRoute: typeof ArchiveRouteWithChildren
   ArenaRoute: typeof ArenaRoute
   AssessmentRoute: typeof AssessmentRoute
   BoardRoute: typeof BoardRoute
   CharterRoute: typeof CharterRoute
   CityHallRoute: typeof CityHallRoute
+  CommunityRoute: typeof CommunityRoute
   DevintelRoute: typeof DevintelRoute
   DoubleRoute: typeof DoubleRoute
   DropRoute: typeof DropRoute
+  EarlyYearsRoute: typeof EarlyYearsRoute
   EducatorsRoute: typeof EducatorsRoute
   FamilyRoute: typeof FamilyRoute
   FirstPhoneRoute: typeof FirstPhoneRoute
+  HomeschoolRoute: typeof HomeschoolRoute
   KitRoute: typeof KitRoute
   MarketRoute: typeof MarketRoute
   PaperRoute: typeof PaperRouteWithChildren
@@ -521,6 +585,7 @@ export interface RootRouteChildren {
   ShiftRoute: typeof ShiftRoute
   StandoffRoute: typeof StandoffRoute
   StudioRoute: typeof StudioRoute
+  TeacherAcademyRoute: typeof TeacherAcademyRoute
   VisitRoute: typeof VisitRoute
   WallRoute: typeof WallRoute
   BossBossIdRoute: typeof BossBossIdRoute
@@ -549,6 +614,13 @@ declare module '@tanstack/react-router' {
       path: '/visit'
       fullPath: '/visit'
       preLoaderRoute: typeof VisitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/teacher-academy': {
+      id: '/teacher-academy'
+      path: '/teacher-academy'
+      fullPath: '/teacher-academy'
+      preLoaderRoute: typeof TeacherAcademyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/studio': {
@@ -635,6 +707,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KitRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/homeschool': {
+      id: '/homeschool'
+      path: '/homeschool'
+      fullPath: '/homeschool'
+      preLoaderRoute: typeof HomeschoolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/first-phone': {
       id: '/first-phone'
       path: '/first-phone'
@@ -656,6 +735,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EducatorsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/early-years': {
+      id: '/early-years'
+      path: '/early-years'
+      fullPath: '/early-years'
+      preLoaderRoute: typeof EarlyYearsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/drop': {
       id: '/drop'
       path: '/drop'
@@ -675,6 +761,13 @@ declare module '@tanstack/react-router' {
       path: '/devintel'
       fullPath: '/devintel'
       preLoaderRoute: typeof DevintelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/city-hall': {
@@ -717,6 +810,13 @@ declare module '@tanstack/react-router' {
       path: '/archive'
       fullPath: '/archive'
       preLoaderRoute: typeof ArchiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-literacy': {
+      id: '/ai-literacy'
+      path: '/ai-literacy'
+      fullPath: '/ai-literacy'
+      preLoaderRoute: typeof AiLiteracyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -836,18 +936,22 @@ const PaperRouteWithChildren = PaperRoute._addFileChildren(PaperRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiLiteracyRoute: AiLiteracyRoute,
   ArchiveRoute: ArchiveRouteWithChildren,
   ArenaRoute: ArenaRoute,
   AssessmentRoute: AssessmentRoute,
   BoardRoute: BoardRoute,
   CharterRoute: CharterRoute,
   CityHallRoute: CityHallRoute,
+  CommunityRoute: CommunityRoute,
   DevintelRoute: DevintelRoute,
   DoubleRoute: DoubleRoute,
   DropRoute: DropRoute,
+  EarlyYearsRoute: EarlyYearsRoute,
   EducatorsRoute: EducatorsRoute,
   FamilyRoute: FamilyRoute,
   FirstPhoneRoute: FirstPhoneRoute,
+  HomeschoolRoute: HomeschoolRoute,
   KitRoute: KitRoute,
   MarketRoute: MarketRoute,
   PaperRoute: PaperRouteWithChildren,
@@ -860,6 +964,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShiftRoute: ShiftRoute,
   StandoffRoute: StandoffRoute,
   StudioRoute: StudioRoute,
+  TeacherAcademyRoute: TeacherAcademyRoute,
   VisitRoute: VisitRoute,
   WallRoute: WallRoute,
   BossBossIdRoute: BossBossIdRoute,
@@ -876,3 +981,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

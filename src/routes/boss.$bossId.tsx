@@ -26,6 +26,7 @@ import {
   type BossOutcome,
 } from "@/lib/boss/engine";
 import { attemptCount, recordBossAttempt, canRematch, loadBossProfile } from "@/lib/boss/profile";
+import { bossRevealAlert } from "@/lib/mirror/audio";
 import { ColdOpen } from "@/components/boss/ColdOpen";
 import { useVisualMode } from "@/lib/visual-quality";
 import { shouldReduceMotion } from "@/lib/access";
@@ -46,6 +47,7 @@ import { CHAT_SKINS } from "@/lib/chat/skins";
 import { useJuniorGate } from "@/components/firstPhone/JuniorGate";
 import { TacticStamp } from "@/components/TacticStamp";
 import type { TacticId } from "@/lib/manual/entries";
+import { EvidenceBoardSheet } from "@/components/boss/EvidenceBoardSheet";
 
 // Boss → canonical Field Manual tactic. Chosen by reading each boss's
 // method page: the Ghost swaps channels ("new number, it's me"), the Twin
@@ -107,6 +109,7 @@ function BossPlay() {
   );
   const [bankOpen, setBankOpen] = useState(false);
   const [banner, setBanner] = useState<NotificationPayload | null>(null);
+  const [boardOpen, setBoardOpen] = useState(false);
 
   const variant = useMemo(() => {
     if (!boss) return null;
@@ -115,6 +118,7 @@ function BossPlay() {
 
   useEffect(() => {
     if (boss && variant && stage === "play" && !state) {
+      bossRevealAlert();
       const s = initBoss(boss, variant);
       setState(s);
       setLog([
@@ -413,14 +417,28 @@ function BossPlay() {
               }}
               reducedMotion={reducedMotion}
             />
+            <EvidenceBoardSheet
+              open={boardOpen}
+              onClose={() => setBoardOpen(false)}
+              state={state}
+              variant={variant}
+            />
           </>
         }
         composer={
           <div className="p-3 space-y-3">
             {/* Fact-check chips */}
             <div>
-              <div className="text-[10px] tracking-[0.3em] text-white/40 mb-1.5 font-mono">
-                FACT-CHECK
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="text-[10px] tracking-[0.3em] text-white/40 font-mono">
+                  FACT-CHECK
+                </div>
+                <button
+                  onClick={() => setBoardOpen(true)}
+                  className="text-[10px] tracking-[0.3em] text-cyan-400/80 hover:text-cyan-300 font-mono underline underline-offset-2"
+                >
+                  OPEN BOARD
+                </button>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {variant.factChecks.map((f) => (

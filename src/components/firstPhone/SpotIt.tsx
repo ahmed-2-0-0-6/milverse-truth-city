@@ -12,6 +12,7 @@ import {
   type SpotItRound,
 } from "@/lib/firstPhone/spotit";
 import { loadFirstPhone, setSpotItBest } from "@/lib/firstPhone/profile";
+import { phoneKeyTap, correctChime, wrongBuzz } from "@/lib/mirror/audio";
 
 interface Props {
   onBackHome: () => void;
@@ -68,6 +69,7 @@ export function SpotIt({ onBackHome, onGoToLesson1 }: Props) {
     if (answer) return;
     setAnswer({ correct: isCorrect, picked: id });
     if (isCorrect) {
+      correctChime();
       const nc = correct + 1;
       const ns = streak + 1;
       setCorrect(nc);
@@ -77,11 +79,13 @@ export function SpotIt({ onBackHome, onGoToLesson1 }: Props) {
         setSpotItBest(ns);
       }
     } else {
+      wrongBuzz();
       setStreak(0);
     }
   }
 
   function next() {
+    phoneKeyTap();
     const isLast = i >= rounds.length - 1;
     if (isLast) {
       const perfect = correct === rounds.length;
@@ -103,6 +107,7 @@ export function SpotIt({ onBackHome, onGoToLesson1 }: Props) {
   }
 
   function again() {
+    phoneKeyTap();
     setI(0);
     setStreak(0);
     setCorrect(0);

@@ -18,6 +18,7 @@ import { screenPersonaName, fairnessGate } from "@/lib/mask/safety";
 import { RACK, cloneRack } from "@/lib/mask/rack";
 import { decodeToken } from "@/lib/mask/tokens";
 import { loadMaskStamps, saveMaskStamp, stampsByCode, armMask } from "@/lib/mask/plays";
+import { phoneKeyTap } from "@/lib/mirror/audio";
 
 
 export const Route = createFileRoute("/studio")({
@@ -279,6 +280,7 @@ function Studio() {
   }
 
   async function publish(lane: "private" | "community") {
+    phoneKeyTap();
     const err = validate(draft);
     if (err) {
       setError(err);

@@ -100,6 +100,14 @@ export function AccessPanel() {
             onChange={(v) => set("transcriptsAlwaysOpen", v)}
           />
 
+          <ToggleRow
+            id="access-dyslexic-font"
+            label="Dyslexia friendly typography"
+            help="Increases letter spacing, line height, and font clarity for neurodivergent reading accessibility."
+            checked={prefs.dyslexicFont}
+            onChange={(v) => set("dyslexicFont", v)}
+          />
+
           <div className="flex items-center justify-between rounded border border-border p-3">
             <div>
               <div className="text-sm text-foreground">Sound</div>

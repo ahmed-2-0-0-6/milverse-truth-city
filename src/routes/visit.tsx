@@ -9,8 +9,6 @@
 // is intentionally IGNORED under prefers-reduced-motion — recording happens on
 // a machine without that setting, and preserving accessibility trumps auto-run.
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { zodValidator, fallback } from "@tanstack/zod-adapter";
-import { z } from "zod";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
@@ -66,11 +64,9 @@ export const DIRECTOR_TIMINGS = {
 } as const;
 
 export const Route = createFileRoute("/visit")({
-  validateSearch: zodValidator(
-    z.object({
-      director: fallback(z.string(), "").default(""),
-    }),
-  ),
+  validateSearch: (search: Record<string, unknown>): { director: string } => ({
+    director: typeof search.director === "string" ? search.director : "",
+  }),
   head: () => ({
     meta: [
       { title: "Visit MILVERSE — 3 minutes inside the city that trains trust" },

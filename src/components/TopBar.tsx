@@ -22,6 +22,8 @@ import {
 import { isMuted, setMuted } from "@/lib/mirror/audio";
 
 import { SoundIntroChip } from "@/components/SoundIntroChip";
+import { FullscreenToggle } from "@/components/FullscreenToggle";
+import { FullscreenPrompt } from "@/components/FullscreenPrompt";
 import { AccessPanel } from "@/components/AccessPanel";
 import { loadUnlocked } from "@/lib/manual/state";
 import { computeXp, rankFromXp } from "@/lib/ranks";
@@ -31,36 +33,36 @@ type NavGroup = { label: string; items: NavItem[] };
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    label: "PLAY",
+    label: "SIMULATION (THE MIRAGE)",
     items: [
-      { label: "The City", to: "/", desc: "Enter MILVERSE" },
+      { label: "The Mirage City", to: "/", desc: "Enter The Mirage — City of Verification" },
       { label: "Daily Drop", to: "/drop", desc: "One quick case a day. Keep the streak alive" },
       { label: "The Feed", to: "/feed", desc: "Is that viral forward true? Prove it" },
       { label: "The Mirror", to: "/mirror", desc: "Catch the scammer sliding into your DMs" },
       { label: "The Shift", to: "/shift", desc: "Five cases, three lives, one score" },
       { label: "The Paper", to: "/paper", desc: "The city's newspaper. Play the front page" },
-      { label: "Boss Fights", to: "/boss", desc: "Boss fights. Con artists your fact-checks can't touch" },
+      { label: "Boss Fights", to: "/boss", desc: "Con artists your fact-checks can't touch" },
     ],
   },
   {
-    label: "LEARN",
+    label: "AGE & GRADE SPECTRUM",
     items: [
-      { label: "First Phone", to: "/first-phone", desc: "The ten lessons before a kid's first phone" },
-      { label: "Field Manual", to: "/manual", desc: "Every scam trick, named and dissected" },
-      { label: "City Charter", to: "/charter", desc: "The rules this city is built on" },
-      { label: "Quick Tour", to: "/quick-tour", desc: "30-second orientation" },
+      { label: "Early Years (Ages 4-7)", to: "/early-years", desc: "Picture stories & parent co-reading" },
+      { label: "First Phone (Grades 1-8)", to: "/first-phone", desc: "10-lesson interactive phone simulator" },
+      { label: "AI & Deepfakes (Grades 9-12+)", to: "/ai-literacy", desc: "Synthetic media & provenance verification" },
+      { label: "Field Manual Codex", to: "/manual", desc: "Every scam trick & manipulation tactic" },
+      { label: "City Charter", to: "/charter", desc: "The founding articles of digital trust" },
     ],
   },
   {
-    label: "COMMUNITY",
+    label: "COMMUNITY & SCHOOLS",
     items: [
-      { label: "For Educators", to: "/educators", desc: "Classroom kit" },
-      { label: "For Family", to: "/family", desc: "Household dashboard" },
-      { label: "Visit", to: "/visit", desc: "3-minute guided tour" },
-      { label: "City Hall", to: "/city-hall", desc: "Your stats, your rank, the city's census" },
-      { label: "Archive", to: "/archive", desc: "The city's records and old cases" },
-      { label: "Arena", to: "/arena", desc: "Head-to-head. You vs another citizen" },
-      { label: "Studio", to: "/studio", desc: "Design your own scam case. Test your friends" },
+      { label: "Educators & NGOs", to: "/educators", desc: "Classroom kit, Braille & printable packs" },
+      { label: "Teacher Academy", to: "/teacher-academy", desc: "Professional development & lesson plans" },
+      { label: "Family & Homeschool", to: "/homeschool", desc: "Household agreements & family toolkits" },
+      { label: "Community Commons", to: "/community", desc: "Grade rooms, student posts & reflection" },
+      { label: "Guided Tour", to: "/visit", desc: "3-minute UNESCO evaluation tour" },
+      { label: "Youth Studio", to: "/studio", desc: "Design your own scam case. Test your friends" },
     ],
   },
 ];
@@ -130,7 +132,7 @@ export function TopBar() {
       role="banner"
       className="print:hidden fixed top-0 inset-x-0 z-50 bg-transparent pointer-events-none"
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 sm:px-4 py-2 safe-top pointer-events-none [&>*]:pointer-events-auto">
+      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 sm:px-4 py-2 safe-top pointer-events-none [&>*]:pointer-events-auto">
 
         {/* ── Brand ── */}
         <Link
@@ -146,6 +148,11 @@ export function TopBar() {
             MILVERSE
           </div>
         </Link>
+
+        {/* ── Top-Center Floating Fullscreen Toggle ── */}
+        <div className="absolute left-1/2 -translate-x-1/2 top-2 z-10 pointer-events-auto">
+          <FullscreenToggle />
+        </div>
 
         {/* ── Compact actions — only truly essential, always-fitting items ── */}
         <div className="flex items-center gap-1.5 shrink-0">
@@ -265,6 +272,7 @@ export function TopBar() {
 
 
       <SoundIntroChip />
+      <FullscreenPrompt />
     </header>
   );
 }

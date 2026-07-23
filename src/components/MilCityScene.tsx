@@ -566,11 +566,10 @@ export function MilCityScene() {
       ctx.save();
       ctx.globalCompositeOperation = "screen";
       const roadY = H * 0.735;
-      const wet = ctx.createLinearGradient(0, roadY, 0, H);
-      wet.addColorStop(0, "rgba(80,120,180,0.05)");
-      wet.addColorStop(1, "rgba(30,60,100,0.15)");
-      ctx.fillStyle = wet;
-      ctx.fillRect(0, roadY, W, H - roadY);
+      if (cachedWet) {
+        ctx.fillStyle = cachedWet;
+        ctx.fillRect(0, roadY, W, H - roadY);
+      }
       // Streaked reflections from car lights
       for (const car of cars) {
         const y = laneYs[car.lane];
@@ -609,18 +608,20 @@ export function MilCityScene() {
       }
 
       // Vignette
-      const vg = ctx.createRadialGradient(W / 2, H * 0.55, Math.min(W, H) * 0.28, W / 2, H * 0.55, Math.max(W, H) * 0.8);
-      vg.addColorStop(0, "rgba(0,0,0,0)");
-      vg.addColorStop(1, "rgba(0,0,0,0.78)");
-      ctx.fillStyle = vg;
-      ctx.fillRect(0, 0, W, H);
+      if (cachedVignette) {
+        ctx.fillStyle = cachedVignette;
+        ctx.fillRect(0, 0, W, H);
+      }
 
       raf = requestAnimationFrame(frame);
     }
 
+    let cachedWet: CanvasGradient | null = null;
+    let cachedVignette: CanvasGradient | null = null;
+
     function build() {
       const rect = wrap.getBoundingClientRect();
-      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      DPR = Math.min(window.devicePixelRatio || 1, 1.5);
       W = Math.max(320, Math.floor(rect.width));
       H = Math.max(320, Math.floor(rect.height));
       canvas.width = W * DPR;
@@ -628,6 +629,16 @@ export function MilCityScene() {
       canvas.style.width = W + "px";
       canvas.style.height = H + "px";
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+      const roadY = H * 0.735;
+      cachedWet = ctx.createLinearGradient(0, roadY, 0, H);
+      cachedWet.addColorStop(0, "rgba(80,120,180,0.05)");
+      cachedWet.addColorStop(1, "rgba(30,60,100,0.15)");
+
+      cachedVignette = ctx.createRadialGradient(W / 2, H * 0.55, Math.min(W, H) * 0.28, W / 2, H * 0.55, Math.max(W, H) * 0.8);
+      cachedVignette.addColorStop(0, "rgba(0,0,0,0)");
+      cachedVignette.addColorStop(1, "rgba(0,0,0,0.78)");
+
       bakeSky();
       bakeCity();
       if (!bakedNoise) bakeNoise();

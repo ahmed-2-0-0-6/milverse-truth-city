@@ -180,6 +180,72 @@ function EducatorsPage() {
           </div>
         </section>
 
+        {/* Global Age & Grade Spectrum Hub */}
+        <section className="mt-10 rounded-2xl border border-primary/30 bg-neutral-900/80 p-6">
+          <div className="stencil text-[10px] tracking-widest text-primary mb-2">
+            AGE &amp; GRADE SPECTRUM · ALL LEARNERS
+          </div>
+          <h2 className="text-2xl font-black text-white" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
+            TAILORED FOR EVERY GRADE &amp; INSTITUTION
+          </h2>
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="rounded-xl border border-white/10 bg-black/40 p-4">
+              <div className="stencil text-xs text-primary">PRE-SCHOOL &amp; EARLY YEARS (AGES 4-7)</div>
+              <p className="mt-1 text-sm text-white/80 leading-snug">
+                Audio-narrated story cards, parent co-viewing guides, and basic visual honesty drills before children receive their first personal screen.
+              </p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-black/40 p-4">
+              <div className="stencil text-xs text-teal-300">PRIMARY &amp; MIDDLE SCHOOL (GRADES 1-8)</div>
+              <p className="mt-1 text-sm text-white/80 leading-snug">
+                The 10-lesson First Phone program ("TruthOS"), Spot-It scam drills, and group classroom activity worksheets for kids ages 8–14.
+              </p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-black/40 p-4">
+              <div className="stencil text-xs text-caution">HIGH SCHOOL &amp; UNIVERSITY (GRADES 9-12+)</div>
+              <p className="mt-1 text-sm text-white/80 leading-snug">
+                Deepfake voice/video verification, algorithmic outrage, synthetic romance fraud, and multi-stage Boss Battle simulations.
+              </p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-black/40 p-4">
+              <div className="stencil text-xs text-rose-300">GOVERNMENT SCHOOLS &amp; NGOS</div>
+              <p className="mt-1 text-sm text-white/80 leading-snug">
+                100% free, zero login, zero tracking. Fully playable offline via PWA, local WebRTC QR class sync, and printable lesson packs.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Universal Accessibility & Inclusion */}
+        <section className="mt-8 rounded-2xl border border-border bg-card p-6">
+          <div className="stencil text-[10px] tracking-widest text-primary mb-2">
+            UNIVERSAL ACCESSIBILITY · NO LEARNER LEFT BEHIND
+          </div>
+          <h2 className="text-2xl font-black text-white" style={{ fontFamily: '"Bebas Neue", sans-serif' }}>
+            ACCESSIBLE TO ALL ABILITIES
+          </h2>
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs leading-relaxed">
+            <div className="rounded-lg border border-border p-3">
+              <div className="stencil text-[11px] text-primary mb-1">⠃⠗⠁⠊⠇⠇⠑ BRAILLE &amp; BLIND</div>
+              <p className="text-muted-foreground">
+                Printable ASCII Braille worksheets, ARIA-accessible screen reader labels on all chat interfaces, and high-contrast tactile export formats.
+              </p>
+            </div>
+            <div className="rounded-lg border border-border p-3">
+              <div className="stencil text-[11px] text-teal-300 mb-1">DEAF &amp; HARD OF HEARING</div>
+              <p className="text-muted-foreground">
+                Closed captions &amp; full verbatim transcripts on all voice notes, sound wave visualizer indicators, and sign-language visual guides.
+              </p>
+            </div>
+            <div className="rounded-lg border border-border p-3">
+              <div className="stencil text-[11px] text-caution mb-1">NEURODIVERGENT &amp; SPECIAL NEEDS</div>
+              <p className="text-muted-foreground">
+                LITE mode sensory reduction, dyslexia-friendly typography toggle, zero-flicker controls, and clear structured step-by-step guidance.
+              </p>
+            </div>
+          </div>
+        </section>
+
         <section className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="rounded-xl border border-border bg-card p-4">
             <Shield className="h-5 w-5 text-primary" />
@@ -199,8 +265,16 @@ function EducatorsPage() {
         </section>
 
         <section className="mt-8 rounded-xl border border-primary/40 bg-primary/[0.05] p-5">
-          <div className="stencil text-[10px] tracking-widest text-primary mb-2">
-            CLASSROOM NOTE
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="stencil text-[10px] tracking-widest text-primary">
+              CLASSROOM NOTE & OFFLINE TOOLKIT
+            </div>
+            <button
+              onClick={() => window.print()}
+              className="print:hidden tap inline-flex items-center gap-1.5 rounded border border-primary/60 bg-primary/15 px-3 py-1 stencil text-[10px] text-primary hover:bg-primary/25"
+            >
+              <Printer className="h-3.5 w-3.5" /> PRINT WORKSHEET
+            </button>
           </div>
           <ul className="space-y-1.5 text-sm">
             <li>

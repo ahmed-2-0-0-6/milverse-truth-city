@@ -151,18 +151,26 @@ export function CalibrationQuadrant({ profile, compact = false, caption }: Props
           {cal.label.toUpperCase()}
         </div>
         {total > 0 ? (
-          <div
-            className={`mt-2 grid grid-cols-2 ${compact ? "gap-1.5" : "gap-2"} font-mono text-[10px] tracking-widest text-muted-foreground`}
-          >
-            <div>
-              MISS ·{" "}
-              <span className="text-foreground tabular-nums">{(missRate * 100).toFixed(0)}%</span>
+          <>
+            <div
+              className={`mt-2 grid grid-cols-2 ${compact ? "gap-1.5" : "gap-2"} font-mono text-[10px] tracking-widest text-muted-foreground`}
+            >
+              <div>
+                MISS ·{" "}
+                <span className="text-foreground tabular-nums">{(missRate * 100).toFixed(0)}%</span>
+              </div>
+              <div>
+                F-ALARM ·{" "}
+                <span className="text-foreground tabular-nums">{(faRate * 100).toFixed(0)}%</span>
+              </div>
             </div>
-            <div>
-              F-ALARM ·{" "}
-              <span className="text-foreground tabular-nums">{(faRate * 100).toFixed(0)}%</span>
+            <div className="mt-1.5 font-mono text-[9px] tracking-widest text-primary/90 flex items-center gap-1.5">
+              <span>BRIER CALIBRATION:</span>
+              <span className="tabular-nums font-semibold">
+                {(Math.max(0, 1 - (missRate * missRate + faRate * faRate) / 2) * 100).toFixed(1)}% ACCURACY
+              </span>
             </div>
-          </div>
+          </>
         ) : (
           <p className="mt-2 text-[11px] text-muted-foreground italic">
             No cases yet. Your dot lands after your first verdict.

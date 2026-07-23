@@ -8,6 +8,7 @@ import { LockScreen } from "./LockScreen";
 import { shouldReduceMotion } from "@/lib/access";
 import { Shield, Check, ChevronLeft, PhoneCall } from "lucide-react";
 import { JUNIOR_COPY } from "@/lib/firstPhone/copy";
+import { correctChime, wrongBuzz } from "@/lib/mirror/audio";
 
 interface Props {
   lesson: Lesson;
@@ -226,6 +227,8 @@ export function JuniorLesson({ lesson, state, onBackHome, onComplete }: Props) {
                 key={o.id}
                 onClick={() => {
                   setChosen(o);
+                  if (o.correct) correctChime();
+                  else wrongBuzz();
                   setBubbles((prev) => [...prev, { role: "out", text: o.label, ts: Date.now() }]);
                   setTimeout(() => setPhase("feedback"), reduced ? 100 : 500);
                 }}

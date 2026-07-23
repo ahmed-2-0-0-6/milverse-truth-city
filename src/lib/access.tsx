@@ -13,6 +13,7 @@ export interface AccessPrefs {
   highLegibility: boolean; // plain dark bg, no grain/flicker/vignette, denser leading
   forceReduceMotion: boolean; // additive to system prefers-reduced-motion
   transcriptsAlwaysOpen: boolean;
+  dyslexicFont: boolean; // high-readability font formatting
 }
 
 const DEFAULTS: AccessPrefs = {
@@ -20,6 +21,7 @@ const DEFAULTS: AccessPrefs = {
   highLegibility: false,
   forceReduceMotion: false,
   transcriptsAlwaysOpen: false,
+  dyslexicFont: false,
 };
 
 const KEY = "milverse.access.v1";
@@ -39,6 +41,7 @@ function apply(prefs: AccessPrefs) {
   html.dataset.highLegibility = prefs.highLegibility ? "on" : "off";
   html.dataset.forceReduceMotion = prefs.forceReduceMotion ? "on" : "off";
   html.dataset.transcriptsOpen = prefs.transcriptsAlwaysOpen ? "on" : "off";
+  html.dataset.dyslexicFont = prefs.dyslexicFont ? "on" : "off";
 }
 
 export function AccessProvider({ children }: { children: ReactNode }) {

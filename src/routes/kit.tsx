@@ -255,19 +255,36 @@ function FieldKit() {
     <div className="min-h-screen bg-background text-foreground print:bg-white print:text-black">
       {/* screen-only header */}
       <div className="print:hidden border-b border-border bg-card/50">
-        <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
+        <div className="mx-auto max-w-5xl px-4 py-4 flex flex-wrap items-center justify-between gap-3">
           <Link
             to="/"
             className="flex items-center gap-2 font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" /> MILVERSE
           </Link>
-          <button
-            onClick={() => window.print()}
-            className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-mono text-xs tracking-widest text-primary-foreground hover:opacity-90"
-          >
-            <Printer className="h-4 w-4" /> PRINT / SAVE AS PDF
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                const text = CARDS.map((c) => `=== ${c.title.toUpperCase()} ===\n[TYPE: ${c.truth}]\nSCENE: ${c.target.scene}\nDOSSIER: ${c.target.dossier.join("; ")}\nREVEAL: ${c.reveal}\n\n`).join("");
+                const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "MILVERSE_Tactile_Braille_Kit.txt";
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+              className="flex items-center gap-2 rounded-md border border-primary/60 bg-primary/10 px-3 py-2 font-mono text-xs tracking-widest text-primary hover:bg-primary/20"
+            >
+              ⠃⠗⠁⠊⠇⠇⠑ BRAILLE ASCII EXPORT
+            </button>
+            <button
+              onClick={() => window.print()}
+              className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-mono text-xs tracking-widest text-primary-foreground hover:opacity-90"
+            >
+              <Printer className="h-4 w-4" /> PRINT / SAVE AS PDF
+            </button>
+          </div>
         </div>
       </div>
 
