@@ -1,10 +1,5 @@
 // LAYER-1 — WebGL noir city hero (three.js via r3f). Lazy-loaded.
 // Runs behind the interactive 2D map as atmosphere. Pauses when tab hidden.
-//
-// PERF: buildings + window-glow strips are rendered as two InstancedMeshes
-// (2 draw calls instead of 240), rain uses a lean shader that animates on
-// the GPU (no per-frame JS BufferAttribute uploads). Same look, ~1/10th
-// the CPU cost and materially smaller JS heap.
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, useEffect, useState } from "react";
@@ -18,80 +13,61 @@ function seeded(seed: number) {
   };
 }
 
-const COUNT = 90;
-
-function CityInstances() {
-  const boxRef = useRef<THREE.InstancedMesh>(null);
-  const glowRef = useRef<THREE.InstancedMesh>(null);
-
-  const { boxColor, glowColors } = useMemo(() => {
-    const rand = seeded(42);
-    const dummy = new THREE.Object3D();
-    const warm = new THREE.Color("#f5b942");
-    const cool = new THREE.Color("#22d3ee");
-    const glowColors: THREE.Color[] = [];
-    // Prepare matrices for both instanced meshes.
-    const boxMatrices: THREE.Matrix4[] = [];
-    const glowMatrices: THREE.Matrix4[] = [];
-
-    for (let i = 0; i < COUNT; i++) {
-      const x = (rand() - 0.5) * 80;
-      const z = (rand() - 0.5) * 80;
-      const w = 1 + rand() * 2.5;
-      const d = 1 + rand() * 2.5;
-      const h = 2 + rand() * 14;
-      const lit = rand();
-
-      dummy.position.set(x, h / 2, z);
-      dummy.rotation.set(0, 0, 0);
-      dummy.scale.set(w, h, d);
-      dummy.updateMatrix();
-      boxMatrices.push(dummy.matrix.clone());
-
-      // Glow plane sits on the +Z face of the box. Unit plane scaled to
-      // 0.9 × w and 0.9 × h; offset by d/2 + a hair to avoid z-fighting.
-      dummy.position.set(x, h / 2, z + d / 2 + 0.01);
-      dummy.rotation.set(0, 0, 0);
-      dummy.scale.set(w * 0.9, h * 0.9, 1);
-      dummy.updateMatrix();
-      glowMatrices.push(dummy.matrix.clone());
-
-      glowColors.push(lit > 0.55 ? warm : cool);
+function Buildings() {
+  const rand = useMemo(() => seeded(42), []);
+  const buildings = useMemo(() => {
+    const arr: { x: number; z: number; w: number; d: number; h: number; lit: number }[] = [];
+    for (let i = 0; i < 120; i++) {
+      arr.push({
+        x: (rand() - 0.5) * 80,
+        z: (rand() - 0.5) * 80,
+        w: 1 + rand() * 2.5,
+        d: 1 + rand() * 2.5,
+        h: 2 + rand() * 14,
+        lit: rand(),
+      });
     }
-
-    // Stash matrices on refs after mount via effect below.
-    (CityInstances as unknown as { _bm: THREE.Matrix4[]; _gm: THREE.Matrix4[] })._bm = boxMatrices;
-    (CityInstances as unknown as { _bm: THREE.Matrix4[]; _gm: THREE.Matrix4[] })._gm = glowMatrices;
-
-    return { boxColor: new THREE.Color("#05070d"), glowColors };
-  }, []);
-
-  useEffect(() => {
-    const boxes = boxRef.current;
-    const glows = glowRef.current;
-    if (!boxes || !glows) return;
-    const bm = (CityInstances as unknown as { _bm: THREE.Matrix4[] })._bm;
-    const gm = (CityInstances as unknown as { _gm: THREE.Matrix4[] })._gm;
-    for (let i = 0; i < COUNT; i++) {
-      boxes.setMatrixAt(i, bm[i]);
-      glows.setMatrixAt(i, gm[i]);
-      glows.setColorAt(i, glowColors[i]);
-    }
-    boxes.instanceMatrix.needsUpdate = true;
-    glows.instanceMatrix.needsUpdate = true;
-    if (glows.instanceColor) glows.instanceColor.needsUpdate = true;
-  }, [glowColors]);
+    return arr;
+  }, [rand]);
 
   return (
     <group>
-      <instancedMesh ref={boxRef} args={[undefined, undefined, COUNT]}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial color={boxColor} />
-      </instancedMesh>
-      <instancedMesh ref={glowRef} args={[undefined, undefined, COUNT]}>
-        <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial transparent opacity={0.75} toneMapped={false} />
-      </instancedMesh>
+      {buildings.map((b, i) => (
+        <group key={i} position={[b.x, b.h / 2, b.z]}>
+          <mesh castShadow={false} receiveShadow={false}>
+            <boxGeometry args={[b.w, b.h, b.d]} />
+            <meshStandardMaterial color="#05070d" roughness={0.9} metalness={0.1} />
+          </mesh>
+          {/* window glow strip */}
+          <mesh position={[0, 0, b.d / 2 + 0.01]}>
+            <planeGeometry args={[b.w * 0.9, b.h * 0.9]} />
+            <shaderMaterial
+              transparent
+              uniforms={{
+                uColor: { value: new THREE.Color(b.lit > 0.55 ? "#f5b942" : "#22d3ee") },
+                uSeed: { value: b.lit * 100 },
+              }}
+              vertexShader={`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`}
+              fragmentShader={`
+                varying vec2 vUv; uniform vec3 uColor; uniform float uSeed;
+                float grid(vec2 uv, vec2 cells){
+                  vec2 g = fract(uv*cells);
+                  float m = step(0.35,g.x)*step(g.x,0.75)*step(0.55,g.y)*step(g.y,0.85);
+                  return m;
+                }
+                float rnd(vec2 p){ return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453); }
+                void main(){
+                  vec2 cells = vec2(6.0, 12.0);
+                  vec2 cid = floor(vUv*cells);
+                  float on = step(0.55, rnd(cid+uSeed));
+                  float m = grid(vUv, cells) * on;
+                  gl_FragColor = vec4(uColor*1.4, m*0.9);
+                }
+              `}
+            />
+          </mesh>
+        </group>
+      ))}
     </group>
   );
 }
@@ -100,50 +76,31 @@ function Rain() {
   const ref = useRef<THREE.Points>(null);
   const geom = useMemo(() => {
     const g = new THREE.BufferGeometry();
-    const n = 400;
+    const n = 800;
     const pos = new Float32Array(n * 3);
-    const off = new Float32Array(n);
     for (let i = 0; i < n; i++) {
       pos[i * 3] = (Math.random() - 0.5) * 100;
       pos[i * 3 + 1] = Math.random() * 40;
       pos[i * 3 + 2] = (Math.random() - 0.5) * 100;
-      off[i] = Math.random() * 40;
     }
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    g.setAttribute("aOff", new THREE.BufferAttribute(off, 1));
     return g;
   }, []);
-
-  const mat = useMemo(
-    () =>
-      new THREE.ShaderMaterial({
-        transparent: true,
-        depthWrite: false,
-        uniforms: { uTime: { value: 0 } },
-        vertexShader: `
-          attribute float aOff;
-          uniform float uTime;
-          void main(){
-            vec3 p = position;
-            p.y = mod(p.y - uTime * 22.0 + aOff, 40.0);
-            vec4 mv = modelViewMatrix * vec4(p, 1.0);
-            gl_Position = projectionMatrix * mv;
-            gl_PointSize = 2.0;
-          }`,
-        fragmentShader: `
-          void main(){
-            gl_FragColor = vec4(0.29, 0.42, 0.60, 0.5);
-          }`,
-      }),
-    [],
-  );
-
   useFrame((_, dt) => {
-    mat.uniforms.uTime.value += dt;
-    if (ref.current) ref.current.geometry = geom;
+    if (!ref.current) return;
+    const pos = ref.current.geometry.attributes.position as THREE.BufferAttribute;
+    const arr = pos.array as Float32Array;
+    for (let i = 0; i < arr.length; i += 3) {
+      arr[i + 1] -= dt * 22;
+      if (arr[i + 1] < 0) arr[i + 1] = 40;
+    }
+    pos.needsUpdate = true;
   });
-
-  return <points ref={ref} geometry={geom} material={mat} />;
+  return (
+    <points ref={ref} geometry={geom}>
+      <pointsMaterial size={0.06} color="#4a6a9a" transparent opacity={0.5} />
+    </points>
+  );
 }
 
 function CameraRig() {
@@ -185,8 +142,8 @@ export default function NoirCityScene() {
 
   const dpr: [number, number] =
     typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches
-      ? [1, 1.25]
-      : [1, 1.75];
+      ? [1, 1.5]
+      : [1, 2];
 
   return (
     <div ref={wrapRef} className="absolute inset-0" aria-hidden>
@@ -194,18 +151,21 @@ export default function NoirCityScene() {
         dpr={dpr}
         frameloop={visible ? "always" : "never"}
         camera={{ position: [0, 10, 30], fov: 55 }}
-        gl={{ antialias: false, powerPreference: "low-power", alpha: true, stencil: false, depth: true }}
+        gl={{ antialias: false, powerPreference: "low-power", alpha: true }}
         style={{ background: "transparent" }}
       >
         <PauseWhenHidden />
         <CameraRig />
         <fog attach="fog" args={["#04060a", 20, 90]} />
-        <CityInstances />
+        <ambientLight intensity={0.15} />
+        <directionalLight position={[10, 30, 10]} intensity={0.25} color="#4a7cff" />
+        <hemisphereLight args={["#22d3ee", "#0a0f1a", 0.15]} />
+        <Buildings />
         <Rain />
-        {/* ground — unlit, single draw */}
+        {/* ground */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
           <planeGeometry args={[200, 200]} />
-          <meshBasicMaterial color="#02040a" />
+          <meshStandardMaterial color="#02040a" roughness={0.6} metalness={0.4} />
         </mesh>
       </Canvas>
     </div>
