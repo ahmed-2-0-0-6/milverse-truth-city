@@ -62,7 +62,7 @@ const DISTRICTS: District[] = [
     label: "THE STUDIO",
     tag: "Design the attack yourself — teach by authoring.",
     art: studioArt,
-    href: "/studio",
+    video: studioVideo.url,
     glow: "245,185,66",
   },
   {
