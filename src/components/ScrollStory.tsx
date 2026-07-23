@@ -52,6 +52,7 @@ const DISTRICTS: District[] = [
     label: "THE FEED",
     tag: "Judge real-world posts — true, false, or misleading?",
     art: feedArt,
+    video: feedVideo.url,
     href: "/feed",
     glow: "245,185,66",
   },
