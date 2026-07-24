@@ -71,7 +71,7 @@ export function CityJournal() {
 
   return (
     <section className="mx-auto mt-4 w-full max-w-5xl px-3">
-      <div className="rounded-md border border-amber-400/25 bg-black/60 backdrop-blur-sm">
+      <div className="rounded-sm border border-amber-400/20 bg-black/70 backdrop-blur-sm">
         <header className="flex items-baseline justify-between border-b border-amber-400/20 px-4 py-2.5 gap-3 flex-wrap">
           <h3 className="stencil text-[11px] tracking-widest text-amber-300">CITY JOURNAL</h3>
           <span className="font-mono text-[10px] text-amber-200/60 tabular-nums">
@@ -80,7 +80,7 @@ export function CityJournal() {
         </header>
 
         {entries.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 border-b border-amber-400/10 px-4 py-2">
+          <div className="flex flex-wrap gap-1.5 border-b border-amber-400/20 px-4 py-2">
             {FILTERS.map((f) => {
               const n =
                 f.id === "all"
@@ -99,8 +99,8 @@ export function CityJournal() {
                     active
                       ? "border-amber-300/70 bg-amber-400/15 text-amber-100"
                       : n === 0
-                        ? "border-amber-400/15 text-amber-200/25 cursor-not-allowed"
-                        : "border-amber-400/25 text-amber-200/70 hover:text-amber-100"
+                        ? "border-amber-400/20 text-amber-200/25 cursor-not-allowed"
+                        : "border-amber-400/20 text-amber-200/70 hover:text-amber-100"
                   }`}
                   aria-pressed={active}
                 >
@@ -141,7 +141,7 @@ const JournalRow = memo(function JournalRow({
   return (
     <li className="px-4 py-2 grid grid-cols-[auto_1fr_auto] items-baseline gap-3">
       <span className={`stencil text-[9px] tracking-widest ${meta.tone}`}>{meta.tag}</span>
-      <span className="font-mono text-[12px] text-amber-100/90 truncate">{entry.text}</span>
+      <span className="font-mono text-[11px] text-amber-100/90 truncate">{entry.text}</span>
       <span className="font-mono text-[10px] tabular-nums text-amber-200/50">{rel}</span>
     </li>
   );

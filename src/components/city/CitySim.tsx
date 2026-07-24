@@ -48,7 +48,7 @@ export function CitySim() {
 
   return (
     <section className="mx-auto mt-6 w-full max-w-3xl px-4">
-      <div className="rounded border border-amber-400/25 bg-black/30 p-4 backdrop-blur-sm">
+      <div className="rounded border border-amber-400/20 bg-black/40 p-4 backdrop-blur-sm">
         <header className="flex items-baseline justify-between gap-3">
           <h3 className="stencil text-[11px] tracking-widest text-amber-100/80">
             CITY REPORT
@@ -87,7 +87,7 @@ export function CitySim() {
           {report.advisories.map((a) => (
             <li
               key={a.id}
-              className={`rounded border-l-2 bg-black/20 px-3 py-2 ${SEV_TONE[a.severity]}`}
+              className={`rounded border-l-2 bg-black/40 px-3 py-2 ${SEV_TONE[a.severity]}`}
             >
               <span className="stencil mr-2 text-[9px] tracking-widest opacity-70">
                 {a.who}
@@ -116,7 +116,7 @@ export function CitySim() {
               <span className="stencil block text-[10px] tracking-widest text-amber-100/70">
                 THE CITY WANTS
               </span>
-              <span className="font-mono text-[12px] text-amber-100">
+              <span className="font-mono text-[11px] text-amber-100">
                 {report.demand.name}
               </span>
               <span className="ml-2 font-mono text-[10px] text-amber-100/45">

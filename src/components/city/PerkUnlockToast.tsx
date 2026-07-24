@@ -50,7 +50,7 @@ export function PerkUnlockToast() {
           );
           setQueue((q) => q.slice(1));
         }}
-        className="tap block w-full text-left rounded-md border border-emerald-400/60 bg-emerald-950/90 backdrop-blur px-4 py-3 shadow-[0_0_28px_rgba(52,211,153,0.35)] hover:bg-emerald-900/90 transition-colors"
+        className="tap block w-full text-left rounded-sm border border-emerald-400/60 bg-emerald-950/90 backdrop-blur px-4 py-3 shadow-[0_0_28px_rgba(52,211,153,0.35)] hover:bg-emerald-900/90 transition-colors"
       >
         <div className="flex items-baseline justify-between gap-3">
           <span className="stencil text-[10px] tracking-widest text-emerald-300">

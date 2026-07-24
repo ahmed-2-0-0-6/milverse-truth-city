@@ -49,6 +49,29 @@ const iso = (gx: number, gy: number) => ({
   y: ((gx + gy) * TH) / 2,
 });
 
+/* ── map label system ────────────────────────────────────────
+   One type scale and one ink set for every label drawn on the
+   board. Signage reads the same whether it's a plot, a district
+   plate or a tooltip. Don't hand-roll sizes below. */
+const STENCIL = '"Bebas Neue", sans-serif';
+const MONO = "ui-monospace, monospace";
+/** Plate headings (plot names, district names, tooltip titles). */
+const SIGN_TITLE = { fontFamily: STENCIL, letterSpacing: "1.1px" } as const;
+/** Small print (costs, levels, rank gates). */
+const SIGN_META = { fontFamily: MONO, letterSpacing: "0.2px" } as const;
+const SIGN_SIZE = { title: 8, titleLg: 9, meta: 6, metaLg: 6.5 } as const;
+/** Ink. Amber = live, rose = sealed, emerald = done, stone = idle. */
+const INK = {
+  live: "#fde68a",
+  ready: "#fde047",
+  sealed: "#fda4af",
+  sealedMeta: "#e7b7c0",
+  done: "#a7f3d0",
+  doneMeta: "#6ee7b7",
+  idle: "#d6d3d1",
+  meta: "#a8a29e",
+} as const;
+
 
 /* ── palette per district ────────────────────────────────── */
 const PALETTE: Record<
@@ -699,7 +722,7 @@ function CamBtn({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-sm border border-amber-400/35 bg-black/60 font-mono text-sm leading-none text-amber-200/90 transition-colors hover:bg-amber-400/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-sm border border-amber-400/40 bg-black/70 font-mono text-sm leading-none text-amber-200/90 transition-colors hover:bg-amber-400/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300"
     >
       {children}
     </button>
@@ -977,7 +1000,7 @@ export function CityIsometric() {
       className={`mx-auto max-w-6xl mt-8 px-4 sm:px-6${active ? "" : " milv-idle"}`}
     >
       {/* Header */}
-      <div className="border-b border-amber-400/30 pb-3 mb-3 flex items-end justify-between gap-3">
+      <div className="border-b border-amber-400/20 pb-3 mb-3 flex items-end justify-between gap-3">
         <div>
           <div className="stencil text-[10px] text-amber-300/80 tracking-widest">
             YOUR CITY · PLOTS {built}/{BUILDINGS.length}
@@ -1059,10 +1082,10 @@ export function CityIsometric() {
       {/* Isometric board */}
       <div
         ref={stageRef}
-        className={`relative border border-amber-400/25 bg-gradient-to-b from-[#050307] via-[#0a0812] to-[#0e0916] overflow-hidden shadow-[inset_0_0_60px_rgba(0,0,0,0.9)] ${
+        className={`relative border border-amber-400/20 bg-gradient-to-b from-[#050307] via-[#0a0812] to-[#0e0916] overflow-hidden shadow-[inset_0_0_60px_rgba(0,0,0,0.9)] ${
           immersed
             ? "milv-immersed fixed inset-0 z-[90] rounded-none flex items-center justify-center"
-            : "rounded-md"
+            : "rounded-sm"
         }`}
       >
         {immersed && (
@@ -1260,10 +1283,10 @@ export function CityIsometric() {
             return (
               <g key={`zseal-${z.id}`} transform={`translate(${x - 46},${y - 4})`} aria-hidden="true">
                 <rect x={-52} y={-9} width={104} height={18} rx={2} fill="#0a0509" opacity="0.9" stroke="#f43f5e" strokeOpacity="0.4" strokeWidth="0.5" />
-                <text x={0} y={-1} textAnchor="middle" fontSize="7" fill="#fda4af" style={{ fontFamily: '"Bebas Neue", sans-serif', letterSpacing: "1.4px" }}>
+                <text x={0} y={-1} textAnchor="middle" fontSize={SIGN_SIZE.title} fill={INK.sealed} style={SIGN_TITLE}>
                   {z.name} · SEALED
                 </text>
-                <text x={0} y={6.5} textAnchor="middle" fontSize="5.5" fill="#e7b7c0" opacity="0.8" style={{ fontFamily: "ui-monospace, monospace" }}>
+                <text x={0} y={6.5} textAnchor="middle" fontSize={SIGN_SIZE.meta} fill={INK.sealedMeta} opacity="0.8" style={SIGN_META}>
                   OPENS AT {["CONSTABLE","INSPECTOR","CHIEF","COMMISSIONER","MAYOR","GOVERNOR"][z.step]}
                 </text>
               </g>
@@ -1535,12 +1558,9 @@ export function CityIsometric() {
                       x={0}
                       y={8}
                       textAnchor="middle"
-                      fontSize="7.5"
-                      fill={lock.locked ? "#fda4af" : maxed ? "#a7f3d0" : canAfford ? "#fde68a" : "#d6d3d1"}
-                      style={{
-                        fontFamily: '"Bebas Neue", sans-serif',
-                        letterSpacing: "1px",
-                      }}
+                      fontSize={SIGN_SIZE.title}
+                      fill={lock.locked ? INK.sealed : maxed ? INK.done : canAfford ? INK.live : INK.idle}
+                      style={SIGN_TITLE}
                     >
                       {lock.locked ? `SEALED · ${lock.needRank}` : bc.def.name.toUpperCase()}
                     </text>
@@ -1551,7 +1571,7 @@ export function CityIsometric() {
                       cx={0}
                       cy={-6 - (22 + lvl * 14)}
                       r={3}
-                      fill="#fde047"
+                      fill={INK.ready}
                       className="milv-beacon"
                       filter="url(#glow-soft)"
                     />
@@ -1562,15 +1582,15 @@ export function CityIsometric() {
                       x={0}
                       y={0}
                       textAnchor="middle"
-                      fontSize="6"
-                      fill="#78716c"
-                      style={{ fontFamily: "monospace" }}
+                      fontSize={SIGN_SIZE.meta}
+                      fill={maxed ? INK.doneMeta : canAfford ? INK.live : INK.meta}
+                      style={SIGN_META}
                     >
                       {maxed
-                        ? "MAX"
+                        ? "MAX LEVEL"
                         : lvl === 0
                           ? `${cost}◼`
-                          : `Lv${lvl}/${bc.def.maxLevel} · ${cost}◼`}
+                          : `LV ${lvl}/${bc.def.maxLevel} · ${cost}◼`}
                     </text>
                   </g>
                   {flash && (
@@ -1613,7 +1633,7 @@ export function CityIsometric() {
                   {perkOnline.has(bc.id) && (
                     <g transform={`translate(${TW / 2 - 14}, ${-6 - (22 + lvl * 14) - 4})`}>
                       <circle cx={0} cy={0} r={6} fill="#022c22" stroke="#34d399" strokeWidth="0.8" filter="url(#glow-soft)" />
-                      <text x={0} y={2.5} textAnchor="middle" fontSize="7" fill="#6ee7b7" style={{ fontFamily: "monospace", fontWeight: 700 }}>
+                      <text x={0} y={2.5} textAnchor="middle" fontSize={SIGN_SIZE.metaLg} fill={INK.doneMeta} style={{ ...SIGN_META, fontWeight: 700 }}>
                         ★
                       </text>
                     </g>
@@ -1642,11 +1662,11 @@ export function CityIsometric() {
               <g aria-hidden="true" pointerEvents="none" className="milv-tip" transform={`translate(${tx},${ty})`}>
                 <rect x={0} y={0} width={w} height={h} rx={3} fill="#08060c" opacity="0.94" stroke="#f59e0b" strokeWidth="0.6" />
                 <rect x={0} y={0} width={w} height={1.4} fill="#f59e0b" opacity="0.7" />
-                <text x={7} y={14} fontSize="9" fill="#fde68a" style={{ fontFamily: '"Bebas Neue", sans-serif', letterSpacing: "1px" }}>
+                <text x={7} y={14} fontSize={SIGN_SIZE.titleLg} fill={INK.live} style={SIGN_TITLE}>
                   {b.def.name.toUpperCase()}
                 </text>
                 {rows.map((r, i) => (
-                  <text key={i} x={7} y={25 + i * 10} fontSize="6.5" fill={i === 1 && perkOnline.has(hoverId) ? "#6ee7b7" : "#a8a29e"} style={{ fontFamily: "monospace" }}>
+                  <text key={i} x={7} y={25 + i * 10} fontSize={SIGN_SIZE.metaLg} fill={i === 1 && perkOnline.has(hoverId) ? INK.doneMeta : INK.meta} style={SIGN_META}>
                     {r}
                   </text>
                 ))}

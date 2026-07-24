@@ -76,20 +76,20 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
     ? "MAXED · PERK ACTIVE"
     : level === 0
       ? `BUILD · ${cost} BRICKS`
-      : `UPGRADE TO Lv${level + 1} · ${cost} BRICKS`;
+      : `UPGRADE TO LV ${level + 1} · ${cost} BRICKS`;
 
   return (
     <>
       <button
         aria-label="Close"
         onClick={onClose}
-        className="fixed inset-0 z-[9990] bg-black/60 backdrop-blur-sm cursor-default"
+        className="fixed inset-0 z-[9990] bg-black/70 backdrop-blur-sm cursor-default"
       />
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="building-title"
-        className={`fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[9991] w-[calc(100%-1.5rem)] sm:w-[420px] max-w-[95vw] max-h-[70vh] overflow-y-auto rounded-lg border border-amber-400/40 bg-[#0a0f1c]/98 backdrop-blur-xl shadow-[0_0_60px_rgba(253,224,71,0.25)] animate-in zoom-in-95 fade-in duration-200 ${
+        className={`fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[9991] w-[calc(100%-1.5rem)] sm:w-[420px] max-w-[95vw] max-h-[70vh] overflow-y-auto rounded-sm border border-amber-400/40 bg-[#0a0f1c]/98 backdrop-blur-xl shadow-[0_0_60px_rgba(253,224,71,0.25)] animate-in zoom-in-95 fade-in duration-200 ${
           flash === "ok" ? "ring-2 ring-emerald-400/70" : ""
         } ${flash === "err" ? "ring-2 ring-red-400/70" : ""}`}
 
@@ -107,7 +107,7 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
             >
               {def.name.toUpperCase()}
             </h2>
-            <p className="mt-1 text-[12px] text-amber-200/70 italic">{def.tagline}</p>
+            <p className="mt-1 text-[11px] text-amber-200/70 italic">{def.tagline}</p>
           </div>
           <button
             onClick={onClose}
@@ -129,7 +129,7 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
                   className={`h-2 flex-1 rounded-sm border ${
                     filled
                       ? "bg-amber-400 border-amber-300 shadow-[0_0_8px_rgba(253,224,71,0.7)]"
-                      : "bg-amber-400/10 border-amber-400/30"
+                      : "bg-amber-400/10 border-amber-400/20"
                   }`}
                   aria-hidden
                 />
@@ -138,7 +138,7 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
           </div>
           <div className="mt-2 flex items-baseline justify-between font-mono text-[11px]">
             <span className="text-amber-200/80">
-              {level === 0 ? "UNBUILT PLOT" : `LEVEL ${level} / ${def.maxLevel}`}
+              {level === 0 ? "UNBUILT PLOT" : `LV ${level} / ${def.maxLevel}`}
             </span>
             {lock.locked ? (
               <span className="stencil text-[9px] text-red-300/80 tracking-widest">
@@ -158,11 +158,11 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
         </p>
 
         {/* Perk at max */}
-        <div className="mx-4 mt-3 rounded-sm border border-amber-400/25 bg-amber-400/5 p-2.5">
+        <div className="mx-4 mt-3 rounded-sm border border-amber-400/20 bg-amber-400/5 p-2.5">
           <div className="stencil text-[9px] text-amber-300/80 tracking-widest">
             PERK AT MAX LEVEL
           </div>
-          <div className="mt-0.5 text-[12px] text-amber-100/90">{def.perkAtMax}</div>
+          <div className="mt-0.5 text-[11px] text-amber-100/90">{def.perkAtMax}</div>
         </div>
 
         {/* Action row */}
@@ -196,8 +196,8 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
                 disabled={!canAfford}
                 className={`tap w-full rounded-sm border py-3 stencil text-[11px] tracking-widest transition-all ${
                   canAfford
-                    ? "border-amber-400/70 bg-amber-400 text-black hover:bg-amber-300 shadow-[0_0_20px_rgba(253,224,71,0.5)]"
-                    : "border-amber-400/25 bg-amber-400/5 text-amber-200/40 cursor-not-allowed"
+                    ? "border-amber-400/40 bg-amber-400 text-black hover:bg-amber-300 shadow-[0_0_20px_rgba(253,224,71,0.5)]"
+                    : "border-amber-400/20 bg-amber-400/5 text-amber-200/40 cursor-not-allowed"
                 }`}
               >
                 {actionLabel}
