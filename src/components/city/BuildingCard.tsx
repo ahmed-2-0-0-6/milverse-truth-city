@@ -28,7 +28,11 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
     };
     refresh();
     window.addEventListener("milverse:city", refresh);
-    return () => window.removeEventListener("milverse:city", refresh);
+    window.addEventListener("milverse:city:built", refresh);
+    return () => {
+      window.removeEventListener("milverse:city", refresh);
+      window.removeEventListener("milverse:city:built", refresh);
+    };
   }, [open, buildingId]);
 
   useEffect(() => {
