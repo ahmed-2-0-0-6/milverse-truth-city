@@ -594,9 +594,36 @@ export function CityIsometric() {
   const target = hint?.cost ?? 1;
   const filled = hint ? Math.max(0, Math.min(1, (target - hint.remaining) / target)) : 1;
 
+  // ── LIVE CITY STATS — derived from building levels ──
+  const totalLevels = BUILDINGS.reduce((s, b) => s + levelOf(save, b.id), 0);
+  const population = Math.round(totalLevels * 128 + built * 42);
+  const power = Math.min(100, totalLevels * 6 + built * 3);
+  const safety = Math.min(100, levelOf(save, "outpost") * 20 + levelOf(save, "watchtower") * 12 + built * 4);
+  const literacy = Math.min(100, levelOf(save, "library") * 18 + levelOf(save, "school") * 22 + levelOf(save, "archive") * 8);
+
+  // Which building IDs the player can currently afford — used to decorate the empty lot with a construction crane
+  const affordableIds = new Set<BuildingId>();
+  for (const b of BUILDINGS) {
+    const lvl = levelOf(save, b.id);
+    if (lvl === 0) {
+      const c = nextCost(b.id, 0);
+      if (c !== null && save.bricks >= c) affordableIds.add(b.id);
+    }
+  }
+
+  // Time-of-day tint — overlays a subtle color wash based on user's local hour
+  const hr = new Date().getHours();
+  const tint =
+    hr < 6 ? "rgba(20,15,40,0.35)" :          // deep night — indigo
+    hr < 9 ? "rgba(210,120,60,0.14)" :         // dawn — amber
+    hr < 17 ? "rgba(120,140,180,0.06)" :       // day — pale blue
+    hr < 20 ? "rgba(220,90,60,0.16)" :         // dusk — orange
+    "rgba(15,10,30,0.28)";                     // night — indigo
+
   // viewBox — encompass full 5×5 iso grid comfortably
   const bounds = { w: TW * (GRID + 1), h: TH * (GRID + 3) };
   const viewBox = `${-bounds.w / 2} ${-140} ${bounds.w} ${bounds.h + 60}`;
+
 
   return (
     <section
