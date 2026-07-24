@@ -894,6 +894,15 @@ export function CityIsometric() {
             : "rounded-md"
         }`}
       >
+        {immersed && (
+          <button
+            type="button"
+            onClick={toggleImmerse}
+            className="absolute right-3 top-3 z-20 inline-flex min-h-[36px] min-w-[36px] items-center justify-center rounded-sm border border-amber-400/40 bg-black/70 px-3 stencil text-[10px] tracking-widest text-amber-200 hover:bg-amber-400/20"
+          >
+            EXIT
+          </button>
+        )}
         {/* subtle grid vignette */}
         <div
           aria-hidden
