@@ -845,6 +845,77 @@ export function CityIsometric() {
   }, [setCamTo]);
   const resetCam = useCallback(() => setCamTo({ x: 0, y: 0, z: 1.7 }), [setCamTo]);
 
+  // ── DIRECTOR DECK ── glide the camera instead of teleporting it, and let
+  // the player fly the city hands-free. Presentation only: nothing here
+  // touches bricks, ranks or saves.
+  const glideRef = useRef(0);
+  const tourRef = useRef<number[]>([]);
+  const [tour, setTour] = useState(false);
+  const [film, setFilm] = useState(true);
+
+  const stopGlide = useCallback(() => {
+    if (glideRef.current) cancelAnimationFrame(glideRef.current);
+    glideRef.current = 0;
+  }, []);
+
+  const glideTo = useCallback(
+    (target: { x: number; y: number; z: number }, ms = 900) => {
+      stopGlide();
+      if (reducedMotion) { setCamTo(target); return; }
+      const from = { ...camRef.current };
+      const t0 = performance.now();
+      const tick = (now: number) => {
+        const p = Math.min(1, (now - t0) / ms);
+        const e = 1 - Math.pow(1 - p, 3); // easeOutCubic — a crane, not a cut
+        setCamTo({
+          x: from.x + (target.x - from.x) * e,
+          y: from.y + (target.y - from.y) * e,
+          z: from.z + (target.z - from.z) * e,
+        });
+        if (p < 1) glideRef.current = requestAnimationFrame(tick);
+        else glideRef.current = 0;
+      };
+      glideRef.current = requestAnimationFrame(tick);
+    },
+    [reducedMotion, setCamTo, stopGlide],
+  );
+
+  /** Frame a grid cell dead centre. */
+  const focusCell = useCallback(
+    (gx: number, gy: number, z = 2.2) => {
+      const { x, y } = iso(gx, gy);
+      const bh = TH * (GRID + 3);
+      glideTo({ x, y: y + 140 - (bh + 60) / 2, z });
+    },
+    [glideTo],
+  );
+
+  const stopTour = useCallback(() => {
+    tourRef.current.forEach((id) => window.clearTimeout(id));
+    tourRef.current = [];
+    setTour(false);
+  }, []);
+
+  const startTour = useCallback(() => {
+    stopTour();
+    setTour(true);
+    const stops = ZONES.map((z) => z.cells[Math.floor(z.cells.length / 2)]);
+    stops.forEach(([gx, gy], i) => {
+      tourRef.current.push(
+        window.setTimeout(() => focusCell(gx, gy, 2.1), i * 2600),
+      );
+    });
+    tourRef.current.push(
+      window.setTimeout(() => {
+        glideTo({ x: 0, y: 0, z: 1.7 }, 1400);
+        setTour(false);
+      }, stops.length * 2600),
+    );
+  }, [focusCell, glideTo, stopTour]);
+
+  useEffect(() => () => { stopGlide(); tourRef.current.forEach((id) => window.clearTimeout(id)); }, [stopGlide]);
+
+
   const onPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
     if (e.button !== 0 && e.pointerType === "mouse") return;
     // No pointer capture yet — capturing here would retarget the click and
