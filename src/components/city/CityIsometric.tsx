@@ -1633,7 +1633,7 @@ export function CityIsometric() {
                   {perkOnline.has(bc.id) && (
                     <g transform={`translate(${TW / 2 - 14}, ${-6 - (22 + lvl * 14) - 4})`}>
                       <circle cx={0} cy={0} r={6} fill="#022c22" stroke="#34d399" strokeWidth="0.8" filter="url(#glow-soft)" />
-                      <text x={0} y={2.5} textAnchor="middle" fontSize="7" fill="#6ee7b7" style={{ fontFamily: "monospace", fontWeight: 700 }}>
+                      <text x={0} y={2.5} textAnchor="middle" fontSize={SIGN_SIZE.metaLg} fill={INK.doneMeta} style={{ ...SIGN_META, fontWeight: 700 }}>
                         ★
                       </text>
                     </g>
