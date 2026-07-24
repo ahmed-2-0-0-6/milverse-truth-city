@@ -393,13 +393,44 @@ const GroundLayer = React.memo(function GroundLayer({
   reducedMotion: boolean;
   lowFx: boolean;
 }) {
+  // The board is a slab of earth, not a sheet of paper. Cut the sides and the
+  // bedrock below it once, behind every tile.
+  const N = GRID;
+  const top = iso(0, 0);
+  const right = iso(N - 1, 0);
+  const bottom = iso(N - 1, N - 1);
+  const left = iso(0, N - 1);
+  const RX = right.x + TW / 2, RY = right.y + TH / 2;
+  const BX = bottom.x, BY = bottom.y + TH;
+  const LX = left.x - TW / 2, LY = left.y + TH / 2;
+  const D = 34; // slab thickness
+
   return (
     <g shapeRendering="optimizeSpeed">
+      <g aria-hidden="true" pointerEvents="none">
+        {/* south-west cut — the lit face */}
+        <polygon points={`${LX},${LY} ${BX},${BY} ${BX},${BY + D} ${LX},${LY + D}`} fill="#241a2c" />
+        <polygon points={`${LX},${LY} ${BX},${BY} ${BX},${BY + D} ${LX},${LY + D}`} fill="url(#soil-strata)" opacity="0.7" />
+        {/* south-east cut — in shadow */}
+        <polygon points={`${BX},${BY} ${RX},${RY} ${RX},${RY + D} ${BX},${BY + D}`} fill="#160f1c" />
+        <polygon points={`${BX},${BY} ${RX},${RY} ${RX},${RY + D} ${BX},${BY + D}`} fill="url(#soil-strata)" opacity="0.5" />
+        {/* topsoil line where the plate meets the cut */}
+        <polyline points={`${LX},${LY} ${BX},${BY} ${RX},${RY}`} fill="none" stroke="#4a3a52" strokeWidth="1.2" opacity="0.6" />
+        {/* the slab throws a shadow into the dark under the board */}
+        <polygon
+          points={`${LX},${LY + D} ${BX},${BY + D} ${RX},${RY + D} ${BX},${BY + D + 22}`}
+          fill="#000"
+          opacity="0.45"
+        />
+        {/* faint bedrock haze so the cut doesn't end on a hard line */}
+        <polygon points={`${top.x},${top.y} ${RX},${RY} ${BX},${BY} ${LX},${LY}`} fill="url(#ground-vignette)" opacity="0.35" />
+      </g>
       {cells.map(({ gx, gy }) => (
         <GroundTile key={`t-${gx}-${gy}`} gx={gx} gy={gy} reducedMotion={reducedMotion} lowFx={lowFx} />
       ))}
     </g>
   );
+
 });
 
 
