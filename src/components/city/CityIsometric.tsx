@@ -678,6 +678,28 @@ function lightTint(h: number): string {
 
 
 
+/** Camera pad button — 36px hit area, thumb-safe. */
+function CamBtn({
+  children,
+  label,
+  onClick,
+}: {
+  children: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onClick={onClick}
+      className="inline-flex h-9 w-9 items-center justify-center rounded-sm border border-amber-400/35 bg-black/60 font-mono text-sm leading-none text-amber-200/90 transition-colors hover:bg-amber-400/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300"
+    >
+      {children}
+    </button>
+  );
+}
+
 /* ── main component ──────────────────────────────────────── */
 export function CityIsometric() {
   const [save, setSave] = useState<CitySave | null>(null);
@@ -981,6 +1003,27 @@ export function CityIsometric() {
             EXIT
           </button>
         )}
+        {/* ── camera controls ── */}
+        <div className="absolute left-3 bottom-3 z-20 flex items-end gap-2">
+          <div className="grid grid-cols-3 grid-rows-3 gap-1">
+            <span />
+            <CamBtn label="Pan up" onClick={() => nudge(0, -90)}>↑</CamBtn>
+            <span />
+            <CamBtn label="Pan left" onClick={() => nudge(-90, 0)}>←</CamBtn>
+            <CamBtn label="Center the city" onClick={resetCam}>⌖</CamBtn>
+            <CamBtn label="Pan right" onClick={() => nudge(90, 0)}>→</CamBtn>
+            <span />
+            <CamBtn label="Pan down" onClick={() => nudge(0, 90)}>↓</CamBtn>
+            <span />
+          </div>
+          <div className="flex flex-col gap-1">
+            <CamBtn label="Zoom in" onClick={() => zoomBy(1.2)}>+</CamBtn>
+            <CamBtn label="Zoom out" onClick={() => zoomBy(1 / 1.2)}>−</CamBtn>
+          </div>
+        </div>
+        <div className="absolute right-3 bottom-3 z-20 stencil text-[9px] tracking-widest text-amber-200/50 pointer-events-none">
+          DRAG TO PAN · SCROLL TO ZOOM · {Math.round(cam.z * 100)}%
+        </div>
         {/* subtle grid vignette */}
         <div
           aria-hidden
