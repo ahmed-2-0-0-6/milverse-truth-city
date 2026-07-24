@@ -1195,6 +1195,15 @@ export function CityIsometric() {
           className="pointer-events-none absolute inset-0 mix-blend-overlay"
           style={{ background: tint }}
         />
+        <CinematicLayer
+          active={active}
+          immersed={immersed}
+          reducedMotion={reducedMotion}
+          lowFx={lowFx}
+          title="TRUTH CITY"
+          subtitle="SECTOR ONLINE"
+        />
+
 
         <svg
           ref={svgRef}
