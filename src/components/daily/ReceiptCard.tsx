@@ -235,23 +235,23 @@ export function ReceiptCard({ data }: { data: ReceiptData }) {
       <pre className="whitespace-pre-wrap break-words rounded-sm border border-border bg-card p-3 text-xs text-muted-foreground font-mono">
         {text}
       </pre>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 pt-1">
         <button
           onClick={copy}
-          className="inline-flex items-center gap-2 rounded-sm border border-primary/50 bg-primary/10 px-3 py-2 stencil text-[10px] text-primary hover:bg-primary/20"
+          className="hover-lift neon-glow-cyan inline-flex items-center gap-2 rounded-full border border-primary/60 bg-primary/20 px-4 py-2 stencil text-[11px] font-bold text-primary hover:bg-primary/30 transition-all"
         >
           {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-          {copied ? "COPIED" : "COPY LINE"}
+          {copied ? "COPIED TO CLIPBOARD" : "COPY LINE"}
         </button>
         <button
           onClick={download}
-          className="inline-flex items-center gap-2 rounded-sm border border-border px-3 py-2 stencil text-[10px] text-muted-foreground hover:text-foreground"
+          className="hover-lift inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-4 py-2 stencil text-[11px] text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
         >
           <Download className="h-3.5 w-3.5" /> DOWNLOAD PNG
         </button>
         <button
           onClick={share}
-          className="inline-flex items-center gap-2 rounded-sm border border-border px-3 py-2 stencil text-[10px] text-muted-foreground hover:text-foreground"
+          className="hover-lift inline-flex items-center gap-2 rounded-full border border-caution/50 bg-caution/10 px-4 py-2 stencil text-[11px] text-caution hover:bg-caution/20 transition-all"
         >
           <Share2 className="h-3.5 w-3.5" /> SHARE
         </button>

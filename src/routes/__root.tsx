@@ -110,22 +110,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2d5a6420-ffd9-4775-8625-21924b3f113e/id-preview-9a528e14--b1bda37d-f290-471e-8242-1f3cfcf0f7d7.lovable.app-1784092810821.png",
+        content: "https://milverse-truth-city.lovable.app/og-preview.png",
       },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
       {
         name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2d5a6420-ffd9-4775-8625-21924b3f113e/id-preview-9a528e14--b1bda37d-f290-471e-8242-1f3cfcf0f7d7.lovable.app-1784092810821.png",
+        content: "https://milverse-truth-city.lovable.app/og-preview.png",
       },
+      // iOS PWA meta
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "MILVERSE" },
     ],
     links: [
-      { rel: "dns-prefetch", href: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev" },
-      { rel: "preconnect", href: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev" },
       { rel: "dns-prefetch", href: "https://images.unsplash.com" },
       { rel: "preconnect", href: "https://images.unsplash.com" },
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "apple-touch-icon", href: "/icon-512.png" },
       { rel: "manifest", href: "/manifest.json" },
     ],
   }),
@@ -146,6 +149,12 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Courier+Prime:ital@0;1&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body>
         {children}

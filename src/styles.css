@@ -6028,3 +6028,701 @@ img, video, canvas, svg {
   }
 }
 
+/* ── Modern Premium UI Utilities ── */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-panel-cyan {
+  background: rgba(8, 47, 73, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  box-shadow: 0 0 25px rgba(34, 211, 238, 0.15);
+}
+
+.glass-panel-amber {
+  background: rgba(69, 26, 3, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(245, 185, 66, 0.3);
+  box-shadow: 0 0 25px rgba(245, 185, 66, 0.15);
+}
+
+.glass-panel-red {
+  background: rgba(69, 10, 10, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.2);
+}
+
+.neon-glow-cyan {
+  box-shadow: 0 0 20px oklch(0.82 0.14 195 / 0.45);
+}
+
+.neon-glow-amber {
+  box-shadow: 0 0 20px oklch(0.8 0.14 80 / 0.45);
+}
+
+.neon-glow-red {
+  box-shadow: 0 0 20px oklch(0.64 0.21 22 / 0.55);
+}
+
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+.animate-pulse-ring {
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+
+/* ── Flash Card 3D Flip System ── */
+.flashcard-perspective {
+  perspective: 1200px;
+}
+.flashcard-inner {
+  position: relative;
+  width: 100%;
+  transition: transform 0.6s cubic-bezier(0.34, 1.3, 0.64, 1);
+  transform-style: preserve-3d;
+}
+.flashcard-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+.flashcard-front,
+.flashcard-back {
+  width: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flashcard-front {
+  pointer-events: auto;
+}
+.flashcard-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  pointer-events: none;
+}
+.flashcard-inner.is-flipped .flashcard-back {
+  pointer-events: auto;
+  z-index: 20;
+}
+.flashcard-inner.is-flipped .flashcard-front {
+  pointer-events: none;
+}
+
+
+/* ================================================================
+   EVIDENCE FILE SYSTEM — Neo-Noir Detective Case Files
+   ================================================================
+   Inspired by: Alan Wake 2, LA Noire, True Detective, Se7en,
+   Mindhunter, Control, real FBI/CIA case documents.
+   
+   Pure CSS physicality — paper grain, desk lamp lighting,
+   coffee stains, paperclip, rubber stamps, fold marks,
+   paper stack depth, and tactile hover interactions.
+   ================================================================ */
+
+/* ── Container ── */
+.evidence-file {
+  position: relative;
+  cursor: pointer;
+  perspective: 900px;
+  display: block;
+}
+
+/* ── Paper Stack Effect — sheets layered beneath ── */
+.evidence-file__stack {
+  position: absolute;
+  bottom: -2px;
+  left: 2px;
+  right: -1px;
+  height: 100%;
+  border-radius: 1px 1px 2px 2px;
+  pointer-events: none;
+  z-index: 0;
+}
+.evidence-file__stack::before,
+.evidence-file__stack::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  border-radius: inherit;
+}
+/* Bottom sheet — slightly offset, darker */
+.evidence-file__stack::before {
+  background: #b8a88a;
+  transform: translate(3px, 4px) rotate(0.6deg);
+  box-shadow: 2px 3px 6px rgba(0,0,0,0.25);
+}
+/* Middle sheet — barely offset */
+.evidence-file__stack::after {
+  background: #c4b598;
+  transform: translate(1px, 2px) rotate(-0.2deg);
+  box-shadow: 1px 2px 4px rgba(0,0,0,0.15);
+}
+
+/* ── Main Paper Surface ── */
+.evidence-file__paper {
+  position: relative;
+  z-index: 1;
+  /* Aged warm ivory paper */
+  background:
+    /* Warm desk lamp — directional from top-left */
+    radial-gradient(ellipse 120% 100% at 10% -5%, rgba(255, 235, 190, 0.22), transparent 55%),
+    /* Subtle foxing / aging toward edges */
+    radial-gradient(ellipse at 90% 90%, rgba(180, 150, 100, 0.12), transparent 50%),
+    radial-gradient(ellipse at 5% 95%, rgba(160, 130, 80, 0.08), transparent 40%),
+    /* Base paper color */
+    linear-gradient(178deg, #e4d8c2 0%, #ddd0b6 30%, #d6c8ac 70%, #d0c0a0 100%);
+  border: 1px solid rgba(140, 120, 80, 0.35);
+  border-top-color: rgba(180, 160, 120, 0.5);
+  border-bottom-color: rgba(100, 80, 50, 0.3);
+  border-radius: 1px 1px 2px 2px;
+  padding: 1.75rem 1.5rem 1.25rem;
+  color: #1e1a14;
+  overflow: visible;
+  transform-style: preserve-3d;
+  transform-origin: center bottom;
+  transition:
+    transform 500ms cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 500ms cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow:
+    /* Paper resting on desk — contact shadow */
+    0 1px 1px rgba(0,0,0,0.12),
+    /* Soft spread */
+    0 3px 6px rgba(0,0,0,0.1),
+    /* Desk lamp long shadow — bottom-right direction */
+    3px 6px 16px -2px rgba(0,0,0,0.22),
+    /* Deep ambient */
+    0 12px 28px -8px rgba(0,0,0,0.18),
+    /* Subtle inner glow on top edge (lamp reflection on paper) */
+    inset 0 1px 0 rgba(255, 245, 220, 0.35);
+}
+
+/* ── Paper Grain & Fiber Texture ── */
+.evidence-file__paper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    /* Horizontal paper fibers */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(160, 140, 100, 0.025) 3px,
+      transparent 5px
+    ),
+    /* Vertical fibers — finer */
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 4px,
+      rgba(140, 120, 80, 0.018) 4px,
+      transparent 7px
+    ),
+    /* Tiny dust / speckle particles */
+    radial-gradient(circle 0.6px at 18% 22%, rgba(90, 70, 35, 0.12), transparent 1px),
+    radial-gradient(circle 0.4px at 72% 14%, rgba(70, 55, 25, 0.08), transparent 1px),
+    radial-gradient(circle 0.5px at 45% 67%, rgba(100, 80, 40, 0.1), transparent 1px),
+    radial-gradient(circle 0.3px at 88% 45%, rgba(80, 60, 30, 0.06), transparent 1px),
+    radial-gradient(circle 0.4px at 33% 82%, rgba(110, 85, 45, 0.07), transparent 1px),
+    radial-gradient(circle 0.5px at 62% 38%, rgba(75, 55, 25, 0.05), transparent 1px),
+    radial-gradient(circle 0.3px at 8% 58%, rgba(95, 75, 35, 0.06), transparent 1px);
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+/* ── Warm Light Falloff / Vignette ── */
+.evidence-file__paper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    /* Desk lamp warm spot */
+    radial-gradient(ellipse 80% 70% at 20% 15%, rgba(255, 240, 200, 0.1), transparent 60%),
+    /* Edge darkening — natural shadow falloff */
+    radial-gradient(ellipse 140% 140% at 50% 50%, transparent 45%, rgba(80, 60, 30, 0.06) 100%);
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+/* ── Coffee Stain Ring ── */
+.evidence-file__stain {
+  position: absolute;
+  right: 18px;
+  bottom: 28px;
+  width: 58px;
+  height: 54px;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 50% 50%,
+      transparent 48%,
+      rgba(130, 85, 35, 0.07) 50%,
+      rgba(110, 70, 25, 0.05) 55%,
+      rgba(90, 60, 20, 0.03) 60%,
+      transparent 64%
+    );
+  transform: rotate(-18deg) scale(1.1, 0.9);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.8;
+}
+
+/* ── Fold Corner — top right ── */
+.evidence-file__fold {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 22px;
+  height: 22px;
+  background:
+    linear-gradient(225deg,
+      rgba(200, 185, 155, 0.95) 0%,
+      rgba(190, 175, 145, 0.9) 48%,
+      transparent 50%
+    );
+  box-shadow: -1px 1px 2px rgba(0,0,0,0.08);
+  z-index: 3;
+  pointer-events: none;
+}
+/* Shadow beneath the fold */
+.evidence-file__fold::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(225deg, transparent 50%, rgba(0,0,0,0.04) 50%, transparent 65%);
+  pointer-events: none;
+}
+
+/* ── Paperclip — CSS wire shape ── */
+.evidence-file__clip {
+  position: absolute;
+  top: -8px;
+  right: 42px;
+  width: 14px;
+  height: 40px;
+  border: 2.5px solid #a09580;
+  border-radius: 7px 7px 0 0;
+  border-bottom: none;
+  transform: rotate(2.5deg);
+  z-index: 10;
+  transition: transform 500ms cubic-bezier(0.23, 1, 0.32, 1);
+  filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.25));
+}
+.evidence-file__clip::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 2px;
+  width: 6px;
+  height: 28px;
+  border: 2px solid #a09580;
+  border-radius: 0 0 5px 5px;
+  border-top: none;
+}
+/* Metallic highlight on clip */
+.evidence-file__clip::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 1px;
+  width: 3px;
+  height: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.25), transparent);
+  border-radius: 3px;
+}
+
+/* ── Classification / "CONFIDENTIAL" Stamp ── */
+.evidence-file__stamp {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-family: 'Courier Prime', 'Courier New', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(160, 45, 35, 0.45);
+  border: 2px solid rgba(160, 45, 35, 0.3);
+  padding: 2px 8px;
+  transform: rotate(-8deg);
+  z-index: 4;
+  pointer-events: none;
+  /* Worn ink effect */
+  text-shadow: 0 0 1px rgba(160, 45, 35, 0.15);
+  /* Rough rubber stamp edges */
+  filter: contrast(1.3) saturate(0.7);
+}
+
+/* ── Outcome Stamp Overlay (CASE CLOSED / TRANSACTED) ── */
+.evidence-file__outcome {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-18deg);
+  font-family: 'Courier Prime', 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  padding: 4px 18px;
+  border: 3px double currentColor;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.55;
+  /* Ink bleed */
+  text-shadow: 0 0 2px currentColor;
+}
+.evidence-file__outcome--closed {
+  color: rgba(20, 120, 80, 0.7);
+}
+.evidence-file__outcome--transacted {
+  color: rgba(180, 40, 30, 0.65);
+}
+.evidence-file__outcome--false_alarm {
+  color: rgba(180, 140, 30, 0.6);
+}
+
+/* ── Header Strip — Case No., Date, Archive ── */
+.evidence-file__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(140, 120, 80, 0.25);
+  margin-bottom: 0.85rem;
+  position: relative;
+  z-index: 3;
+}
+.evidence-file__caseno {
+  font-family: 'Courier Prime', 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: rgba(80, 65, 40, 0.75);
+  text-transform: uppercase;
+}
+.evidence-file__tier {
+  font-family: 'Courier Prime', 'Courier New', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: rgba(100, 80, 50, 0.6);
+  text-transform: uppercase;
+  border: 1px solid rgba(140, 120, 80, 0.25);
+  padding: 1px 6px;
+  background: rgba(220, 200, 160, 0.3);
+}
+
+/* ── Title — editorial serif typography ── */
+.evidence-file__title {
+  font-family: 'IBM Plex Serif', Georgia, 'Times New Roman', serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #1a1610;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.35rem;
+  position: relative;
+  z-index: 3;
+}
+
+/* ── Description ── */
+.evidence-file__desc {
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.55;
+  color: rgba(60, 50, 35, 0.72);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  position: relative;
+  z-index: 3;
+}
+
+/* ── Thin ruled lines across the paper (like a real form) ── */
+.evidence-file__rules {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 29px,
+    rgba(160, 140, 110, 0.08) 29px,
+    rgba(160, 140, 110, 0.08) 30px
+  );
+  border-radius: inherit;
+}
+
+/* ── Tags / Evidence Badges ── */
+.evidence-file__tags {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  position: relative;
+  z-index: 3;
+}
+.evidence-file__tag {
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(80, 65, 40, 0.65);
+  border: 1px solid rgba(140, 120, 80, 0.2);
+  padding: 2px 7px;
+  background: rgba(230, 215, 185, 0.4);
+}
+
+/* ── Footer / Action Strip ── */
+.evidence-file__footer {
+  margin-top: 0.85rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(140, 120, 80, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 3;
+}
+.evidence-file__cta {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(90, 75, 50, 0.7);
+  transition: color 300ms ease, letter-spacing 300ms ease;
+}
+.evidence-file:hover .evidence-file__cta {
+  color: rgba(50, 40, 25, 0.9);
+  letter-spacing: 0.3em;
+}
+
+/* ── Interactive CTA chip (cyan accent) ── */
+.evidence-file__action {
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(80, 65, 40, 0.6);
+  border: 1px solid rgba(140, 120, 80, 0.25);
+  padding: 3px 10px;
+  background: rgba(230, 220, 195, 0.35);
+  cursor: pointer;
+  transition: all 250ms ease;
+}
+.evidence-file__action:hover {
+  background: rgba(215, 200, 170, 0.5);
+  color: rgba(50, 40, 25, 0.85);
+  border-color: rgba(120, 100, 60, 0.35);
+}
+
+/* ── Redacted Text Effect ── */
+.evidence-file__redacted {
+  display: inline-block;
+  background: rgba(30, 25, 18, 0.75);
+  color: transparent;
+  padding: 0 4px;
+  margin: 0 2px;
+  border-radius: 1px;
+  user-select: none;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* ── Sticky Note ── */
+.evidence-file__sticky {
+  position: absolute;
+  bottom: 12px;
+  left: 16px;
+  background: linear-gradient(175deg, #f5e8a0, #edd87a);
+  color: #4a3f28;
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-style: italic;
+  font-size: 10px;
+  line-height: 1.4;
+  padding: 6px 10px;
+  transform: rotate(-3deg);
+  box-shadow:
+    1px 2px 4px rgba(0,0,0,0.15),
+    0 0 0 0.5px rgba(200, 180, 100, 0.4);
+  z-index: 6;
+  pointer-events: none;
+  max-width: 120px;
+  transition: transform 500ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ── Barcode Strip ── */
+.evidence-file__barcode {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 16px;
+  opacity: 0.25;
+  position: relative;
+  z-index: 3;
+}
+.evidence-file__barcode span {
+  display: block;
+  width: 1px;
+  background: #2a2218;
+}
+
+/* ================================================================
+   HOVER — Physical paper lift from desk
+   ================================================================ */
+.evidence-file:hover .evidence-file__paper {
+  transform: translateY(-4px) rotateX(1.5deg) rotateY(-0.5deg);
+  box-shadow:
+    0 2px 3px rgba(0,0,0,0.08),
+    0 6px 12px rgba(0,0,0,0.12),
+    4px 10px 24px -4px rgba(0,0,0,0.25),
+    0 16px 36px -10px rgba(0,0,0,0.2),
+    inset 0 1px 0 rgba(255, 245, 220, 0.4);
+}
+.evidence-file:hover .evidence-file__clip {
+  transform: rotate(2.5deg) translateY(-2px);
+}
+.evidence-file:hover .evidence-file__sticky {
+  transform: rotate(-3deg) translateY(-1px);
+}
+/* Light shifts subtly on hover (lamp effect) */
+.evidence-file:hover .evidence-file__paper::after {
+  background:
+    radial-gradient(ellipse 80% 70% at 25% 10%, rgba(255, 240, 200, 0.14), transparent 60%),
+    radial-gradient(ellipse 140% 140% at 50% 50%, transparent 45%, rgba(80, 60, 30, 0.05) 100%);
+}
+
+/* ── Active state — press down ── */
+.evidence-file:active .evidence-file__paper {
+  transform: translateY(-1px);
+  transition-duration: 120ms;
+}
+
+/* ================================================================
+   LOCKED / SEALED STATE
+   ================================================================ */
+.evidence-file--locked .evidence-file__paper {
+  filter: saturate(0.5) brightness(0.85);
+  cursor: default;
+}
+.evidence-file--locked .evidence-file__content {
+  opacity: 0.4;
+}
+/* Evidence tape seal across locked files */
+.evidence-file__seal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 8;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent 0 16px,
+    rgba(180, 50, 30, 0.04) 16px 32px
+  );
+}
+.evidence-file__seal-label {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(160, 50, 35, 0.7);
+  background: rgba(225, 215, 190, 0.85);
+  border-top: 2px dashed rgba(160, 50, 35, 0.35);
+  border-bottom: 2px dashed rgba(160, 50, 35, 0.35);
+  padding: 0.35rem 1.5rem;
+  transform: rotate(-4deg);
+  white-space: nowrap;
+}
+
+/* ================================================================
+   BACK SIDE — Intel Card (for flip)
+   ================================================================ */
+.evidence-file__intel {
+  background:
+    radial-gradient(ellipse 120% 100% at 10% -5%, rgba(255, 235, 190, 0.15), transparent 55%),
+    linear-gradient(178deg, #e0d4be 0%, #d8ccb2 50%, #d0c4a4 100%);
+  border: 1px solid rgba(140, 120, 80, 0.35);
+  color: #1e1a14;
+  padding: 1.5rem;
+  border-radius: 1px 1px 2px 2px;
+  position: relative;
+  overflow: hidden;
+  min-height: 100%;
+}
+.evidence-file__intel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(160,140,100,0.02) 3px, transparent 5px),
+    repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(140,120,80,0.015) 4px, transparent 7px);
+  pointer-events: none;
+}
+
+/* ================================================================
+   RESPONSIVE — smaller screens
+   ================================================================ */
+@media (max-width: 640px) {
+  .evidence-file__paper {
+    padding: 1.25rem 1rem 1rem;
+  }
+  .evidence-file__title {
+    font-size: 1.1rem;
+  }
+  .evidence-file__clip {
+    display: none;
+  }
+  .evidence-file__stamp {
+    font-size: 8px;
+    top: 10px;
+    right: 10px;
+  }
+}
+
+/* ================================================================
+   REDUCED MOTION
+   ================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .evidence-file:hover .evidence-file__paper {
+    transform: none;
+  }
+  .evidence-file__paper {
+    transition: none;
+  }
+  .evidence-file__clip {
+    transition: none;
+  }
+}
+

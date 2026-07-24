@@ -11,12 +11,11 @@ export function FullscreenToggle() {
     <button
       type="button"
       onClick={enterFullscreen}
-      className="tap inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/40 px-3 py-1 stencil text-[10px] tracking-widest text-white/80 transition-all duration-200 backdrop-blur-md hover:border-primary/50 hover:text-white hover:bg-white/10 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-      title="Enter Fullscreen Mode"
+      className="inline-flex items-center justify-center h-9 w-9 rounded-md border border-border/80 bg-background/80 text-foreground hover:bg-accent hover:border-primary/50 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 shadow-sm"
+      title="Enter Fullscreen Mode (F11)"
       aria-label="Enter Fullscreen Mode"
     >
-      <Maximize2 className="h-3.5 w-3.5 text-primary/90" aria-hidden />
-      <span>FULLSCREEN</span>
+      <Maximize2 className="h-4 w-4 text-primary" aria-hidden />
     </button>
   );
 }

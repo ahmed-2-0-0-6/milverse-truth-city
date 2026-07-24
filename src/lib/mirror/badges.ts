@@ -13,6 +13,7 @@ export interface BadgeDef {
 }
 
 export const BADGES: BadgeDef[] = [
+  // ── ONBOARDING ──
   {
     id: "first-verify",
     name: "First Verification",
@@ -20,6 +21,14 @@ export const BADGES: BadgeDef[] = [
     emoji: "🔍",
     earned: (p) => p.casesPlayed >= 1,
   },
+  {
+    id: "ten-cases",
+    name: "Case Hardened",
+    blurb: "10 cases filed. The desk knows your name.",
+    emoji: "🗂️",
+    earned: (p) => p.casesPlayed >= 10,
+  },
+  // ── SKILL ──
   {
     id: "imposter-spotter",
     name: "Imposter Spotter",
@@ -36,11 +45,43 @@ export const BADGES: BadgeDef[] = [
     earned: (p) => p.correctVerdicts >= 3 && p.falseAlarms === 0,
   },
   {
+    id: "zero-drift",
+    name: "Zero Drift",
+    blurb: "5+ cases. No missed scams, no false alarms.",
+    emoji: "🎯",
+    earned: (p) => p.casesPlayed >= 5 && p.missedScams === 0 && p.falseAlarms === 0,
+  },
+  {
     id: "verify-another-way",
     name: "Out of Band",
     blurb: "Won a case with an out-of-band verification.",
     emoji: "📞",
     earned: (p) => p.history.some((h) => h.usedVob && h.result === "correct"),
+  },
+  {
+    id: "strong-arm",
+    name: "Strong Arm",
+    blurb: "More strong probes than weak ones. You ask the right questions.",
+    emoji: "💪",
+    earned: (p) =>
+      p.strongProbesTotal >= 8 && p.strongProbesTotal > p.weakProbesTotal,
+  },
+  // ── TIER PROGRESSION ──
+  {
+    id: "tier-3-unlock",
+    name: "Clearance Level 3",
+    blurb: "Unlocked Tier 3 cases.",
+    emoji: "🔓",
+    earned: (p) =>
+      p.history.filter((h) => h.tier === 2 && h.result === "correct").length >= 2,
+  },
+  {
+    id: "tier-4-unlock",
+    name: "Clearance Level 4",
+    blurb: "Unlocked Tier 4. These ones fight back.",
+    emoji: "🔐",
+    earned: (p) =>
+      p.history.filter((h) => h.tier === 3 && h.result === "correct").length >= 2,
   },
   {
     id: "clean-room",
@@ -49,6 +90,52 @@ export const BADGES: BadgeDef[] = [
     emoji: "🧪",
     earned: (p) =>
       p.history.some((h) => h.tier === 5 && (h.result === "correct" || h.result === "lucky_guess")),
+  },
+  // ── DAILY DROP ──
+  {
+    id: "daily-debut",
+    name: "On the Beat",
+    blurb: "Played your first Daily Drop.",
+    emoji: "📰",
+    earned: (p) => (p.dailyPlays?.length ?? 0) >= 1,
+  },
+  {
+    id: "daily-streak-3",
+    name: "Three-Day Watch",
+    blurb: "3-day streak. The city noticed.",
+    emoji: "🔥",
+    earned: (p) => (p.dailyStreak ?? 0) >= 3,
+  },
+  {
+    id: "daily-streak-7",
+    name: "Week on Watch",
+    blurb: "7-day streak. You don't miss a shift.",
+    emoji: "⚡",
+    earned: (p) => (p.dailyStreak ?? 0) >= 7,
+  },
+  {
+    id: "daily-streak-14",
+    name: "Fortnight Guard",
+    blurb: "14-day streak. The city depends on you.",
+    emoji: "🏅",
+    earned: (p) => (p.dailyStreak ?? 0) >= 14,
+  },
+  // ── CONVICTION ──
+  {
+    id: "certain-correct",
+    name: "Dead Certain",
+    blurb: "Called CERTAIN (90%) and got it right.",
+    emoji: "🎰",
+    earned: (p) =>
+      p.history.some((h) => h.confidence === 90 && h.result === "correct"),
+  },
+  // ── CREATIVE / ENDGAME ──
+  {
+    id: "studio-published",
+    name: "City Designer",
+    blurb: "Published a scenario in Studio.",
+    emoji: "🏗️",
+    earned: (p) => (p.publishedCount ?? 0) >= 1,
   },
   {
     id: "field-editor",

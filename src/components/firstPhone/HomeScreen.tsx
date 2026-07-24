@@ -2,8 +2,9 @@ import { LESSONS } from "@/lib/firstPhone/lessons";
 import { getWallpaper } from "./wallpapers";
 import type { FirstPhoneState } from "@/lib/firstPhone/profile";
 import { isLessonUnlocked } from "@/lib/firstPhone/profile";
-import { Lock, Check, ShieldCheck, Target, Wifi, Signal, BatteryMedium } from "lucide-react";
+import { Lock, Check, ShieldCheck, Target, Wifi, Signal, BatteryMedium, ArrowRight } from "lucide-react";
 import { phoneKeyTap } from "@/lib/mirror/audio";
+import { Link } from "@tanstack/react-router";
 
 // Domain-specific mini glyphs per lesson tactic — one per lesson.
 const APP_ICONS: Record<number, string> = {
@@ -174,6 +175,24 @@ export function HomeScreen({ state, onOpenLesson, onOpenLicense, onOpenSpotIt }:
                   <span className="block text-sm font-semibold">First Phone License</span>
                 </span>
               </button>
+            </li>
+          )}
+          {licensed && (
+            <li className="col-span-4 mt-2">
+              <Link
+                to="/mirror"
+                className="w-full flex items-center gap-3 rounded-2xl border border-primary/40 bg-primary/20 backdrop-blur px-4 py-3 text-white hover:bg-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-all"
+              >
+                <span className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary shadow-lg">
+                  <ArrowRight className="h-6 w-6 text-primary-foreground" />
+                </span>
+                <span className="text-left">
+                  <span className="block font-mono text-[10px] tracking-[0.25em] opacity-80 text-primary">
+                    GRADUATE
+                  </span>
+                  <span className="block text-sm font-semibold">Enter The Mirror</span>
+                </span>
+              </Link>
             </li>
           )}
         </ul>

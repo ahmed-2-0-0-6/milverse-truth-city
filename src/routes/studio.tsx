@@ -382,6 +382,7 @@ function Studio() {
         <div className="mb-6 flex rounded-md border border-border overflow-hidden text-xs font-mono tracking-widest">
           <Link
             to="/studio"
+            search={{ mode: undefined, handoff: undefined }}
             className={`flex-1 py-2 text-center ${mode === "city" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:bg-accent"}`}
           >
             CASE FOR THE CITY

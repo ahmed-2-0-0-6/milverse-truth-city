@@ -27,6 +27,7 @@ import { ReopenedStrip } from "@/components/mirror/ReopenedStrip";
 import { DistrictIntro } from "@/components/DistrictIntro";
 import { DistrictHero } from "@/components/DistrictHero";
 import { CaseCard, TierMeter, type CaseCardOutcome, type ArtifactChip } from "@/components/CaseCard";
+import { GiantCaseFlashcardModal } from "@/components/GiantCaseFlashcardModal";
 import { TierRail } from "@/components/hub/TierRail";
 import { platformForCase } from "@/lib/chat/skins";
 import mirrorArt from "@/assets/district-mirror.jpg";
@@ -164,6 +165,8 @@ function CaseFiles() {
       ? "SHELF: UNTOUCHED. EVERY FILE IS WAITING."
       : `SHELF: ${solvedCount}/${totalCases} FILES CLOSED · ${lossCount} STILL OPEN ON YOUR RECORD`;
 
+  const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
+
   // Unread arrivals from today's inbox (client-only read).
   const [unread, setUnread] = useState<Set<string>>(new Set());
   useEffect(() => {
@@ -244,30 +247,31 @@ function CaseFiles() {
 
 
         {/* Share code entry */}
-        <div className="mt-6 mb-8 flex flex-wrap items-center gap-2">
-          <input
-            value={code}
-            onChange={(e) => {
-              setCode(e.target.value);
-              setCodeErr(null);
-            }}
-            onKeyDown={(e) => e.key === "Enter" && openCode()}
-            placeholder="Enter 6-char share code…"
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary font-mono uppercase tracking-widest w-64"
-            maxLength={6}
-          />
-          <button
-            onClick={openCode}
-            disabled={codeBusy}
-            className="rounded-md border border-primary/50 bg-primary/10 px-4 py-2 text-xs font-mono tracking-widest text-primary hover:bg-primary/20 disabled:opacity-50"
-          >
-            {codeBusy ? "LOOKING UP…" : "OPEN CASE"}
-          </button>
-          {codeErr && <span className="text-xs text-destructive">{codeErr}</span>}
-          <div className="basis-full font-mono text-[10px] tracking-widest text-muted-foreground">
-            Got a code from a friend? It goes here.
+        <div className="mt-6 mb-8 glass-panel-cyan rounded-2xl p-4 sm:p-5">
+          <div className="flex flex-wrap items-center gap-3">
+            <input
+              value={code}
+              onChange={(e) => {
+                setCode(e.target.value);
+                setCodeErr(null);
+              }}
+              onKeyDown={(e) => e.key === "Enter" && openCode()}
+              placeholder="ENTER 6-CHAR SHARE CODE…"
+              className="rounded-xl border border-primary/40 bg-background/80 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/40 font-mono uppercase tracking-widest w-full sm:w-72 text-foreground placeholder:text-muted-foreground/60 transition-all shadow-inner"
+              maxLength={6}
+            />
+            <button
+              onClick={openCode}
+              disabled={codeBusy}
+              className="hover-lift neon-glow-cyan rounded-xl border border-primary/60 bg-primary px-6 py-2.5 text-xs font-mono font-bold tracking-widest text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-all shadow-md"
+            >
+              {codeBusy ? "LOOKING UP…" : "OPEN CASE →"}
+            </button>
+            {codeErr && <span className="text-xs font-mono text-destructive font-semibold">{codeErr}</span>}
           </div>
-
+          <div className="mt-2 font-mono text-[10px] tracking-widest text-primary/80">
+            Got a case code from a classmate or friend? Paste it above to launch.
+          </div>
         </div>
 
         <ReopenedStrip />
@@ -362,9 +366,11 @@ function CaseFiles() {
                         inSeason={inSeason}
                         title={s.title}
                         teaser={s.teaser}
+                        tacticName={tacticForMirror(s.id)}
                         outcome={latestOutcome.get(s.id)}
                         artifactChip={chipFor(s.id)}
                         unreadThread={unread.has(s.id)}
+                        onOpenModal={() => setSelectedScenario(s)}
 
                         coldStamp={best !== null ? `COLD CLEARED · ${formatDrillTime(best)}` : undefined}
                         coldAction={
@@ -419,6 +425,7 @@ function CaseFiles() {
             </div>
             <Link
               to="/studio"
+              search={{ mode: undefined, handoff: undefined }}
               className="ml-auto font-mono text-[10px] tracking-widest text-primary hover:underline"
             >
               <Sparkles className="inline h-3 w-3 mr-1" />
@@ -428,7 +435,7 @@ function CaseFiles() {
           {citizen.length === 0 ? (
             <div className="rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
               Nobody's filed one yet. First designer sets the bar.{" "}
-              <Link to="/studio" className="text-primary underline">
+              <Link to="/studio" search={{ mode: undefined, handoff: undefined }} className="text-primary underline">
                 Open The Studio →
               </Link>
             </div>
@@ -468,6 +475,15 @@ function CaseFiles() {
             </div>
           )}
         </section>
+
+        <GiantCaseFlashcardModal
+          scenario={selectedScenario}
+          onClose={() => setSelectedScenario(null)}
+          onSelectScenario={(s) => setSelectedScenario(s)}
+          isUnlocked={selectedScenario ? selectedScenario.tier <= maxTier : true}
+          done={selectedScenario ? profile?.history.some((h) => h.caseId === selectedScenario.id && h.result === "correct") : false}
+          bestClearedTime={selectedScenario && profile && isColdEligible(profile, selectedScenario.id) && bestClearedSeconds(selectedScenario.id) !== null ? formatDrillTime(bestClearedSeconds(selectedScenario.id)!) : undefined}
+        />
       </main>
     </div>
   );

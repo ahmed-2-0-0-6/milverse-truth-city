@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import { useServerFn } from "@tanstack/react-start";
 import { TopBar } from "@/components/TopBar";
 import { VoiceNote } from "@/components/VoiceNote";
-import { getScenario, type EvidenceChip, type Scenario } from "@/lib/mirror/scenarios";
+import { getScenario, SCENARIOS, type EvidenceChip, type Scenario } from "@/lib/mirror/scenarios";
 import {
   initState,
   respond,
@@ -30,7 +30,7 @@ import { checkAndAwardBadges } from "@/lib/mirror/badges";
 import { logPilotEntry } from "@/lib/pilot";
 import { track } from "@/lib/telemetry";
 import { tick, tensionCue } from "@/lib/mirror/audio";
-import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer } from "lucide-react";
+import { FileText, Pin, StickyNote, Send, Phone, ShieldCheck, X, Timer, RotateCw, ChevronLeft, ChevronRight, ArrowRight, Sparkles } from "lucide-react";
 import { RealCaseFile } from "@/components/RealCaseFile";
 import { NextCaseCard } from "@/components/NextCaseCard";
 import { RookieIntro } from "@/components/handler/RookieIntro";
@@ -154,7 +154,7 @@ type Phase = "dossier" | "sim" | "verdict" | "reveal" | "debrief";
 
 function CasePlay() {
   const { scenario } = Route.useLoaderData();
-  const [phase, setPhase] = useState<Phase>("dossier");
+  const [phase, setPhase] = useState<Phase>("sim");
 
   // COLD READ + STANDOFF arms — lazy-init so the first paint already knows
   // which mode we're in. Consuming the arm here clears it; reload => normal
@@ -357,111 +357,222 @@ function VerdictReveal({ scenario, onDone }: { scenario: Scenario; onDone: () =>
 }
 
 
-/* ─────────────────────────── DOSSIER ─────────────────────────── */
+function fileNo(seed: string): string {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  return `${String((h % 90) + 10)}-${String((h % 900) + 100)}`;
+}
 
 function Dossier({ scenario, onStart }: { scenario: Scenario; onStart: () => void }) {
+  const [flipped, setFlipped] = useState(false);
+
+  const currentIndex = SCENARIOS.findIndex((s) => s.id === scenario.id);
+  const prevScenario = currentIndex > 0 ? SCENARIOS[currentIndex - 1] : SCENARIOS[SCENARIOS.length - 1];
+  const nextScenario = currentIndex < SCENARIOS.length - 1 ? SCENARIOS[currentIndex + 1] : SCENARIOS[0];
+  const no = fileNo(scenario.title);
+
   return (
-    <main className="mx-auto max-w-2xl px-4 py-10">
-      <Link
-        to="/mirror"
-        className="font-mono text-xs tracking-widest text-muted-foreground hover:text-foreground"
-      >
-        ← CASE FILES
-      </Link>
+    <main className="mx-auto max-w-4xl px-4 py-6 sm:py-10">
+      {/* Top Bar Navigation: Close (← CASE FILES) + Previous/Next Switcher */}
+      <div className="mb-6 flex items-center justify-between gap-4 font-mono text-xs tracking-widest">
+        <Link
+          to="/mirror"
+          className="tap inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/40 px-3.5 py-1.5 text-muted-foreground hover:border-primary/50 hover:text-foreground transition-all shadow-sm"
+        >
+          <X className="h-3.5 w-3.5" /> CLOSE (CASE FILES)
+        </Link>
 
-      <div className="mt-6 rounded-xl border border-caution/30 bg-caution/5 p-6">
-        <div className="flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-caution">
-          <FileText className="h-4 w-4" /> ASSIGNMENT · TIER {scenario.tier}
+        {/* Prev / Next Case Switcher */}
+        <div className="flex items-center gap-2">
+          <Link
+            to="/mirror/$caseId"
+            params={{ caseId: prevScenario.id }}
+            className="tap inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/40 px-3 py-1.5 text-white/80 hover:bg-white/10 hover:border-primary/50 transition-all"
+            title={`Previous Case: ${prevScenario.title}`}
+          >
+            <ChevronLeft className="h-4 w-4" /> PREV
+          </Link>
+          <span className="text-primary font-bold text-[11px] px-1">
+            {currentIndex + 1} / {SCENARIOS.length}
+          </span>
+          <Link
+            to="/mirror/$caseId"
+            params={{ caseId: nextScenario.id }}
+            className="tap inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/40 px-3 py-1.5 text-white/80 hover:bg-white/10 hover:border-primary/50 transition-all"
+            title={`Next Case: ${nextScenario.title}`}
+          >
+            NEXT <ChevronRight className="h-4 w-4" />
+          </Link>
         </div>
-        <h1 data-phase-anchor="mirror" tabIndex={-1} className="mt-4 text-2xl font-semibold outline-none">{scenario.title}</h1>
-        <p className="mt-3 font-mono text-[11px] tracking-wide text-muted-foreground italic">
-          This number's been working the district. The desk routed it to you.
-        </p>
-
-        {/* THE CLAIM — bordered claim card. */}
-        <section className="mt-6">
-          <div className="font-mono text-[11px] tracking-widest text-muted-foreground">
-            WHO IS CONTACTING YOU
-          </div>
-          <div className="relative mt-2 rounded-md border border-border bg-background/50 p-4">
-            <span className="absolute right-2 top-1.5 font-mono text-[9px] tracking-[0.3em] text-caution">
-              THE CLAIM
-            </span>
-            <p className="text-sm leading-relaxed">{scenario.dossier.contactClaim}</p>
-          </div>
-        </section>
-
-
-        {/* KNOWN — numbered reference cards (K1..). */}
-        <section className="mt-6">
-          <div className="font-mono text-[11px] tracking-widest text-muted-foreground">
-            WHAT YOU KNOW FOR CERTAIN — ONLY YOU AND THE REAL ONE
-          </div>
-          <ul className="mt-2 space-y-1.5">
-            {scenario.dossier.knownFacts.map((f, i) => (
-              <li
-                key={i}
-                className="flex gap-3 rounded-md border border-primary/30 bg-primary/5 p-2.5"
-              >
-                <span className="shrink-0 rounded-sm border border-primary/40 bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] tracking-widest text-primary">
-                  K{i + 1}
-                </span>
-                <span className="text-sm leading-relaxed">{f}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* PUBLIC — numbered reference cards (P1..). */}
-        <section className="mt-6">
-          <div className="font-mono text-[11px] tracking-widest text-muted-foreground">
-            PUBLICLY FINDABLE — AMMUNITION FOR IMPOSTERS
-          </div>
-          <div className="mt-1 font-mono text-[10px] tracking-widest text-muted-foreground/80">
-            If they only ever prove these, they've proven nothing.
-          </div>
-          <ul className="mt-2 space-y-1.5">
-            {scenario.dossier.publicFacts.map((f, i) => (
-              <li
-                key={i}
-                className="flex gap-3 rounded-md border border-border bg-muted/20 p-2.5"
-              >
-                <span className="shrink-0 rounded-sm border border-border bg-background/60 px-1.5 py-0.5 font-mono text-[10px] tracking-widest text-muted-foreground">
-                  P{i + 1}
-                </span>
-                <span className="text-sm leading-relaxed text-muted-foreground">{f}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
       </div>
 
-      <SendOff />
+      {/* 3D Flash Card Container */}
+      <div className="flashcard-perspective w-full min-h-[560px]">
+        <div className={`flashcard-inner w-full h-full min-h-[560px] ${flipped ? "is-flipped" : ""}`}>
 
-      {scenario.tier === 5 && (
-        <div className="mt-6 rounded-sm border border-[#1b2430]/40 bg-[#f4f4f0] p-5 text-[#1b2430]">
-          <div className="stencil text-[11px] tracking-[0.3em] text-[#1b2430]/70">
-            TIER 5 · THE CLEAN ROOM
+          {/* ── FRONT SIDE OF FLASH CARD ── */}
+          <div className="flashcard-front w-full min-h-[560px] rounded-2xl border-2 border-primary/40 bg-slate-950 p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden">
+            <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-primary/20 blur-3xl pointer-events-none" />
+
+            <div>
+              {/* Header Tab */}
+              <div className="flex items-center justify-between gap-3 pb-3 border-b border-white/15">
+                <div className="flex items-center gap-2 font-mono text-xs tracking-[0.25em] text-primary font-bold">
+                  <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                  DOSSIER FILE #{no}
+                  <span className="ml-2 rounded bg-primary/20 px-2 py-0.5 text-[10px] tracking-widest text-primary font-semibold">
+                    TIER {scenario.tier}
+                  </span>
+                </div>
+                <div className="font-mono text-[10px] tracking-widest text-white/60 uppercase">
+                  {scenario.channel}
+                </div>
+              </div>
+
+              {/* Title & Teaser */}
+              <h1 className="mt-4 text-2xl sm:text-3xl font-black text-white leading-tight">
+                {scenario.title}
+              </h1>
+              <p className="mt-2 text-sm text-white/80 leading-relaxed italic">
+                {scenario.teaser}
+              </p>
+
+              {/* Claim Box */}
+              <div className="mt-4 rounded-xl border border-white/15 bg-black/60 p-3.5">
+                <span className="block font-mono text-[9px] tracking-[0.25em] text-caution uppercase font-bold mb-1">
+                  WHO IS CONTACTING YOU (THE CLAIM)
+                </span>
+                <p className="text-sm text-white leading-relaxed">{scenario.dossier.contactClaim}</p>
+              </div>
+
+              {/* Known Facts (K1..K5) */}
+              <div className="mt-4">
+                <div className="font-mono text-[10px] tracking-widest text-primary font-bold uppercase mb-2">
+                  WHAT YOU KNOW FOR CERTAIN (ONLY YOU AND THE REAL ONE)
+                </div>
+                <ul className="space-y-2">
+                  {scenario.dossier.knownFacts.map((f, i) => (
+                    <li key={i} className="flex items-start gap-2.5 rounded-lg border border-primary/30 bg-primary/10 p-2.5 text-xs text-white">
+                      <span className="shrink-0 rounded bg-primary/20 px-1.5 py-0.5 font-mono text-[10px] font-bold text-primary">
+                        K{i + 1}
+                      </span>
+                      <span className="leading-snug">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Actions Bar */}
+            <div className="relative z-10 pt-4 border-t border-white/15 flex flex-wrap items-center justify-between gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => setFlipped(true)}
+                className="hover-lift inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/10 px-4 py-2.5 font-mono text-xs font-bold tracking-widest text-primary hover:bg-primary/20 transition-all shadow-sm"
+              >
+                <RotateCw className="h-4 w-4" /> FLIP FOR PUBLIC FACTS & TACTICS 🔄
+              </button>
+
+              <button
+                type="button"
+                onClick={onStart}
+                className="hover-lift neon-glow-cyan inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 font-mono text-xs font-extrabold tracking-widest text-primary-foreground shadow-lg hover:bg-primary/90 transition-all"
+              >
+                ⚡ I'VE MEMORIZED IT — START CHAT <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
-          <p className="mt-3 text-sm leading-relaxed">
-            Every fact you hold will be answered correctly. Every tell you've learned will be
-            absent. Reading this conversation cannot settle it — in here, a flawless performance
-            and the plain truth look identical. The door out is marked VERIFY. It was always the
-            door.
-          </p>
+
+          {/* ── BACK SIDE OF FLASH CARD ── */}
+          <div className="flashcard-back w-full min-h-[560px] rounded-2xl border-2 border-primary/60 bg-neutral-950 p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden">
+            <div className="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-cyan-500/20 blur-3xl pointer-events-none" />
+
+            <div>
+              {/* Header Tab */}
+              <div className="flex items-center justify-between gap-3 pb-3 border-b border-white/15 font-mono text-xs">
+                <div className="flex items-center gap-2 text-primary font-bold tracking-[0.25em]">
+                  <Sparkles className="h-4 w-4 animate-pulse" />
+                  CLASSIFIED INTEL & PUBLIC AMMUNITION
+                </div>
+                <div className="text-white/60">FILE #{no}</div>
+              </div>
+
+              {/* Public Facts (P1..P2) */}
+              <div className="mt-4">
+                <div className="font-mono text-[10px] tracking-widest text-caution font-bold uppercase mb-1">
+                  PUBLICLY FINDABLE (AMMUNITION FOR IMPOSTERS)
+                </div>
+                <div className="font-mono text-[9px] text-muted-foreground mb-2">
+                  If they only ever prove these, they've proven nothing.
+                </div>
+                <ul className="space-y-2">
+                  {scenario.dossier.publicFacts.map((f, i) => (
+                    <li key={i} className="flex items-start gap-2.5 rounded-lg border border-white/15 bg-black/60 p-2.5 text-xs text-white/90">
+                      <span className="shrink-0 rounded bg-white/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-white/70">
+                        P{i + 1}
+                      </span>
+                      <span className="leading-snug">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Tactic & Facts */}
+              <div className="mt-4 grid grid-cols-2 gap-3 font-mono text-xs">
+                <div className="rounded-xl border border-primary/40 bg-primary/10 p-3">
+                  <span className="block text-[9px] tracking-widest text-primary font-bold">PRIMARY TACTIC</span>
+                  <span className="block font-bold text-white mt-1 uppercase text-sm">{scenario.tactic}</span>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-black/60 p-3">
+                  <span className="block text-[9px] tracking-widest text-caution font-bold">FACTS TO PROBE</span>
+                  <span className="block font-bold text-white mt-1 uppercase text-sm">{scenario.facts.length} FACTS</span>
+                </div>
+              </div>
+
+              {/* Opener speech bubble */}
+              <div className="mt-4 rounded-xl border border-white/15 bg-black/70 p-4">
+                <span className="block font-mono text-[9px] tracking-widest text-muted-foreground uppercase mb-1">
+                  FIRST SCAM MESSAGE INCOMING:
+                </span>
+                <p className="text-xs sm:text-sm font-sans italic text-white/90 leading-snug">
+                  "{scenario.opener}"
+                </p>
+              </div>
+
+              {scenario.tier === 5 && (
+                <div className="mt-4 rounded-xl border border-red-500/40 bg-red-950/20 p-3.5 text-xs text-red-200">
+                  <span className="font-mono text-[9px] tracking-widest text-red-400 font-bold block mb-1">TIER 5 · THE CLEAN ROOM</span>
+                  Flawless imposter performance. Reading alone cannot settle it — use the VERIFY door.
+                </div>
+              )}
+            </div>
+
+            {/* Actions Bar */}
+            <div className="relative z-10 pt-4 border-t border-white/15 flex flex-wrap items-center justify-between gap-3 mt-6">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setFlipped(false);
+                }}
+                className="hover-lift inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/10 px-5 py-3 font-mono text-xs font-bold tracking-widest text-primary hover:bg-primary/20 transition-all shadow-md cursor-pointer"
+              >
+                <RotateCw className="h-4 w-4" /> FLIP TO FRONT COVER 🔄
+              </button>
+
+              <button
+                type="button"
+                onClick={onStart}
+                className="hover-lift neon-glow-cyan inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 font-mono text-xs font-extrabold tracking-widest text-primary-foreground shadow-lg hover:bg-primary/90 transition-all"
+              >
+                ▶ I'VE MEMORIZED IT — START CHAT <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
         </div>
-      )}
-
-      <button
-        onClick={onStart}
-        className="mt-6 w-full rounded-md bg-primary py-3 font-mono text-sm tracking-widest text-primary-foreground transition-transform hover:scale-[1.01]"
-      >
-        I'VE MEMORIZED IT — START
-      </button>
-
-      <p className="mt-3 text-center text-xs text-muted-foreground">
-        The brief rides along in NOTES. Pin what smells wrong and tag which fact it breaks.
-      </p>
+      </div>
     </main>
   );
 }
@@ -569,6 +680,7 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
       ts: Date.now(),
     };
     setMessages([opener]);
+    track("case_start", { case_id: scenario.id, payload: { district: "mirror", tier: scenario.tier } });
   }, [scenario.id]);
 
   // Persist for verdict/debrief.
@@ -607,6 +719,22 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
     return () => window.removeEventListener("keydown", onKey);
   }, [openRef]);
 
+
+  // Hand chip shortcuts (1-4).
+  useEffect(() => {
+    if (ended || typing || handMode !== "hand" || (coldMode && drillExpired) || showVob) return;
+    const onKey = (e: KeyboardEvent) => {
+      // Ignore if user is inside an input (just in case)
+      if (document.activeElement?.tagName === "INPUT" || document.activeElement?.tagName === "TEXTAREA") return;
+      const num = parseInt(e.key, 10);
+      if (!isNaN(num) && num >= 1 && num <= handChips.length) {
+        e.preventDefault();
+        pickChip(handChips[num - 1]);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [ended, typing, handMode, coldMode, drillExpired, showVob, handChips]);
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
@@ -1092,14 +1220,15 @@ function Simulation({ scenario, onEnd }: { scenario: Scenario; onEnd: () => void
                         aria-label={srName}
                         disabled={disabled}
                         onClick={() => pickChip(chip)}
-                        className={`relative touch-manipulation rounded-md border ${border} bg-neutral-900/70 px-3 py-2 pt-3.5 text-left text-[13px] leading-snug text-white min-h-[48px] hover:bg-neutral-900 disabled:opacity-40`}
+                        className={`relative touch-manipulation hover-lift rounded-xl border ${border} bg-neutral-900/80 backdrop-blur-md px-3.5 py-2.5 pt-4 text-left text-[13px] leading-snug text-white min-h-[52px] hover:bg-neutral-800/90 transition-all disabled:opacity-40 shadow-sm`}
                       >
-                        <span className={`absolute right-1.5 top-0.5 font-mono text-[8px] tracking-widest ${tagColor}`}>
+                        <span className={`absolute right-2 top-1 font-mono text-[8px] tracking-widest flex items-center gap-1.5 font-semibold ${tagColor}`}>
+                          <span className="opacity-40 hidden sm:inline px-1 rounded bg-white/5 border border-white/10">[{handChips.indexOf(chip) + 1}]</span>
                           {chip.tag}
                         </span>
-                        <span className="block">{chip.label}</span>
+                        <span className="block font-medium">{chip.label}</span>
                         {chip.hint && (
-                          <span className="mt-0.5 block font-mono text-[9px] tracking-wider text-white/45">
+                          <span className="mt-0.5 block font-mono text-[9px] tracking-wider text-white/55">
                             {chip.hint}
                           </span>
                         )}

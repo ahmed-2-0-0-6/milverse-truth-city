@@ -56,7 +56,12 @@ export function DailyBeacon({ compact = false, onNavigate }: { compact?: boolean
             className={`absolute inset-0 rounded-full ${played ? "bg-muted-foreground" : "bg-primary"}`}
           />
         </span>
-        <span>{played ? "COME BACK" : "TODAY'S FORWARD"}</span>
+        <span>{played ? "COME BACK" : (!played && streak > 0 ? "PROTECT YOUR STREAK" : "TODAY'S FORWARD")}</span>
+        {streak > 0 && (
+          <span className="inline-flex items-center gap-0.5 text-primary">
+            <Flame className="h-2.5 w-2.5" />{streak}D
+          </span>
+        )}
         {played && (
           <span className="text-muted-foreground normal-case tracking-normal">
             · {hhmmss(remain)}
@@ -100,7 +105,11 @@ export function DailyBeacon({ compact = false, onNavigate }: { compact?: boolean
             className="mt-1 text-xl sm:text-2xl font-black text-white leading-tight"
             style={{ fontFamily: '"Bebas Neue", sans-serif' }}
           >
-            {played ? "THE CITY HAS MOVED ON." : "TODAY'S FORWARD IS OPEN."}
+            {played
+              ? "THE CITY HAS MOVED ON."
+              : (streak > 0
+                ? `YOUR ${streak}-DAY STREAK IS ON THE LINE.`
+                : "TODAY'S FORWARD IS OPEN.")}
           </div>
           <div className="mt-0.5 text-xs text-white/60">
             {played ? (
@@ -116,7 +125,7 @@ export function DailyBeacon({ compact = false, onNavigate }: { compact?: boolean
           </div>
         </div>
         {streak > 0 && (
-          <div className="hidden sm:flex items-center gap-1.5 rounded-sm border border-primary/40 px-2 py-1 stencil text-[10px] text-primary">
+          <div className="flex items-center gap-1.5 rounded-sm border border-primary/40 px-2 py-1 stencil text-[10px] text-primary">
             <Flame className="h-3 w-3" /> {streak}D
           </div>
         )}

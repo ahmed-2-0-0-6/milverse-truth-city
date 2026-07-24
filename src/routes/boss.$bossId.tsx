@@ -32,6 +32,7 @@ import { useVisualMode } from "@/lib/visual-quality";
 import { shouldReduceMotion } from "@/lib/access";
 import { DOCTRINE_RULES } from "@/lib/boss/doctrine";
 import { logPilotEntry } from "@/lib/pilot";
+import { track } from "@/lib/telemetry";
 import { loadProfile } from "@/lib/mirror/profile";
 import { CalibrationQuadrant } from "@/components/CalibrationQuadrant";
 import { CitySolved } from "@/components/CitySolved";
@@ -125,6 +126,7 @@ function BossPlay() {
         { kind: "sys", text: `${boss.codename} — ${boss.phases[0].label}` },
         { kind: "boss", text: variant.opener },
       ]);
+      track("case_start", { case_id: `boss-${boss.id}`, payload: { district: "boss" } });
     }
   }, [boss, variant, stage, state]);
 
@@ -334,6 +336,10 @@ function BossPlay() {
         out.kind === "WIN" ? boss!.badge.label : undefined,
         declassify,
       );
+      track("case_complete", {
+        case_id: `boss-${boss!.id}`,
+        payload: { district: "boss", outcome: out.kind },
+      });
       logPilotEntry({
         wing: boss!.district === "feed" ? "feed" : "mirror",
         caseId: `boss-${boss!.id}`,

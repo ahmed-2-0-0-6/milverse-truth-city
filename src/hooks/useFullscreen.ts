@@ -47,23 +47,35 @@ export function useFullscreen() {
     );
     setIsSupported(supported);
 
+    const checkWindowFullscreen = () => {
+      if (typeof window === "undefined") return false;
+      const apiFs = checkFullscreenStatus();
+      const windowFs =
+        window.innerWidth >= window.screen.width - 2 &&
+        window.innerHeight >= window.screen.height - 2;
+      const mediaFs = window.matchMedia?.("(display-mode: fullscreen)").matches ?? false;
+      return apiFs || windowFs || mediaFs;
+    };
+
     const handleFullscreenChange = () => {
-      setIsFullscreen(checkFullscreenStatus());
+      setIsFullscreen(checkWindowFullscreen());
     };
 
     // Initial check
-    setIsFullscreen(checkFullscreenStatus());
+    setIsFullscreen(checkWindowFullscreen());
 
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
     document.addEventListener("mozfullscreenchange", handleFullscreenChange);
     document.addEventListener("MSFullscreenChange", handleFullscreenChange);
+    window.addEventListener("resize", handleFullscreenChange);
 
     return () => {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
       document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
       document.removeEventListener("mozfullscreenchange", handleFullscreenChange);
       document.removeEventListener("MSFullscreenChange", handleFullscreenChange);
+      window.removeEventListener("resize", handleFullscreenChange);
     };
   }, [checkFullscreenStatus]);
 

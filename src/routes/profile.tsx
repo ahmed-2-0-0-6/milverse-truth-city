@@ -243,6 +243,7 @@ function ProfilePage() {
               </Link>
               <Link
                 to="/studio"
+                search={{ mode: undefined, handoff: undefined }}
                 className="rounded-md border border-border bg-background/50 p-3 transition-colors hover:border-primary/50"
               >
                 <div className="stencil text-[10px] tracking-widest text-muted-foreground">

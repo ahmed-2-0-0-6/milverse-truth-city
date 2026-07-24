@@ -283,7 +283,7 @@ function MaskPickList({ masks, onPick }: { masks: Scenario[]; onPick: (caseId: s
     return (
       <div className="mt-6 rounded-md border border-border bg-muted/30 p-6 text-sm text-muted-foreground">
         No Studio masks on this device yet. Build one in{" "}
-        <Link to="/studio" className="text-primary underline">the Studio</Link>{" "}
+        <Link to="/studio" search={{ mode: undefined, handoff: undefined }} className="text-primary underline">the Studio</Link>{" "}
         and it'll appear here.
       </div>
     );

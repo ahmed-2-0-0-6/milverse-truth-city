@@ -274,6 +274,7 @@ function CityMap() {
         <div className="text-center mb-6">
           <Link
             to="/visit"
+            search={{ director: "0" }}
             className="tap inline-flex items-center justify-center rounded-md border border-primary/60 bg-primary/10 px-4 py-2 text-primary hover:bg-primary/20 stencil text-[10px] tracking-widest"
           >
             JUDGES &amp; EDUCATORS · 3-MINUTE VISIT →

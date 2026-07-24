@@ -113,8 +113,8 @@ function ClockIn() {
   };
 
   return (
-    <section aria-labelledby="clockin-title">
-      <div className="stencil text-[10px] text-primary/80 mb-2">// THE SHIFT</div>
+    <section aria-labelledby="clockin-title" className="glass-panel-cyan rounded-2xl p-6 sm:p-8">
+      <div className="stencil text-[10px] text-primary mb-2">// THE SHIFT</div>
       <h1
         id="clockin-title"
         className="text-step-5 font-black text-foreground leading-none tracking-tight"
@@ -123,7 +123,7 @@ function ClockIn() {
         THE SHIFT.
       </h1>
 
-      <p className="mt-4 max-w-xl text-sm text-muted-foreground">
+      <p className="mt-4 max-w-xl text-sm text-foreground/80 leading-relaxed">
         Five files. Three lives. Falling for a scam costs a life. Calling wolf on a real one costs a life. The combo pays
         for clean, consecutive work. Clock in.
       </p>
@@ -134,7 +134,7 @@ function ClockIn() {
         ))}
       </div>
       {preview && (
-        <div className="mt-2 stencil text-[10px] text-muted-foreground">
+        <div className="mt-3 stencil text-[10px] text-primary/80">
           DOCKET {preview.seed}
         </div>
       )}
@@ -142,7 +142,7 @@ function ClockIn() {
       <button
         onClick={handleClockIn}
         disabled={!profile}
-        className="mt-6 cta-glow inline-flex items-center gap-2 rounded-sm bg-primary px-6 py-3 min-h-[56px] stencil text-sm tracking-widest text-primary-foreground disabled:opacity-50"
+        className="mt-6 hover-lift neon-glow-cyan inline-flex items-center justify-center gap-2 rounded-full bg-primary px-8 py-3.5 min-h-[56px] stencil text-sm tracking-widest text-primary-foreground font-bold hover:bg-primary/90 transition-all disabled:opacity-50"
       >
         CLOCK IN <ArrowRight className="h-4 w-4" />
       </button>
@@ -183,27 +183,30 @@ function Resume({
   const done = shift.slot >= shift.caseRefs.length;
   const to = next ? (next.kind === "mirror" ? "/mirror/$caseId" : "/feed/$caseId") : "/";
   return (
-    <section aria-labelledby="resume-title">
-      <div className="stencil text-[10px] text-primary/80 mb-2">// SHIFT IN PROGRESS</div>
+    <section aria-labelledby="resume-title" className="glass-panel-cyan rounded-2xl p-6 sm:p-8">
+      <div className="stencil text-[10px] text-primary mb-2">// SHIFT IN PROGRESS</div>
       <h1
         id="resume-title"
         className="text-step-4 font-black text-foreground leading-none tracking-tight"
         style={{ fontFamily: '"Bebas Neue", sans-serif' }}
       >
-        SHIFT {Math.min(shift.slot + 1, shift.caseRefs.length)}/{shift.caseRefs.length}
+        SHIFT FILE {Math.min(shift.slot + 1, shift.caseRefs.length)}/{shift.caseRefs.length}
       </h1>
 
-
-      <div className="mt-4 flex flex-wrap items-center gap-4 stencil text-[11px] text-muted-foreground tabular-nums">
-        <span className="inline-flex items-center gap-1">
-          <Heart className="h-3.5 w-3.5 text-destructive" /> {shift.lives} LIVES
+      <div className="mt-4 flex flex-wrap items-center gap-4 stencil text-[11px] text-foreground/90 tabular-nums">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-destructive/15 border border-destructive/40 text-destructive font-bold">
+          <Heart className="h-4 w-4 fill-destructive animate-pulse-ring" /> {shift.lives} LIVES
         </span>
-        <span>COMBO ×{shift.combo}</span>
-        <span>SCORE {shift.score}</span>
-        <span>DOCKET {shift.seed}</span>
+        <span className="px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary font-mono font-bold">
+          COMBO ×{shift.combo}
+        </span>
+        <span className="px-3 py-1 rounded-full bg-caution/10 border border-caution/30 text-caution font-mono font-bold">
+          SCORE {shift.score}
+        </span>
+        <span className="text-muted-foreground font-mono">DOCKET {shift.seed}</span>
       </div>
 
-      <div className="mt-5 grid grid-cols-5 gap-2">
+      <div className="mt-6 grid grid-cols-5 gap-2">
         {shift.caseRefs.map((r, i) => (
           <SlotChip key={i} ref={r} index={i} played={shift.results.find((x) => x.slot === i) ?? null} isNext={i === shift.slot} />
         ))}
@@ -212,7 +215,7 @@ function Resume({
       {!done && next && (
         <button
           onClick={() => onGo(to, { caseId: next.id })}
-          className="mt-6 cta-glow inline-flex items-center gap-2 rounded-sm bg-primary px-6 py-3 min-h-[56px] stencil text-sm tracking-widest text-primary-foreground"
+          className="mt-6 hover-lift neon-glow-cyan inline-flex items-center justify-center gap-2 rounded-full bg-primary px-8 py-3.5 min-h-[56px] stencil text-sm tracking-widest text-primary-foreground font-bold hover:bg-primary/90 transition-all"
         >
           GO TO NEXT FILE <ArrowRight className="h-4 w-4" />
         </button>

@@ -230,23 +230,33 @@ export function Toolbelt({ scenario, used, onUse, onGrade }: Props) {
         return (
           <section
             key={tool.kind}
-            className={`rounded-md border p-3 transition ${
-              isFit ? "border-primary/40 bg-primary/[0.04]" : "border-border bg-card"
-            } ${wasted ? "animate-[fade-in_.2s_ease-out] border-caution/60" : ""}`}
+            className={`rounded-xl border p-3.5 transition-all ${
+              isFit
+                ? "border-primary/40 bg-primary/10 shadow-[0_0_15px_oklch(0.82_0.14_195/0.1)]"
+                : "border-border/80 bg-card/80"
+            } ${wasted ? "animate-[fade-in_.2s_ease-out] border-caution/60 glass-panel-amber" : ""}`}
           >
             <header className="flex items-center gap-2 mb-1.5">
               <div
-                className={`relative h-6 w-6 grid place-items-center rounded-sm border ${isFit ? "border-primary/50 text-primary" : "border-border text-muted-foreground"}`}
+                className={`relative h-7 w-7 grid place-items-center rounded-md border ${
+                  isFit ? "border-primary/50 text-primary bg-primary/20" : "border-border text-muted-foreground bg-background"
+                }`}
               >
-                <tool.Icon className={`h-3.5 w-3.5 ${spinning ? tool.animClass : ""}`} />
+                <tool.Icon className={`h-4 w-4 ${spinning ? tool.animClass : ""}`} />
               </div>
-              <div className="stencil text-[10px] tracking-widest">{tool.label}</div>
-              {isFit && <span className="stencil text-[9px] text-primary">· FIT</span>}
+              <div className="stencil text-[11px] font-bold tracking-widest text-foreground">{tool.label}</div>
+              {isFit && (
+                <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/40 stencil text-[9px] font-bold">
+                  RECOMMENDED FIT
+                </span>
+              )}
               {!isFit && (
-                <span className="stencil text-[9px] text-muted-foreground">· POOR FIT</span>
+                <span className="px-2 py-0.5 rounded-full bg-muted/60 text-muted-foreground border border-border stencil text-[9px]">
+                  POOR FIT
+                </span>
               )}
             </header>
-            <p className="text-[11px] text-muted-foreground mb-2">{tool.hint}</p>
+            <p className="text-[11px] text-muted-foreground mb-2.5 leading-relaxed">{tool.hint}</p>
 
             {showedFirst && (
               <Link
@@ -276,13 +286,13 @@ export function Toolbelt({ scenario, used, onUse, onGrade }: Props) {
             ) : (
               <button
                 onClick={() => runTool(tool)}
-                className={`w-full rounded-md border p-2 stencil text-[10px] tracking-widest transition ${
+                className={`w-full rounded-full border px-4 py-2.5 stencil text-[10px] tracking-widest font-bold transition-all hover-lift ${
                   isFit
-                    ? "border-primary/50 bg-background/60 text-primary hover:bg-primary/10"
-                    : "border-border bg-background/40 text-muted-foreground hover:border-caution/60 hover:text-caution"
+                    ? "border-primary/60 bg-primary/20 text-primary neon-glow-cyan hover:bg-primary/30"
+                    : "border-border bg-card text-muted-foreground hover:border-caution/60 hover:text-caution"
                 }`}
               >
-                {tooltipFor(tool.kind).toUpperCase().split(".")[0]} — USE INSTRUMENT →
+                {tooltipFor(tool.kind).toUpperCase().split(".")[0]} — RUN INSTRUMENT →
               </button>
             )}
           </section>

@@ -7,7 +7,7 @@ import { BOSSES } from "@/lib/boss/scenarios";
 import { loadBossProfile } from "@/lib/boss/profile";
 import { RedactedTitle } from "@/components/RedactedTitle";
 import { EngravedReveal } from "@/components/civic/EngravedReveal";
-import { FileText, Lock, ExternalLink, Skull } from "lucide-react";
+import { FileText, Lock, ExternalLink, Skull, Search } from "lucide-react";
 import { loadProfile } from "@/lib/mirror/profile";
 import { encountersFor } from "@/lib/manual/encounters";
 
@@ -61,9 +61,22 @@ function ManualIndex() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileTick]);
 
+  const [searchQuery, setSearchQuery] = useState("");
   const unlockedCount = MANUAL_ENTRIES.filter((e) => unlocked.has(e.id)).length;
-
   const pct = Math.round((unlockedCount / MANUAL_ENTRIES.length) * 100);
+
+  const filteredEntries = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return MANUAL_ENTRIES;
+    return MANUAL_ENTRIES.filter((e) => {
+      const matchName = e.name.toLowerCase().includes(q);
+      const matchCode = e.code.toLowerCase().includes(q);
+      const matchOneLine = e.oneLine.toLowerCase().includes(q);
+      const matchWorks = e.howItWorks.toLowerCase().includes(q);
+      const matchFlags = e.redFlags.some((f) => f.toLowerCase().includes(q));
+      return matchName || matchCode || matchOneLine || matchWorks || matchFlags;
+    });
+  }, [searchQuery]);
 
   return (
     <div className="min-h-dvh grain polaroid-desk">
@@ -171,7 +184,19 @@ function ManualIndex() {
           what is true. Truth verdicts come from the case dossier and from the tools you learn here.
         </div>
 
-        <EngravedReveal className="mt-8 border-l-2 border-amber-300/60 pl-4">
+        {/* Live Search Bar */}
+        <div className="mt-8 relative max-w-md">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search manipulation tactics by name, keyword, or code..."
+            className="w-full rounded-full border border-border bg-background/80 backdrop-blur pl-10 pr-4 py-2 text-xs text-foreground outline-none focus:border-primary transition-all shadow-sm"
+          />
+        </div>
+
+        <EngravedReveal className="mt-6 border-l-2 border-amber-300/60 pl-4">
           <p className="font-mono text-sm sm:text-base text-foreground/85 italic leading-snug">
             Tactics age. The instinct to check doesn't.
           </p>
@@ -180,8 +205,8 @@ function ManualIndex() {
           </p>
         </EngravedReveal>
 
-        <div className="mt-10 hub-grid pt-4">
-          {MANUAL_ENTRIES.map((e) => {
+        <div className="mt-8 hub-grid pt-4">
+          {filteredEntries.map((e) => {
             const isUnlocked = unlocked.has(e.id);
             const rec = record.get(e.id);
             const chipTone =

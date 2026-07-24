@@ -137,25 +137,42 @@ export function TopBar() {
         {/* ── Brand ── */}
         <Link
           to="/"
-          className="flex items-center gap-2 min-w-0 focus-visible:outline-none rounded-md -m-1 p-1"
+          className="flex items-center gap-2 min-w-0 focus-visible:outline-none rounded-md -m-1 p-1 group"
           aria-label="MILVERSE home"
         >
-          <div className="relative h-7 w-7 shrink-0" aria-hidden>
+          <div className="relative h-7 w-7 shrink-0 transition-transform group-hover:scale-105" aria-hidden>
             <div className="absolute inset-0 rounded-sm bg-primary shadow-[0_0_18px_oklch(0.82_0.14_195/0.7)]" />
             <div className="absolute inset-1 rounded-sm border border-background/60" />
           </div>
-          <div className="stencil text-[13px] sm:text-sm text-foreground leading-none truncate">
+          <div className="stencil text-[13px] sm:text-sm text-foreground leading-none truncate group-hover:text-primary transition-colors">
             MILVERSE
           </div>
         </Link>
 
-        {/* ── Top-Center Floating Fullscreen Toggle ── */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-2 z-10 pointer-events-auto">
-          <FullscreenToggle />
-        </div>
+        {/* ── Desktop Quick Rail ── */}
+        <nav aria-label="Quick Navigation" className="hidden md:flex items-center gap-1 rounded-full border border-white/15 bg-black/20 backdrop-blur-xl px-3 py-1 shadow-lg hover:bg-black/30 transition-all">
+          {DESKTOP_PRIMARY.map((item) => {
+            const active = isActive(item.to);
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                aria-current={active ? "page" : undefined}
+                className={`stencil text-[11px] px-2.5 py-1 rounded-full transition-all ${
+                  active
+                    ? "bg-primary text-primary-foreground font-semibold shadow-[0_0_12px_oklch(0.82_0.14_195/0.5)]"
+                    : "text-white/70 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
 
-        {/* ── Compact actions — only truly essential, always-fitting items ── */}
+        {/* ── Compact actions ── */}
         <div className="flex items-center gap-1.5 shrink-0">
+          <FullscreenToggle />
           {showRankChip && <RankChip />}
           {showInbox && <InboxTray />}
 

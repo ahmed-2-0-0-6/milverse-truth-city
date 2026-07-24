@@ -474,7 +474,7 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
       Icon: Clapperboard,
       onClick: () => {
         flyTo(1180, 1700, ZOOM_LEVELS[2], 600);
-        setTimeout(() => nav({ to: "/studio" }), 700);
+        setTimeout(() => nav({ to: "/studio", search: { mode: undefined, handoff: undefined } }), 700);
       },
     },
     {
