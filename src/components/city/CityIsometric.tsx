@@ -227,7 +227,7 @@ const GroundTile = React.memo(GroundTileImpl);
 
 
 /* ── building block ──────────────────────────────────────── */
-function Building({
+const Building = React.memo(function Building({
   def,
   level,
   reducedMotion,
