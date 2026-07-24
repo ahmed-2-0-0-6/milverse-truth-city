@@ -234,12 +234,14 @@ function Building({
   def,
   level,
   reducedMotion,
+  affordable = false,
 }: {
   def: BuildingDef;
   level: number;
   reducedMotion: boolean;
+  affordable?: boolean;
 }) {
-  if (level === 0) return <EmptyLot />;
+  if (level === 0) return <EmptyLot crane={affordable} reducedMotion={reducedMotion} />;
   const palette = PALETTE[def.district];
   // Height per level: base 22 + 14 per additional level
   const height = 22 + level * 14;
