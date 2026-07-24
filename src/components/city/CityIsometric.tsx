@@ -32,6 +32,9 @@ import { titleFor, nextTitle } from "@/lib/city/title";
 import {
   PLOT_CELL,
   ZONES,
+  GRID,
+  CENTER,
+  ringOf,
   cellLocked,
   buildingLock,
 } from "@/lib/city/zones";
@@ -39,13 +42,13 @@ import {
 /* ── geometry ────────────────────────────────────────────── */
 const TW = 96; // tile width
 const TH = 48; // tile height (2:1 iso)
-const GRID = 5;
 type Cell = [number, number];
 const PLACEMENT: Record<BuildingId, Cell> = PLOT_CELL;
 const iso = (gx: number, gy: number) => ({
   x: ((gx - gy) * TW) / 2,
   y: ((gx + gy) * TH) / 2,
 });
+
 
 /* ── palette per district ────────────────────────────────── */
 const PALETTE: Record<
