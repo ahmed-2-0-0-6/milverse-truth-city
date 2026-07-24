@@ -1,11 +1,23 @@
 // LAYER-4 — Desktop-only glow-dot cursor with high-performance trailing ease.
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useVisualMode } from "@/lib/visual-quality";
 
 export function GlowCursor() {
   const { mode } = useVisualMode();
   const dotRef = useRef<HTMLDivElement>(null);
   const trailRef = useRef<HTMLDivElement>(null);
+  // While an element is in native fullscreen (the city board's IMMERSE), only
+  // that subtree paints — a fixed body-level cursor disappears. Re-home it.
+  const [host, setHost] = useState<Element | null>(null);
+
+  useEffect(() => {
+    const sync = () => setHost(document.fullscreenElement ?? null);
+    sync();
+    document.addEventListener("fullscreenchange", sync);
+    return () => document.removeEventListener("fullscreenchange", sync);
+  }, []);
+
 
   useEffect(() => {
     if (mode !== "cinematic") return;
