@@ -1413,6 +1413,7 @@ export function CityIsometric() {
               const cost = nextCost(bc.id, lvl);
               const canAfford = cost !== null && save.bricks >= cost;
               const maxed = isMaxed(bc.id, lvl);
+              const lock = buildingLock(bc.id, step);
               const flash = flashId === bc.id;
               return (
                 <g
@@ -1425,7 +1426,11 @@ export function CityIsometric() {
                   onBlur={() => setHoverId((h) => (h === bc.id ? null : h))}
                   className="cursor-pointer milv-tile-hover"
                   role="button"
-                  aria-label={`${bc.def.name} — Lv${lvl}${cost !== null ? `, next ${cost} bricks` : ", maxed"}`}
+                  aria-label={
+                    lock.locked
+                      ? `${bc.def.name} — sealed, opens at ${lock.needRank}`
+                      : `${bc.def.name} — Lv${lvl}${cost !== null ? `, next ${cost} bricks` : ", maxed"}`
+                  }
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
@@ -1435,7 +1440,30 @@ export function CityIsometric() {
                   }}
                 >
 
-                  <Building def={bc.def} level={lvl} reducedMotion={reducedMotion} affordable={affordableIds.has(bc.id)} />
+                  {lock.locked ? (
+                    <g aria-hidden="true">
+                      {/* fenced-off lot with a padlock */}
+                      <ellipse cx={0} cy={TH / 2} rx={26} ry={13} fill="#000" opacity="0.5" />
+                      <polygon
+                        points={`0,${-4} ${TW / 2 - 12},${TH / 2 - 6} 0,${TH - 8} ${-(TW / 2 - 12)},${TH / 2 - 6}`}
+                        fill="#0b0810"
+                        stroke="#f43f5e"
+                        strokeOpacity="0.45"
+                        strokeWidth="0.7"
+                        strokeDasharray="3 2"
+                      />
+                      {[-18, -9, 0, 9, 18].map((fx) => (
+                        <line key={fx} x1={fx} y1={TH / 2 - 10} x2={fx} y2={TH / 2 - 18} stroke="#5b4a52" strokeWidth="0.8" />
+                      ))}
+                      <g transform={`translate(0,${-14})`}>
+                        <rect x={-5} y={-3} width={10} height={8} rx={1.5} fill="#2a1c22" stroke="#f43f5e" strokeOpacity="0.7" strokeWidth="0.7" />
+                        <path d="M -2.6 -3 v -2.4 a 2.6 2.6 0 0 1 5.2 0 v 2.4" fill="none" stroke="#f43f5e" strokeOpacity="0.7" strokeWidth="0.9" />
+                        <circle cx={0} cy={1} r={1} fill="#fda4af" />
+                      </g>
+                    </g>
+                  ) : (
+                    <Building def={bc.def} level={lvl} reducedMotion={reducedMotion} affordable={affordableIds.has(bc.id)} />
+                  )}
                   {/* label plate */}
                   <g transform={`translate(0, ${TH / 2 + 6})`}>
                     <rect
@@ -1452,17 +1480,17 @@ export function CityIsometric() {
                       y={8}
                       textAnchor="middle"
                       fontSize="7.5"
-                      fill={maxed ? "#a7f3d0" : canAfford ? "#fde68a" : "#d6d3d1"}
+                      fill={lock.locked ? "#fda4af" : maxed ? "#a7f3d0" : canAfford ? "#fde68a" : "#d6d3d1"}
                       style={{
                         fontFamily: '"Bebas Neue", sans-serif',
                         letterSpacing: "1px",
                       }}
                     >
-                      {bc.def.name.toUpperCase()}
+                      {lock.locked ? `SEALED · ${lock.needRank}` : bc.def.name.toUpperCase()}
                     </text>
                   </g>
                   {/* affordability marker */}
-                  {canAfford && !maxed && (
+                  {canAfford && !maxed && !lock.locked && (
                     <circle
                       cx={0}
                       cy={-6 - (22 + lvl * 14)}
