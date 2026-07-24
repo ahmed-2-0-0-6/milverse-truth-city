@@ -7,6 +7,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CinematicLayer } from "@/components/city/CinematicLayer";
+import { OceanLayer } from "@/components/city/OceanLayer";
 
 import {
   BUILDINGS_BY_ID,
@@ -1698,6 +1699,9 @@ export function CityIsometric() {
               <stop offset="1" stopColor="#3a2a4a" stopOpacity="0.7" />
             </linearGradient>
           </defs>
+
+          {/* the bay: ocean, harbour, resort strip */}
+          <OceanLayer grid={GRID} reducedMotion={reducedMotion} lowFx={lowFx} />
 
           {/* ground tiles */}
           <GroundLayer cells={cells} reducedMotion={reducedMotion} lowFx={lowFx} />
