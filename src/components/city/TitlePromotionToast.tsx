@@ -57,11 +57,11 @@ export function TitlePromotionToast() {
       aria-live="polite"
       className="fixed z-[70] left-1/2 top-24 -translate-x-1/2 pointer-events-none"
     >
-      <div className="rounded-md border-2 border-yellow-300/70 bg-black/85 backdrop-blur px-5 py-3 shadow-[0_0_40px_rgba(253,224,71,0.35)] animate-[promoIn_.4s_ease-out]">
+      <div className="rounded-sm border-2 border-yellow-300/70 bg-black/70 backdrop-blur px-5 py-3 shadow-[0_0_40px_rgba(253,224,71,0.35)] animate-[promoIn_.4s_ease-out]">
         <div className="stencil text-[10px] tracking-widest text-yellow-200/80 text-center">
           CITY HALL · SEAT PROMOTION
         </div>
-        <div className="mt-1 text-center font-mono text-[15px] text-yellow-100">
+        <div className="mt-1 text-center font-mono text-[13px] text-yellow-100">
           Sworn in as <span className="text-yellow-300">{visible.rank}</span>
         </div>
         <div className="text-center text-[11px] text-yellow-100/60 font-mono">{visible.seat}</div>

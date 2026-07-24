@@ -55,7 +55,7 @@ export function ThreatSiren({ active = true }: { active?: boolean }) {
 
       <div className="absolute left-1/2 top-3 z-30 w-[min(420px,calc(100%-1.5rem))] -translate-x-1/2">
         <div
-          className={`relative rounded-sm border bg-black/85 backdrop-blur-sm px-3 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.8)] ${
+          className={`relative rounded-sm border bg-black/70 backdrop-blur-sm px-3 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.8)] ${
             held
               ? "border-emerald-300/50"
               : inc.urgency

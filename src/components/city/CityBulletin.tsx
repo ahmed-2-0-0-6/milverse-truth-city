@@ -66,7 +66,7 @@ export function CityBulletin() {
 
   return (
     <section className="mx-auto mt-4 w-full max-w-5xl px-3">
-      <div className="rounded-md border border-amber-400/25 bg-black/60 backdrop-blur-sm overflow-hidden">
+      <div className="rounded-sm border border-amber-400/20 bg-black/70 backdrop-blur-sm overflow-hidden">
         <header className="flex items-baseline justify-between border-b border-amber-400/20 px-4 py-2 gap-3 flex-wrap">
           <div className="flex items-baseline gap-2 flex-wrap">
             <span className="stencil text-[10px] tracking-widest text-amber-300">
@@ -84,7 +84,7 @@ export function CityBulletin() {
               <button
                 type="button"
                 onClick={() => setPaused((p) => !p)}
-                className="tap stencil ml-1 rounded border border-amber-400/30 px-1.5 py-0.5 text-[9px] tracking-widest text-amber-200/70 hover:text-amber-100 transition-colors"
+                className="tap stencil ml-1 rounded border border-amber-400/20 px-1.5 py-0.5 text-[9px] tracking-widest text-amber-200/70 hover:text-amber-100 transition-colors"
                 aria-pressed={paused}
               >
                 {paused ? "RESUME" : "HOLD"}
@@ -118,7 +118,7 @@ export function CityBulletin() {
         </div>
 
         {next && (
-          <footer className="border-t border-amber-400/15 px-4 py-2 flex flex-col gap-1.5">
+          <footer className="border-t border-amber-400/20 px-4 py-2 flex flex-col gap-1.5">
             <div className="flex items-baseline justify-between gap-3 flex-wrap">
               <span className="stencil text-[10px] tracking-widest text-amber-300/80">NEXT SEAT</span>
               <span className="font-mono text-[11px] text-amber-100/90">
@@ -160,7 +160,7 @@ function BulletinLine({ b }: { b: Bulletin }) {
     <>
       <span className="stencil text-[9px] tracking-widest text-amber-300/70">{b.kicker}</span>
       <span className="text-amber-300/40">·</span>
-      <span className="font-mono text-[12px] text-amber-100/90">{b.text}</span>
+      <span className="font-mono text-[11px] text-amber-100/90">{b.text}</span>
     </>
   );
   if (!buildingId) return body;

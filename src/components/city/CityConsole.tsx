@@ -117,7 +117,7 @@ export function CityConsole() {
 
   return (
     <section className="mx-auto mt-4 w-full max-w-5xl px-3">
-      <div className="rounded-md border border-amber-400/25 bg-black/60 backdrop-blur-sm overflow-hidden">
+      <div className="rounded-sm border border-amber-400/20 bg-black/70 backdrop-blur-sm overflow-hidden">
         <div
           role="tablist"
           aria-label="City desk console"

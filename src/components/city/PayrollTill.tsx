@@ -57,12 +57,12 @@ export function PayrollTill({ active = true }: { active?: boolean }) {
         </div>
       )}
       <div
-        className={`rounded-sm border bg-black/75 backdrop-blur-sm px-2.5 py-2 shadow-[0_6px_20px_rgba(0,0,0,0.7)] ${
+        className={`rounded-sm border bg-black/70 backdrop-blur-sm px-2.5 py-2 shadow-[0_6px_20px_rgba(0,0,0,0.7)] ${
           l.full
             ? "border-red-400/50"
             : ready
               ? "border-emerald-300/50"
-              : "border-amber-400/30"
+              : "border-amber-400/20"
         }`}
       >
         <div className="flex items-baseline justify-between gap-2">

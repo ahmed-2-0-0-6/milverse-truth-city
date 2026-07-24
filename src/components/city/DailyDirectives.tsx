@@ -117,7 +117,7 @@ export function DailyDirectives() {
 
   return (
     <section className="mx-auto mt-4 w-full max-w-5xl px-3">
-      <div className="rounded-md border border-amber-400/25 bg-black/60 backdrop-blur-sm">
+      <div className="rounded-sm border border-amber-400/20 bg-black/70 backdrop-blur-sm">
         <header className="flex items-baseline justify-between border-b border-amber-400/20 px-4 py-2.5 gap-3 flex-wrap">
           <div className="flex items-baseline gap-3 flex-wrap">
             <h3 className="stencil text-[11px] tracking-widest text-amber-300">
@@ -172,7 +172,7 @@ export function DailyDirectives() {
           ))}
         </ul>
 
-        <footer className="border-t border-amber-400/15 px-4 py-2 text-[10px] text-amber-100/50 font-mono">
+        <footer className="border-t border-amber-400/20 px-4 py-2 text-[10px] text-amber-100/50 font-mono">
           Directives refresh at midnight. Clear all three for the combo. Un-claimed rewards don't roll over.
         </footer>
       </div>
@@ -197,7 +197,7 @@ const DirectiveRow = memo(function DirectiveRow({
     <li className="px-4 py-2.5">
       <div className="flex items-baseline justify-between gap-3 flex-wrap">
         <div className="min-w-0">
-          <div className="font-mono text-[12px] text-amber-100/90">{d.label}</div>
+          <div className="font-mono text-[11px] text-amber-100/90">{d.label}</div>
           <div className="text-[11px] text-amber-100/60 leading-snug">{d.detail}</div>
         </div>
         <div className="shrink-0 flex items-center gap-2">
@@ -214,7 +214,7 @@ const DirectiveRow = memo(function DirectiveRow({
               className={`tap stencil text-[10px] tracking-widest rounded px-2.5 py-1 border transition-colors ${
                 complete
                   ? "border-emerald-400/60 text-emerald-200 bg-emerald-500/10 hover:bg-emerald-500/20 shadow-[0_0_10px_rgba(52,211,153,0.25)] motion-safe:animate-pulse"
-                  : "border-amber-400/25 text-amber-200/40 cursor-not-allowed"
+                  : "border-amber-400/20 text-amber-200/40 cursor-not-allowed"
               }`}
 
               aria-label={`Claim ${d.reward} BRICKS for ${d.label}`}

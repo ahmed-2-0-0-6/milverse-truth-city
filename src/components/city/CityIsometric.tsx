@@ -722,7 +722,7 @@ function CamBtn({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-sm border border-amber-400/35 bg-black/60 font-mono text-sm leading-none text-amber-200/90 transition-colors hover:bg-amber-400/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-sm border border-amber-400/40 bg-black/70 font-mono text-sm leading-none text-amber-200/90 transition-colors hover:bg-amber-400/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300"
     >
       {children}
     </button>
@@ -1000,7 +1000,7 @@ export function CityIsometric() {
       className={`mx-auto max-w-6xl mt-8 px-4 sm:px-6${active ? "" : " milv-idle"}`}
     >
       {/* Header */}
-      <div className="border-b border-amber-400/30 pb-3 mb-3 flex items-end justify-between gap-3">
+      <div className="border-b border-amber-400/20 pb-3 mb-3 flex items-end justify-between gap-3">
         <div>
           <div className="stencil text-[10px] text-amber-300/80 tracking-widest">
             YOUR CITY · PLOTS {built}/{BUILDINGS.length}
@@ -1082,10 +1082,10 @@ export function CityIsometric() {
       {/* Isometric board */}
       <div
         ref={stageRef}
-        className={`relative border border-amber-400/25 bg-gradient-to-b from-[#050307] via-[#0a0812] to-[#0e0916] overflow-hidden shadow-[inset_0_0_60px_rgba(0,0,0,0.9)] ${
+        className={`relative border border-amber-400/20 bg-gradient-to-b from-[#050307] via-[#0a0812] to-[#0e0916] overflow-hidden shadow-[inset_0_0_60px_rgba(0,0,0,0.9)] ${
           immersed
             ? "milv-immersed fixed inset-0 z-[90] rounded-none flex items-center justify-center"
-            : "rounded-md"
+            : "rounded-sm"
         }`}
       >
         {immersed && (

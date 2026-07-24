@@ -70,7 +70,7 @@ export function CityPlots() {
       className="mx-auto max-w-6xl mt-8 px-4 sm:px-6"
     >
       {/* Header strip */}
-      <div className="border-b border-amber-400/30 pb-3 mb-3">
+      <div className="border-b border-amber-400/20 pb-3 mb-3">
         <div className="flex items-end justify-between gap-3">
           <div>
             <div className="stencil text-[10px] text-amber-300/80 tracking-widest">
@@ -121,7 +121,7 @@ export function CityPlots() {
 
       {/* Onboarding hint */}
       {isEmpty && (
-        <div className="mb-3 rounded-sm border border-dashed border-amber-400/40 bg-amber-400/[0.03] p-3 text-[12px] text-amber-100/80">
+        <div className="mb-3 rounded-sm border border-dashed border-amber-400/40 bg-amber-400/[0.03] p-3 text-[11px] text-amber-100/80">
           <span className="stencil text-amber-300 tracking-widest text-[10px] mr-2">
             HOW IT WORKS
           </span>
@@ -150,7 +150,7 @@ export function CityPlots() {
               ? "text-emerald-200 border-emerald-400/50 bg-emerald-400/10"
               : canAfford
                 ? "text-amber-100 border-amber-300/80 bg-amber-400/15"
-                : "text-amber-200/70 border-amber-400/25 bg-amber-400/5";
+                : "text-amber-200/70 border-amber-400/20 bg-amber-400/5";
           const flashing = flashId === def.id;
 
           return (

@@ -45,7 +45,7 @@ export function UpgradeToastHost() {
       aria-live="polite"
       className="fixed top-16 right-3 z-[9997] print:hidden pointer-events-none animate-in slide-in-from-right-4 fade-in duration-500"
     >
-      <div className="pointer-events-auto rounded-sm border border-amber-400/60 bg-[#0a0f1c]/95 backdrop-blur-xl px-3 py-2 shadow-[0_0_30px_rgba(253,224,71,0.35)] min-w-[200px]">
+      <div className="pointer-events-auto rounded-sm border border-amber-400/40 bg-[#0a0f1c]/95 backdrop-blur-xl px-3 py-2 shadow-[0_0_30px_rgba(253,224,71,0.35)] min-w-[200px]">
         <div className="flex items-center gap-2 stencil text-[10px] text-amber-300 tracking-widest">
           <span aria-hidden>◼◼◼</span>
           <span>YOUR CITY</span>

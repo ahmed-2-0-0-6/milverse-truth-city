@@ -74,7 +74,7 @@ const PerkRow = React.memo(function PerkRow({ r }: { r: Row }) {
         />
         <div className="min-w-0">
           <div className="flex items-baseline gap-2 flex-wrap">
-            <span className={`font-mono text-[12px] ${r.isOn ? "text-emerald-200" : "text-amber-100/85"}`}>
+            <span className={`font-mono text-[11px] ${r.isOn ? "text-emerald-200" : "text-amber-100/85"}`}>
               {r.label}
             </span>
             <span className="stencil text-[9px] tracking-widest text-amber-300/60">
@@ -210,7 +210,7 @@ export function PerksLedger() {
 
   return (
     <section className="mx-auto mt-6 w-full max-w-5xl px-3">
-      <div className="rounded-md border border-amber-400/25 bg-black/60 backdrop-blur-sm">
+      <div className="rounded-sm border border-amber-400/20 bg-black/70 backdrop-blur-sm">
         <header className="border-b border-amber-400/20 px-4 py-2.5">
           <div className="flex items-baseline justify-between gap-3 flex-wrap">
             <h3 className="stencil text-[11px] tracking-widest text-amber-300">PERKS LEDGER</h3>
@@ -236,7 +236,7 @@ export function PerksLedger() {
           <button
             type="button"
             onClick={() => focusBuilding(nextUp.building)}
-            className="tap w-full border-b border-amber-400/15 bg-amber-400/[0.04] px-4 py-2.5 text-left transition-colors hover:bg-amber-400/[0.09]"
+            className="tap w-full border-b border-amber-400/20 bg-amber-400/[0.04] px-4 py-2.5 text-left transition-colors hover:bg-amber-400/[0.09]"
             aria-label={`Open ${BUILDINGS_BY_ID[nextUp.building].name} on the map`}
           >
             <div className="flex items-baseline justify-between gap-3">
@@ -245,7 +245,7 @@ export function PerksLedger() {
                 {nextUp.remaining === 1 ? "1 LEVEL AWAY" : `${nextUp.remaining} LEVELS AWAY`}
               </span>
             </div>
-            <div className="mt-0.5 font-mono text-[12px] text-amber-100/90">
+            <div className="mt-0.5 font-mono text-[11px] text-amber-100/90">
               {nextUp.label} <span className="text-amber-300/60">·</span>{" "}
               <span className="text-amber-200/70">{BUILDINGS_BY_ID[nextUp.building].name}</span>
             </div>

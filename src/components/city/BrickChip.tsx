@@ -46,7 +46,7 @@ export function BrickChip() {
       aria-label={`Your city · ${save.bricks} bricks${next ? ` · ${next.remaining} to next build` : ""}`}
       title={next ? `${next.remaining} bricks to your next build` : "Every plot maxed"}
       className={`relative inline-flex items-center gap-1.5 rounded-full border ${
-        ready ? "border-emerald-300 bg-emerald-400/10" : "border-amber-400/50 bg-black/40"
+        ready ? "border-emerald-300 bg-emerald-400/10" : "border-amber-400/40 bg-black/40"
       } backdrop-blur-md px-2.5 py-1 stencil text-[10px] text-amber-200 hover:bg-amber-400/10 transition-all overflow-hidden ${
         pulse ? "ring-2 ring-amber-300/70 shadow-[0_0_18px_rgba(253,224,71,0.6)]" : ""
       }`}
