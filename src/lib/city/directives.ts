@@ -29,7 +29,12 @@ interface DailyState {
   picks: DirectiveId[];
   progress: Record<string, number>;
   claimed: Record<string, boolean>;
+  streak?: number;      // consecutive days with ≥1 claim
+  lastClaimDay?: string; // YYYY-MM-DD of last day any directive was claimed
+  comboClaimed?: boolean; // combo bonus awarded today
 }
+
+export const COMBO_BONUS = 30; // BRICKS for clearing all 3 directives
 
 const CATALOG: Directive[] = [
   { id: "solve_two",     label: "Two takedowns.",         detail: "Close two cases today.",           target: 2,   reward: 25 },
@@ -82,7 +87,19 @@ export function loadDirectives(): DailyState {
   const today = todayKey();
   const raw = readStore<DailyState>(KEY, isValid);
   if (raw && raw !== "corrupt" && raw.day === today) return raw;
-  const fresh: DailyState = { v: 1, day: today, picks: pickForToday(today), progress: {}, claimed: {} };
+  // Roll to a new day: keep streak/lastClaimDay from prior state if present.
+  const prevStreak = raw && raw !== "corrupt" ? (raw.streak ?? 0) : 0;
+  const prevLast = raw && raw !== "corrupt" ? (raw.lastClaimDay ?? "") : "";
+  const fresh: DailyState = {
+    v: 1,
+    day: today,
+    picks: pickForToday(today),
+    progress: {},
+    claimed: {},
+    streak: prevStreak,
+    lastClaimDay: prevLast,
+    comboClaimed: false,
+  };
   writeStore(KEY, fresh);
   return fresh;
 }
@@ -131,7 +148,7 @@ export function trackCaseSolved() {
   bump("solve_two", 1);
 }
 
-export function claim(id: DirectiveId): { ok: boolean; reward: number } {
+export function claim(id: DirectiveId): { ok: boolean; reward: number; combo?: number; streak?: number } {
   const s = loadDirectives();
   const def = CATALOG.find((d) => d.id === id);
   if (!def || !s.picks.includes(id)) return { ok: false, reward: 0 };
@@ -139,9 +156,35 @@ export function claim(id: DirectiveId): { ok: boolean; reward: number } {
   const prog = s.progress[id] ?? 0;
   if (prog < def.target) return { ok: false, reward: 0 };
   s.claimed[id] = true;
+
+  // Streak accounting on first claim of the day.
+  const today = s.day;
+  if (s.lastClaimDay !== today) {
+    const yest = new Date(); yest.setDate(yest.getDate() - 1);
+    const yKey = `${yest.getFullYear()}-${String(yest.getMonth() + 1).padStart(2, "0")}-${String(yest.getDate()).padStart(2, "0")}`;
+    s.streak = s.lastClaimDay === yKey ? (s.streak ?? 0) + 1 : 1;
+    s.lastClaimDay = today;
+  }
+
+  // Combo: all 3 directives claimed today.
+  let combo = 0;
+  const allDone = s.picks.every((pid) => s.claimed[pid]);
+  if (allDone && !s.comboClaimed) {
+    s.comboClaimed = true;
+    combo = COMBO_BONUS;
+  }
+
   persist(s);
-  creditBricks(def.reward);
-  return { ok: true, reward: def.reward };
+  creditBricks(def.reward + combo);
+  return { ok: true, reward: def.reward, combo, streak: s.streak };
+}
+
+export function directiveMeta(state: DailyState) {
+  return {
+    streak: state.streak ?? 0,
+    comboClaimed: !!state.comboClaimed,
+    allDone: state.picks.length > 0 && state.picks.every((pid) => state.claimed[pid]),
+  };
 }
 
 /** Wire once at app boot. Idempotent per module load. */
