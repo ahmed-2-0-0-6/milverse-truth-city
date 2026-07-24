@@ -39,6 +39,8 @@ import {
   ringOf,
   cellLocked,
   buildingLock,
+  rankName,
+
 } from "@/lib/city/zones";
 
 /* ── geometry ────────────────────────────────────────────── */
@@ -845,8 +847,83 @@ export function CityIsometric() {
   }, [setCamTo]);
   const resetCam = useCallback(() => setCamTo({ x: 0, y: 0, z: 1.7 }), [setCamTo]);
 
+  // ── DIRECTOR DECK ── glide the camera instead of teleporting it, and let
+  // the player fly the city hands-free. Presentation only: nothing here
+  // touches bricks, ranks or saves.
+  const glideRef = useRef(0);
+  const tourRef = useRef<number[]>([]);
+  const [tour, setTour] = useState(false);
+  const [film, setFilm] = useState(true);
+
+  const stopGlide = useCallback(() => {
+    if (glideRef.current) cancelAnimationFrame(glideRef.current);
+    glideRef.current = 0;
+  }, []);
+
+  const glideTo = useCallback(
+    (target: { x: number; y: number; z: number }, ms = 900) => {
+      stopGlide();
+      if (reducedMotion) { setCamTo(target); return; }
+      const from = { ...camRef.current };
+      const t0 = performance.now();
+      const tick = (now: number) => {
+        const p = Math.min(1, (now - t0) / ms);
+        const e = 1 - Math.pow(1 - p, 3); // easeOutCubic — a crane, not a cut
+        setCamTo({
+          x: from.x + (target.x - from.x) * e,
+          y: from.y + (target.y - from.y) * e,
+          z: from.z + (target.z - from.z) * e,
+        });
+        if (p < 1) glideRef.current = requestAnimationFrame(tick);
+        else glideRef.current = 0;
+      };
+      glideRef.current = requestAnimationFrame(tick);
+    },
+    [reducedMotion, setCamTo, stopGlide],
+  );
+
+  /** Frame a grid cell dead centre. */
+  const focusCell = useCallback(
+    (gx: number, gy: number, z = 2.2) => {
+      const { x, y } = iso(gx, gy);
+      const bh = TH * (GRID + 3);
+      glideTo({ x, y: y + 140 - (bh + 60) / 2, z });
+    },
+    [glideTo],
+  );
+
+  const stopTour = useCallback(() => {
+    tourRef.current.forEach((id) => window.clearTimeout(id));
+    tourRef.current = [];
+    setTour(false);
+  }, []);
+
+  const startTour = useCallback(() => {
+    stopTour();
+    setTour(true);
+    const stops = ZONES.map((z) => z.cells[Math.floor(z.cells.length / 2)]);
+    stops.forEach(([gx, gy], i) => {
+      tourRef.current.push(
+        window.setTimeout(() => focusCell(gx, gy, 2.1), i * 2600),
+      );
+    });
+    tourRef.current.push(
+      window.setTimeout(() => {
+        glideTo({ x: 0, y: 0, z: 1.7 }, 1400);
+        setTour(false);
+      }, stops.length * 2600),
+    );
+  }, [focusCell, glideTo, stopTour]);
+
+  useEffect(() => () => { stopGlide(); tourRef.current.forEach((id) => window.clearTimeout(id)); }, [stopGlide]);
+
+
   const onPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
     if (e.button !== 0 && e.pointerType === "mouse") return;
+    // The player's hand always outranks the director: kill any running glide.
+    stopGlide();
+    if (tour) stopTour();
+
     // No pointer capture yet — capturing here would retarget the click and
     // stop plots from opening. We only capture once a real drag starts.
     const c = camRef.current;
@@ -1175,8 +1252,55 @@ export function CityIsometric() {
             <CamBtn label="Zoom out" onClick={() => zoomBy(1 / 1.2)}>−</CamBtn>
           </div>
         </div>
+        {/* ── director deck ── jump to a district, fly the city, kill the film */}
+        <div className="absolute left-3 top-3 z-20 flex max-w-[calc(100%-6rem)] flex-wrap items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => (tour ? stopTour() : startTour())}
+            aria-pressed={tour}
+            className={`inline-flex min-h-[32px] items-center gap-1.5 rounded-sm border px-2.5 stencil text-[9px] tracking-widest transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 ${
+              tour
+                ? "border-amber-300 bg-amber-400/25 text-amber-100"
+                : "border-amber-400/40 bg-black/70 text-amber-200/90 hover:bg-amber-400/15"
+            }`}
+          >
+            {tour ? "STOP FLYOVER" : "FLYOVER"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilm((v) => !v)}
+            aria-pressed={film}
+            className={`inline-flex min-h-[32px] items-center rounded-sm border px-2.5 stencil text-[9px] tracking-widest transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 ${
+              film
+                ? "border-amber-300 bg-amber-400/25 text-amber-100"
+                : "border-amber-400/40 bg-black/70 text-amber-200/60 hover:bg-amber-400/15"
+            }`}
+          >
+            FILM {film ? "ON" : "OFF"}
+          </button>
+          {ZONES.map((z) => {
+            const locked = z.step > step;
+            const mid = z.cells[Math.floor(z.cells.length / 2)];
+            return (
+              <button
+                key={z.id}
+                type="button"
+                onClick={() => { stopTour(); focusCell(mid[0], mid[1]); }}
+                title={locked ? `${z.name} — sealed until ${rankName(z.step)}` : z.blurb}
+                className={`hidden sm:inline-flex min-h-[32px] items-center rounded-sm border px-2 stencil text-[9px] tracking-widest transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 ${
+                  locked
+                    ? "border-rose-400/30 bg-black/60 text-rose-200/60 hover:bg-rose-400/10"
+                    : "border-amber-400/30 bg-black/60 text-amber-200/80 hover:bg-amber-400/15"
+                }`}
+              >
+                {locked ? "🔒 " : ""}{z.name}
+              </button>
+            );
+          })}
+        </div>
         <ThreatSiren active={active} />
         <PayrollTill active={active} />
+
 
         <div className="absolute right-3 bottom-3 z-20 stencil text-[9px] tracking-widest text-amber-200/50 pointer-events-none">
           DRAG TO PAN · SCROLL TO ZOOM · <span ref={zoomLabelRef}>100%</span>
@@ -1197,14 +1321,18 @@ export function CityIsometric() {
           className="pointer-events-none absolute inset-0 mix-blend-overlay"
           style={{ background: tint }}
         />
-        <CinematicLayer
-          active={active}
-          immersed={immersed}
-          reducedMotion={reducedMotion}
-          lowFx={lowFx}
-          title="TRUTH CITY"
-          subtitle="SECTOR ONLINE"
-        />
+        {film && (
+          <CinematicLayer
+            active={active}
+            immersed={immersed}
+            reducedMotion={reducedMotion}
+            lowFx={lowFx}
+            title="TRUTH CITY"
+            subtitle="SECTOR ONLINE"
+          />
+        )}
+
+
 
 
         <svg
