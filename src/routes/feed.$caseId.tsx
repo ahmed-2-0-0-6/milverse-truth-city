@@ -210,6 +210,21 @@ function FeedPlay() {
             });
             window.dispatchEvent(new Event("milverse:profile"));
             checkAndAwardBadges(p);
+            // Your City — bricks payout.
+            try {
+              const { awardBricksForCase } = await import("@/lib/city/economy");
+              const v =
+                oc.result === "correct"
+                  ? "correct"
+                  : oc.result === "missed_fake"
+                    ? "missed_scam"
+                    : oc.result === "pyrrhic"
+                      ? "pyrrhic"
+                      : "false_alarm";
+              awardBricksForCase("feed", v, scenario.tier ?? 1);
+            } catch {
+              /* noop */
+            }
             setPhase("reveal");
           }}
         />

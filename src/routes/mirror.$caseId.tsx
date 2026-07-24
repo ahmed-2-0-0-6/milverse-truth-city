@@ -2340,6 +2340,21 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     }
     window.dispatchEvent(new Event("milverse:profile"));
     checkAndAwardBadges(p);
+    // Your City — bricks payout (deterministic; no AI, no truth reveal).
+    try {
+      const { awardBricksForCase } = await import("@/lib/city/economy");
+      const verdictForCity =
+        result.resultKind === "correct"
+          ? "correct"
+          : result.resultKind === "pyrrhic"
+            ? "pyrrhic"
+            : result.resultKind === "missed_scam"
+              ? "missed_scam"
+              : "false_alarm";
+      awardBricksForCase("mirror", verdictForCity, scenario.tier ?? 1);
+    } catch {
+      /* noop — city is presentation-only */
+    }
 
     // "The City Checks Back" — spaced retests.
     // 1) Resolve any pending retest that this caseId satisfies.
