@@ -949,7 +949,9 @@ export function CityIsometric() {
             {sealedZones.length > 0 ? (
               <span className="font-mono text-[10px] text-red-200/70">
                 {sealedZones.length} district{sealedZones.length > 1 ? "s" : ""} sealed
-                {nextRank ? ` · ${nextRank.rank} at ${nextRank.plotsNeeded} plots` : ""}
+                {nextRank
+                  ? ` · ${nextRank.rank} needs ${nextRank.plotsNeeded} more plot${nextRank.plotsNeeded === 1 ? "" : "s"}`
+                  : ""}
               </span>
             ) : (
               <span className="font-mono text-[10px] text-emerald-300/80">
@@ -1199,10 +1201,10 @@ export function CityIsometric() {
             })}
           {/* district seal plates */}
           {ZONES.filter((z) => z.step > step).map((z) => {
-            const mid = z.cells[Math.floor(z.cells.length / 2)];
+            const mid = z.cells[0];
             const { x, y } = iso(mid[0], mid[1]);
             return (
-              <g key={`zseal-${z.id}`} transform={`translate(${x},${y + TH / 2})`} aria-hidden="true">
+              <g key={`zseal-${z.id}`} transform={`translate(${x - 46},${y - 4})`} aria-hidden="true">
                 <rect x={-52} y={-9} width={104} height={18} rx={2} fill="#0a0509" opacity="0.9" stroke="#f43f5e" strokeOpacity="0.4" strokeWidth="0.5" />
                 <text x={0} y={-1} textAnchor="middle" fontSize="7" fill="#fda4af" style={{ fontFamily: '"Bebas Neue", sans-serif', letterSpacing: "1.4px" }}>
                   {z.name} · SEALED
