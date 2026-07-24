@@ -14,6 +14,7 @@ import {
   type Directive,
   type DirectiveId,
 } from "@/lib/city/directives";
+import { useTabAwake } from "@/hooks/useOnScreen";
 import { useCoalescedRefresh } from "@/hooks/useCoalescedRefresh";
 
 /** Milliseconds until local midnight. */
@@ -66,14 +67,17 @@ export function DailyDirectives() {
 
   // Countdown to midnight; also rolls the board over when the day flips.
   const [left, setLeft] = useState(() => msToMidnight());
+  const awake = useTabAwake();
   useEffect(() => {
+    if (!awake) return;
+    setLeft(msToMidnight());
     const t = setInterval(() => {
       const ms = msToMidnight();
       setLeft(ms);
       if (ms > 23 * 3600_000) setState(loadDirectives()); // just past midnight
     }, 30_000);
     return () => clearInterval(t);
-  }, []);
+  }, [awake]);
 
   const claimOne = (id: DirectiveId) => {
     const def = defs.find((x) => x.id === id);

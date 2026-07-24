@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useMemo, useState } from "react";
 import { loadJournal, wireJournalListeners, type JournalEntry } from "@/lib/city/journal";
+import { useTabAwake } from "@/hooks/useOnScreen";
 import { useCoalescedRefresh } from "@/hooks/useCoalescedRefresh";
 
 const KIND_LABEL: Record<JournalEntry["kind"], { tag: string; tone: string }> = {
@@ -44,10 +45,13 @@ export function CityJournal() {
   useCoalescedRefresh(["milverse:journal"], () => setEntries(loadJournal()));
 
   // Refresh "Xs ago" once a minute — cheap, no listener churn.
+  const awake = useTabAwake();
   useEffect(() => {
+    if (!awake) return;
+    setNow(Date.now());
     const t = setInterval(() => setNow(Date.now()), 60_000);
     return () => clearInterval(t);
-  }, []);
+  }, [awake]);
 
   const shown = useMemo(
     () =>
