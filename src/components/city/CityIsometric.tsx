@@ -5,7 +5,7 @@
 // Interaction: tap a tile → BuildingCard bottom sheet.
 // Perf: rows memoized; ambient window flicker gated on reduced-motion.
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   BUILDINGS_BY_ID,
   BUILDINGS,
@@ -686,6 +686,28 @@ export function CityIsometric() {
   const [flashId, setFlashId] = useState<BuildingId | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [clock, setClock] = useState(() => new Date(0));
+  // Immersive mode — the board goes fullscreen and the city fills the glass.
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const [immersed, setImmersed] = useState(false);
+
+  useEffect(() => {
+    const onChange = () =>
+      setImmersed(!!document.fullscreenElement && document.fullscreenElement === stageRef.current);
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+
+  const toggleImmerse = useCallback(async () => {
+    const el = stageRef.current;
+    if (!el) return;
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else if (el.requestFullscreen) await el.requestFullscreen({ navigationUI: "hide" });
+      else setImmersed((v) => !v); // iOS Safari has no element fullscreen — fake it.
+    } catch {
+      setImmersed((v) => !v);
+    }
+  }, []);
   // Perf: everything ambient stops when the board is offscreen or the tab is hidden.
   const { ref: boardRef, active } = useOnScreen<HTMLElement>("300px");
 
@@ -818,6 +840,14 @@ export function CityIsometric() {
           </p>
         </div>
         <div className="text-right shrink-0">
+          <button
+            type="button"
+            onClick={toggleImmerse}
+            className="mb-1 inline-flex min-h-[32px] items-center gap-1.5 rounded-sm border border-amber-400/40 bg-amber-400/5 px-2.5 py-1 stencil text-[9px] tracking-widest text-amber-200/90 transition-colors hover:bg-amber-400/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300"
+            aria-pressed={immersed}
+          >
+            {immersed ? "EXIT" : "IMMERSE"}
+          </button>
           <div className="stencil text-[9px] text-amber-300/70 tracking-widest">BRICKS</div>
           <div className="font-mono text-2xl text-amber-200 tabular-nums leading-none">
             {save.bricks}
@@ -856,7 +886,23 @@ export function CityIsometric() {
       </div>
 
       {/* Isometric board */}
-      <div className="relative rounded-md border border-amber-400/25 bg-gradient-to-b from-[#050307] via-[#0a0812] to-[#0e0916] overflow-hidden shadow-[inset_0_0_60px_rgba(0,0,0,0.9)]">
+      <div
+        ref={stageRef}
+        className={`relative border border-amber-400/25 bg-gradient-to-b from-[#050307] via-[#0a0812] to-[#0e0916] overflow-hidden shadow-[inset_0_0_60px_rgba(0,0,0,0.9)] ${
+          immersed
+            ? "milv-immersed fixed inset-0 z-[90] rounded-none flex items-center justify-center"
+            : "rounded-md"
+        }`}
+      >
+        {immersed && (
+          <button
+            type="button"
+            onClick={toggleImmerse}
+            className="absolute right-3 top-3 z-20 inline-flex min-h-[36px] min-w-[36px] items-center justify-center rounded-sm border border-amber-400/40 bg-black/70 px-3 stencil text-[10px] tracking-widest text-amber-200 hover:bg-amber-400/20"
+          >
+            EXIT
+          </button>
+        )}
         {/* subtle grid vignette */}
         <div
           aria-hidden
@@ -876,7 +922,7 @@ export function CityIsometric() {
         <svg
           viewBox={viewBox}
           className="block w-full h-auto"
-          style={{ maxHeight: 520 }}
+          style={{ maxHeight: immersed ? "100vh" : 520 }}
           role="img"
           aria-label="Your city — isometric view of all plots"
         >
