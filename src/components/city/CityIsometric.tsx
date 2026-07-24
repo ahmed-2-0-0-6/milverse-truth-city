@@ -889,25 +889,54 @@ export function CityIsometric() {
 
           {/* ── SKY BACKDROP: sun/moon by hour + skyline + drifting clouds ── */}
           <g aria-hidden="true">
-            {/* SUN by day, MOON by dusk/night */}
-            {hr >= 6 && hr < 18 ? (
-              <g>
-                <circle cx={-bounds.w / 2 + 60} cy={-108} r={22} fill="#fde68a" opacity="0.15" />
-                <circle cx={-bounds.w / 2 + 60} cy={-108} r={14} fill="#fef3c7" opacity="0.35" />
-                <circle cx={-bounds.w / 2 + 60} cy={-108} r={9} fill="#fde68a" opacity="0.95" />
-              </g>
-            ) : (
-              <g>
-                <circle cx={bounds.w / 2 - 60} cy={-100} r={12} fill="#f5e6c4" opacity="0.9" />
-                <circle cx={bounds.w / 2 - 56} cy={-104} r={12} fill="#0a0812" />
-              </g>
-            )}
-            {/* stars — fade during the day */}
-            {(hr < 6 || hr >= 19) && Array.from({ length: 18 }).map((_, i) => {
-              const sx = -bounds.w / 2 + hashCell(i, 0, 5) * bounds.w;
-              const sy = -130 + hashCell(0, i, 5) * 40;
-              return <circle key={i} cx={sx} cy={sy} r={hashCell(i, i, 9) * 0.9 + 0.2} fill="#fef3c7" opacity={0.4 + hashCell(i, 1, 9) * 0.6} />;
-            })}
+            {/* SUN by day, MOON by night — both ride a real arc across the sky */}
+            {(() => {
+              const t = Math.max(0, Math.min(1, arcT));
+              const cx = -bounds.w / 2 + 50 + t * (bounds.w - 100);
+              const cy = -58 - Math.sin(Math.PI * t) * 78;
+              const low = Math.sin(Math.PI * t); // 0 at horizon, 1 at zenith
+              return isDay ? (
+                <g>
+                  <circle cx={cx} cy={cy} r={26} fill="#fde68a" opacity={0.10 + low * 0.10} />
+                  <circle cx={cx} cy={cy} r={15} fill="#fef3c7" opacity="0.32" />
+                  <circle cx={cx} cy={cy} r={9} fill={low < 0.35 ? "#fbbf24" : "#fde68a"} opacity="0.95" />
+                </g>
+              ) : (
+                <g>
+                  <circle cx={cx} cy={cy} r={20} fill="#cbd5f5" opacity={0.06 + low * 0.06} />
+                  <circle cx={cx} cy={cy} r={12} fill="#f5e6c4" opacity="0.9" />
+                  <circle cx={cx + 4} cy={cy - 4} r={12} fill="#0a0812" />
+                </g>
+              );
+            })()}
+            {/* stars — fade out around the edges of night */}
+            {!isDay && (() => {
+              const night = Math.min(1, Math.max(0, 1 - Math.abs(arcT - 0.5) * 1.6));
+              return Array.from({ length: 18 }).map((_, i) => {
+                const sx = -bounds.w / 2 + hashCell(i, 0, 5) * bounds.w;
+                const sy = -130 + hashCell(0, i, 5) * 40;
+                return (
+                  <circle
+                    key={i}
+                    cx={sx}
+                    cy={sy}
+                    r={hashCell(i, i, 9) * 0.9 + 0.2}
+                    fill="#fef3c7"
+                    opacity={(0.3 + hashCell(i, 1, 9) * 0.6) * (0.35 + night * 0.65)}
+                  >
+                    {!reducedMotion && (
+                      <animate
+                        attributeName="opacity"
+                        values={`${0.2 + hashCell(i, 2, 9) * 0.3};${0.7 + hashCell(i, 3, 9) * 0.3};${0.2 + hashCell(i, 2, 9) * 0.3}`}
+                        dur={`${3 + hashCell(i, 4, 9) * 5}s`}
+                        repeatCount="indefinite"
+                      />
+                    )}
+                  </circle>
+                );
+              });
+            })()}
+
             {/* far skyline — hand-composed rectangles, low-contrast */}
 ...
             {/* horizon haze */}
