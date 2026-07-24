@@ -4,6 +4,7 @@ import { TopBar } from "@/components/TopBar";
 import { CityWorld } from "@/components/CityWorld";
 import { CityPlots } from "@/components/city/CityPlots";
 import { CityIsometric } from "@/components/city/CityIsometric";
+import { PerksLedger } from "@/components/city/PerksLedger";
 import { CityList } from "@/components/CityList";
 import { ChevronDown } from "lucide-react";
 import { CityHero3D } from "@/components/city3d/CityHero3D";
@@ -265,6 +266,7 @@ function CityMap() {
         </div>
 
         <CityIsometric />
+        <PerksLedger />
         <CityPlots />
 
       </section>
