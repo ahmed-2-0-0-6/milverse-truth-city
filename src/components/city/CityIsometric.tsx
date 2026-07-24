@@ -23,6 +23,8 @@ import {
 } from "@/lib/city/citySave";
 import { BuildingCard } from "@/components/city/BuildingCard";
 import { PayrollTill } from "@/components/city/PayrollTill";
+import { ThreatSiren } from "@/components/city/ThreatSiren";
+
 
 import { useOnScreen } from "@/hooks/useOnScreen";
 
@@ -1087,7 +1089,9 @@ export function CityIsometric() {
             <CamBtn label="Zoom out" onClick={() => zoomBy(1 / 1.2)}>−</CamBtn>
           </div>
         </div>
+        <ThreatSiren active={active} />
         <PayrollTill active={active} />
+
         <div className="absolute right-3 bottom-3 z-20 stencil text-[9px] tracking-widest text-amber-200/50 pointer-events-none">
           DRAG TO PAN · SCROLL TO ZOOM · <span ref={zoomLabelRef}>100%</span>
         </div>
