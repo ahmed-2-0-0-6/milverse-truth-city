@@ -146,7 +146,7 @@ function GroundTileImpl({ gx, gy, reducedMotion, lowFx }: { gx: number; gy: numb
             stroke="#3a3444"
             strokeWidth="0.4"
           />
-          {!reducedMotion && (
+          {animate && (
             <>
               <circle cx={-(TW / 2 - 8)} cy={TH / 2} r={1.1} fill="#fef3c7" opacity="0.9">
                 <animate
@@ -219,7 +219,7 @@ function GroundTileImpl({ gx, gy, reducedMotion, lowFx }: { gx: number; gy: numb
               <line x1={0} y1={0} x2={0} y2={-14} stroke="#4a4a55" strokeWidth="1" />
               <line x1={0} y1={-14} x2={4} y2={-14} stroke="#4a4a55" strokeWidth="1" />
               <circle cx={4} cy={-13} r={1.6} fill="#fde68a" opacity="0.95">
-                {!reducedMotion && (
+                {animate && (
                   <animate attributeName="opacity" values="0.9;0.5;0.9" dur="3s" repeatCount="indefinite" />
                 )}
               </circle>
@@ -245,7 +245,7 @@ function GroundTileImpl({ gx, gy, reducedMotion, lowFx }: { gx: number; gy: numb
           <circle cx={0} cy={TH / 2} r={7} fill="#3a2e1a" stroke="#5a4a2a" strokeWidth="0.6" />
           <circle cx={0} cy={TH / 2} r={3.5} fill="#fcd34d" opacity="0.6" />
           <circle cx={0} cy={TH / 2 - 4} r={1.2} fill="#fde68a">
-            {!reducedMotion && (
+            {animate && (
               <>
                 <animate attributeName="cy" values={`${TH / 2 - 4};${TH / 2 - 8};${TH / 2 - 4}`} dur="2.4s" repeatCount="indefinite" />
                 <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.4s" repeatCount="indefinite" />
