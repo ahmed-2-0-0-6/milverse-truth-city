@@ -1558,12 +1558,9 @@ export function CityIsometric() {
                       x={0}
                       y={8}
                       textAnchor="middle"
-                      fontSize="7.5"
-                      fill={lock.locked ? "#fda4af" : maxed ? "#a7f3d0" : canAfford ? "#fde68a" : "#d6d3d1"}
-                      style={{
-                        fontFamily: '"Bebas Neue", sans-serif',
-                        letterSpacing: "1px",
-                      }}
+                      fontSize={SIGN_SIZE.title}
+                      fill={lock.locked ? INK.sealed : maxed ? INK.done : canAfford ? INK.live : INK.idle}
+                      style={SIGN_TITLE}
                     >
                       {lock.locked ? `SEALED · ${lock.needRank}` : bc.def.name.toUpperCase()}
                     </text>
