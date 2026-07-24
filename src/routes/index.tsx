@@ -285,11 +285,9 @@ function CityMap() {
         </div>
 
         <Suspense fallback={<DeskFallback />}>
-          <div style={{ contentVisibility: "auto", containIntrinsicSize: "1200px" } as React.CSSProperties}>
-            <CityIsometric />
-            <CityBulletin />
-            <CityConsole />
-          </div>
+          <CityIsometric />
+          <CityBulletin />
+          <CityConsole />
         </Suspense>
         <PerkUnlockToast />
         <TitlePromotionToast />
