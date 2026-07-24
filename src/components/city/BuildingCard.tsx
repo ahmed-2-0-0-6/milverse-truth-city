@@ -76,7 +76,7 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
     ? "MAXED · PERK ACTIVE"
     : level === 0
       ? `BUILD · ${cost} BRICKS`
-      : `UPGRADE TO Lv${level + 1} · ${cost} BRICKS`;
+      : `UPGRADE TO LV ${level + 1} · ${cost} BRICKS`;
 
   return (
     <>
@@ -138,7 +138,7 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
           </div>
           <div className="mt-2 flex items-baseline justify-between font-mono text-[11px]">
             <span className="text-amber-200/80">
-              {level === 0 ? "UNBUILT PLOT" : `LEVEL ${level} / ${def.maxLevel}`}
+              {level === 0 ? "UNBUILT PLOT" : `LV ${level} / ${def.maxLevel}`}
             </span>
             {lock.locked ? (
               <span className="stencil text-[9px] text-red-300/80 tracking-widest">

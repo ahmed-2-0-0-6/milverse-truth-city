@@ -140,7 +140,7 @@ export function CityPlots() {
             : maxed
               ? "MAXED"
               : isBuilt
-                ? `Lv${lvl}`
+                ? `LV ${lvl}`
                 : "UNBUILT";
           const stateColor = lock.locked
             ? "text-red-200/70 border-red-400/30 bg-red-400/[0.04]"

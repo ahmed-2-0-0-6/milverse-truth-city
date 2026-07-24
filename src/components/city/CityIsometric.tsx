@@ -1587,10 +1587,10 @@ export function CityIsometric() {
                       style={SIGN_META}
                     >
                       {maxed
-                        ? "MAX"
+                        ? "MAX LEVEL"
                         : lvl === 0
                           ? `${cost}◼`
-                          : `Lv${lvl}/${bc.def.maxLevel} · ${cost}◼`}
+                          : `LV ${lvl}/${bc.def.maxLevel} · ${cost}◼`}
                     </text>
                   </g>
                   {flash && (
