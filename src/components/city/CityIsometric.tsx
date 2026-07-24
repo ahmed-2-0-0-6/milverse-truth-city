@@ -96,15 +96,45 @@ function GroundTile({ gx, gy }: { gx: number; gy: number }) {
     <g transform={`translate(${x},${y})`}>
       <polygon points={pts} fill={fill} stroke={stroke} strokeWidth="0.5" />
 
-      {/* SIDEWALK inset ring on grass tiles that hold buildings */}
-      {kind === "grass" && hasBuilding && (
+      {/* WET-ASPHALT SHEEN on roads — a soft highlight strip */}
+      {kind === "road" && (
         <polygon
-          points={`0,4 ${TW / 2 - 4},${TH / 2} 0,${TH - 4} ${-(TW / 2 - 4)},${TH / 2}`}
-          fill="#2a2530"
-          stroke="#3a3444"
-          strokeWidth="0.4"
+          points={pts}
+          fill="url(#road-sheen)"
+          opacity="0.35"
+          pointerEvents="none"
         />
       )}
+
+      {/* SIDEWALK inset ring on grass tiles that hold buildings + tiny pedestrians */}
+      {kind === "grass" && hasBuilding && (
+        <>
+          <polygon
+            points={`0,4 ${TW / 2 - 4},${TH / 2} 0,${TH - 4} ${-(TW / 2 - 4)},${TH / 2}`}
+            fill="#2a2530"
+            stroke="#3a3444"
+            strokeWidth="0.4"
+          />
+          {/* pedestrian dot walking a short back-and-forth on the sidewalk */}
+          <circle cx={-(TW / 2 - 8)} cy={TH / 2} r={1.1} fill="#fef3c7" opacity="0.9">
+            <animate
+              attributeName="cx"
+              values={`${-(TW / 2 - 8)};${TW / 2 - 8};${-(TW / 2 - 8)}`}
+              dur={`${9 + rA * 4}s`}
+              repeatCount="indefinite"
+            />
+          </circle>
+          <circle cx={TW / 2 - 8} cy={TH / 2 + 2} r={1.1} fill="#fda4af" opacity="0.85">
+            <animate
+              attributeName="cx"
+              values={`${TW / 2 - 8};${-(TW / 2 - 8)};${TW / 2 - 8}`}
+              dur={`${10 + rB * 4}s`}
+              repeatCount="indefinite"
+            />
+          </circle>
+        </>
+      )}
+
 
       {/* GRASS TEXTURE — scatter tiny specks and one shrub / tree if empty */}
       {kind === "grass" && !hasBuilding && (
