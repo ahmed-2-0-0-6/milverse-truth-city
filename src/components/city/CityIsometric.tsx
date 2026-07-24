@@ -186,8 +186,9 @@ function GroundTileImpl({ gx, gy, reducedMotion }: { gx: number; gy: number; red
             strokeDasharray="3 3"
             opacity="0.7"
           />
-          {(gx === 2 ? gy !== 2 : true) && (gy === 2 ? gx !== 2 : true) && rA < 0.55 && (
-            <g transform={`translate(${gx === 2 ? -TW / 2 + 5 : 0}, ${gy === 2 ? TH / 2 : -2})`}>
+          {!(gx === CENTER && gy === CENTER) && rA < 0.55 && (
+            <g transform={`translate(${gx === CENTER ? -TW / 2 + 5 : 0}, ${gy === CENTER ? TH / 2 : -2})`}>
+
               <line x1={0} y1={0} x2={0} y2={-14} stroke="#4a4a55" strokeWidth="1" />
               <line x1={0} y1={-14} x2={4} y2={-14} stroke="#4a4a55" strokeWidth="1" />
               <circle cx={4} cy={-13} r={1.6} fill="#fde68a" opacity="0.95">
