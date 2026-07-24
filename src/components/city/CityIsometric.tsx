@@ -646,19 +646,54 @@ const PERK_REQ: Record<BuildingId, number> = {
   signal_tower: 5, archive: 5, clean_room: 3, watchtower: 3,
 };
 
+/* ── light model ─────────────────────────────────────────────
+   Smooth tint interpolation across the day instead of hard hour
+   buckets. Keyed on fractional hour, so dusk actually creeps in. */
+type Rgba = [number, number, number, number];
+const LIGHT_KEYS: { h: number; c: Rgba }[] = [
+  { h: 0,    c: [15, 10, 30, 0.30] },
+  { h: 5,    c: [22, 16, 44, 0.30] },
+  { h: 6.5,  c: [214, 118, 58, 0.16] },
+  { h: 9,    c: [168, 150, 150, 0.08] },
+  { h: 13,   c: [120, 140, 180, 0.05] },
+  { h: 17,   c: [206, 132, 74, 0.11] },
+  { h: 18.5, c: [224, 88, 58, 0.18] },
+  { h: 20.5, c: [40, 22, 60, 0.26] },
+  { h: 24,   c: [15, 10, 30, 0.30] },
+];
+function lightTint(h: number): string {
+  let a = LIGHT_KEYS[0], b = LIGHT_KEYS[LIGHT_KEYS.length - 1];
+  for (let i = 0; i < LIGHT_KEYS.length - 1; i++) {
+    if (h >= LIGHT_KEYS[i].h && h <= LIGHT_KEYS[i + 1].h) {
+      a = LIGHT_KEYS[i];
+      b = LIGHT_KEYS[i + 1];
+      break;
+    }
+  }
+  const t = b.h === a.h ? 0 : (h - a.h) / (b.h - a.h);
+  const v = (i: number) => a.c[i] + (b.c[i] - a.c[i]) * t;
+  return `rgba(${Math.round(v(0))},${Math.round(v(1))},${Math.round(v(2))},${v(3).toFixed(3)})`;
+}
+
+
 
 /* ── main component ──────────────────────────────────────── */
 export function CityIsometric() {
   const [save, setSave] = useState<CitySave | null>(null);
   const [open, setOpen] = useState<BuildingId | null>(null);
+  const [hoverId, setHoverId] = useState<BuildingId | null>(null);
   const [flashId, setFlashId] = useState<BuildingId | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [clock, setClock] = useState(() => new Date(0));
 
   useEffect(() => {
     setSave(loadCity());
+    setClock(new Date());
+    const tick = window.setInterval(() => setClock(new Date()), 60_000);
     if (typeof window !== "undefined" && window.matchMedia) {
       setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     }
+
     const refresh = () => setSave(loadCity());
     const onBuilt = (e: Event) => {
       refresh();
@@ -677,12 +712,14 @@ export function CityIsometric() {
     window.addEventListener("milverse:bricks", refresh);
     window.addEventListener("milverse:city:open", onOpen);
     return () => {
+      window.clearInterval(tick);
       window.removeEventListener("milverse:city", refresh);
       window.removeEventListener("milverse:city:built", onBuilt);
       window.removeEventListener("milverse:bricks", refresh);
       window.removeEventListener("milverse:city:open", onOpen);
     };
   }, []);
+
 
   const cells = useMemo(() => {
     const list: { gx: number; gy: number }[] = [];
@@ -734,14 +771,16 @@ export function CityIsometric() {
   if (!save || !derived) return null;
   const { hint, built, filled, perkOnline, population, power, safety, literacy, affordableIds } = derived;
 
-  // Time-of-day tint — cheap; hour granularity is coarse so per-render is fine.
-  const hr = new Date().getHours();
-  const tint =
-    hr < 6 ? "rgba(20,15,40,0.35)" :
-    hr < 9 ? "rgba(210,120,60,0.14)" :
-    hr < 17 ? "rgba(120,140,180,0.06)" :
-    hr < 20 ? "rgba(220,90,60,0.16)" :
-    "rgba(15,10,30,0.28)";
+  // Smooth day/night light model — fractional hour drives tint and the sun/moon arc.
+  const hFrac = clock.getHours() + clock.getMinutes() / 60;
+  
+  const isDay = hFrac >= 6 && hFrac < 18.5;
+  // 0 at rise, 1 at set — for both the sun and the moon.
+  const arcT = isDay
+    ? (hFrac - 6) / 12.5
+    : ((hFrac < 6 ? hFrac + 24 : hFrac) - 18.5) / 11.5;
+  const tint = lightTint(hFrac);
+
 
   const bounds = { w: TW * (GRID + 1), h: TH * (GRID + 3) };
   const viewBox = `${-bounds.w / 2} ${-140} ${bounds.w} ${bounds.h + 60}`;
@@ -846,36 +885,70 @@ export function CityIsometric() {
               <stop offset="0.5" stopColor="#a0d8ff" stopOpacity="0.35" />
               <stop offset="1" stopColor="#a0d8ff" stopOpacity="0" />
             </linearGradient>
+            <radialGradient id="fountain-water" cx="0.5" cy="0.4" r="0.6">
+              <stop offset="0" stopColor="#67e8f9" stopOpacity="0.55" />
+              <stop offset="1" stopColor="#0d2a33" stopOpacity="0" />
+            </radialGradient>
           </defs>
+
 
           {/* ── SKY BACKDROP: sun/moon by hour + skyline + drifting clouds ── */}
           <g aria-hidden="true">
-            {/* SUN by day, MOON by dusk/night */}
-            {hr >= 6 && hr < 18 ? (
-              <g>
-                <circle cx={-bounds.w / 2 + 60} cy={-108} r={22} fill="#fde68a" opacity="0.15" />
-                <circle cx={-bounds.w / 2 + 60} cy={-108} r={14} fill="#fef3c7" opacity="0.35" />
-                <circle cx={-bounds.w / 2 + 60} cy={-108} r={9} fill="#fde68a" opacity="0.95" />
-              </g>
-            ) : (
-              <g>
-                <circle cx={bounds.w / 2 - 60} cy={-100} r={12} fill="#f5e6c4" opacity="0.9" />
-                <circle cx={bounds.w / 2 - 56} cy={-104} r={12} fill="#0a0812" />
-              </g>
-            )}
-            {/* stars — fade during the day */}
-            {(hr < 6 || hr >= 19) && Array.from({ length: 18 }).map((_, i) => {
-              const sx = -bounds.w / 2 + hashCell(i, 0, 5) * bounds.w;
-              const sy = -130 + hashCell(0, i, 5) * 40;
-              return <circle key={i} cx={sx} cy={sy} r={hashCell(i, i, 9) * 0.9 + 0.2} fill="#fef3c7" opacity={0.4 + hashCell(i, 1, 9) * 0.6} />;
-            })}
+            {/* SUN by day, MOON by night — both ride a real arc across the sky */}
+            {(() => {
+              const t = Math.max(0, Math.min(1, arcT));
+              const cx = -bounds.w / 2 + 50 + t * (bounds.w - 100);
+              const cy = -58 - Math.sin(Math.PI * t) * 78;
+              const low = Math.sin(Math.PI * t); // 0 at horizon, 1 at zenith
+              return isDay ? (
+                <g>
+                  <circle cx={cx} cy={cy} r={26} fill="#fde68a" opacity={0.10 + low * 0.10} />
+                  <circle cx={cx} cy={cy} r={15} fill="#fef3c7" opacity="0.32" />
+                  <circle cx={cx} cy={cy} r={9} fill={low < 0.35 ? "#fbbf24" : "#fde68a"} opacity="0.95" />
+                </g>
+              ) : (
+                <g>
+                  <circle cx={cx} cy={cy} r={20} fill="#cbd5f5" opacity={0.06 + low * 0.06} />
+                  <circle cx={cx} cy={cy} r={12} fill="#f5e6c4" opacity="0.9" />
+                  <circle cx={cx + 4} cy={cy - 4} r={12} fill="#0a0812" />
+                </g>
+              );
+            })()}
+            {/* stars — fade out around the edges of night */}
+            {!isDay && (() => {
+              const night = Math.min(1, Math.max(0, 1 - Math.abs(arcT - 0.5) * 1.6));
+              return Array.from({ length: 18 }).map((_, i) => {
+                const sx = -bounds.w / 2 + hashCell(i, 0, 5) * bounds.w;
+                const sy = -130 + hashCell(0, i, 5) * 40;
+                return (
+                  <circle
+                    key={i}
+                    cx={sx}
+                    cy={sy}
+                    r={hashCell(i, i, 9) * 0.9 + 0.2}
+                    fill="#fef3c7"
+                    opacity={(0.3 + hashCell(i, 1, 9) * 0.6) * (0.35 + night * 0.65)}
+                  >
+                    {!reducedMotion && (
+                      <animate
+                        attributeName="opacity"
+                        values={`${0.2 + hashCell(i, 2, 9) * 0.3};${0.7 + hashCell(i, 3, 9) * 0.3};${0.2 + hashCell(i, 2, 9) * 0.3}`}
+                        dur={`${3 + hashCell(i, 4, 9) * 5}s`}
+                        repeatCount="indefinite"
+                      />
+                    )}
+                  </circle>
+                );
+              });
+            })()}
+
             {/* far skyline — hand-composed rectangles, low-contrast */}
 ...
             {/* horizon haze */}
             <rect x={-bounds.w / 2} y={-70} width={bounds.w} height={80} fill="url(#horizon-haze)" opacity="0.4" />
             {/* DRIFTING CLOUDS — two soft banks that cross the sky */}
             {!reducedMotion && (
-              <g opacity={hr >= 6 && hr < 18 ? 0.45 : 0.22}>
+              <g opacity={isDay ? 0.45 : 0.22}>
                 <g>
                   <ellipse cx={0} cy={-90} rx={26} ry={5} fill="#d6c8e8" />
                   <ellipse cx={14} cy={-93} rx={16} ry={4} fill="#e6dcf0" />
@@ -901,6 +974,45 @@ export function CityIsometric() {
           {cells.map(({ gx, gy }) => (
             <GroundTile key={`t-${gx}-${gy}`} gx={gx} gy={gy} reducedMotion={reducedMotion} />
           ))}
+
+          {/* ── PLAZA FOUNTAIN — the centre of town, with water that moves ── */}
+          {(() => {
+            const p = iso(2, 2);
+            const cy = p.y + TH / 2;
+            return (
+              <g aria-hidden="true" transform={`translate(${p.x},${cy})`}>
+                {/* basin */}
+                <ellipse cx={0} cy={0} rx={17} ry={8.5} fill="#1b1720" stroke="#4a4256" strokeWidth="0.7" />
+                <ellipse cx={0} cy={-0.8} rx={13} ry={6.4} fill="#0d2a33" />
+                <ellipse cx={0} cy={-0.8} rx={13} ry={6.4} fill="url(#fountain-water)" opacity="0.75" />
+                {/* plinth + spout */}
+                <rect x={-2} y={-11} width={4} height={10} rx={1} fill="#3a3444" />
+                <ellipse cx={0} cy={-11.5} rx={4} ry={2} fill="#4a4256" />
+                <circle cx={0} cy={-13} r={1.6} fill="#67e8f9" opacity="0.85" filter="url(#glow-soft)" />
+                {!reducedMotion && (
+                  <>
+                    {/* jets */}
+                    {[-1, 1].map((dir, i) => (
+                      <circle key={i} cx={0} cy={-13} r={0.8} fill="#a5f3fc" opacity="0.9">
+                        <animate attributeName="cy" values="-13;-19;-2" dur="1.9s" begin={`${i * 0.5}s`} repeatCount="indefinite" />
+                        <animate attributeName="cx" values={`0;${dir * 4};${dir * 7}`} dur="1.9s" begin={`${i * 0.5}s`} repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.95;0.7;0" dur="1.9s" begin={`${i * 0.5}s`} repeatCount="indefinite" />
+                      </circle>
+                    ))}
+                    {/* ripples */}
+                    {[0, 1].map((i) => (
+                      <ellipse key={i} cx={0} cy={-0.8} rx={3} ry={1.5} fill="none" stroke="#67e8f9" strokeWidth="0.5" opacity="0.7">
+                        <animate attributeName="rx" values="3;12.5" dur="3.2s" begin={`${i * 1.6}s`} repeatCount="indefinite" />
+                        <animate attributeName="ry" values="1.5;6.2" dur="3.2s" begin={`${i * 1.6}s`} repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.7;0" dur="3.2s" begin={`${i * 1.6}s`} repeatCount="indefinite" />
+                      </ellipse>
+                    ))}
+                  </>
+                )}
+              </g>
+            );
+          })()}
+
 
           {/* ── MOVING TRAFFIC — two cars sliding along the two roads ── */}
           {!reducedMotion && (() => {
@@ -1067,6 +1179,10 @@ export function CityIsometric() {
                   key={bc.id}
                   transform={`translate(${x},${y})`}
                   onClick={() => setOpen(bc.id)}
+                  onMouseEnter={() => setHoverId(bc.id)}
+                  onMouseLeave={() => setHoverId((h) => (h === bc.id ? null : h))}
+                  onFocus={() => setHoverId(bc.id)}
+                  onBlur={() => setHoverId((h) => (h === bc.id ? null : h))}
                   className="cursor-pointer milv-tile-hover"
                   role="button"
                   aria-label={`${bc.def.name} — Lv${lvl}${cost !== null ? `, next ${cost} bricks` : ", maxed"}`}
@@ -1078,6 +1194,7 @@ export function CityIsometric() {
                     }
                   }}
                 >
+
                   <Building def={bc.def} level={lvl} reducedMotion={reducedMotion} affordable={affordableIds.has(bc.id)} />
                   {/* label plate */}
                   <g transform={`translate(0, ${TH / 2 + 6})`}>
@@ -1133,16 +1250,41 @@ export function CityIsometric() {
                     </text>
                   </g>
                   {flash && (
-                    <circle
-                      cx={0}
-                      cy={-8}
-                      r={40}
-                      fill="none"
-                      stroke="#34d399"
-                      strokeWidth="1.5"
-                      className="milv-flash-ring"
-                    />
+                    <g aria-hidden="true">
+                      <circle
+                        cx={0}
+                        cy={-8}
+                        r={40}
+                        fill="none"
+                        stroke="#34d399"
+                        strokeWidth="1.5"
+                        className="milv-flash-ring"
+                      />
+                      <circle
+                        cx={0}
+                        cy={-8}
+                        r={26}
+                        fill="none"
+                        stroke="#fde68a"
+                        strokeWidth="0.8"
+                        className="milv-flash-ring milv-flash-ring--late"
+                      />
+                      {/* sparks — deterministic fan, dust settling back onto the plot */}
+                      {!reducedMotion &&
+                        Array.from({ length: 10 }).map((_, i) => {
+                          const a = (i / 10) * Math.PI * 2;
+                          const d = 22 + hashCell(i, lvl, 13) * 16;
+                          return (
+                            <circle key={i} cx={0} cy={-10} r={1.2} fill={i % 2 ? "#fde68a" : "#6ee7b7"}>
+                              <animate attributeName="cx" values={`0;${(Math.cos(a) * d).toFixed(1)}`} dur="0.9s" fill="freeze" />
+                              <animate attributeName="cy" values={`-10;${(-10 + Math.sin(a) * d * 0.5).toFixed(1)}`} dur="0.9s" fill="freeze" />
+                              <animate attributeName="opacity" values="1;0" dur="0.9s" fill="freeze" />
+                            </circle>
+                          );
+                        })}
+                    </g>
                   )}
+
                   {/* PERK ONLINE badge — glowing emerald star above building */}
                   {perkOnline.has(bc.id) && (
                     <g transform={`translate(${TW / 2 - 14}, ${-6 - (22 + lvl * 14) - 4})`}>
@@ -1155,6 +1297,38 @@ export function CityIsometric() {
                 </g>
               );
             })}
+
+          {/* ── PLOT TOOLTIP — reads on hover and on keyboard focus ── */}
+          {hoverId && (() => {
+            const b = buildingCells.find((x) => x.id === hoverId);
+            if (!b) return null;
+            const lvl = levelOf(save, hoverId);
+            const cost = nextCost(hoverId, lvl);
+            const maxed = isMaxed(hoverId, lvl);
+            const p = iso(b.gx, b.gy);
+            const rows = [
+              maxed ? "MAX LEVEL" : lvl === 0 ? `BREAK GROUND · ${cost}◼` : `LV ${lvl}/${b.def.maxLevel} · NEXT ${cost}◼`,
+              perkOnline.has(hoverId) ? "PERK ONLINE" : `PERK AT LV ${PERK_REQ[hoverId]}`,
+            ];
+            const w = 116;
+            const h = 40;
+            const tx = Math.max(-bounds.w / 2 + 6, Math.min(bounds.w / 2 - w - 6, p.x - w / 2));
+            const ty = p.y - 48 - lvl * 14;
+            return (
+              <g aria-hidden="true" pointerEvents="none" className="milv-tip" transform={`translate(${tx},${ty})`}>
+                <rect x={0} y={0} width={w} height={h} rx={3} fill="#08060c" opacity="0.94" stroke="#f59e0b" strokeWidth="0.6" />
+                <rect x={0} y={0} width={w} height={1.4} fill="#f59e0b" opacity="0.7" />
+                <text x={7} y={14} fontSize="9" fill="#fde68a" style={{ fontFamily: '"Bebas Neue", sans-serif', letterSpacing: "1px" }}>
+                  {b.def.name.toUpperCase()}
+                </text>
+                {rows.map((r, i) => (
+                  <text key={i} x={7} y={25 + i * 10} fontSize="6.5" fill={i === 1 && perkOnline.has(hoverId) ? "#6ee7b7" : "#a8a29e"} style={{ fontFamily: "monospace" }}>
+                    {r}
+                  </text>
+                ))}
+              </g>
+            );
+          })()}
         </svg>
       </div>
 
@@ -1170,8 +1344,16 @@ export function CityIsometric() {
         .milv-searchlight { animation: milv-searchlight-sweep 6s ease-in-out infinite; transform-box: fill-box; }
         @keyframes milv-flash-ring { 0% { opacity: 1; r: 10 } 100% { opacity: 0; r: 60 } }
         .milv-flash-ring { animation: milv-flash-ring 1.2s ease-out forwards; }
-        .milv-tile-hover:hover { filter: brightness(1.25); }
+        .milv-flash-ring--late { animation-duration: 0.85s; animation-delay: 0.15s; }
+        .milv-tile-hover { transition: filter 180ms ease; }
+        .milv-tile-hover:hover, .milv-tile-hover:focus-visible { filter: brightness(1.25) drop-shadow(0 0 6px rgba(253,224,71,0.35)); outline: none; }
+        @keyframes milv-tip-in { from { opacity: 0 } to { opacity: 1 } }
+        .milv-tip { animation: milv-tip-in 140ms ease-out both; }
+        @media (prefers-reduced-motion: reduce) {
+          .milv-window, .milv-beacon, .milv-smoke, .milv-searchlight, .milv-tip { animation: none !important; }
+        }
       `}</style>
+
 
       <BuildingCard open={!!open} onClose={() => setOpen(null)} buildingId={open} />
     </section>
