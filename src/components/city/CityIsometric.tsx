@@ -1283,10 +1283,10 @@ export function CityIsometric() {
             return (
               <g key={`zseal-${z.id}`} transform={`translate(${x - 46},${y - 4})`} aria-hidden="true">
                 <rect x={-52} y={-9} width={104} height={18} rx={2} fill="#0a0509" opacity="0.9" stroke="#f43f5e" strokeOpacity="0.4" strokeWidth="0.5" />
-                <text x={0} y={-1} textAnchor="middle" fontSize="7" fill="#fda4af" style={{ fontFamily: '"Bebas Neue", sans-serif', letterSpacing: "1.4px" }}>
+                <text x={0} y={-1} textAnchor="middle" fontSize={SIGN_SIZE.title} fill={INK.sealed} style={SIGN_TITLE}>
                   {z.name} · SEALED
                 </text>
-                <text x={0} y={6.5} textAnchor="middle" fontSize="5.5" fill="#e7b7c0" opacity="0.8" style={{ fontFamily: "ui-monospace, monospace" }}>
+                <text x={0} y={6.5} textAnchor="middle" fontSize={SIGN_SIZE.meta} fill={INK.sealedMeta} opacity="0.8" style={SIGN_META}>
                   OPENS AT {["CONSTABLE","INSPECTOR","CHIEF","COMMISSIONER","MAYOR","GOVERNOR"][z.step]}
                 </text>
               </g>
