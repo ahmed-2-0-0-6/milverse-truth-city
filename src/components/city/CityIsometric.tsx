@@ -1571,7 +1571,7 @@ export function CityIsometric() {
                       cx={0}
                       cy={-6 - (22 + lvl * 14)}
                       r={3}
-                      fill="#fde047"
+                      fill={INK.ready}
                       className="milv-beacon"
                       filter="url(#glow-soft)"
                     />
