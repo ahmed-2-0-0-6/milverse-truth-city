@@ -1318,13 +1318,14 @@ export function CityIsometric() {
           style={{ background: tint }}
         />
         <CinematicLayer
-          active={active}
+          active={active && film}
           immersed={immersed}
           reducedMotion={reducedMotion}
           lowFx={lowFx}
           title="TRUTH CITY"
           subtitle="SECTOR ONLINE"
         />
+
 
 
         <svg
