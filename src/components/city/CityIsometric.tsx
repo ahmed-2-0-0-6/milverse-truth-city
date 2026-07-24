@@ -378,7 +378,7 @@ const Building = React.memo(function Building({
       />
     </g>
   );
-}
+});
 
 function EmptyLot({ crane = false, reducedMotion = false }: { crane?: boolean; reducedMotion?: boolean }) {
   const halfW = TW / 2 - 10;
