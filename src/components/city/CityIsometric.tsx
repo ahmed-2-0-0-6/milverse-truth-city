@@ -116,31 +116,84 @@ const BUILDING_CELLS = new Set(
 function GroundTileImpl({ gx, gy, reducedMotion, lowFx }: { gx: number; gy: number; reducedMotion: boolean; lowFx: boolean }) {
   const { x, y } = iso(gx, gy);
   const kind = classifyTile(gx, gy);
-  const fill =
-    kind === "road" ? "#151519" : kind === "plaza" ? "#2a2620" : "#0f0c14";
-  const stroke = kind === "road" ? "#22222c" : "#1a1424";
   const pts = `0,0 ${TW / 2},${TH / 2} 0,${TH} ${-TW / 2},${TH / 2}`;
   const hasBuilding = BUILDING_CELLS.has(`${gx}-${gy}`);
   const rA = hashCell(gx, gy, 1);
   const rB = hashCell(gx, gy, 2);
   const rC = hashCell(gx, gy, 3);
+  const rD = hashCell(gx, gy, 4);
   // Per-tile SMIL is the single biggest cost on 81 tiles. On weak hardware the
   // decoration stays, the motion goes.
   const animate = !reducedMotion && !lowFx;
 
+  // Ground tone: deterministic jitter so no two plots of dirt read identical.
+  // Kept inside a narrow band — the city stays one material, not a quilt.
+  const tone = Math.round((rD - 0.5) * 10); // -5..+5
+  const clamp = (n: number) => Math.max(0, Math.min(255, n));
+  const shade = (hex: string, d: number) => {
+    const n = parseInt(hex.slice(1), 16);
+    const r = clamp(((n >> 16) & 255) + d);
+    const g = clamp(((n >> 8) & 255) + d);
+    const b = clamp((n & 255) + d);
+    return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
+  };
+  const base =
+    kind === "road" ? "#151519" : kind === "plaza" ? "#2a2620" : "#0f0c14";
+  const fill = shade(base, tone);
+  const stroke = kind === "road" ? "#22222c" : "#1a1424";
+  // Where grass meets an avenue, lay a kerb. Reads as a real block edge.
+  const kerbN = kind === "grass" && (gx - 1 === CENTER || ringOf(gx - 1, gy) === 3);
+  const kerbW = kind === "grass" && (gy - 1 === CENTER || ringOf(gx, gy - 1) === 3);
 
   return (
     <g transform={`translate(${x},${y})`}>
       <polygon points={pts} fill={fill} stroke={stroke} strokeWidth="0.5" />
+      {/* soil / asphalt grain — static, no cost after first paint */}
+      <polygon points={pts} fill="url(#ground-grain)" opacity={kind === "road" ? 0.3 : 0.42} pointerEvents="none" />
+      {/* corner falloff: the plate sinks at the edges, lifts in the middle */}
+      <polygon points={pts} fill="url(#ground-vignette)" opacity="0.55" pointerEvents="none" />
+
+      {kerbN && (
+        <polyline points={`0,0 ${TW / 2},${TH / 2}`} fill="none" stroke="#3a3644" strokeWidth="1.1" opacity="0.55" />
+      )}
+      {kerbW && (
+        <polyline points={`0,0 ${-TW / 2},${TH / 2}`} fill="none" stroke="#3a3644" strokeWidth="1.1" opacity="0.55" />
+      )}
 
       {kind === "road" && (
-        <polygon
-          points={pts}
-          fill="url(#road-sheen)"
-          opacity="0.35"
-          pointerEvents="none"
-        />
+        <>
+          <polygon
+            points={pts}
+            fill="url(#road-sheen)"
+            opacity="0.35"
+            pointerEvents="none"
+          />
+          {/* patch job — resurfaced asphalt, darker than the rest */}
+          {rC < 0.35 && (
+            <polygon
+              points={`${(rA - 0.5) * 18},${8 + rB * 8} ${(rA - 0.5) * 18 + 14},${15 + rB * 8} ${(rA - 0.5) * 18},${22 + rB * 8} ${(rA - 0.5) * 18 - 14},${15 + rB * 8}`}
+              fill="#0e0e13"
+              opacity="0.7"
+            />
+          )}
+          {/* manhole */}
+          {rD > 0.72 && (
+            <g transform={`translate(${(rA - 0.5) * 22},${TH / 2 + (rB - 0.5) * 8})`}>
+              <ellipse rx={4} ry={2} fill="#101014" stroke="#2e2e38" strokeWidth="0.5" />
+              <ellipse rx={2.2} ry={1.1} fill="none" stroke="#2e2e38" strokeWidth="0.4" />
+            </g>
+          )}
+          {/* rain pooled in the low spots, catching the sign light */}
+          {rB > 0.62 && (
+            <g transform={`translate(${(rC - 0.5) * 24},${TH / 2 + 6})`} pointerEvents="none">
+              <ellipse rx={9} ry={3.2} fill="#0b1420" opacity="0.85" />
+              <ellipse rx={9} ry={3.2} fill="url(#puddle-sheen)" opacity="0.5" />
+              <ellipse cx={-2} cy={-0.6} rx={3} ry={0.9} fill="#67e8f9" opacity="0.18" />
+            </g>
+          )}
+        </>
       )}
+
 
       {kind === "grass" && hasBuilding && (
         <>
