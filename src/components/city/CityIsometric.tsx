@@ -1279,9 +1279,8 @@ export function CityIsometric() {
           </defs>
 
           {/* ground tiles */}
-          {cells.map(({ gx, gy }) => (
-            <GroundTile key={`t-${gx}-${gy}`} gx={gx} gy={gy} reducedMotion={reducedMotion} />
-          ))}
+          <GroundLayer cells={cells} reducedMotion={reducedMotion} lowFx={lowFx} />
+
 
           {/* ── SEALED GROUND — districts you haven't earned yet ── */}
           <defs>
