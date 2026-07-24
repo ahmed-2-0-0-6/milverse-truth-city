@@ -966,6 +966,90 @@ export function CityIsometric() {
           })()}
 
 
+          {/* ── PEDESTRIANS — deterministic figures pacing the plaza ── */}
+          {!reducedMotion && (() => {
+            const plaza = iso(2, 2);
+            const walkers = [
+              { r: 18, dur: 24, phase: 0,   color: "#fde68a" },
+              { r: 14, dur: 19, phase: 90,  color: "#a7f3d0" },
+              { r: 22, dur: 31, phase: 180, color: "#fda4af" },
+              { r: 10, dur: 15, phase: 270, color: "#c4b5fd" },
+            ];
+            return (
+              <g aria-hidden="true" transform={`translate(${plaza.x},${plaza.y + TH / 2})`}>
+                {walkers.map((w, i) => (
+                  <g key={i}>
+                    <g>
+                      {/* shadow + tiny figure */}
+                      <ellipse cx={0} cy={2} rx={1.6} ry={0.6} fill="#000" opacity="0.55" />
+                      <rect x={-0.7} y={-4} width={1.4} height={4} fill={w.color} opacity="0.9" />
+                      <circle cx={0} cy={-5} r={0.9} fill="#f5e6c4" />
+                      <animateTransform
+                        attributeName="transform"
+                        type="rotate"
+                        from={`${w.phase} 0 0`}
+                        to={`${w.phase + 360} 0 0`}
+                        dur={`${w.dur}s`}
+                        repeatCount="indefinite"
+                        additive="sum"
+                      />
+                      <animateTransform
+                        attributeName="transform"
+                        type="translate"
+                        values={`${w.r},0`}
+                        additive="sum"
+                      />
+                    </g>
+                  </g>
+                ))}
+              </g>
+            );
+          })()}
+
+          {/* ── MONSOON — subtle rain streaks in Jul/Aug only (LTE dev override via ?rain=1) ── */}
+          {!reducedMotion && (() => {
+            const m = new Date().getMonth();
+            const forced = typeof window !== "undefined" && window.location.search.includes("rain=1");
+            const monsoon = m === 6 || m === 7 || forced;
+            if (!monsoon) return null;
+            return (
+              <g aria-hidden="true" opacity="0.55">
+                {Array.from({ length: 24 }).map((_, i) => {
+                  const x = -bounds.w / 2 + hashCell(i, 3, 11) * bounds.w;
+                  const dur = 0.7 + hashCell(i, 5, 11) * 0.6;
+                  const delay = hashCell(i, 7, 11) * 1.2;
+                  return (
+                    <line
+                      key={i}
+                      x1={x}
+                      y1={-140}
+                      x2={x - 4}
+                      y2={-100}
+                      stroke="#a0d8ff"
+                      strokeWidth="0.5"
+                      opacity="0.75"
+                    >
+                      <animate
+                        attributeName="y1"
+                        values="-140;220"
+                        dur={`${dur}s`}
+                        begin={`${delay}s`}
+                        repeatCount="indefinite"
+                      />
+                      <animate
+                        attributeName="y2"
+                        values="-100;260"
+                        dur={`${dur}s`}
+                        begin={`${delay}s`}
+                        repeatCount="indefinite"
+                      />
+                    </line>
+                  );
+                })}
+              </g>
+            );
+          })()}
+
           {/* buildings (already in back-to-front order because their cells are sorted with the tiles) */}
           {cells
             .map(({ gx, gy }) => buildingCells.find((b) => b.gx === gx && b.gy === gy))
