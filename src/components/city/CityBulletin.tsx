@@ -3,7 +3,7 @@
 // Reduced-motion: falls back to a static rotating stack.
 
 import { useEffect, useMemo, useState } from "react";
-import { loadCity, type CitySave } from "@/lib/city/citySave";
+import { loadCity, plotsBuilt, type CitySave } from "@/lib/city/citySave";
 import { bulletinsFor, type Bulletin } from "@/lib/city/bulletin";
 import { titleFor, nextTitle } from "@/lib/city/title";
 import { useCoalescedRefresh } from "@/hooks/useCoalescedRefresh";
