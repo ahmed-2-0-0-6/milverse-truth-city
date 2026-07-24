@@ -554,7 +554,14 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
 
 
   return (
-    <div className="relative w-full h-[70vh] min-h-[520px] rounded-sm overflow-hidden border border-border/60 bg-[#050914]">
+    <div
+      className={
+        fullscreen
+          ? "fixed inset-0 z-[9998] overflow-hidden bg-[#050914]"
+          : "relative w-full h-[85vh] min-h-[560px] rounded-sm overflow-hidden border border-border/60 bg-[#050914]"
+      }
+    >
+
       <div
         ref={viewportRef}
         className="absolute inset-0 touch-none select-none cursor-grab active:cursor-grabbing"
