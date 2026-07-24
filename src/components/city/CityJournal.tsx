@@ -1,6 +1,6 @@
 // MILVERSE — Your City · Journal panel (Phase 3 upgrade).
 
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { loadJournal, wireJournalListeners, type JournalEntry } from "@/lib/city/journal";
 import { useCoalescedRefresh } from "@/hooks/useCoalescedRefresh";
 
