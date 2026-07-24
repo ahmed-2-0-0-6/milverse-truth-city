@@ -114,7 +114,7 @@ export function DailyDirectives() {
   );
 }
 
-function DirectiveRow({
+const DirectiveRow = memo(function DirectiveRow({
   d,
   progress,
   claimed,
@@ -165,4 +165,5 @@ function DirectiveRow({
       </div>
     </li>
   );
-}
+});
+
