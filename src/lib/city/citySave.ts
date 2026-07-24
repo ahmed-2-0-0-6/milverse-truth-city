@@ -90,7 +90,17 @@ export function upgradeBuilding(id: BuildingId): UpgradeOutcome {
   s.bricks -= cost;
   s.buildings[id] = { level: cur + 1 };
   persist(s);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent("milverse:city:built", { detail: { id, level: cur + 1 } }),
+    );
+  }
   return { ok: true, level: cur + 1, spent: cost };
+}
+
+/** Count of built plots (level ≥ 1). */
+export function plotsBuilt(save: CitySave): number {
+  return Object.values(save.buildings).filter((b) => (b?.level ?? 0) > 0).length;
 }
 
 /** DEV-only reset. Wired to Profile page later. */
