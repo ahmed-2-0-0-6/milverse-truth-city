@@ -1420,7 +1420,27 @@ export function CityIsometric() {
               <stop offset="0" stopColor="#67e8f9" stopOpacity="0.55" />
               <stop offset="1" stopColor="#0d2a33" stopOpacity="0" />
             </radialGradient>
+            {/* ground grain — a speckle of grit over every tile */}
+            <pattern id="ground-grain" width="8" height="8" patternUnits="userSpaceOnUse">
+              <rect width="8" height="8" fill="none" />
+              <circle cx="1.5" cy="2" r="0.45" fill="#ffffff" opacity="0.05" />
+              <circle cx="5.5" cy="5" r="0.4" fill="#000000" opacity="0.35" />
+              <circle cx="3" cy="6.5" r="0.3" fill="#ffffff" opacity="0.035" />
+              <circle cx="6.8" cy="1.2" r="0.3" fill="#000000" opacity="0.3" />
+            </pattern>
+            {/* the plate sinks at its edges so tiles read as slabs, not paint */}
+            <radialGradient id="ground-vignette" cx="0.5" cy="0.5" r="0.62">
+              <stop offset="0.45" stopColor="#000000" stopOpacity="0" />
+              <stop offset="1" stopColor="#000000" stopOpacity="0.5" />
+            </radialGradient>
+            {/* standing water picking up the signs overhead */}
+            <linearGradient id="puddle-sheen" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stopColor="#f0abfc" stopOpacity="0.22" />
+              <stop offset="0.5" stopColor="#a0d8ff" stopOpacity="0.4" />
+              <stop offset="1" stopColor="#fde68a" stopOpacity="0.18" />
+            </linearGradient>
           </defs>
+
 
 
           {/* ── SKY BACKDROP: sun/moon by hour + skyline + drifting clouds ── */}
