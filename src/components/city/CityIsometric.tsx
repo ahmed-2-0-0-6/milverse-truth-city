@@ -1179,6 +1179,10 @@ export function CityIsometric() {
                   key={bc.id}
                   transform={`translate(${x},${y})`}
                   onClick={() => setOpen(bc.id)}
+                  onMouseEnter={() => setHoverId(bc.id)}
+                  onMouseLeave={() => setHoverId((h) => (h === bc.id ? null : h))}
+                  onFocus={() => setHoverId(bc.id)}
+                  onBlur={() => setHoverId((h) => (h === bc.id ? null : h))}
                   className="cursor-pointer milv-tile-hover"
                   role="button"
                   aria-label={`${bc.def.name} — Lv${lvl}${cost !== null ? `, next ${cost} bricks` : ", maxed"}`}
@@ -1190,6 +1194,7 @@ export function CityIsometric() {
                     }
                   }}
                 >
+
                   <Building def={bc.def} level={lvl} reducedMotion={reducedMotion} affordable={affordableIds.has(bc.id)} />
                   {/* label plate */}
                   <g transform={`translate(0, ${TH / 2 + 6})`}>
@@ -1245,16 +1250,41 @@ export function CityIsometric() {
                     </text>
                   </g>
                   {flash && (
-                    <circle
-                      cx={0}
-                      cy={-8}
-                      r={40}
-                      fill="none"
-                      stroke="#34d399"
-                      strokeWidth="1.5"
-                      className="milv-flash-ring"
-                    />
+                    <g aria-hidden="true">
+                      <circle
+                        cx={0}
+                        cy={-8}
+                        r={40}
+                        fill="none"
+                        stroke="#34d399"
+                        strokeWidth="1.5"
+                        className="milv-flash-ring"
+                      />
+                      <circle
+                        cx={0}
+                        cy={-8}
+                        r={26}
+                        fill="none"
+                        stroke="#fde68a"
+                        strokeWidth="0.8"
+                        className="milv-flash-ring milv-flash-ring--late"
+                      />
+                      {/* sparks — deterministic fan, dust settling back onto the plot */}
+                      {!reducedMotion &&
+                        Array.from({ length: 10 }).map((_, i) => {
+                          const a = (i / 10) * Math.PI * 2;
+                          const d = 22 + hashCell(i, lvl, 13) * 16;
+                          return (
+                            <circle key={i} cx={0} cy={-10} r={1.2} fill={i % 2 ? "#fde68a" : "#6ee7b7"}>
+                              <animate attributeName="cx" values={`0;${(Math.cos(a) * d).toFixed(1)}`} dur="0.9s" fill="freeze" />
+                              <animate attributeName="cy" values={`-10;${(-10 + Math.sin(a) * d * 0.5).toFixed(1)}`} dur="0.9s" fill="freeze" />
+                              <animate attributeName="opacity" values="1;0" dur="0.9s" fill="freeze" />
+                            </circle>
+                          );
+                        })}
+                    </g>
                   )}
+
                   {/* PERK ONLINE badge — glowing emerald star above building */}
                   {perkOnline.has(bc.id) && (
                     <g transform={`translate(${TW / 2 - 14}, ${-6 - (22 + lvl * 14) - 4})`}>
@@ -1267,6 +1297,38 @@ export function CityIsometric() {
                 </g>
               );
             })}
+
+          {/* ── PLOT TOOLTIP — reads on hover and on keyboard focus ── */}
+          {hoverId && (() => {
+            const b = buildingCells.find((x) => x.id === hoverId);
+            if (!b) return null;
+            const lvl = levelOf(save, hoverId);
+            const cost = nextCost(hoverId, lvl);
+            const maxed = isMaxed(hoverId, lvl);
+            const p = iso(b.gx, b.gy);
+            const rows = [
+              maxed ? "MAX LEVEL" : lvl === 0 ? `BREAK GROUND · ${cost}◼` : `LV ${lvl}/${b.def.maxLevel} · NEXT ${cost}◼`,
+              perkOnline.has(hoverId) ? "PERK ONLINE" : `PERK AT LV ${PERK_REQ[hoverId]}`,
+            ];
+            const w = 116;
+            const h = 40;
+            const tx = Math.max(-bounds.w / 2 + 6, Math.min(bounds.w / 2 - w - 6, p.x - w / 2));
+            const ty = p.y - 48 - lvl * 14;
+            return (
+              <g aria-hidden="true" pointerEvents="none" className="milv-tip" transform={`translate(${tx},${ty})`}>
+                <rect x={0} y={0} width={w} height={h} rx={3} fill="#08060c" opacity="0.94" stroke="#f59e0b" strokeWidth="0.6" />
+                <rect x={0} y={0} width={w} height={1.4} fill="#f59e0b" opacity="0.7" />
+                <text x={7} y={14} fontSize="9" fill="#fde68a" style={{ fontFamily: '"Bebas Neue", sans-serif', letterSpacing: "1px" }}>
+                  {b.def.name.toUpperCase()}
+                </text>
+                {rows.map((r, i) => (
+                  <text key={i} x={7} y={25 + i * 10} fontSize="6.5" fill={i === 1 && perkOnline.has(hoverId) ? "#6ee7b7" : "#a8a29e"} style={{ fontFamily: "monospace" }}>
+                    {r}
+                  </text>
+                ))}
+              </g>
+            );
+          })()}
         </svg>
       </div>
 
@@ -1282,8 +1344,16 @@ export function CityIsometric() {
         .milv-searchlight { animation: milv-searchlight-sweep 6s ease-in-out infinite; transform-box: fill-box; }
         @keyframes milv-flash-ring { 0% { opacity: 1; r: 10 } 100% { opacity: 0; r: 60 } }
         .milv-flash-ring { animation: milv-flash-ring 1.2s ease-out forwards; }
-        .milv-tile-hover:hover { filter: brightness(1.25); }
+        .milv-flash-ring--late { animation-duration: 0.85s; animation-delay: 0.15s; }
+        .milv-tile-hover { transition: filter 180ms ease; }
+        .milv-tile-hover:hover, .milv-tile-hover:focus-visible { filter: brightness(1.25) drop-shadow(0 0 6px rgba(253,224,71,0.35)); outline: none; }
+        @keyframes milv-tip-in { from { opacity: 0 } to { opacity: 1 } }
+        .milv-tip { animation: milv-tip-in 140ms ease-out both; }
+        @media (prefers-reduced-motion: reduce) {
+          .milv-window, .milv-beacon, .milv-smoke, .milv-searchlight, .milv-tip { animation: none !important; }
+        }
       `}</style>
+
 
       <BuildingCard open={!!open} onClose={() => setOpen(null)} buildingId={open} />
     </section>
