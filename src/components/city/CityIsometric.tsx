@@ -1376,7 +1376,7 @@ export function CityIsometric() {
 
           {/* ── PEDESTRIANS — deterministic figures pacing the plaza ── */}
           {!reducedMotion && (() => {
-            const plaza = iso(2, 2);
+            const plaza = iso(CENTER, CENTER);
             const walkers = [
               { r: 18, dur: 24, phase: 0,   color: "#fde68a" },
               { r: 14, dur: 19, phase: 90,  color: "#a7f3d0" },
