@@ -1255,7 +1255,7 @@ export function CityIsometric() {
             })}
           {/* district seal plates */}
           {ZONES.filter((z) => z.step > step).map((z) => {
-            const mid = z.cells[0];
+            const mid = z.cells[Math.floor(z.cells.length / 2)];
             const { x, y } = iso(mid[0], mid[1]);
             return (
               <g key={`zseal-${z.id}`} transform={`translate(${x - 46},${y - 4})`} aria-hidden="true">
