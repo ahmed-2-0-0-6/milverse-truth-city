@@ -41,6 +41,8 @@ export function bricksFor(
       break;
   }
   if (district === "first_phone" && verdict === "correct") base += 3;
+  // School Lv5 perk — First Phone lessons pay double.
+  if (district === "first_phone" && hasPerk("school_double_lessons")) base *= 2;
   // Outpost Lv3 perk — +5% on every case (rounded down).
   if (hasPerk("outpost_bonus")) base = Math.floor(base * 1.05);
   return base;
