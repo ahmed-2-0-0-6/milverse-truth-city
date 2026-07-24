@@ -96,15 +96,45 @@ function GroundTile({ gx, gy }: { gx: number; gy: number }) {
     <g transform={`translate(${x},${y})`}>
       <polygon points={pts} fill={fill} stroke={stroke} strokeWidth="0.5" />
 
-      {/* SIDEWALK inset ring on grass tiles that hold buildings */}
-      {kind === "grass" && hasBuilding && (
+      {/* WET-ASPHALT SHEEN on roads — a soft highlight strip */}
+      {kind === "road" && (
         <polygon
-          points={`0,4 ${TW / 2 - 4},${TH / 2} 0,${TH - 4} ${-(TW / 2 - 4)},${TH / 2}`}
-          fill="#2a2530"
-          stroke="#3a3444"
-          strokeWidth="0.4"
+          points={pts}
+          fill="url(#road-sheen)"
+          opacity="0.35"
+          pointerEvents="none"
         />
       )}
+
+      {/* SIDEWALK inset ring on grass tiles that hold buildings + tiny pedestrians */}
+      {kind === "grass" && hasBuilding && (
+        <>
+          <polygon
+            points={`0,4 ${TW / 2 - 4},${TH / 2} 0,${TH - 4} ${-(TW / 2 - 4)},${TH / 2}`}
+            fill="#2a2530"
+            stroke="#3a3444"
+            strokeWidth="0.4"
+          />
+          {/* pedestrian dot walking a short back-and-forth on the sidewalk */}
+          <circle cx={-(TW / 2 - 8)} cy={TH / 2} r={1.1} fill="#fef3c7" opacity="0.9">
+            <animate
+              attributeName="cx"
+              values={`${-(TW / 2 - 8)};${TW / 2 - 8};${-(TW / 2 - 8)}`}
+              dur={`${9 + rA * 4}s`}
+              repeatCount="indefinite"
+            />
+          </circle>
+          <circle cx={TW / 2 - 8} cy={TH / 2 + 2} r={1.1} fill="#fda4af" opacity="0.85">
+            <animate
+              attributeName="cx"
+              values={`${TW / 2 - 8};${-(TW / 2 - 8)};${TW / 2 - 8}`}
+              dur={`${10 + rB * 4}s`}
+              repeatCount="indefinite"
+            />
+          </circle>
+        </>
+      )}
+
 
       {/* GRASS TEXTURE — scatter tiny specks and one shrub / tree if empty */}
       {kind === "grass" && !hasBuilding && (
@@ -204,12 +234,14 @@ function Building({
   def,
   level,
   reducedMotion,
+  affordable = false,
 }: {
   def: BuildingDef;
   level: number;
   reducedMotion: boolean;
+  affordable?: boolean;
 }) {
-  if (level === 0) return <EmptyLot />;
+  if (level === 0) return <EmptyLot crane={affordable} reducedMotion={reducedMotion} />;
   const palette = PALETTE[def.district];
   // Height per level: base 22 + 14 per additional level
   const height = 22 + level * 14;
@@ -351,33 +383,105 @@ function Building({
   );
 }
 
-function EmptyLot() {
+function EmptyLot({ crane = false, reducedMotion = false }: { crane?: boolean; reducedMotion?: boolean }) {
   const halfW = TW / 2 - 10;
   const halfD = TH / 2 - 4;
   return (
     <g>
+      {/* dashed plot outline */}
       <polygon
         points={`0,${-6} ${halfW},${-6 + halfD} 0,${-6 + 2 * halfD} ${-halfW},${-6 + halfD}`}
         fill="none"
-        stroke="#8a6a2a"
+        stroke={crane ? "#fde047" : "#8a6a2a"}
         strokeWidth="1"
         strokeDasharray="3 3"
-        opacity="0.7"
+        opacity={crane ? 0.95 : 0.7}
       />
-      <text
-        x={0}
-        y={halfD - 1}
-        textAnchor="middle"
-        fontSize="14"
-        fill="#a97a2a"
-        opacity="0.9"
-        style={{ fontFamily: "monospace" }}
-      >
-        +
-      </text>
+      {!crane && (
+        <text x={0} y={halfD - 1} textAnchor="middle" fontSize="14" fill="#a97a2a" opacity="0.9" style={{ fontFamily: "monospace" }}>
+          +
+        </text>
+      )}
+      {/* CONSTRUCTION CRANE — anticipation cue when affordable */}
+      {crane && (
+        <g transform={`translate(${-halfW / 2}, ${halfD - 4})`}>
+          {/* base */}
+          <rect x={-2} y={-4} width={4} height={4} fill="#3a2818" />
+          {/* mast */}
+          <line x1={0} y1={-4} x2={0} y2={-26} stroke="#c9a84c" strokeWidth="1.2" />
+          {/* jib (horizontal arm) */}
+          <line x1={-8} y1={-26} x2={18} y2={-26} stroke="#c9a84c" strokeWidth="1" />
+          {/* counter-jib rail */}
+          <line x1={-8} y1={-24} x2={0} y2={-26} stroke="#c9a84c" strokeWidth="0.6" opacity="0.7" />
+          <line x1={18} y1={-24} x2={0} y2={-26} stroke="#c9a84c" strokeWidth="0.6" opacity="0.7" />
+          {/* hook + cable */}
+          <line x1={14} y1={-26} x2={14} y2={-14} stroke="#c9a84c" strokeWidth="0.5" opacity="0.8">
+            {!reducedMotion && (
+              <animate attributeName="y2" values="-14;-8;-14" dur="3.5s" repeatCount="indefinite" />
+            )}
+          </line>
+          <rect x={13} y={-16} width={2} height={2} fill="#fde047">
+            {!reducedMotion && (
+              <animate attributeName="y" values="-16;-10;-16" dur="3.5s" repeatCount="indefinite" />
+            )}
+          </rect>
+          {/* warning beacon on mast top */}
+          <circle cx={0} cy={-27} r={1} fill="#f43f5e">
+            {!reducedMotion && (
+              <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" repeatCount="indefinite" />
+            )}
+          </circle>
+          {/* small ground pallet with materials */}
+          <rect x={-6} y={-1} width={10} height={2} fill="#3a2818" />
+          <rect x={-5} y={-2} width={3} height={1} fill="#c9a84c" opacity="0.7" />
+          <rect x={-1} y={-2} width={3} height={1} fill="#c9a84c" opacity="0.5" />
+        </g>
+      )}
     </g>
   );
 }
+
+/* ── STATS HUD helpers ───────────────────────────────────── */
+function StatChip({ label, value, accent }: { label: string; value: string; accent: string }) {
+  return (
+    <div className="rounded-sm border border-amber-400/20 bg-black/40 px-2 py-1.5 flex items-center justify-between gap-2 min-w-0">
+      <span className="stencil tracking-widest text-amber-300/70 shrink-0">{label}</span>
+      <span
+        className="font-mono tabular-nums text-[13px] leading-none truncate transition-all duration-500"
+        style={{ color: accent, textShadow: `0 0 8px ${accent}55` }}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function StatBar({ label, value, accent, suffix = "" }: { label: string; value: number; accent: string; suffix?: string }) {
+  return (
+    <div className="rounded-sm border border-amber-400/20 bg-black/40 px-2 py-1.5 min-w-0">
+      <div className="flex items-center justify-between gap-2 mb-1">
+        <span className="stencil tracking-widest text-amber-300/70">{label}</span>
+        <span
+          className="font-mono tabular-nums text-[11px] leading-none transition-all duration-500"
+          style={{ color: accent, textShadow: `0 0 6px ${accent}55` }}
+        >
+          {value}{suffix}
+        </span>
+      </div>
+      <div className="h-[3px] w-full bg-white/5 rounded-full overflow-hidden">
+        <div
+          className="h-full transition-all duration-700 ease-out"
+          style={{
+            width: `${Math.max(0, Math.min(100, value))}%`,
+            background: `linear-gradient(90deg, ${accent}55, ${accent})`,
+            boxShadow: `0 0 6px ${accent}88`,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 
 /* ── per-building roof details unlocked by level ─────────── */
 function RoofDetail({
@@ -594,9 +698,36 @@ export function CityIsometric() {
   const target = hint?.cost ?? 1;
   const filled = hint ? Math.max(0, Math.min(1, (target - hint.remaining) / target)) : 1;
 
+  // ── LIVE CITY STATS — derived from building levels ──
+  const totalLevels = BUILDINGS.reduce((s, b) => s + levelOf(save, b.id), 0);
+  const population = Math.round(totalLevels * 128 + built * 42);
+  const power = Math.min(100, totalLevels * 6 + built * 3);
+  const safety = Math.min(100, levelOf(save, "outpost") * 20 + levelOf(save, "watchtower") * 12 + built * 4);
+  const literacy = Math.min(100, levelOf(save, "library") * 18 + levelOf(save, "school") * 22 + levelOf(save, "archive") * 8);
+
+  // Which building IDs the player can currently afford — used to decorate the empty lot with a construction crane
+  const affordableIds = new Set<BuildingId>();
+  for (const b of BUILDINGS) {
+    const lvl = levelOf(save, b.id);
+    if (lvl === 0) {
+      const c = nextCost(b.id, 0);
+      if (c !== null && save.bricks >= c) affordableIds.add(b.id);
+    }
+  }
+
+  // Time-of-day tint — overlays a subtle color wash based on user's local hour
+  const hr = new Date().getHours();
+  const tint =
+    hr < 6 ? "rgba(20,15,40,0.35)" :          // deep night — indigo
+    hr < 9 ? "rgba(210,120,60,0.14)" :         // dawn — amber
+    hr < 17 ? "rgba(120,140,180,0.06)" :       // day — pale blue
+    hr < 20 ? "rgba(220,90,60,0.16)" :         // dusk — orange
+    "rgba(15,10,30,0.28)";                     // night — indigo
+
   // viewBox — encompass full 5×5 iso grid comfortably
   const bounds = { w: TW * (GRID + 1), h: TH * (GRID + 3) };
   const viewBox = `${-bounds.w / 2} ${-140} ${bounds.w} ${bounds.h + 60}`;
+
 
   return (
     <section
@@ -638,7 +769,7 @@ export function CityIsometric() {
       </div>
 
       {hint && (
-        <div className="mb-3 h-1 w-full rounded-sm bg-amber-400/10 overflow-hidden">
+        <div className="mb-2 h-1 w-full rounded-sm bg-amber-400/10 overflow-hidden">
           <div
             className={`h-full transition-all duration-500 ${
               hint.remaining === 0
@@ -649,6 +780,14 @@ export function CityIsometric() {
           />
         </div>
       )}
+
+      {/* ── LIVE CITY STATS HUD ── */}
+      <div className="mb-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
+        <StatChip label="POPULATION" value={population.toLocaleString()} accent="#fde68a" />
+        <StatBar   label="POWER"      value={power}    accent="#22d3ee" suffix="%" />
+        <StatBar   label="SAFETY"     value={safety}   accent="#f97316" suffix="%" />
+        <StatBar   label="LITERACY"   value={literacy} accent="#a7f3d0" suffix="%" />
+      </div>
 
       {/* Isometric board */}
       <div className="relative rounded-md border border-amber-400/25 bg-gradient-to-b from-[#050307] via-[#0a0812] to-[#0e0916] overflow-hidden shadow-[inset_0_0_60px_rgba(0,0,0,0.9)]">
@@ -661,6 +800,13 @@ export function CityIsometric() {
               "radial-gradient(ellipse at 50% 60%, transparent 40%, rgba(0,0,0,0.75) 100%)",
           }}
         />
+        {/* time-of-day tint */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 mix-blend-overlay"
+          style={{ background: tint }}
+        />
+
         <svg
           viewBox={viewBox}
           className="block w-full h-auto"
@@ -676,6 +822,12 @@ export function CityIsometric() {
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
+            {/* wet-asphalt highlight — pale sheen across each road tile */}
+            <linearGradient id="road-sheen" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stopColor="#a0d8ff" stopOpacity="0" />
+              <stop offset="0.5" stopColor="#a0d8ff" stopOpacity="0.35" />
+              <stop offset="1" stopColor="#a0d8ff" stopOpacity="0" />
+            </linearGradient>
           </defs>
 
           {/* ── SKY BACKDROP: distant skyline silhouette + moon ── */}
@@ -774,6 +926,29 @@ export function CityIsometric() {
                     repeatCount="indefinite"
                   />
                 </g>
+                {/* BUS — bigger, more windows, slower, opposite direction on horizontal road */}
+                <g>
+                  <ellipse cx={0} cy={TH / 2 + 3} rx={11} ry={1.4} fill="#000" opacity="0.55" />
+                  <rect x={-10} y={-4} width={20} height={5} rx={1.2} fill="#c9a84c" />
+                  <rect x={-10} y={-4} width={20} height={1.2} fill="#8a7030" />
+                  {/* window row */}
+                  {[-7, -3.5, 0, 3.5, 7].map((wx, i) => (
+                    <rect key={i} x={wx - 1.2} y={-3} width={2.4} height={2} fill="#a0d8ff" opacity="0.75" />
+                  ))}
+                  {/* door split line */}
+                  <line x1={-4} y1={-4} x2={-4} y2={1} stroke="#8a7030" strokeWidth="0.4" />
+                  <circle cx={-8} cy={1.5} r={1.1} fill="#111" />
+                  <circle cx={8} cy={1.5} r={1.1} fill="#111" />
+                  {/* headlight */}
+                  <circle cx={-10.5} cy={-1.5} r={0.8} fill="#fef3c7" opacity="0.95" />
+                  <animateTransform
+                    attributeName="transform"
+                    type="translate"
+                    values={`${endH.x},${endH.y + TH / 2};${startH.x},${startH.y + TH / 2};${endH.x},${endH.y + TH / 2}`}
+                    dur="22s"
+                    repeatCount="indefinite"
+                  />
+                </g>
               </g>
             );
           })()}
@@ -807,7 +982,7 @@ export function CityIsometric() {
                     }
                   }}
                 >
-                  <Building def={bc.def} level={lvl} reducedMotion={reducedMotion} />
+                  <Building def={bc.def} level={lvl} reducedMotion={reducedMotion} affordable={affordableIds.has(bc.id)} />
                   {/* label plate */}
                   <g transform={`translate(0, ${TH / 2 + 6})`}>
                     <rect
