@@ -728,7 +728,7 @@ export function CityIsometric() {
   // ── CAMERA ── drag to pan, wheel/buttons to zoom, arrows to walk the city.
   // Imperative on purpose: panning writes the SVG viewBox directly inside a
   // rAF instead of re-rendering the whole city every pointermove.
-  const camRef = useRef({ x: 0, y: 0, z: 1 });
+  const camRef = useRef({ x: 0, y: 0, z: 1.7 });
   const dragRef = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
   const [dragging, setDragging] = useState(false);
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -778,7 +778,7 @@ export function CityIsometric() {
     const c = camRef.current;
     setCamTo({ ...c, z: c.z * f });
   }, [setCamTo]);
-  const resetCam = useCallback(() => setCamTo({ x: 0, y: 0, z: 1 }), [setCamTo]);
+  const resetCam = useCallback(() => setCamTo({ x: 0, y: 0, z: 1.7 }), [setCamTo]);
 
   const onPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
     if (e.button !== 0 && e.pointerType === "mouse") return;
