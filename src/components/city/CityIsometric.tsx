@@ -773,7 +773,7 @@ export function CityIsometric() {
 
   // Smooth day/night light model — fractional hour drives tint and the sun/moon arc.
   const hFrac = clock.getHours() + clock.getMinutes() / 60;
-  const hr = clock.getHours();
+  
   const isDay = hFrac >= 6 && hFrac < 18.5;
   // 0 at rise, 1 at set — for both the sun and the moon.
   const arcT = isDay
