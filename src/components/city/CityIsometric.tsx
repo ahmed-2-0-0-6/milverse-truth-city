@@ -22,6 +22,7 @@ import {
   type CitySave,
 } from "@/lib/city/citySave";
 import { BuildingCard } from "@/components/city/BuildingCard";
+import { useOnScreen } from "@/hooks/useOnScreen";
 
 /* ── geometry ────────────────────────────────────────────── */
 const TW = 96; // tile width
@@ -685,11 +686,11 @@ export function CityIsometric() {
   const [flashId, setFlashId] = useState<BuildingId | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [clock, setClock] = useState(() => new Date(0));
+  // Perf: everything ambient stops when the board is offscreen or the tab is hidden.
+  const { ref: boardRef, active } = useOnScreen<HTMLElement>("300px");
 
   useEffect(() => {
     setSave(loadCity());
-    setClock(new Date());
-    const tick = window.setInterval(() => setClock(new Date()), 60_000);
     if (typeof window !== "undefined" && window.matchMedia) {
       setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     }
@@ -712,7 +713,6 @@ export function CityIsometric() {
     window.addEventListener("milverse:bricks", refresh);
     window.addEventListener("milverse:city:open", onOpen);
     return () => {
-      window.clearInterval(tick);
       window.removeEventListener("milverse:city", refresh);
       window.removeEventListener("milverse:city:built", onBuilt);
       window.removeEventListener("milverse:bricks", refresh);
@@ -720,6 +720,14 @@ export function CityIsometric() {
     };
   }, []);
 
+
+  // Clock only ticks while the board is actually being looked at.
+  useEffect(() => {
+    if (!active) return;
+    setClock(new Date());
+    const tick = window.setInterval(() => setClock(new Date()), 60_000);
+    return () => window.clearInterval(tick);
+  }, [active]);
 
   const cells = useMemo(() => {
     const list: { gx: number; gy: number }[] = [];
@@ -788,8 +796,9 @@ export function CityIsometric() {
 
   return (
     <section
+      ref={boardRef}
       aria-labelledby="city-iso-heading"
-      className="mx-auto max-w-6xl mt-8 px-4 sm:px-6"
+      className={`mx-auto max-w-6xl mt-8 px-4 sm:px-6${active ? "" : " milv-idle"}`}
     >
       {/* Header */}
       <div className="border-b border-amber-400/30 pb-3 mb-3 flex items-end justify-between gap-3">
@@ -1119,7 +1128,7 @@ export function CityIsometric() {
           })()}
 
           {/* ── MONSOON — subtle rain streaks in Jul/Aug only (LTE dev override via ?rain=1) ── */}
-          {!reducedMotion && (() => {
+          {!reducedMotion && active && (() => {
             const m = new Date().getMonth();
             const forced = typeof window !== "undefined" && window.location.search.includes("rain=1");
             const monsoon = m === 6 || m === 7 || forced;
@@ -1349,6 +1358,8 @@ export function CityIsometric() {
         .milv-tile-hover:hover, .milv-tile-hover:focus-visible { filter: brightness(1.25) drop-shadow(0 0 6px rgba(253,224,71,0.35)); outline: none; }
         @keyframes milv-tip-in { from { opacity: 0 } to { opacity: 1 } }
         .milv-tip { animation: milv-tip-in 140ms ease-out both; }
+        .milv-idle .milv-window, .milv-idle .milv-beacon, .milv-idle .milv-smoke,
+        .milv-idle .milv-searchlight { animation-play-state: paused !important; }
         @media (prefers-reduced-motion: reduce) {
           .milv-window, .milv-beacon, .milv-smoke, .milv-searchlight, .milv-tip { animation: none !important; }
         }

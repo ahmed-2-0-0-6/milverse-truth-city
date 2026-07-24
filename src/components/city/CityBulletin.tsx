@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { loadCity, plotsBuilt, type CitySave } from "@/lib/city/citySave";
 import { bulletinsFor, type Bulletin } from "@/lib/city/bulletin";
 import { titleFor, nextTitle } from "@/lib/city/title";
+import { useTabAwake } from "@/hooks/useOnScreen";
 import { useCoalescedRefresh } from "@/hooks/useCoalescedRefresh";
 
 function usePrefersReducedMotion(): boolean {
@@ -31,6 +32,7 @@ export function CityBulletin() {
   );
 
   const rm = usePrefersReducedMotion();
+  const awake = useTabAwake();
   const items: Bulletin[] = useMemo(() => (save ? bulletinsFor(save) : []), [save]);
   const title = useMemo(() => (save ? titleFor(save) : null), [save]);
   const next = useMemo(() => (save ? nextTitle(save) : null), [save]);
@@ -38,10 +40,10 @@ export function CityBulletin() {
   // Rotate for reduced-motion.
   const [idx, setIdx] = useState(0);
   useEffect(() => {
-    if (!rm || items.length <= 1) return;
+    if (!rm || items.length <= 1 || !awake) return;
     const t = setInterval(() => setIdx((n) => (n + 1) % items.length), 4200);
     return () => clearInterval(t);
-  }, [rm, items.length]);
+  }, [rm, items.length, awake]);
 
   const [paused, setPaused] = useState(false);
 
