@@ -252,7 +252,7 @@ function CityMap() {
           </div>
         </div>
 
-        <div className="mx-auto max-w-6xl mt-6 relative">
+        <div className={view === "map" ? "mt-6 relative w-full px-0 sm:px-2" : "mx-auto max-w-6xl mt-6 relative"}>
           <div className="relative z-[1]">
             {view === "map" ? (
               <CityWorld onSwitchToList={() => setViewPersist("list")} />
@@ -261,6 +261,7 @@ function CityMap() {
             )}
           </div>
         </div>
+
       </section>
       </main>
 
