@@ -704,6 +704,15 @@ export function CityIsometric() {
   const target = hint?.cost ?? 1;
   const filled = hint ? Math.max(0, Math.min(1, (target - hint.remaining) / target)) : 1;
 
+  // Buildings whose city-perk is currently ONLINE — surfaces a badge on the tile.
+  const PERK_REQ: Record<BuildingId, number> = {
+    outpost: 3, library: 5, school: 5, newsroom: 5,
+    signal_tower: 5, archive: 5, clean_room: 3, watchtower: 3,
+  };
+  const perkOnline = new Set<BuildingId>(
+    (Object.keys(PERK_REQ) as BuildingId[]).filter((id) => levelOf(save, id) >= PERK_REQ[id]),
+  );
+
   // ── LIVE CITY STATS — derived from building levels ──
   const totalLevels = BUILDINGS.reduce((s, b) => s + levelOf(save, b.id), 0);
   const population = Math.round(totalLevels * 128 + built * 42);
@@ -1052,6 +1061,15 @@ export function CityIsometric() {
                       strokeWidth="1.5"
                       className="milv-flash-ring"
                     />
+                  )}
+                  {/* PERK ONLINE badge — glowing emerald star above building */}
+                  {perkOnline.has(bc.id) && (
+                    <g transform={`translate(${TW / 2 - 14}, ${-6 - (22 + lvl * 14) - 4})`}>
+                      <circle cx={0} cy={0} r={6} fill="#022c22" stroke="#34d399" strokeWidth="0.8" filter="url(#glow-soft)" />
+                      <text x={0} y={2.5} textAnchor="middle" fontSize="7" fill="#6ee7b7" style={{ fontFamily: "monospace", fontWeight: 700 }}>
+                        ★
+                      </text>
+                    </g>
                   )}
                 </g>
               );
