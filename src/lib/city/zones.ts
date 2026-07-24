@@ -91,11 +91,20 @@ export interface LockInfo {
   kind: "zone" | "permit" | "open";
 }
 
-export function buildingLock(
-  id: BuildingId,
-  cell: [number, number],
-  step: number,
-): LockInfo {
+/** Where each plot sits on the 5×5 board. Single source of truth. */
+export const PLOT_CELL: Record<BuildingId, [number, number]> = {
+  signal_tower: [0, 0],
+  outpost: [2, 0],
+  archive: [4, 0],
+  library: [0, 2],
+  school: [4, 2],
+  clean_room: [0, 4],
+  newsroom: [2, 4],
+  watchtower: [4, 4],
+};
+
+export function buildingLock(id: BuildingId, step: number): LockInfo {
+  const cell = PLOT_CELL[id] ?? [2, 2];
   const zone = zoneOfCell(cell[0], cell[1]);
   const permit = BUILDING_RANK[id] ?? 0;
   const needStep = Math.max(zone.step, permit);
