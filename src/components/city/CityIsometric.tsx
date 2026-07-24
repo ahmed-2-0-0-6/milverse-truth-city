@@ -1246,8 +1246,55 @@ export function CityIsometric() {
             <CamBtn label="Zoom out" onClick={() => zoomBy(1 / 1.2)}>−</CamBtn>
           </div>
         </div>
+        {/* ── director deck ── jump to a district, fly the city, kill the film */}
+        <div className="absolute left-3 top-3 z-20 flex max-w-[calc(100%-6rem)] flex-wrap items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => (tour ? stopTour() : startTour())}
+            aria-pressed={tour}
+            className={`inline-flex min-h-[32px] items-center gap-1.5 rounded-sm border px-2.5 stencil text-[9px] tracking-widest transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 ${
+              tour
+                ? "border-amber-300 bg-amber-400/25 text-amber-100"
+                : "border-amber-400/40 bg-black/70 text-amber-200/90 hover:bg-amber-400/15"
+            }`}
+          >
+            {tour ? "STOP FLYOVER" : "FLYOVER"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilm((v) => !v)}
+            aria-pressed={film}
+            className={`inline-flex min-h-[32px] items-center rounded-sm border px-2.5 stencil text-[9px] tracking-widest transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 ${
+              film
+                ? "border-amber-300 bg-amber-400/25 text-amber-100"
+                : "border-amber-400/40 bg-black/70 text-amber-200/60 hover:bg-amber-400/15"
+            }`}
+          >
+            FILM {film ? "ON" : "OFF"}
+          </button>
+          {ZONES.map((z) => {
+            const locked = z.step > step;
+            const mid = z.cells[Math.floor(z.cells.length / 2)];
+            return (
+              <button
+                key={z.id}
+                type="button"
+                onClick={() => { stopTour(); focusCell(mid[0], mid[1]); }}
+                title={locked ? `${z.name} — sealed until ${rankName(z.step)}` : z.blurb}
+                className={`hidden sm:inline-flex min-h-[32px] items-center rounded-sm border px-2 stencil text-[9px] tracking-widest transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 ${
+                  locked
+                    ? "border-rose-400/30 bg-black/60 text-rose-200/60 hover:bg-rose-400/10"
+                    : "border-amber-400/30 bg-black/60 text-amber-200/80 hover:bg-amber-400/15"
+                }`}
+              >
+                {locked ? "🔒 " : ""}{z.name}
+              </button>
+            );
+          })}
+        </div>
         <ThreatSiren active={active} />
         <PayrollTill active={active} />
+
 
         <div className="absolute right-3 bottom-3 z-20 stencil text-[9px] tracking-widest text-amber-200/50 pointer-events-none">
           DRAG TO PAN · SCROLL TO ZOOM · <span ref={zoomLabelRef}>100%</span>
