@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import { CityWorld } from "@/components/CityWorld";
 import { CityPlots } from "@/components/city/CityPlots";
+import { CityIsometric } from "@/components/city/CityIsometric";
 import { CityList } from "@/components/CityList";
 import { ChevronDown } from "lucide-react";
 import { CityHero3D } from "@/components/city3d/CityHero3D";
@@ -263,6 +264,7 @@ function CityMap() {
           </div>
         </div>
 
+        <CityIsometric />
         <CityPlots />
 
       </section>
