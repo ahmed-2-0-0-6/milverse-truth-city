@@ -8,6 +8,8 @@ import { PerksLedger } from "@/components/city/PerksLedger";
 import { PerkUnlockToast } from "@/components/city/PerkUnlockToast";
 import { CityBulletin } from "@/components/city/CityBulletin";
 import { DailyDirectives } from "@/components/city/DailyDirectives";
+import { CityJournal } from "@/components/city/CityJournal";
+import { TitlePromotionToast } from "@/components/city/TitlePromotionToast";
 import { CityList } from "@/components/CityList";
 import { ChevronDown } from "lucide-react";
 import { CityHero3D } from "@/components/city3d/CityHero3D";
@@ -272,7 +274,9 @@ function CityMap() {
         <CityBulletin />
         <DailyDirectives />
         <PerksLedger />
+        <CityJournal />
         <PerkUnlockToast />
+        <TitlePromotionToast />
         <CityPlots />
 
 

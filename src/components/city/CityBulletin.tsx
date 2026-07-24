@@ -67,17 +67,15 @@ export function CityBulletin() {
           </div>
         </header>
 
-        {/* Ticker body */}
-        <div className="relative h-9">
+        {/* Ticker body — hover pauses; click line opens the referenced building. */}
+        <div className="relative h-9 group">
           {rm ? (
             <div className="absolute inset-0 flex items-center px-4">
-              {items[idx] && (
-                <BulletinLine b={items[idx]} />
-              )}
+              {items[idx] && <BulletinLine b={items[idx]} />}
             </div>
           ) : (
             <div
-              className="absolute inset-y-0 flex items-center whitespace-nowrap will-change-transform"
+              className="absolute inset-y-0 flex items-center whitespace-nowrap will-change-transform group-hover:[animation-play-state:paused]"
               style={{ animation: `bulletin-scroll ${Math.max(24, items.length * 6)}s linear infinite` }}
             >
               {[...items, ...items].map((b, i) => (
@@ -117,11 +115,27 @@ export function CityBulletin() {
 }
 
 function BulletinLine({ b }: { b: Bulletin }) {
-  return (
+  // Cheap match: bulletin ids of the form "up-<id>" / "max-<id>" carry the building id.
+  const m = /^(?:up|max)-(.+)$/.exec(b.id);
+  const buildingId = m?.[1];
+  const body = (
     <>
       <span className="stencil text-[9px] tracking-widest text-amber-300/70">{b.kicker}</span>
       <span className="text-amber-300/40">·</span>
       <span className="font-mono text-[12px] text-amber-100/90">{b.text}</span>
     </>
+  );
+  if (!buildingId) return body;
+  return (
+    <button
+      type="button"
+      onClick={() =>
+        window.dispatchEvent(new CustomEvent("milverse:city:open", { detail: { id: buildingId } }))
+      }
+      className="tap inline-flex items-center gap-2 hover:text-amber-50 transition-colors"
+      aria-label={`Open ${buildingId}`}
+    >
+      {body}
+    </button>
   );
 }
