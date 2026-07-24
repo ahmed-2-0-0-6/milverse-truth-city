@@ -695,48 +695,47 @@ export function CityIsometric() {
     }));
   }, []);
 
-  if (!save) return null;
-  const hint = nextAfford(save);
-  const built = plotsBuilt(save);
-  const target = hint?.cost ?? 1;
-  const filled = hint ? Math.max(0, Math.min(1, (target - hint.remaining) / target)) : 1;
+  // Derived stats/affordability/perks — memoized on save so flashId re-renders stay cheap.
+  const derived = useMemo(() => {
+    if (!save) return null;
+    const hint = nextAfford(save);
+    const built = plotsBuilt(save);
+    const target = hint?.cost ?? 1;
+    const filled = hint ? Math.max(0, Math.min(1, (target - hint.remaining) / target)) : 1;
 
-  // Buildings whose city-perk is currently ONLINE — surfaces a badge on the tile.
-  const PERK_REQ: Record<BuildingId, number> = {
-    outpost: 3, library: 5, school: 5, newsroom: 5,
-    signal_tower: 5, archive: 5, clean_room: 3, watchtower: 3,
-  };
-  const perkOnline = new Set<BuildingId>(
-    (Object.keys(PERK_REQ) as BuildingId[]).filter((id) => levelOf(save, id) >= PERK_REQ[id]),
-  );
+    const perkOnline = new Set<BuildingId>(
+      (Object.keys(PERK_REQ) as BuildingId[]).filter((id) => levelOf(save, id) >= PERK_REQ[id]),
+    );
 
-  // ── LIVE CITY STATS — derived from building levels ──
-  const totalLevels = BUILDINGS.reduce((s, b) => s + levelOf(save, b.id), 0);
-  const population = Math.round(totalLevels * 128 + built * 42);
-  const power = Math.min(100, totalLevels * 6 + built * 3);
-  const safety = Math.min(100, levelOf(save, "outpost") * 20 + levelOf(save, "watchtower") * 12 + built * 4);
-  const literacy = Math.min(100, levelOf(save, "library") * 18 + levelOf(save, "school") * 22 + levelOf(save, "archive") * 8);
+    const totalLevels = BUILDINGS.reduce((s, b) => s + levelOf(save, b.id), 0);
+    const population = Math.round(totalLevels * 128 + built * 42);
+    const power = Math.min(100, totalLevels * 6 + built * 3);
+    const safety = Math.min(100, levelOf(save, "outpost") * 20 + levelOf(save, "watchtower") * 12 + built * 4);
+    const literacy = Math.min(100, levelOf(save, "library") * 18 + levelOf(save, "school") * 22 + levelOf(save, "archive") * 8);
 
-  // Which building IDs the player can currently afford — used to decorate the empty lot with a construction crane
-  const affordableIds = new Set<BuildingId>();
-  for (const b of BUILDINGS) {
-    const lvl = levelOf(save, b.id);
-    if (lvl === 0) {
-      const c = nextCost(b.id, 0);
-      if (c !== null && save.bricks >= c) affordableIds.add(b.id);
+    const affordableIds = new Set<BuildingId>();
+    for (const b of BUILDINGS) {
+      const lvl = levelOf(save, b.id);
+      if (lvl === 0) {
+        const c = nextCost(b.id, 0);
+        if (c !== null && save.bricks >= c) affordableIds.add(b.id);
+      }
     }
-  }
+    return { hint, built, filled, perkOnline, population, power, safety, literacy, affordableIds };
+  }, [save]);
 
-  // Time-of-day tint — overlays a subtle color wash based on user's local hour
+  if (!save || !derived) return null;
+  const { hint, built, filled, perkOnline, population, power, safety, literacy, affordableIds } = derived;
+
+  // Time-of-day tint — cheap; hour granularity is coarse so per-render is fine.
   const hr = new Date().getHours();
   const tint =
-    hr < 6 ? "rgba(20,15,40,0.35)" :          // deep night — indigo
-    hr < 9 ? "rgba(210,120,60,0.14)" :         // dawn — amber
-    hr < 17 ? "rgba(120,140,180,0.06)" :       // day — pale blue
-    hr < 20 ? "rgba(220,90,60,0.16)" :         // dusk — orange
-    "rgba(15,10,30,0.28)";                     // night — indigo
+    hr < 6 ? "rgba(20,15,40,0.35)" :
+    hr < 9 ? "rgba(210,120,60,0.14)" :
+    hr < 17 ? "rgba(120,140,180,0.06)" :
+    hr < 20 ? "rgba(220,90,60,0.16)" :
+    "rgba(15,10,30,0.28)";
 
-  // viewBox — encompass full 5×5 iso grid comfortably
   const bounds = { w: TW * (GRID + 1), h: TH * (GRID + 3) };
   const viewBox = `${-bounds.w / 2} ${-140} ${bounds.w} ${bounds.h + 60}`;
 
