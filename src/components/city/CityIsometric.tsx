@@ -987,6 +987,14 @@ export function CityIsometric() {
     }));
   }, []);
 
+  // Back-to-front paint order, computed once instead of a find() per tile.
+  const orderedBuildings = useMemo(
+    () => [...buildingCells].sort((a, b) => a.gx + a.gy - (b.gx + b.gy)),
+    [buildingCells],
+  );
+
+
+
   // Derived stats/affordability/perks — memoized on save so flashId re-renders stay cheap.
   const derived = useMemo(() => {
     if (!save) return null;
