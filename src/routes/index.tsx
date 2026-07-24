@@ -268,6 +268,7 @@ function CityMap() {
 
         <CityIsometric />
         <PerksLedger />
+        <PerkUnlockToast />
         <CityPlots />
 
       </section>
