@@ -1582,9 +1582,9 @@ export function CityIsometric() {
                       x={0}
                       y={0}
                       textAnchor="middle"
-                      fontSize="6"
-                      fill="#78716c"
-                      style={{ fontFamily: "monospace" }}
+                      fontSize={SIGN_SIZE.meta}
+                      fill={maxed ? INK.doneMeta : canAfford ? INK.live : INK.meta}
+                      style={SIGN_META}
                     >
                       {maxed
                         ? "MAX"
