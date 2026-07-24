@@ -7,6 +7,8 @@ import { X } from "lucide-react";
 import type { BuildingId } from "@/lib/city/buildings";
 import { BUILDINGS_BY_ID, nextCost, isMaxed } from "@/lib/city/buildings";
 import { loadCity, levelOf, upgradeBuilding } from "@/lib/city/citySave";
+import { titleFor } from "@/lib/city/title";
+import { buildingLock } from "@/lib/city/zones";
 
 interface Props {
   open: boolean;
@@ -18,6 +20,7 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
   const [bricks, setBricks] = useState(0);
   const [level, setLevel] = useState(0);
   const [flash, setFlash] = useState<"ok" | "err" | null>(null);
+  const [step, setStep] = useState(0);
 
   useEffect(() => {
     if (!open || !buildingId) return;
@@ -25,6 +28,7 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
       const s = loadCity();
       setBricks(s.bricks);
       setLevel(levelOf(s, buildingId));
+      setStep(titleFor(s).step);
     };
     refresh();
     window.addEventListener("milverse:city", refresh);
@@ -48,12 +52,14 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
   const def = BUILDINGS_BY_ID[buildingId];
   if (!def) return null;
 
+  const lock = buildingLock(buildingId, step);
   const cost = nextCost(buildingId, level);
   const maxed = isMaxed(buildingId, level);
-  const canAfford = cost !== null && bricks >= cost;
+  const canAfford = cost !== null && bricks >= cost && !lock.locked;
   const remaining = cost !== null ? Math.max(0, cost - bricks) : 0;
 
   const onUpgrade = () => {
+    if (lock.locked) return;
     const out = upgradeBuilding(buildingId);
     if (out.ok) {
       setFlash("ok");
@@ -133,11 +139,15 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
             <span className="text-amber-200/80">
               {level === 0 ? "UNBUILT PLOT" : `LEVEL ${level} / ${def.maxLevel}`}
             </span>
-            {!def.wired && (
+            {lock.locked ? (
+              <span className="stencil text-[9px] text-red-300/80 tracking-widest">
+                SEALED · {lock.needRank}
+              </span>
+            ) : !def.wired ? (
               <span className="stencil text-[9px] text-red-300/80 tracking-widest">
                 LOCKED · PASS 2
               </span>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -156,7 +166,21 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
 
         {/* Action row */}
         <div className="p-4">
-          {maxed ? (
+          {lock.locked ? (
+            <div className="w-full rounded-sm border border-red-400/40 bg-red-400/5 p-3 text-center">
+              <div className="stencil text-[11px] tracking-widest text-red-200/90">
+                {lock.kind === "zone" ? "DISTRICT SEALED" : "NO PERMIT"}
+              </div>
+              <div className="mt-1 font-mono text-[11px] text-amber-200/70">
+                {lock.kind === "zone"
+                  ? `${lock.zone.name} opens at ${lock.needRank}.`
+                  : `The city issues this permit at ${lock.needRank}.`}
+              </div>
+              <div className="mt-1 text-[11px] text-amber-100/60">
+                Clear cases. Build plots. The badge comes with the work.
+              </div>
+            </div>
+          ) : maxed ? (
             <div className="w-full rounded-sm border border-emerald-400/50 bg-emerald-400/10 py-3 text-center stencil text-[11px] text-emerald-200 tracking-widest">
               {actionLabel}
             </div>

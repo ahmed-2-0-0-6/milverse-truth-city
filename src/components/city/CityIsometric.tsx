@@ -24,21 +24,20 @@ import {
 import { BuildingCard } from "@/components/city/BuildingCard";
 import { useOnScreen } from "@/hooks/useOnScreen";
 
+import { titleFor, nextTitle } from "@/lib/city/title";
+import {
+  PLOT_CELL,
+  ZONES,
+  cellLocked,
+  buildingLock,
+} from "@/lib/city/zones";
+
 /* ── geometry ────────────────────────────────────────────── */
 const TW = 96; // tile width
 const TH = 48; // tile height (2:1 iso)
 const GRID = 5;
 type Cell = [number, number];
-const PLACEMENT: Record<BuildingId, Cell> = {
-  signal_tower: [0, 0],
-  outpost: [2, 0],
-  archive: [4, 0],
-  library: [0, 2],
-  school: [4, 2],
-  clean_room: [0, 4],
-  newsroom: [2, 4],
-  watchtower: [4, 4],
-};
+const PLACEMENT: Record<BuildingId, Cell> = PLOT_CELL;
 const iso = (gx: number, gy: number) => ({
   x: ((gx - gy) * TW) / 2,
   y: ((gx + gy) * TH) / 2,
@@ -872,6 +871,8 @@ export function CityIsometric() {
     if (!save) return null;
     const hint = nextAfford(save);
     const built = plotsBuilt(save);
+    const step = titleFor(save).step;
+    const nextRank = nextTitle(save);
     const target = hint?.cost ?? 1;
     const filled = hint ? Math.max(0, Math.min(1, (target - hint.remaining) / target)) : 1;
 
@@ -888,16 +889,17 @@ export function CityIsometric() {
     const affordableIds = new Set<BuildingId>();
     for (const b of BUILDINGS) {
       const lvl = levelOf(save, b.id);
-      if (lvl === 0) {
+      if (lvl === 0 && !buildingLock(b.id, step).locked) {
         const c = nextCost(b.id, 0);
         if (c !== null && save.bricks >= c) affordableIds.add(b.id);
       }
     }
-    return { hint, built, filled, perkOnline, population, power, safety, literacy, affordableIds };
+    return { hint, built, filled, perkOnline, population, power, safety, literacy, affordableIds, step, nextRank };
   }, [save]);
 
   if (!save || !derived) return null;
-  const { hint, built, filled, perkOnline, population, power, safety, literacy, affordableIds } = derived;
+  const { hint, built, filled, perkOnline, population, power, safety, literacy, affordableIds, step, nextRank } = derived;
+  const sealedZones = ZONES.filter((z) => z.step > step);
 
   // Smooth day/night light model — fractional hour drives tint and the sun/moon arc.
   const hFrac = clock.getHours() + clock.getMinutes() / 60;
@@ -940,6 +942,23 @@ export function CityIsometric() {
           <p className="mt-1 text-[11px] text-amber-200/60 italic">
             Tap a plot to build. Every case earns the bricks.
           </p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            <span className="stencil rounded-sm border border-amber-400/40 bg-amber-400/10 px-1.5 py-0.5 text-[9px] tracking-widest text-amber-200">
+              {titleFor(save).rank}
+            </span>
+            {sealedZones.length > 0 ? (
+              <span className="font-mono text-[10px] text-red-200/70">
+                {sealedZones.length} district{sealedZones.length > 1 ? "s" : ""} sealed
+                {nextRank
+                  ? ` · ${nextRank.rank} needs ${nextRank.plotsNeeded} more plot${nextRank.plotsNeeded === 1 ? "" : "s"}`
+                  : ""}
+              </span>
+            ) : (
+              <span className="font-mono text-[10px] text-emerald-300/80">
+                CITY FULLY ZONED
+              </span>
+            )}
+          </div>
         </div>
         <div className="text-right shrink-0">
           <button
@@ -1160,6 +1179,43 @@ export function CityIsometric() {
             <GroundTile key={`t-${gx}-${gy}`} gx={gx} gy={gy} reducedMotion={reducedMotion} />
           ))}
 
+          {/* ── SEALED GROUND — districts you haven't earned yet ── */}
+          <defs>
+            <pattern id="milv-seal-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+              <rect width="6" height="6" fill="#05040a" />
+              <line x1="0" y1="0" x2="0" y2="6" stroke="#f43f5e" strokeWidth="0.7" opacity="0.35" />
+            </pattern>
+          </defs>
+          {cells
+            .filter(({ gx, gy }) => cellLocked(gx, gy, step))
+            .map(({ gx, gy }) => {
+              const { x, y } = iso(gx, gy);
+              const pts = `0,0 ${TW / 2},${TH / 2} 0,${TH} ${-TW / 2},${TH / 2}`;
+              return (
+                <g key={`seal-${gx}-${gy}`} transform={`translate(${x},${y})`} aria-hidden="true">
+                  <polygon points={pts} fill="#04030a" opacity="0.9" />
+                  <polygon points={pts} fill="url(#milv-seal-hatch)" opacity="0.55" />
+                  <polygon points={pts} fill="none" stroke="#f43f5e" strokeWidth="0.4" opacity="0.28" />
+                </g>
+              );
+            })}
+          {/* district seal plates */}
+          {ZONES.filter((z) => z.step > step).map((z) => {
+            const mid = z.cells[0];
+            const { x, y } = iso(mid[0], mid[1]);
+            return (
+              <g key={`zseal-${z.id}`} transform={`translate(${x - 46},${y - 4})`} aria-hidden="true">
+                <rect x={-52} y={-9} width={104} height={18} rx={2} fill="#0a0509" opacity="0.9" stroke="#f43f5e" strokeOpacity="0.4" strokeWidth="0.5" />
+                <text x={0} y={-1} textAnchor="middle" fontSize="7" fill="#fda4af" style={{ fontFamily: '"Bebas Neue", sans-serif', letterSpacing: "1.4px" }}>
+                  {z.name} · SEALED
+                </text>
+                <text x={0} y={6.5} textAnchor="middle" fontSize="5.5" fill="#e7b7c0" opacity="0.8" style={{ fontFamily: "ui-monospace, monospace" }}>
+                  OPENS AT {["CONSTABLE","INSPECTOR","CHIEF","COMMISSIONER","MAYOR","GOVERNOR"][z.step]}
+                </text>
+              </g>
+            );
+          })}
+
           {/* ── PLAZA FOUNTAIN — the centre of town, with water that moves ── */}
           {(() => {
             const p = iso(2, 2);
@@ -1358,6 +1414,7 @@ export function CityIsometric() {
               const cost = nextCost(bc.id, lvl);
               const canAfford = cost !== null && save.bricks >= cost;
               const maxed = isMaxed(bc.id, lvl);
+              const lock = buildingLock(bc.id, step);
               const flash = flashId === bc.id;
               return (
                 <g
@@ -1370,7 +1427,11 @@ export function CityIsometric() {
                   onBlur={() => setHoverId((h) => (h === bc.id ? null : h))}
                   className="cursor-pointer milv-tile-hover"
                   role="button"
-                  aria-label={`${bc.def.name} — Lv${lvl}${cost !== null ? `, next ${cost} bricks` : ", maxed"}`}
+                  aria-label={
+                    lock.locked
+                      ? `${bc.def.name} — sealed, opens at ${lock.needRank}`
+                      : `${bc.def.name} — Lv${lvl}${cost !== null ? `, next ${cost} bricks` : ", maxed"}`
+                  }
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
@@ -1380,7 +1441,30 @@ export function CityIsometric() {
                   }}
                 >
 
-                  <Building def={bc.def} level={lvl} reducedMotion={reducedMotion} affordable={affordableIds.has(bc.id)} />
+                  {lock.locked ? (
+                    <g aria-hidden="true">
+                      {/* fenced-off lot with a padlock */}
+                      <ellipse cx={0} cy={TH / 2} rx={26} ry={13} fill="#000" opacity="0.5" />
+                      <polygon
+                        points={`0,${-4} ${TW / 2 - 12},${TH / 2 - 6} 0,${TH - 8} ${-(TW / 2 - 12)},${TH / 2 - 6}`}
+                        fill="#0b0810"
+                        stroke="#f43f5e"
+                        strokeOpacity="0.45"
+                        strokeWidth="0.7"
+                        strokeDasharray="3 2"
+                      />
+                      {[-18, -9, 0, 9, 18].map((fx) => (
+                        <line key={fx} x1={fx} y1={TH / 2 - 10} x2={fx} y2={TH / 2 - 18} stroke="#5b4a52" strokeWidth="0.8" />
+                      ))}
+                      <g transform={`translate(0,${-14})`}>
+                        <rect x={-5} y={-3} width={10} height={8} rx={1.5} fill="#2a1c22" stroke="#f43f5e" strokeOpacity="0.7" strokeWidth="0.7" />
+                        <path d="M -2.6 -3 v -2.4 a 2.6 2.6 0 0 1 5.2 0 v 2.4" fill="none" stroke="#f43f5e" strokeOpacity="0.7" strokeWidth="0.9" />
+                        <circle cx={0} cy={1} r={1} fill="#fda4af" />
+                      </g>
+                    </g>
+                  ) : (
+                    <Building def={bc.def} level={lvl} reducedMotion={reducedMotion} affordable={affordableIds.has(bc.id)} />
+                  )}
                   {/* label plate */}
                   <g transform={`translate(0, ${TH / 2 + 6})`}>
                     <rect
@@ -1397,17 +1481,17 @@ export function CityIsometric() {
                       y={8}
                       textAnchor="middle"
                       fontSize="7.5"
-                      fill={maxed ? "#a7f3d0" : canAfford ? "#fde68a" : "#d6d3d1"}
+                      fill={lock.locked ? "#fda4af" : maxed ? "#a7f3d0" : canAfford ? "#fde68a" : "#d6d3d1"}
                       style={{
                         fontFamily: '"Bebas Neue", sans-serif',
                         letterSpacing: "1px",
                       }}
                     >
-                      {bc.def.name.toUpperCase()}
+                      {lock.locked ? `SEALED · ${lock.needRank}` : bc.def.name.toUpperCase()}
                     </text>
                   </g>
                   {/* affordability marker */}
-                  {canAfford && !maxed && (
+                  {canAfford && !maxed && !lock.locked && (
                     <circle
                       cx={0}
                       cy={-6 - (22 + lvl * 14)}
