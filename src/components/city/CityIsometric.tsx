@@ -1539,11 +1539,9 @@ export function CityIsometric() {
           })()}
 
           {/* buildings (already in back-to-front order because their cells are sorted with the tiles) */}
-          {cells
-            .map(({ gx, gy }) => buildingCells.find((b) => b.gx === gx && b.gy === gy))
-            .filter(Boolean)
+          {orderedBuildings
             .map((b) => {
-              const bc = b!;
+              const bc = b;
               const lvl = levelOf(save, bc.id);
               const { x, y } = iso(bc.gx, bc.gy);
               const cost = nextCost(bc.id, lvl);
