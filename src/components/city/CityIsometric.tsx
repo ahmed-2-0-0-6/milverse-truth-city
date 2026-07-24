@@ -28,7 +28,6 @@ import { titleFor, nextTitle } from "@/lib/city/title";
 import {
   PLOT_CELL,
   ZONES,
-  zoneOfCell,
   cellLocked,
   buildingLock,
 } from "@/lib/city/zones";
@@ -890,7 +889,7 @@ export function CityIsometric() {
     const affordableIds = new Set<BuildingId>();
     for (const b of BUILDINGS) {
       const lvl = levelOf(save, b.id);
-      if (lvl === 0) {
+      if (lvl === 0 && !buildingLock(b.id, step).locked) {
         const c = nextCost(b.id, 0);
         if (c !== null && save.bricks >= c) affordableIds.add(b.id);
       }
