@@ -3,9 +3,10 @@
 // Reduced-motion: falls back to a static rotating stack.
 
 import { useEffect, useMemo, useState } from "react";
-import { loadCity } from "@/lib/city/citySave";
+import { loadCity, type CitySave } from "@/lib/city/citySave";
 import { bulletinsFor, type Bulletin } from "@/lib/city/bulletin";
 import { titleFor, nextTitle } from "@/lib/city/title";
+import { useCoalescedRefresh } from "@/hooks/useCoalescedRefresh";
 
 function usePrefersReducedMotion(): boolean {
   const [rm, setRm] = useState(false);
@@ -21,32 +22,29 @@ function usePrefersReducedMotion(): boolean {
 }
 
 export function CityBulletin() {
-  const [, setTick] = useState(0);
-  useEffect(() => {
-    const on = () => setTick((n) => n + 1);
-    window.addEventListener("milverse:city", on);
-    window.addEventListener("milverse:bricks", on);
-    window.addEventListener("milverse:city:built", on);
-    return () => {
-      window.removeEventListener("milverse:city", on);
-      window.removeEventListener("milverse:bricks", on);
-      window.removeEventListener("milverse:city:built", on);
-    };
-  }, []);
+  const [save, setSave] = useState<CitySave | null>(() =>
+    typeof window === "undefined" ? null : loadCity(),
+  );
+  useCoalescedRefresh(
+    ["milverse:city", "milverse:bricks", "milverse:city:built"],
+    () => setSave(loadCity()),
+  );
 
-  const save = loadCity();
-  const items: Bulletin[] = useMemo(() => bulletinsFor(save), [save]);
-  const title = useMemo(() => titleFor(save), [save]);
-  const next = useMemo(() => nextTitle(save), [save]);
   const rm = usePrefersReducedMotion();
+  const items: Bulletin[] = useMemo(() => (save ? bulletinsFor(save) : []), [save]);
+  const title = useMemo(() => (save ? titleFor(save) : null), [save]);
+  const next = useMemo(() => (save ? nextTitle(save) : null), [save]);
 
   // Rotate for reduced-motion.
   const [idx, setIdx] = useState(0);
   useEffect(() => {
-    if (!rm) return;
-    const t = setInterval(() => setIdx((n) => (n + 1) % Math.max(1, items.length)), 4200);
+    if (!rm || items.length <= 1) return;
+    const t = setInterval(() => setIdx((n) => (n + 1) % items.length), 4200);
     return () => clearInterval(t);
   }, [rm, items.length]);
+
+  if (!save || !title) return null;
+
 
   return (
     <section className="mx-auto mt-4 w-full max-w-5xl px-3">
