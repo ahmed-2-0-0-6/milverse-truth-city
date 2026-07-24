@@ -820,6 +820,12 @@ export function CityIsometric() {
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
+            {/* wet-asphalt highlight — pale sheen across each road tile */}
+            <linearGradient id="road-sheen" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stopColor="#a0d8ff" stopOpacity="0" />
+              <stop offset="0.5" stopColor="#a0d8ff" stopOpacity="0.35" />
+              <stop offset="1" stopColor="#a0d8ff" stopOpacity="0" />
+            </linearGradient>
           </defs>
 
           {/* ── SKY BACKDROP: distant skyline silhouette + moon ── */}
