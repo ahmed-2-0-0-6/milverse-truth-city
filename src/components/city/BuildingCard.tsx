@@ -89,9 +89,10 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="building-title"
-        className={`fixed left-1/2 -translate-x-1/2 bottom-0 sm:bottom-6 z-[9991] w-full sm:w-[440px] max-w-[95vw] rounded-t-lg sm:rounded-lg border border-amber-400/40 bg-[#0a0f1c]/98 backdrop-blur-xl shadow-[0_0_60px_rgba(253,224,71,0.25)] animate-in slide-in-from-bottom-6 fade-in duration-300 ${
+        className={`fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[9991] w-[calc(100%-1.5rem)] sm:w-[420px] max-w-[95vw] max-h-[70vh] overflow-y-auto rounded-lg border border-amber-400/40 bg-[#0a0f1c]/98 backdrop-blur-xl shadow-[0_0_60px_rgba(253,224,71,0.25)] animate-in zoom-in-95 fade-in duration-200 ${
           flash === "ok" ? "ring-2 ring-emerald-400/70" : ""
         } ${flash === "err" ? "ring-2 ring-red-400/70" : ""}`}
+
       >
         {/* Header */}
         <div className="flex items-start justify-between p-4 border-b border-amber-400/20">
