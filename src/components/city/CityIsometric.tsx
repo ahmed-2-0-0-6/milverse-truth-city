@@ -80,7 +80,7 @@ const BUILDING_CELLS = new Set(
   }).map(([a, b]) => `${a}-${b}`),
 );
 
-function GroundTile({ gx, gy }: { gx: number; gy: number }) {
+function GroundTileImpl({ gx, gy, reducedMotion }: { gx: number; gy: number; reducedMotion: boolean }) {
   const { x, y } = iso(gx, gy);
   const kind = classifyTile(gx, gy);
   const fill =
@@ -96,7 +96,6 @@ function GroundTile({ gx, gy }: { gx: number; gy: number }) {
     <g transform={`translate(${x},${y})`}>
       <polygon points={pts} fill={fill} stroke={stroke} strokeWidth="0.5" />
 
-      {/* WET-ASPHALT SHEEN on roads — a soft highlight strip */}
       {kind === "road" && (
         <polygon
           points={pts}
@@ -106,7 +105,6 @@ function GroundTile({ gx, gy }: { gx: number; gy: number }) {
         />
       )}
 
-      {/* SIDEWALK inset ring on grass tiles that hold buildings + tiny pedestrians */}
       {kind === "grass" && hasBuilding && (
         <>
           <polygon
@@ -115,31 +113,31 @@ function GroundTile({ gx, gy }: { gx: number; gy: number }) {
             stroke="#3a3444"
             strokeWidth="0.4"
           />
-          {/* pedestrian dot walking a short back-and-forth on the sidewalk */}
-          <circle cx={-(TW / 2 - 8)} cy={TH / 2} r={1.1} fill="#fef3c7" opacity="0.9">
-            <animate
-              attributeName="cx"
-              values={`${-(TW / 2 - 8)};${TW / 2 - 8};${-(TW / 2 - 8)}`}
-              dur={`${9 + rA * 4}s`}
-              repeatCount="indefinite"
-            />
-          </circle>
-          <circle cx={TW / 2 - 8} cy={TH / 2 + 2} r={1.1} fill="#fda4af" opacity="0.85">
-            <animate
-              attributeName="cx"
-              values={`${TW / 2 - 8};${-(TW / 2 - 8)};${TW / 2 - 8}`}
-              dur={`${10 + rB * 4}s`}
-              repeatCount="indefinite"
-            />
-          </circle>
+          {!reducedMotion && (
+            <>
+              <circle cx={-(TW / 2 - 8)} cy={TH / 2} r={1.1} fill="#fef3c7" opacity="0.9">
+                <animate
+                  attributeName="cx"
+                  values={`${-(TW / 2 - 8)};${TW / 2 - 8};${-(TW / 2 - 8)}`}
+                  dur={`${9 + rA * 4}s`}
+                  repeatCount="indefinite"
+                />
+              </circle>
+              <circle cx={TW / 2 - 8} cy={TH / 2 + 2} r={1.1} fill="#fda4af" opacity="0.85">
+                <animate
+                  attributeName="cx"
+                  values={`${TW / 2 - 8};${-(TW / 2 - 8)};${TW / 2 - 8}`}
+                  dur={`${10 + rB * 4}s`}
+                  repeatCount="indefinite"
+                />
+              </circle>
+            </>
+          )}
         </>
       )}
 
-
-      {/* GRASS TEXTURE — scatter tiny specks and one shrub / tree if empty */}
       {kind === "grass" && !hasBuilding && (
         <>
-          {/* speck texture */}
           {[0, 1, 2, 3, 4].map((i) => {
             const rx = hashCell(gx, gy, 10 + i);
             const ry = hashCell(gx, gy, 20 + i);
@@ -149,7 +147,6 @@ function GroundTile({ gx, gy }: { gx: number; gy: number }) {
               <circle key={i} cx={px} cy={py} r={0.6} fill="#2a2036" opacity="0.6" />
             );
           })}
-          {/* tree — chosen for ~40% of empty grass */}
           {rA < 0.4 && (
             <g transform={`translate(${(rB - 0.5) * 20}, ${(rC - 0.5) * 10 + TH / 2})`}>
               <ellipse cx={0} cy={2} rx={5} ry={1.5} fill="#000" opacity="0.5" />
@@ -159,7 +156,6 @@ function GroundTile({ gx, gy }: { gx: number; gy: number }) {
               <circle cx={2} cy={-9} r={3} fill="#183020" />
             </g>
           )}
-          {/* park bench occasionally */}
           {rA >= 0.7 && rA < 0.85 && (
             <g transform={`translate(${(rB - 0.5) * 24}, ${TH / 2 + 4})`}>
               <ellipse cx={0} cy={1} rx={7} ry={1.2} fill="#000" opacity="0.4" />
@@ -172,10 +168,8 @@ function GroundTile({ gx, gy }: { gx: number; gy: number }) {
         </>
       )}
 
-      {/* ROAD detail */}
       {kind === "road" && (
         <>
-          {/* centreline */}
           <line
             x1={-TW / 4}
             y1={TH / 2}
@@ -186,19 +180,18 @@ function GroundTile({ gx, gy }: { gx: number; gy: number }) {
             strokeDasharray="3 3"
             opacity="0.7"
           />
-          {/* Streetlamp on corners of road (not center row/col intersection) */}
           {(gx === 2 ? gy !== 2 : true) && (gy === 2 ? gx !== 2 : true) && rA < 0.55 && (
             <g transform={`translate(${gx === 2 ? -TW / 2 + 5 : 0}, ${gy === 2 ? TH / 2 : -2})`}>
               <line x1={0} y1={0} x2={0} y2={-14} stroke="#4a4a55" strokeWidth="1" />
               <line x1={0} y1={-14} x2={4} y2={-14} stroke="#4a4a55" strokeWidth="1" />
               <circle cx={4} cy={-13} r={1.6} fill="#fde68a" opacity="0.95">
-                <animate attributeName="opacity" values="0.9;0.5;0.9" dur="3s" repeatCount="indefinite" />
+                {!reducedMotion && (
+                  <animate attributeName="opacity" values="0.9;0.5;0.9" dur="3s" repeatCount="indefinite" />
+                )}
               </circle>
-              {/* light pool */}
               <ellipse cx={4} cy={2} rx={10} ry={4} fill="#fde68a" opacity="0.08" />
             </g>
           )}
-          {/* parked car occasionally */}
           {rB < 0.3 && (
             <g transform={`translate(${(rC - 0.5) * 16}, ${TH / 2 + 2})`}>
               <ellipse cx={0} cy={3} rx={9} ry={1.5} fill="#000" opacity="0.55" />
@@ -212,21 +205,25 @@ function GroundTile({ gx, gy }: { gx: number; gy: number }) {
         </>
       )}
 
-      {/* PLAZA fountain */}
       {kind === "plaza" && (
         <>
           <circle cx={0} cy={TH / 2} r={12} fill="#1f1a12" stroke="#5a4a2a" strokeWidth="1" />
           <circle cx={0} cy={TH / 2} r={7} fill="#3a2e1a" stroke="#5a4a2a" strokeWidth="0.6" />
           <circle cx={0} cy={TH / 2} r={3.5} fill="#fcd34d" opacity="0.6" />
           <circle cx={0} cy={TH / 2 - 4} r={1.2} fill="#fde68a">
-            <animate attributeName="cy" values={`${TH / 2 - 4};${TH / 2 - 8};${TH / 2 - 4}`} dur="2.4s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.4s" repeatCount="indefinite" />
+            {!reducedMotion && (
+              <>
+                <animate attributeName="cy" values={`${TH / 2 - 4};${TH / 2 - 8};${TH / 2 - 4}`} dur="2.4s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.4s" repeatCount="indefinite" />
+              </>
+            )}
           </circle>
         </>
       )}
     </g>
   );
 }
+const GroundTile = React.memo(GroundTileImpl);
 
 
 /* ── building block ──────────────────────────────────────── */
