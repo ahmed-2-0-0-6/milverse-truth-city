@@ -3,7 +3,7 @@
 // landing page stops being an endless stack of panels.
 // Presentation only: it mounts the existing panels, it never changes their logic.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { DailyDirectives } from "./DailyDirectives";
 import { PerksLedger } from "./PerksLedger";
 import { CityJournal } from "./CityJournal";
@@ -96,7 +96,7 @@ export function CityConsole() {
   }, [tab, tick]);
 
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const onKeyDown = (e: React.KeyboardEvent) => {
+  const onKeyDown = (e: ReactKeyboardEvent) => {
     const i = TABS.findIndex((t) => t.id === tab);
     let next = -1;
     if (e.key === "ArrowRight") next = (i + 1) % TABS.length;
@@ -176,7 +176,7 @@ export function CityConsole() {
           className="pb-2 motion-safe:animate-[console-in_220ms_ease-out]"
         >
           {/* Panels ship their own section chrome; pull the outer padding back in. */}
-          <div className="[&>section]:mt-0 [&>section]:px-0 [&>section]:max-w-none">
+          <div className="[&>section]:mt-0 [&>section]:px-0 [&>section]:max-w-none [&>section>div]:border-0 [&>section>div]:bg-transparent [&>section>div]:backdrop-blur-none [&>section>div]:rounded-none">
             {tab === "directives" && <DailyDirectives />}
             {tab === "perks" && <PerksLedger />}
             {tab === "journal" && <CityJournal />}

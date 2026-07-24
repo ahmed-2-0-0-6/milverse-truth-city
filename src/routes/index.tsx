@@ -8,7 +8,7 @@ import { PerksLedger } from "@/components/city/PerksLedger";
 import { PerkUnlockToast } from "@/components/city/PerkUnlockToast";
 import { CityBulletin } from "@/components/city/CityBulletin";
 import { DailyDirectives } from "@/components/city/DailyDirectives";
-import { CityJournal } from "@/components/city/CityJournal";
+import { CityConsole } from "@/components/city/CityConsole";
 import { TitlePromotionToast } from "@/components/city/TitlePromotionToast";
 import { CityList } from "@/components/CityList";
 import { ChevronDown } from "lucide-react";
@@ -272,9 +272,7 @@ function CityMap() {
 
         <CityIsometric />
         <CityBulletin />
-        <DailyDirectives />
-        <PerksLedger />
-        <CityJournal />
+        <CityConsole />
         <PerkUnlockToast />
         <TitlePromotionToast />
         <CityPlots />
