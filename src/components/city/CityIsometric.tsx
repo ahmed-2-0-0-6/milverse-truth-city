@@ -848,53 +848,47 @@ export function CityIsometric() {
             </linearGradient>
           </defs>
 
-          {/* ── SKY BACKDROP: distant skyline silhouette + moon ── */}
+          {/* ── SKY BACKDROP: sun/moon by hour + skyline + drifting clouds ── */}
           <g aria-hidden="true">
-            {/* moon */}
-            <circle cx={bounds.w / 2 - 60} cy={-100} r={12} fill="#f5e6c4" opacity="0.9" />
-            <circle cx={bounds.w / 2 - 56} cy={-104} r={12} fill="#0a0812" />
-            {/* stars */}
-            {Array.from({ length: 18 }).map((_, i) => {
+            {/* SUN by day, MOON by dusk/night */}
+            {hr >= 6 && hr < 18 ? (
+              <g>
+                <circle cx={-bounds.w / 2 + 60} cy={-108} r={22} fill="#fde68a" opacity="0.15" />
+                <circle cx={-bounds.w / 2 + 60} cy={-108} r={14} fill="#fef3c7" opacity="0.35" />
+                <circle cx={-bounds.w / 2 + 60} cy={-108} r={9} fill="#fde68a" opacity="0.95" />
+              </g>
+            ) : (
+              <g>
+                <circle cx={bounds.w / 2 - 60} cy={-100} r={12} fill="#f5e6c4" opacity="0.9" />
+                <circle cx={bounds.w / 2 - 56} cy={-104} r={12} fill="#0a0812" />
+              </g>
+            )}
+            {/* stars — fade during the day */}
+            {(hr < 6 || hr >= 19) && Array.from({ length: 18 }).map((_, i) => {
               const sx = -bounds.w / 2 + hashCell(i, 0, 5) * bounds.w;
               const sy = -130 + hashCell(0, i, 5) * 40;
               return <circle key={i} cx={sx} cy={sy} r={hashCell(i, i, 9) * 0.9 + 0.2} fill="#fef3c7" opacity={0.4 + hashCell(i, 1, 9) * 0.6} />;
             })}
             {/* far skyline — hand-composed rectangles, low-contrast */}
-            {(() => {
-              const rects: React.ReactNode[] = [];
-              let x = -bounds.w / 2 - 10;
-              let i = 0;
-              while (x < bounds.w / 2 + 10) {
-                const w = 18 + hashCell(i, 3, 7) * 30;
-                const h = 30 + hashCell(i, 5, 7) * 60;
-                const y = -60 - h;
-                rects.push(
-                  <g key={i}>
-                    <rect x={x} y={y} width={w} height={h} fill="#0d0a18" stroke="#1a1428" strokeWidth="0.4" />
-                    {/* window grid — very dim */}
-                    {Array.from({ length: Math.floor(h / 6) }).map((_, r) =>
-                      Array.from({ length: Math.floor(w / 4) }).map((__, c) => {
-                        const lit = hashCell(i * 31 + r, c, 13) > 0.7;
-                        return lit ? (
-                          <rect key={`${r}-${c}`} x={x + 1 + c * 4} y={y + 2 + r * 6} width={1.5} height={2} fill="#fde68a" opacity="0.5" />
-                        ) : null;
-                      })
-                    )}
-                    {/* aircraft warning beacon on tallest ones */}
-                    {h > 70 && (
-                      <circle cx={x + w / 2} cy={y - 1} r={0.9} fill="#f43f5e" opacity="0.9">
-                        <animate attributeName="opacity" values="0.9;0.2;0.9" dur="2s" repeatCount="indefinite" />
-                      </circle>
-                    )}
-                  </g>,
-                );
-                x += w + 2 + hashCell(i, 7, 7) * 6;
-                i += 1;
-              }
-              return rects;
-            })()}
+...
             {/* horizon haze */}
             <rect x={-bounds.w / 2} y={-70} width={bounds.w} height={80} fill="url(#horizon-haze)" opacity="0.4" />
+            {/* DRIFTING CLOUDS — two soft banks that cross the sky */}
+            {!reducedMotion && (
+              <g opacity={hr >= 6 && hr < 18 ? 0.45 : 0.22}>
+                <g>
+                  <ellipse cx={0} cy={-90} rx={26} ry={5} fill="#d6c8e8" />
+                  <ellipse cx={14} cy={-93} rx={16} ry={4} fill="#e6dcf0" />
+                  <ellipse cx={-12} cy={-92} rx={14} ry={3.5} fill="#c8b8dc" />
+                  <animateTransform attributeName="transform" type="translate" from={`${-bounds.w / 2 - 60} 0`} to={`${bounds.w / 2 + 60} 0`} dur="70s" repeatCount="indefinite" />
+                </g>
+                <g>
+                  <ellipse cx={0} cy={-115} rx={20} ry={4} fill="#b8a8cc" />
+                  <ellipse cx={-10} cy={-117} rx={12} ry={3} fill="#c8b8dc" />
+                  <animateTransform attributeName="transform" type="translate" from={`${bounds.w / 2 + 40} 0`} to={`${-bounds.w / 2 - 40} 0`} dur="95s" repeatCount="indefinite" />
+                </g>
+              </g>
+            )}
           </g>
           <defs>
             <linearGradient id="horizon-haze" x1="0" x2="0" y1="0" y2="1">
@@ -971,6 +965,90 @@ export function CityIsometric() {
             );
           })()}
 
+
+          {/* ── PEDESTRIANS — deterministic figures pacing the plaza ── */}
+          {!reducedMotion && (() => {
+            const plaza = iso(2, 2);
+            const walkers = [
+              { r: 18, dur: 24, phase: 0,   color: "#fde68a" },
+              { r: 14, dur: 19, phase: 90,  color: "#a7f3d0" },
+              { r: 22, dur: 31, phase: 180, color: "#fda4af" },
+              { r: 10, dur: 15, phase: 270, color: "#c4b5fd" },
+            ];
+            return (
+              <g aria-hidden="true" transform={`translate(${plaza.x},${plaza.y + TH / 2})`}>
+                {walkers.map((w, i) => (
+                  <g key={i}>
+                    <g>
+                      {/* shadow + tiny figure */}
+                      <ellipse cx={0} cy={2} rx={1.6} ry={0.6} fill="#000" opacity="0.55" />
+                      <rect x={-0.7} y={-4} width={1.4} height={4} fill={w.color} opacity="0.9" />
+                      <circle cx={0} cy={-5} r={0.9} fill="#f5e6c4" />
+                      <animateTransform
+                        attributeName="transform"
+                        type="rotate"
+                        from={`${w.phase} 0 0`}
+                        to={`${w.phase + 360} 0 0`}
+                        dur={`${w.dur}s`}
+                        repeatCount="indefinite"
+                        additive="sum"
+                      />
+                      <animateTransform
+                        attributeName="transform"
+                        type="translate"
+                        values={`${w.r},0`}
+                        additive="sum"
+                      />
+                    </g>
+                  </g>
+                ))}
+              </g>
+            );
+          })()}
+
+          {/* ── MONSOON — subtle rain streaks in Jul/Aug only (LTE dev override via ?rain=1) ── */}
+          {!reducedMotion && (() => {
+            const m = new Date().getMonth();
+            const forced = typeof window !== "undefined" && window.location.search.includes("rain=1");
+            const monsoon = m === 6 || m === 7 || forced;
+            if (!monsoon) return null;
+            return (
+              <g aria-hidden="true" opacity="0.55">
+                {Array.from({ length: 24 }).map((_, i) => {
+                  const x = -bounds.w / 2 + hashCell(i, 3, 11) * bounds.w;
+                  const dur = 0.7 + hashCell(i, 5, 11) * 0.6;
+                  const delay = hashCell(i, 7, 11) * 1.2;
+                  return (
+                    <line
+                      key={i}
+                      x1={x}
+                      y1={-140}
+                      x2={x - 4}
+                      y2={-100}
+                      stroke="#a0d8ff"
+                      strokeWidth="0.5"
+                      opacity="0.75"
+                    >
+                      <animate
+                        attributeName="y1"
+                        values="-140;220"
+                        dur={`${dur}s`}
+                        begin={`${delay}s`}
+                        repeatCount="indefinite"
+                      />
+                      <animate
+                        attributeName="y2"
+                        values="-100;260"
+                        dur={`${dur}s`}
+                        begin={`${delay}s`}
+                        repeatCount="indefinite"
+                      />
+                    </line>
+                  );
+                })}
+              </g>
+            );
+          })()}
 
           {/* buildings (already in back-to-front order because their cells are sorted with the tiles) */}
           {cells
