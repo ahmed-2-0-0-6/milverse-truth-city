@@ -640,6 +640,13 @@ const RoofDetail = React.memo(function RoofDetail({
   }
 });
 
+/* Perk unlock thresholds per building — module-level constant. */
+const PERK_REQ: Record<BuildingId, number> = {
+  outpost: 3, library: 5, school: 5, newsroom: 5,
+  signal_tower: 5, archive: 5, clean_room: 3, watchtower: 3,
+};
+
+
 /* ── main component ──────────────────────────────────────── */
 export function CityIsometric() {
   const [save, setSave] = useState<CitySave | null>(null);
