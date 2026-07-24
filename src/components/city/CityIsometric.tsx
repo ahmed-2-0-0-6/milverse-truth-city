@@ -287,8 +287,10 @@ function GroundTileImpl({ gx, gy, reducedMotion, lowFx }: { gx: number; gy: numb
               <ellipse cx={-2} cy={-0.6} rx={3} ry={0.9} fill="#67e8f9" opacity="0.18" />
             </g>
           )}
-        </>
-      )}
+          </>
+        );
+      })()}
+
 
 
       {kind === "grass" && hasBuilding && (
