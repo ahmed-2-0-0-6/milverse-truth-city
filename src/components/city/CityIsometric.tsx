@@ -638,7 +638,7 @@ const RoofDetail = React.memo(function RoofDetail({
       );
     }
   }
-}
+});
 
 /* ── main component ──────────────────────────────────────── */
 export function CityIsometric() {
