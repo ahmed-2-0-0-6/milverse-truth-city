@@ -16,7 +16,10 @@ import {
   Newspaper,
   Store,
   Swords,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
+
 import {
   WORLD_W,
   WORLD_H,
@@ -425,6 +428,23 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
   const [selected, setSelected] = useState<Station | null>(null);
   const [scaffoldOpen, setScaffoldOpen] = useState<"market" | "arena" | null>(null);
 
+  /* ── fullscreen mode (immersive) ─────────────────────────── */
+  const [fullscreen, setFullscreen] = useState(false);
+  useEffect(() => {
+    if (!fullscreen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFullscreen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [fullscreen]);
+
+
   const focusStation = (s: Station) => flyTo(s.x, s.y, ZOOM_LEVELS[2], 500);
 
   const doubleTapLandmark = (l: WorldLandmark) => {
@@ -534,7 +554,14 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
 
 
   return (
-    <div className="relative w-full h-[70vh] min-h-[520px] rounded-sm overflow-hidden border border-border/60 bg-[#050914]">
+    <div
+      className={
+        fullscreen
+          ? "fixed inset-0 z-[9998] overflow-hidden bg-[#050914]"
+          : "relative w-full h-[85vh] min-h-[560px] rounded-sm overflow-hidden border border-border/60 bg-[#050914]"
+      }
+    >
+
       <div
         ref={viewportRef}
         className="absolute inset-0 touch-none select-none cursor-grab active:cursor-grabbing"
@@ -612,7 +639,16 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
           >
             <Home className="h-4 w-4" />
           </button>
+          <button
+            onClick={() => setFullscreen((v) => !v)}
+            className="rounded-sm border border-primary/40 bg-background/70 backdrop-blur p-2 text-primary hover:bg-primary/10"
+            aria-label={fullscreen ? "Exit fullscreen (Esc)" : "Enter fullscreen"}
+            title={fullscreen ? "Exit fullscreen (Esc)" : "Fullscreen"}
+          >
+            {fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+          </button>
         </div>
+
       </div>
 
       {/* Progress chips */}
