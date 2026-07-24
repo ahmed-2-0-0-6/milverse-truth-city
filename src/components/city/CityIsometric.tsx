@@ -954,11 +954,13 @@ export function CityIsometric() {
 
 
   const bounds = { w: TW * (GRID + 1), h: TH * (GRID + 3) };
-  const vbW = bounds.w / cam.z;
-  const vbH = (bounds.h + 60) / cam.z;
-  const cx = cam.x;
-  const cy = -140 + (bounds.h + 60) / 2 + cam.y;
-  const viewBox = `${cx - vbW / 2} ${cy - vbH / 2} ${vbW} ${vbH}`;
+  // Initial framing only — live pan/zoom mutates the attribute imperatively.
+  const c0 = camRef.current;
+  const vbW = bounds.w / c0.z;
+  const vbH = (bounds.h + 60) / c0.z;
+  const cy = -140 + (bounds.h + 60) / 2 + c0.y;
+  const viewBox = `${c0.x - vbW / 2} ${cy - vbH / 2} ${vbW} ${vbH}`;
+
 
 
   return (
