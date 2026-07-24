@@ -738,8 +738,9 @@ export function CityIsometric() {
 
   const onPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
     if (e.button !== 0 && e.pointerType === "mouse") return;
+    // No pointer capture yet — capturing here would retarget the click and
+    // stop plots from opening. We only capture once a real drag starts.
     dragRef.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: cam.x, oy: cam.y, moved: false };
-    (e.currentTarget as SVGSVGElement).setPointerCapture?.(e.pointerId);
   };
   const onPointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
     const d = dragRef.current;
@@ -752,6 +753,7 @@ export function CityIsometric() {
     if (!d.moved && Math.hypot(e.clientX - d.sx, e.clientY - d.sy) > 6) {
       d.moved = true;
       setDragging(true);
+      e.currentTarget.setPointerCapture?.(e.pointerId);
     }
     if (d.moved) setCam((c) => clampCam({ ...c, x: d.ox - dx, y: d.oy - dy }));
   };
@@ -766,7 +768,7 @@ export function CityIsometric() {
       window.addEventListener("click", swallow, { capture: true, once: true });
       window.setTimeout(() => window.removeEventListener("click", swallow, true), 60);
     }
-    e.currentTarget.releasePointerCapture?.(d.id);
+    if (d.moved) e.currentTarget.releasePointerCapture?.(d.id);
   };
 
   // Non-passive wheel zoom — React's onWheel is passive, so preventDefault needs this.
