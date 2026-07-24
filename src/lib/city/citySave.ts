@@ -14,6 +14,9 @@ export interface CitySave {
   bricksLifetime: number; // for prestige / rank hooks
   buildings: Partial<Record<BuildingId, { level: number }>>;
   lastVisit: number;
+  /** When the payroll ledger was last emptied. Optional on old saves. */
+  lastCollect?: number;
+
 }
 
 function defaultSave(): CitySave {
