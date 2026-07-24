@@ -36,6 +36,7 @@ import { Route as CommunityRouteImport } from './routes/community'
 import { Route as CityHallRouteImport } from './routes/city-hall'
 import { Route as CharterRouteImport } from './routes/charter'
 import { Route as BoardRouteImport } from './routes/board'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AssessmentRouteImport } from './routes/assessment'
 import { Route as ArenaRouteImport } from './routes/arena'
 import { Route as ArchiveRouteImport } from './routes/archive'
@@ -189,6 +190,11 @@ const BoardRoute = BoardRouteImport.update({
   path: '/board',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AssessmentRoute = AssessmentRouteImport.update({
   id: '/assessment',
   path: '/assessment',
@@ -281,6 +287,7 @@ export interface FileRoutesByFullPath {
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
   '/assessment': typeof AssessmentRoute
+  '/auth': typeof AuthRoute
   '/board': typeof BoardRoute
   '/charter': typeof CharterRoute
   '/city-hall': typeof CityHallRoute
@@ -327,6 +334,7 @@ export interface FileRoutesByTo {
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
   '/assessment': typeof AssessmentRoute
+  '/auth': typeof AuthRoute
   '/board': typeof BoardRoute
   '/charter': typeof CharterRoute
   '/city-hall': typeof CityHallRoute
@@ -374,6 +382,7 @@ export interface FileRoutesById {
   '/archive': typeof ArchiveRouteWithChildren
   '/arena': typeof ArenaRoute
   '/assessment': typeof AssessmentRoute
+  '/auth': typeof AuthRoute
   '/board': typeof BoardRoute
   '/charter': typeof CharterRoute
   '/city-hall': typeof CityHallRoute
@@ -422,6 +431,7 @@ export interface FileRouteTypes {
     | '/archive'
     | '/arena'
     | '/assessment'
+    | '/auth'
     | '/board'
     | '/charter'
     | '/city-hall'
@@ -468,6 +478,7 @@ export interface FileRouteTypes {
     | '/archive'
     | '/arena'
     | '/assessment'
+    | '/auth'
     | '/board'
     | '/charter'
     | '/city-hall'
@@ -514,6 +525,7 @@ export interface FileRouteTypes {
     | '/archive'
     | '/arena'
     | '/assessment'
+    | '/auth'
     | '/board'
     | '/charter'
     | '/city-hall'
@@ -561,6 +573,7 @@ export interface RootRouteChildren {
   ArchiveRoute: typeof ArchiveRouteWithChildren
   ArenaRoute: typeof ArenaRoute
   AssessmentRoute: typeof AssessmentRoute
+  AuthRoute: typeof AuthRoute
   BoardRoute: typeof BoardRoute
   CharterRoute: typeof CharterRoute
   CityHallRoute: typeof CityHallRoute
@@ -791,6 +804,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BoardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/assessment': {
       id: '/assessment'
       path: '/assessment'
@@ -940,6 +960,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArchiveRoute: ArchiveRouteWithChildren,
   ArenaRoute: ArenaRoute,
   AssessmentRoute: AssessmentRoute,
+  AuthRoute: AuthRoute,
   BoardRoute: BoardRoute,
   CharterRoute: CharterRoute,
   CityHallRoute: CityHallRoute,
