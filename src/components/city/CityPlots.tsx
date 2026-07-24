@@ -15,6 +15,8 @@ import {
   type CitySave,
 } from "@/lib/city/citySave";
 import { BuildingCard } from "@/components/city/BuildingCard";
+import { titleFor } from "@/lib/city/title";
+import { buildingLock } from "@/lib/city/zones";
 
 export function CityPlots() {
   const [save, setSave] = useState<CitySave | null>(null);
@@ -44,12 +46,14 @@ export function CityPlots() {
 
   const rows = useMemo(() => {
     if (!save) return [];
+    const step = titleFor(save).step;
     return BUILDINGS.map((def) => {
       const lvl = levelOf(save, def.id);
       const cost = nextCost(def.id, lvl);
       const maxed = isMaxed(def.id, lvl);
-      const canAfford = cost !== null && save.bricks >= cost;
-      return { def, lvl, cost, maxed, canAfford, built: lvl > 0 };
+      const lock = buildingLock(def.id, step);
+      const canAfford = cost !== null && save.bricks >= cost && !lock.locked;
+      return { def, lvl, cost, maxed, canAfford, built: lvl > 0, lock };
     });
   }, [save]);
 
@@ -128,15 +132,19 @@ export function CityPlots() {
 
       {/* Plot grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
-        {rows.map(({ def, lvl, cost, maxed, canAfford, built: isBuilt }) => {
-          const stateLabel = !def.wired
+        {rows.map(({ def, lvl, cost, maxed, canAfford, built: isBuilt, lock }) => {
+          const stateLabel = lock.locked
+            ? `SEALED · ${lock.needRank}`
+            : !def.wired
             ? "SOON"
             : maxed
               ? "MAXED"
               : isBuilt
                 ? `Lv${lvl}`
                 : "UNBUILT";
-          const stateColor = !def.wired
+          const stateColor = lock.locked
+            ? "text-red-200/70 border-red-400/30 bg-red-400/[0.04]"
+            : !def.wired
             ? "text-red-300/70 border-red-400/30 bg-red-400/5"
             : maxed
               ? "text-emerald-200 border-emerald-400/50 bg-emerald-400/10"
@@ -156,6 +164,14 @@ export function CityPlots() {
               }`}
               aria-label={`${def.name} — ${stateLabel}${cost !== null && def.wired ? `, next upgrade ${cost} bricks` : ""}`}
             >
+              {lock.locked && (
+                <span
+                  aria-hidden
+                  className="absolute top-1.5 right-1.5 font-mono text-[11px] text-red-300/80"
+                >
+                  &#9679;&#9679;
+                </span>
+              )}
               {/* Ready pulse */}
               {canAfford && def.wired && !maxed && (
                 <span
@@ -182,7 +198,7 @@ export function CityPlots() {
               </div>
               <div className="mt-1 flex items-baseline justify-between font-mono text-[10px]">
                 <span className="opacity-70">{stateLabel}</span>
-                {cost !== null && def.wired && (
+                {cost !== null && def.wired && !lock.locked && (
                   <span className={`tabular-nums ${canAfford ? "text-amber-200" : ""}`}>
                     {cost}◼
                   </span>
