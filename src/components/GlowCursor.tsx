@@ -74,11 +74,11 @@ export function GlowCursor() {
       cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onMove);
     };
-  }, [mode]);
+  }, [mode, host]);
 
   if (mode !== "cinematic") return null;
 
-  return (
+  const nodes = (
     <>
       <div
         ref={trailRef}
@@ -86,7 +86,7 @@ export function GlowCursor() {
         className="pointer-events-none fixed left-0 top-0 h-8 w-8 rounded-full"
         style={{
           zIndex: 2147483646,
-          background: "radial-gradient(circle, oklch(0.60 0.19 258 / 0.35), transparent 70%)",
+          background: "radial-gradient(circle, oklch(0.70 0.19 258 / 0.45), transparent 70%)",
           willChange: "transform",
           transform: "translate3d(-100px, -100px, 0)",
           contain: "strict",
@@ -98,8 +98,8 @@ export function GlowCursor() {
         className="pointer-events-none fixed left-0 top-0 h-2 w-2 rounded-full"
         style={{
           zIndex: 2147483647,
-          background: "oklch(0.60 0.19 258)",
-          boxShadow: "0 0 12px oklch(0.60 0.19 258 / 0.9)",
+          background: "oklch(0.78 0.16 258)",
+          boxShadow: "0 0 14px oklch(0.70 0.19 258 / 0.95), 0 0 3px oklch(1 0 0 / 0.8)",
           willChange: "transform",
           transform: "translate3d(-100px, -100px, 0)",
           contain: "strict",
@@ -107,4 +107,7 @@ export function GlowCursor() {
       />
     </>
   );
+
+  return host ? createPortal(nodes, host) : nodes;
+
 }
