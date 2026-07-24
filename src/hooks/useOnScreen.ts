@@ -3,17 +3,20 @@
 // backgrounded surfaces can stop animating and stop ticking.
 // SSR-safe: returns false until mounted, then settles on the real answer.
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function useOnScreen<T extends HTMLElement>(
   rootMargin = "200px",
-): { ref: React.RefObject<T | null>; active: boolean } {
-  const ref = useRef<T | null>(null);
+): { ref: (node: T | null) => void; active: boolean } {
+  // Callback ref: the observed node may mount late (components that render a
+  // placeholder before their save loads), so a plain ref would never attach.
+  const [node, setNode] = useState<T | null>(null);
+  const ref = useCallback((n: T | null) => setNode(n), []);
   const [visible, setVisible] = useState(false);
   const [awake, setAwake] = useState(true);
 
   useEffect(() => {
-    const el = ref.current;
+    const el = node;
     if (!el) return;
     if (typeof IntersectionObserver === "undefined") {
       setVisible(true);
@@ -25,7 +28,7 @@ export function useOnScreen<T extends HTMLElement>(
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [rootMargin]);
+  }, [node, rootMargin]);
 
   useEffect(() => {
     const onVis = () => setAwake(!document.hidden);
