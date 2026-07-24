@@ -46,7 +46,7 @@ function GoogleGlyph() {
 
 function AuthPage() {
   const [user, setUser] = useState<User | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<"apple" | "google" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -57,19 +57,23 @@ function AuthPage() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  async function signIn() {
-    setBusy(true);
+  async function signIn(provider: "apple" | "google") {
+    setBusy(provider);
     setError(null);
-    const result = await lovable.auth.signInWithOAuth("apple", {
+    const result = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin,
     });
     if (result.error) {
-      setError("Apple turned us down. Try again.");
-      setBusy(false);
+      setError(
+        provider === "apple"
+          ? "Apple turned us down. Try again."
+          : "Google turned us down. Try again.",
+      );
+      setBusy(null);
       return;
     }
     if (result.redirected) return;
-    setBusy(false);
+    setBusy(null);
   }
 
   async function signOut() {
