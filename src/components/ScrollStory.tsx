@@ -15,6 +15,7 @@ import mirrorVideo from "@/assets/mirror.mp4.asset.json";
 import feedVideo from "@/assets/feed.mp4.asset.json";
 import studioVideo from "@/assets/studio.mp4.asset.json";
 import archiveVideo from "@/assets/archive.mp4.asset.json";
+import cleanroomVideo from "@/assets/cleanroom.mp4.asset.json";
 import gothamDeskArt from "@/assets/detective-desk-gotham.jpg";
 import gothamBoardPortraitArt from "@/assets/detective-board-gotham-wide.jpg";
 import gothamCrimeSceneArt from "@/assets/detective-crime-scene-gotham.jpg";
