@@ -646,19 +646,54 @@ const PERK_REQ: Record<BuildingId, number> = {
   signal_tower: 5, archive: 5, clean_room: 3, watchtower: 3,
 };
 
+/* ── light model ─────────────────────────────────────────────
+   Smooth tint interpolation across the day instead of hard hour
+   buckets. Keyed on fractional hour, so dusk actually creeps in. */
+type Rgba = [number, number, number, number];
+const LIGHT_KEYS: { h: number; c: Rgba }[] = [
+  { h: 0,    c: [15, 10, 30, 0.30] },
+  { h: 5,    c: [22, 16, 44, 0.30] },
+  { h: 6.5,  c: [214, 118, 58, 0.16] },
+  { h: 9,    c: [168, 150, 150, 0.08] },
+  { h: 13,   c: [120, 140, 180, 0.05] },
+  { h: 17,   c: [206, 132, 74, 0.11] },
+  { h: 18.5, c: [224, 88, 58, 0.18] },
+  { h: 20.5, c: [40, 22, 60, 0.26] },
+  { h: 24,   c: [15, 10, 30, 0.30] },
+];
+function lightTint(h: number): string {
+  let a = LIGHT_KEYS[0], b = LIGHT_KEYS[LIGHT_KEYS.length - 1];
+  for (let i = 0; i < LIGHT_KEYS.length - 1; i++) {
+    if (h >= LIGHT_KEYS[i].h && h <= LIGHT_KEYS[i + 1].h) {
+      a = LIGHT_KEYS[i];
+      b = LIGHT_KEYS[i + 1];
+      break;
+    }
+  }
+  const t = b.h === a.h ? 0 : (h - a.h) / (b.h - a.h);
+  const v = (i: number) => a.c[i] + (b.c[i] - a.c[i]) * t;
+  return `rgba(${Math.round(v(0))},${Math.round(v(1))},${Math.round(v(2))},${v(3).toFixed(3)})`;
+}
+
+
 
 /* ── main component ──────────────────────────────────────── */
 export function CityIsometric() {
   const [save, setSave] = useState<CitySave | null>(null);
   const [open, setOpen] = useState<BuildingId | null>(null);
+  const [hoverId, setHoverId] = useState<BuildingId | null>(null);
   const [flashId, setFlashId] = useState<BuildingId | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [clock, setClock] = useState(() => new Date(0));
 
   useEffect(() => {
     setSave(loadCity());
+    setClock(new Date());
+    const tick = window.setInterval(() => setClock(new Date()), 60_000);
     if (typeof window !== "undefined" && window.matchMedia) {
       setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     }
+
     const refresh = () => setSave(loadCity());
     const onBuilt = (e: Event) => {
       refresh();
@@ -677,12 +712,14 @@ export function CityIsometric() {
     window.addEventListener("milverse:bricks", refresh);
     window.addEventListener("milverse:city:open", onOpen);
     return () => {
+      window.clearInterval(tick);
       window.removeEventListener("milverse:city", refresh);
       window.removeEventListener("milverse:city:built", onBuilt);
       window.removeEventListener("milverse:bricks", refresh);
       window.removeEventListener("milverse:city:open", onOpen);
     };
   }, []);
+
 
   const cells = useMemo(() => {
     const list: { gx: number; gy: number }[] = [];
@@ -734,14 +771,16 @@ export function CityIsometric() {
   if (!save || !derived) return null;
   const { hint, built, filled, perkOnline, population, power, safety, literacy, affordableIds } = derived;
 
-  // Time-of-day tint — cheap; hour granularity is coarse so per-render is fine.
-  const hr = new Date().getHours();
-  const tint =
-    hr < 6 ? "rgba(20,15,40,0.35)" :
-    hr < 9 ? "rgba(210,120,60,0.14)" :
-    hr < 17 ? "rgba(120,140,180,0.06)" :
-    hr < 20 ? "rgba(220,90,60,0.16)" :
-    "rgba(15,10,30,0.28)";
+  // Smooth day/night light model — fractional hour drives tint and the sun/moon arc.
+  const hFrac = clock.getHours() + clock.getMinutes() / 60;
+  const hr = clock.getHours();
+  const isDay = hFrac >= 6 && hFrac < 18.5;
+  // 0 at rise, 1 at set — for both the sun and the moon.
+  const arcT = isDay
+    ? (hFrac - 6) / 12.5
+    : ((hFrac < 6 ? hFrac + 24 : hFrac) - 18.5) / 11.5;
+  const tint = lightTint(hFrac);
+
 
   const bounds = { w: TW * (GRID + 1), h: TH * (GRID + 3) };
   const viewBox = `${-bounds.w / 2} ${-140} ${bounds.w} ${bounds.h + 60}`;
