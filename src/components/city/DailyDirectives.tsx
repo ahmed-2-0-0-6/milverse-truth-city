@@ -209,9 +209,10 @@ const DirectiveRow = memo(function DirectiveRow({
               disabled={!complete}
               className={`tap stencil text-[10px] tracking-widest rounded px-2.5 py-1 border transition-colors ${
                 complete
-                  ? "border-emerald-400/60 text-emerald-200 bg-emerald-500/10 hover:bg-emerald-500/20"
+                  ? "border-emerald-400/60 text-emerald-200 bg-emerald-500/10 hover:bg-emerald-500/20 shadow-[0_0_10px_rgba(52,211,153,0.25)] motion-safe:animate-pulse"
                   : "border-amber-400/25 text-amber-200/40 cursor-not-allowed"
               }`}
+
               aria-label={`Claim ${d.reward} BRICKS for ${d.label}`}
             >
               {complete ? `CLAIM +${d.reward}` : `+${d.reward}`}
