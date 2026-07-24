@@ -481,7 +481,7 @@ function StatBar({ label, value, accent, suffix = "" }: { label: string; value: 
 
 
 /* ── per-building roof details unlocked by level ─────────── */
-function RoofDetail({
+const RoofDetail = React.memo(function RoofDetail({
   id,
   level,
   top,
