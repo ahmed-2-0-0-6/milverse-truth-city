@@ -665,7 +665,7 @@ export function CityIsometric() {
       </div>
 
       {hint && (
-        <div className="mb-3 h-1 w-full rounded-sm bg-amber-400/10 overflow-hidden">
+        <div className="mb-2 h-1 w-full rounded-sm bg-amber-400/10 overflow-hidden">
           <div
             className={`h-full transition-all duration-500 ${
               hint.remaining === 0
@@ -676,6 +676,14 @@ export function CityIsometric() {
           />
         </div>
       )}
+
+      {/* ── LIVE CITY STATS HUD ── */}
+      <div className="mb-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
+        <StatChip label="POPULATION" value={population.toLocaleString()} accent="#fde68a" />
+        <StatBar   label="POWER"      value={power}    accent="#22d3ee" suffix="%" />
+        <StatBar   label="SAFETY"     value={safety}   accent="#f97316" suffix="%" />
+        <StatBar   label="LITERACY"   value={literacy} accent="#a7f3d0" suffix="%" />
+      </div>
 
       {/* Isometric board */}
       <div className="relative rounded-md border border-amber-400/25 bg-gradient-to-b from-[#050307] via-[#0a0812] to-[#0e0916] overflow-hidden shadow-[inset_0_0_60px_rgba(0,0,0,0.9)]">
@@ -688,6 +696,13 @@ export function CityIsometric() {
               "radial-gradient(ellipse at 50% 60%, transparent 40%, rgba(0,0,0,0.75) 100%)",
           }}
         />
+        {/* time-of-day tint */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 mix-blend-overlay"
+          style={{ background: tint }}
+        />
+
         <svg
           viewBox={viewBox}
           className="block w-full h-auto"
