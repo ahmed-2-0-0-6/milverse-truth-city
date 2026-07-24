@@ -4,8 +4,10 @@
 
 import { useEffect, useState } from "react";
 import {
+  COMBO_BONUS,
   claim,
   directiveDefs,
+  directiveMeta,
   loadDirectives,
   progressOf,
   wireDirectiveListeners,
@@ -35,27 +37,57 @@ export function DailyDirectives() {
   const doneCount = defs.filter((d) => (state.progress[d.id] ?? 0) >= d.target).length;
 
   const onClaim = (id: DirectiveId) => {
+    const def = defs.find((x) => x.id === id);
     const res = claim(id);
     if (res.ok) {
       setState(loadDirectives());
       window.dispatchEvent(
         new CustomEvent("milverse:toast", {
-          detail: { title: "DIRECTIVE COMPLETE", body: `+${res.reward} BRICKS credited.` },
+          detail: {
+            title: res.combo ? "COMBO CLEARED" : "DIRECTIVE COMPLETE",
+            body: res.combo
+              ? `+${res.reward} +${res.combo} combo. Streak ${res.streak}.`
+              : `+${res.reward} BRICKS credited.`,
+          },
+        }),
+      );
+      window.dispatchEvent(
+        new CustomEvent("milverse:directive:claimed", {
+          detail: { label: def?.label ?? id, reward: res.reward, combo: res.combo, streak: res.streak },
         }),
       );
     }
   };
 
+  const meta = directiveMeta(state);
+
   return (
     <section className="mx-auto mt-4 w-full max-w-5xl px-3">
       <div className="rounded-md border border-amber-400/25 bg-black/60 backdrop-blur-sm">
         <header className="flex items-baseline justify-between border-b border-amber-400/20 px-4 py-2.5 gap-3 flex-wrap">
-          <h3 className="stencil text-[11px] tracking-widest text-amber-300">
-            TODAY'S DIRECTIVES
-          </h3>
-          <span className="font-mono text-[10px] text-amber-200/70 tabular-nums">
-            {doneCount} / {defs.length} DONE
-          </span>
+          <div className="flex items-baseline gap-3 flex-wrap">
+            <h3 className="stencil text-[11px] tracking-widest text-amber-300">
+              TODAY'S DIRECTIVES
+            </h3>
+            {meta.streak > 0 && (
+              <span className="stencil text-[10px] tracking-widest text-emerald-300">
+                STREAK · {meta.streak}D
+              </span>
+            )}
+          </div>
+          <div className="flex items-baseline gap-3">
+            <span className="font-mono text-[10px] text-amber-200/70 tabular-nums">
+              {doneCount} / {defs.length} DONE
+            </span>
+            <span
+              className={`stencil text-[10px] tracking-widest ${
+                meta.comboClaimed ? "text-emerald-300" : meta.allDone ? "text-fuchsia-300 animate-pulse" : "text-amber-200/40"
+              }`}
+              title="Clear all three directives for a combo bonus."
+            >
+              COMBO +{COMBO_BONUS}
+            </span>
+          </div>
         </header>
 
         <ul className="divide-y divide-amber-400/10">
@@ -71,7 +103,7 @@ export function DailyDirectives() {
         </ul>
 
         <footer className="border-t border-amber-400/15 px-4 py-2 text-[10px] text-amber-100/50 font-mono">
-          Directives refresh at midnight. Un-claimed rewards don't roll over.
+          Directives refresh at midnight. Clear all three for the combo. Un-claimed rewards don't roll over.
         </footer>
       </div>
     </section>
