@@ -24,21 +24,21 @@ import {
 import { BuildingCard } from "@/components/city/BuildingCard";
 import { useOnScreen } from "@/hooks/useOnScreen";
 
+import { titleFor, nextTitle } from "@/lib/city/title";
+import {
+  PLOT_CELL,
+  ZONES,
+  zoneOfCell,
+  cellLocked,
+  buildingLock,
+} from "@/lib/city/zones";
+
 /* ── geometry ────────────────────────────────────────────── */
 const TW = 96; // tile width
 const TH = 48; // tile height (2:1 iso)
 const GRID = 5;
 type Cell = [number, number];
-const PLACEMENT: Record<BuildingId, Cell> = {
-  signal_tower: [0, 0],
-  outpost: [2, 0],
-  archive: [4, 0],
-  library: [0, 2],
-  school: [4, 2],
-  clean_room: [0, 4],
-  newsroom: [2, 4],
-  watchtower: [4, 4],
-};
+const PLACEMENT: Record<BuildingId, Cell> = PLOT_CELL;
 const iso = (gx: number, gy: number) => ({
   x: ((gx - gy) * TW) / 2,
   y: ((gx + gy) * TH) / 2,
@@ -872,6 +872,8 @@ export function CityIsometric() {
     if (!save) return null;
     const hint = nextAfford(save);
     const built = plotsBuilt(save);
+    const step = titleFor(save).step;
+    const nextRank = nextTitle(save);
     const target = hint?.cost ?? 1;
     const filled = hint ? Math.max(0, Math.min(1, (target - hint.remaining) / target)) : 1;
 
@@ -893,11 +895,12 @@ export function CityIsometric() {
         if (c !== null && save.bricks >= c) affordableIds.add(b.id);
       }
     }
-    return { hint, built, filled, perkOnline, population, power, safety, literacy, affordableIds };
+    return { hint, built, filled, perkOnline, population, power, safety, literacy, affordableIds, step, nextRank };
   }, [save]);
 
   if (!save || !derived) return null;
-  const { hint, built, filled, perkOnline, population, power, safety, literacy, affordableIds } = derived;
+  const { hint, built, filled, perkOnline, population, power, safety, literacy, affordableIds, step, nextRank } = derived;
+  const sealedZones = ZONES.filter((z) => z.step > step);
 
   // Smooth day/night light model — fractional hour drives tint and the sun/moon arc.
   const hFrac = clock.getHours() + clock.getMinutes() / 60;
@@ -940,6 +943,21 @@ export function CityIsometric() {
           <p className="mt-1 text-[11px] text-amber-200/60 italic">
             Tap a plot to build. Every case earns the bricks.
           </p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            <span className="stencil rounded-sm border border-amber-400/40 bg-amber-400/10 px-1.5 py-0.5 text-[9px] tracking-widest text-amber-200">
+              {titleFor(save).rank}
+            </span>
+            {sealedZones.length > 0 ? (
+              <span className="font-mono text-[10px] text-red-200/70">
+                {sealedZones.length} district{sealedZones.length > 1 ? "s" : ""} sealed
+                {nextRank ? ` · ${nextRank.rank} at ${nextRank.plotsNeeded} plots` : ""}
+              </span>
+            ) : (
+              <span className="font-mono text-[10px] text-emerald-300/80">
+                CITY FULLY ZONED
+              </span>
+            )}
+          </div>
         </div>
         <div className="text-right shrink-0">
           <button
@@ -1159,6 +1177,43 @@ export function CityIsometric() {
           {cells.map(({ gx, gy }) => (
             <GroundTile key={`t-${gx}-${gy}`} gx={gx} gy={gy} reducedMotion={reducedMotion} />
           ))}
+
+          {/* ── SEALED GROUND — districts you haven't earned yet ── */}
+          <defs>
+            <pattern id="milv-seal-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+              <rect width="6" height="6" fill="#05040a" />
+              <line x1="0" y1="0" x2="0" y2="6" stroke="#f43f5e" strokeWidth="0.7" opacity="0.35" />
+            </pattern>
+          </defs>
+          {cells
+            .filter(({ gx, gy }) => cellLocked(gx, gy, step))
+            .map(({ gx, gy }) => {
+              const { x, y } = iso(gx, gy);
+              const pts = `0,0 ${TW / 2},${TH / 2} 0,${TH} ${-TW / 2},${TH / 2}`;
+              return (
+                <g key={`seal-${gx}-${gy}`} transform={`translate(${x},${y})`} aria-hidden="true">
+                  <polygon points={pts} fill="#04030a" opacity="0.9" />
+                  <polygon points={pts} fill="url(#milv-seal-hatch)" opacity="0.55" />
+                  <polygon points={pts} fill="none" stroke="#f43f5e" strokeWidth="0.4" opacity="0.28" />
+                </g>
+              );
+            })}
+          {/* district seal plates */}
+          {ZONES.filter((z) => z.step > step).map((z) => {
+            const mid = z.cells[Math.floor(z.cells.length / 2)];
+            const { x, y } = iso(mid[0], mid[1]);
+            return (
+              <g key={`zseal-${z.id}`} transform={`translate(${x},${y + TH / 2})`} aria-hidden="true">
+                <rect x={-52} y={-9} width={104} height={18} rx={2} fill="#0a0509" opacity="0.9" stroke="#f43f5e" strokeOpacity="0.4" strokeWidth="0.5" />
+                <text x={0} y={-1} textAnchor="middle" fontSize="7" fill="#fda4af" style={{ fontFamily: '"Bebas Neue", sans-serif', letterSpacing: "1.4px" }}>
+                  {z.name} · SEALED
+                </text>
+                <text x={0} y={6.5} textAnchor="middle" fontSize="5.5" fill="#e7b7c0" opacity="0.8" style={{ fontFamily: "ui-monospace, monospace" }}>
+                  OPENS AT {["CONSTABLE","INSPECTOR","CHIEF","COMMISSIONER","MAYOR","GOVERNOR"][z.step]}
+                </text>
+              </g>
+            );
+          })}
 
           {/* ── PLAZA FOUNTAIN — the centre of town, with water that moves ── */}
           {(() => {
