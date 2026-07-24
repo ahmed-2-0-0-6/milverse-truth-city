@@ -45,6 +45,21 @@ export function CityBulletin() {
 
   const [paused, setPaused] = useState(false);
 
+  // Progress toward the next seat: average of the plot and brick ratios.
+  const seatPct = useMemo(() => {
+    if (!save || !next) return 100;
+    const built = plotsBuilt(save);
+    const bricks = save.bricksLifetime | 0;
+    const plotTarget = built + next.plotsNeeded;
+    const brickTarget = bricks + next.bricksNeeded;
+    const parts: number[] = [];
+    if (plotTarget > 0) parts.push(built / plotTarget);
+    if (brickTarget > 0) parts.push(bricks / brickTarget);
+    if (!parts.length) return 0;
+    return Math.round((parts.reduce((a, b) => a + b, 0) / parts.length) * 100);
+  }, [save, next]);
+
+
   if (!save || !title) return null;
 
   return (
