@@ -2,7 +2,7 @@
 // Three per-day micro-missions. Claim bricks when target met.
 // Wires listeners on mount for retro-tracking of case solves + brick earns.
 
-import { useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import {
   COMBO_BONUS,
   claim,
@@ -14,27 +14,31 @@ import {
   type Directive,
   type DirectiveId,
 } from "@/lib/city/directives";
+import { useCoalescedRefresh } from "@/hooks/useCoalescedRefresh";
 
 export function DailyDirectives() {
   const [state, setState] = useState(() => loadDirectives());
 
   useEffect(() => {
     wireDirectiveListeners();
-    const on = () => setState(loadDirectives());
-    window.addEventListener("milverse:directives", on);
-    window.addEventListener("milverse:city", on);
-    window.addEventListener("milverse:bricks", on);
-    window.addEventListener("milverse:city:built", on);
-    return () => {
-      window.removeEventListener("milverse:directives", on);
-      window.removeEventListener("milverse:city", on);
-      window.removeEventListener("milverse:bricks", on);
-      window.removeEventListener("milverse:city:built", on);
-    };
   }, []);
+  useCoalescedRefresh(
+    [
+      "milverse:directives",
+      "milverse:city",
+      "milverse:bricks",
+      "milverse:city:built",
+    ],
+    () => setState(loadDirectives()),
+  );
 
-  const defs = directiveDefs(state);
-  const doneCount = defs.filter((d) => (state.progress[d.id] ?? 0) >= d.target).length;
+  const defs = useMemo(() => directiveDefs(state), [state]);
+  const meta = useMemo(() => directiveMeta(state), [state]);
+  const doneCount = useMemo(
+    () => defs.filter((d) => (state.progress[d.id] ?? 0) >= d.target).length,
+    [defs, state.progress],
+  );
+
 
   const onClaim = (id: DirectiveId) => {
     const def = defs.find((x) => x.id === id);
