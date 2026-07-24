@@ -719,34 +719,74 @@ export function CityIsometric() {
   }, []);
 
   // ── CAMERA ── drag to pan, wheel/buttons to zoom, arrows to walk the city.
-  const [cam, setCam] = useState({ x: 0, y: 0, z: 1 });
+  // Imperative on purpose: panning writes the SVG viewBox directly inside a
+  // rAF instead of re-rendering the whole city every pointermove.
+  const camRef = useRef({ x: 0, y: 0, z: 1 });
   const dragRef = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
   const [dragging, setDragging] = useState(false);
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const zoomLabelRef = useRef<HTMLSpanElement | null>(null);
+  const rafRef = useRef(0);
 
   const clampCam = (c: { x: number; y: number; z: number }) => {
     const z = Math.min(3, Math.max(0.6, c.z));
     const span = 900 / z;
     return { z, x: Math.min(span, Math.max(-span, c.x)), y: Math.min(span, Math.max(-span, c.y)) };
   };
-  const nudge = useCallback((dx: number, dy: number) => {
-    setCam((c) => clampCam({ ...c, x: c.x + dx / c.z, y: c.y + dy / c.z }));
+
+  const applyCam = useCallback(() => {
+    rafRef.current = 0;
+    const svg = svgRef.current;
+    if (!svg) return;
+    const c = camRef.current;
+    const bw = TW * (GRID + 1);
+    const bh = TH * (GRID + 3);
+    const vw = bw / c.z;
+    const vh = (bh + 60) / c.z;
+    const cyy = -140 + (bh + 60) / 2 + c.y;
+    svg.setAttribute("viewBox", `${c.x - vw / 2} ${cyy - vh / 2} ${vw} ${vh}`);
+    if (zoomLabelRef.current) zoomLabelRef.current.textContent = `${Math.round(c.z * 100)}%`;
   }, []);
-  const zoomBy = useCallback((f: number) => setCam((c) => clampCam({ ...c, z: c.z * f })), []);
-  const resetCam = useCallback(() => setCam({ x: 0, y: 0, z: 1 }), []);
+
+  const scheduleCam = useCallback(() => {
+    if (rafRef.current) return;
+    rafRef.current = requestAnimationFrame(applyCam);
+  }, [applyCam]);
+
+  useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
+
+  const setCamTo = useCallback(
+    (next: { x: number; y: number; z: number }) => {
+      camRef.current = clampCam(next);
+      scheduleCam();
+    },
+    [scheduleCam],
+  );
+
+  const nudge = useCallback((dx: number, dy: number) => {
+    const c = camRef.current;
+    setCamTo({ ...c, x: c.x + dx / c.z, y: c.y + dy / c.z });
+  }, [setCamTo]);
+  const zoomBy = useCallback((f: number) => {
+    const c = camRef.current;
+    setCamTo({ ...c, z: c.z * f });
+  }, [setCamTo]);
+  const resetCam = useCallback(() => setCamTo({ x: 0, y: 0, z: 1 }), [setCamTo]);
 
   const onPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
     if (e.button !== 0 && e.pointerType === "mouse") return;
     // No pointer capture yet — capturing here would retarget the click and
     // stop plots from opening. We only capture once a real drag starts.
-    dragRef.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: cam.x, oy: cam.y, moved: false };
+    const c = camRef.current;
+    dragRef.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: c.x, oy: c.y, moved: false };
   };
   const onPointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
     const d = dragRef.current;
     if (!d || d.id !== e.pointerId) return;
+    const c = camRef.current;
     const rect = e.currentTarget.getBoundingClientRect();
     // px → viewBox units, so the ground sticks to the finger.
-    const scale = (bounds.w / cam.z) / Math.max(1, rect.width);
+    const scale = (TW * (GRID + 1) / c.z) / Math.max(1, rect.width);
     const dx = (e.clientX - d.sx) * scale;
     const dy = (e.clientY - d.sy) * scale;
     if (!d.moved && Math.hypot(e.clientX - d.sx, e.clientY - d.sy) > 6) {
@@ -754,7 +794,7 @@ export function CityIsometric() {
       setDragging(true);
       e.currentTarget.setPointerCapture?.(e.pointerId);
     }
-    if (d.moved) setCam((c) => clampCam({ ...c, x: d.ox - dx, y: d.oy - dy }));
+    if (d.moved) setCamTo({ ...c, x: d.ox - dx, y: d.oy - dy });
   };
   const endDrag = (e: React.PointerEvent<SVGSVGElement>) => {
     const d = dragRef.current;
@@ -781,6 +821,7 @@ export function CityIsometric() {
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
   }, [zoomBy]);
+
 
   const onBoardKeyDown = (e: React.KeyboardEvent) => {
     const step = 90;
@@ -913,11 +954,13 @@ export function CityIsometric() {
 
 
   const bounds = { w: TW * (GRID + 1), h: TH * (GRID + 3) };
-  const vbW = bounds.w / cam.z;
-  const vbH = (bounds.h + 60) / cam.z;
-  const cx = cam.x;
-  const cy = -140 + (bounds.h + 60) / 2 + cam.y;
-  const viewBox = `${cx - vbW / 2} ${cy - vbH / 2} ${vbW} ${vbH}`;
+  // Initial framing only — live pan/zoom mutates the attribute imperatively.
+  const c0 = camRef.current;
+  const vbW = bounds.w / c0.z;
+  const vbH = (bounds.h + 60) / c0.z;
+  const cy = -140 + (bounds.h + 60) / 2 + c0.y;
+  const viewBox = `${c0.x - vbW / 2} ${cy - vbH / 2} ${vbW} ${vbH}`;
+
 
 
   return (
@@ -1043,7 +1086,7 @@ export function CityIsometric() {
           </div>
         </div>
         <div className="absolute right-3 bottom-3 z-20 stencil text-[9px] tracking-widest text-amber-200/50 pointer-events-none">
-          DRAG TO PAN · SCROLL TO ZOOM · {Math.round(cam.z * 100)}%
+          DRAG TO PAN · SCROLL TO ZOOM · <span ref={zoomLabelRef}>100%</span>
         </div>
         {/* subtle grid vignette */}
         <div
