@@ -797,6 +797,7 @@ export function CityIsometric() {
   return (
     <section
       ref={boardRef}
+      data-active={active ? "1" : "0"}
       aria-labelledby="city-iso-heading"
       className={`mx-auto max-w-6xl mt-8 px-4 sm:px-6${active ? "" : " milv-idle"}`}
     >
