@@ -72,6 +72,7 @@ const DISTRICTS: District[] = [
     label: "THE ARCHIVE",
     tag: "Revisit closed cases — build the pattern memory.",
     art: archiveArt,
+    video: archiveVideo.url,
     href: "/archive",
     glow: "34,211,238",
   },
