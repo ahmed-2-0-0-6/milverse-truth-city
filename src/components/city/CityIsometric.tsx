@@ -49,6 +49,29 @@ const iso = (gx: number, gy: number) => ({
   y: ((gx + gy) * TH) / 2,
 });
 
+/* ── map label system ────────────────────────────────────────
+   One type scale and one ink set for every label drawn on the
+   board. Signage reads the same whether it's a plot, a district
+   plate or a tooltip. Don't hand-roll sizes below. */
+const STENCIL = '"Bebas Neue", sans-serif';
+const MONO = "ui-monospace, monospace";
+/** Plate headings (plot names, district names, tooltip titles). */
+const SIGN_TITLE = { fontFamily: STENCIL, letterSpacing: "1.1px" } as const;
+/** Small print (costs, levels, rank gates). */
+const SIGN_META = { fontFamily: MONO, letterSpacing: "0.2px" } as const;
+const SIGN_SIZE = { title: 8, titleLg: 9, meta: 6, metaLg: 6.5 } as const;
+/** Ink. Amber = live, rose = sealed, emerald = done, stone = idle. */
+const INK = {
+  live: "#fde68a",
+  ready: "#fde047",
+  sealed: "#fda4af",
+  sealedMeta: "#e7b7c0",
+  done: "#a7f3d0",
+  doneMeta: "#6ee7b7",
+  idle: "#d6d3d1",
+  meta: "#a8a29e",
+} as const;
+
 
 /* ── palette per district ────────────────────────────────── */
 const PALETTE: Record<
