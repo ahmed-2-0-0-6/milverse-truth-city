@@ -125,7 +125,13 @@ export function DailyDirectives() {
               </span>
             )}
           </div>
-          <div className="flex items-baseline gap-3">
+          <div className="flex items-center gap-3">
+            <span
+              className="font-mono text-[10px] text-amber-200/60 tabular-nums"
+              title="Time until the board resets."
+            >
+              RESET IN {fmtLeft(left)}
+            </span>
             <span className="font-mono text-[10px] text-amber-200/70 tabular-nums">
               {doneCount} / {defs.length} DONE
             </span>
@@ -137,8 +143,18 @@ export function DailyDirectives() {
             >
               COMBO +{COMBO_BONUS}
             </span>
+            {readyIds.length > 1 && (
+              <button
+                type="button"
+                onClick={onClaimAll}
+                className="tap stencil text-[10px] tracking-widest rounded px-2.5 py-1 border border-emerald-400/60 text-emerald-200 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors"
+              >
+                CLAIM ALL ({readyIds.length})
+              </button>
+            )}
           </div>
         </header>
+
 
         <ul className="divide-y divide-amber-400/10">
           {defs.map((d) => (
