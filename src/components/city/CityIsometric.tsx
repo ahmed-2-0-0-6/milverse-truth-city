@@ -109,7 +109,7 @@ const BUILDING_CELLS = new Set(
 );
 
 
-function GroundTileImpl({ gx, gy, reducedMotion }: { gx: number; gy: number; reducedMotion: boolean }) {
+function GroundTileImpl({ gx, gy, reducedMotion, lowFx }: { gx: number; gy: number; reducedMotion: boolean; lowFx: boolean }) {
   const { x, y } = iso(gx, gy);
   const kind = classifyTile(gx, gy);
   const fill =
@@ -120,6 +120,10 @@ function GroundTileImpl({ gx, gy, reducedMotion }: { gx: number; gy: number; red
   const rA = hashCell(gx, gy, 1);
   const rB = hashCell(gx, gy, 2);
   const rC = hashCell(gx, gy, 3);
+  // Per-tile SMIL is the single biggest cost on 81 tiles. On weak hardware the
+  // decoration stays, the motion goes.
+  const animate = !reducedMotion && !lowFx;
+
 
   return (
     <g transform={`translate(${x},${y})`}>
