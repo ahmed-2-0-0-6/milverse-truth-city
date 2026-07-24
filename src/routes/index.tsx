@@ -6,6 +6,8 @@ import { CityPlots } from "@/components/city/CityPlots";
 import { CityIsometric } from "@/components/city/CityIsometric";
 import { PerksLedger } from "@/components/city/PerksLedger";
 import { PerkUnlockToast } from "@/components/city/PerkUnlockToast";
+import { CityBulletin } from "@/components/city/CityBulletin";
+import { DailyDirectives } from "@/components/city/DailyDirectives";
 import { CityList } from "@/components/CityList";
 import { ChevronDown } from "lucide-react";
 import { CityHero3D } from "@/components/city3d/CityHero3D";
@@ -267,9 +269,12 @@ function CityMap() {
         </div>
 
         <CityIsometric />
+        <CityBulletin />
+        <DailyDirectives />
         <PerksLedger />
         <PerkUnlockToast />
         <CityPlots />
+
 
       </section>
       </main>

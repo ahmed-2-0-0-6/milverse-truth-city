@@ -58,6 +58,8 @@ export function BuildingCard({ open, onClose, buildingId }: Props) {
     if (out.ok) {
       setFlash("ok");
       window.setTimeout(() => setFlash(null), 700);
+      // Directive tracking — fire-and-forget, presentation only.
+      void import("@/lib/city/directives").then((m) => m.trackSpend(out.spent));
     } else {
       setFlash("err");
       window.setTimeout(() => setFlash(null), 500);
