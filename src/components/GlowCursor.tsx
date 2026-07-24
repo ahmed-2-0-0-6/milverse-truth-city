@@ -1,11 +1,23 @@
 // LAYER-4 — Desktop-only glow-dot cursor with high-performance trailing ease.
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useVisualMode } from "@/lib/visual-quality";
 
 export function GlowCursor() {
   const { mode } = useVisualMode();
   const dotRef = useRef<HTMLDivElement>(null);
   const trailRef = useRef<HTMLDivElement>(null);
+  // While an element is in native fullscreen (the city board's IMMERSE), only
+  // that subtree paints — a fixed body-level cursor disappears. Re-home it.
+  const [host, setHost] = useState<Element | null>(null);
+
+  useEffect(() => {
+    const sync = () => setHost(document.fullscreenElement ?? null);
+    sync();
+    document.addEventListener("fullscreenchange", sync);
+    return () => document.removeEventListener("fullscreenchange", sync);
+  }, []);
+
 
   useEffect(() => {
     if (mode !== "cinematic") return;
@@ -62,11 +74,11 @@ export function GlowCursor() {
       cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onMove);
     };
-  }, [mode]);
+  }, [mode, host]);
 
   if (mode !== "cinematic") return null;
 
-  return (
+  const nodes = (
     <>
       <div
         ref={trailRef}
@@ -74,7 +86,7 @@ export function GlowCursor() {
         className="pointer-events-none fixed left-0 top-0 h-8 w-8 rounded-full"
         style={{
           zIndex: 2147483646,
-          background: "radial-gradient(circle, oklch(0.60 0.19 258 / 0.35), transparent 70%)",
+          background: "radial-gradient(circle, oklch(0.70 0.19 258 / 0.45), transparent 70%)",
           willChange: "transform",
           transform: "translate3d(-100px, -100px, 0)",
           contain: "strict",
@@ -86,8 +98,8 @@ export function GlowCursor() {
         className="pointer-events-none fixed left-0 top-0 h-2 w-2 rounded-full"
         style={{
           zIndex: 2147483647,
-          background: "oklch(0.60 0.19 258)",
-          boxShadow: "0 0 12px oklch(0.60 0.19 258 / 0.9)",
+          background: "oklch(0.78 0.16 258)",
+          boxShadow: "0 0 14px oklch(0.70 0.19 258 / 0.95), 0 0 3px oklch(1 0 0 / 0.8)",
           willChange: "transform",
           transform: "translate3d(-100px, -100px, 0)",
           contain: "strict",
@@ -95,4 +107,7 @@ export function GlowCursor() {
       />
     </>
   );
+
+  return host ? createPortal(nodes, host) : nodes;
+
 }
