@@ -16,7 +16,10 @@ import {
   Newspaper,
   Store,
   Swords,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
+
 import {
   WORLD_W,
   WORLD_H,
