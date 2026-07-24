@@ -23,7 +23,7 @@ export function useOnScreen<T extends HTMLElement>(
       return;
     }
     const io = new IntersectionObserver(
-      (entries) => { (window as any).__io = (window as any).__io || []; (window as any).__io.push(entries.map(e=>e.isIntersecting)); setVisible(entries.some((e) => e.isIntersecting)); },
+      (entries) => setVisible(entries.some((e) => e.isIntersecting)),
       { rootMargin },
     );
     io.observe(el);
