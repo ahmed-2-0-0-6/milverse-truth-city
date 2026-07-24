@@ -1210,7 +1210,7 @@ export function CityIsometric() {
         <svg
           ref={svgRef}
           viewBox={viewBox}
-          className={`block w-full h-auto touch-none select-none ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
+          className={`block w-full h-auto touch-none select-none ${active ? "milv-establish" : ""} ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
           style={{ maxHeight: immersed ? "100vh" : 520 }}
           role="img"
           aria-label="Your city — isometric view. Drag to pan, arrow keys to move, plus and minus to zoom."
