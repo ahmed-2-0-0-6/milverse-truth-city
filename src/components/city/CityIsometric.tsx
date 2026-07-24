@@ -924,6 +924,29 @@ export function CityIsometric() {
                     repeatCount="indefinite"
                   />
                 </g>
+                {/* BUS — bigger, more windows, slower, opposite direction on horizontal road */}
+                <g>
+                  <ellipse cx={0} cy={TH / 2 + 3} rx={11} ry={1.4} fill="#000" opacity="0.55" />
+                  <rect x={-10} y={-4} width={20} height={5} rx={1.2} fill="#c9a84c" />
+                  <rect x={-10} y={-4} width={20} height={1.2} fill="#8a7030" />
+                  {/* window row */}
+                  {[-7, -3.5, 0, 3.5, 7].map((wx, i) => (
+                    <rect key={i} x={wx - 1.2} y={-3} width={2.4} height={2} fill="#a0d8ff" opacity="0.75" />
+                  ))}
+                  {/* door split line */}
+                  <line x1={-4} y1={-4} x2={-4} y2={1} stroke="#8a7030" strokeWidth="0.4" />
+                  <circle cx={-8} cy={1.5} r={1.1} fill="#111" />
+                  <circle cx={8} cy={1.5} r={1.1} fill="#111" />
+                  {/* headlight */}
+                  <circle cx={-10.5} cy={-1.5} r={0.8} fill="#fef3c7" opacity="0.95" />
+                  <animateTransform
+                    attributeName="transform"
+                    type="translate"
+                    values={`${endH.x},${endH.y + TH / 2};${startH.x},${startH.y + TH / 2};${endH.x},${endH.y + TH / 2}`}
+                    dur="22s"
+                    repeatCount="indefinite"
+                  />
+                </g>
               </g>
             );
           })()}
