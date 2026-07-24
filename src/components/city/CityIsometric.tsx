@@ -64,38 +64,140 @@ function classifyTile(gx: number, gy: number): TileKind {
   return "grass";
 }
 
+// Deterministic pseudo-random per (gx,gy,seed) — stable across renders.
+function hashCell(gx: number, gy: number, seed = 0) {
+  let n = ((gx + 17) * 73856093) ^ ((gy + 31) * 19349663) ^ ((seed + 7) * 83492791);
+  n = (n >>> 0) % 100000;
+  return n / 100000;
+}
+
+// Cells that hold buildings (so we don't scatter props on them)
+const BUILDING_CELLS = new Set(
+  Object.values({
+    signal_tower: [0, 0], outpost: [2, 0], archive: [4, 0],
+    library: [0, 2], school: [4, 2],
+    clean_room: [0, 4], newsroom: [2, 4], watchtower: [4, 4],
+  }).map(([a, b]) => `${a}-${b}`),
+);
+
 function GroundTile({ gx, gy }: { gx: number; gy: number }) {
   const { x, y } = iso(gx, gy);
   const kind = classifyTile(gx, gy);
   const fill =
-    kind === "road" ? "#1a1a20" : kind === "plaza" ? "#2a2620" : "#141018";
-  const stroke = kind === "road" ? "#242430" : "#20182a";
+    kind === "road" ? "#151519" : kind === "plaza" ? "#2a2620" : "#0f0c14";
+  const stroke = kind === "road" ? "#22222c" : "#1a1424";
   const pts = `0,0 ${TW / 2},${TH / 2} 0,${TH} ${-TW / 2},${TH / 2}`;
+  const hasBuilding = BUILDING_CELLS.has(`${gx}-${gy}`);
+  const rA = hashCell(gx, gy, 1);
+  const rB = hashCell(gx, gy, 2);
+  const rC = hashCell(gx, gy, 3);
+
   return (
     <g transform={`translate(${x},${y})`}>
       <polygon points={pts} fill={fill} stroke={stroke} strokeWidth="0.5" />
-      {kind === "road" && (
-        // little dashed centreline
-        <line
-          x1={-TW / 4}
-          y1={TH / 2}
-          x2={TW / 4}
-          y2={TH / 2}
-          stroke="#3a3a48"
-          strokeWidth="0.8"
-          strokeDasharray="3 3"
-          opacity="0.7"
+
+      {/* SIDEWALK inset ring on grass tiles that hold buildings */}
+      {kind === "grass" && hasBuilding && (
+        <polygon
+          points={`0,4 ${TW / 2 - 4},${TH / 2} 0,${TH - 4} ${-(TW / 2 - 4)},${TH / 2}`}
+          fill="#2a2530"
+          stroke="#3a3444"
+          strokeWidth="0.4"
         />
       )}
+
+      {/* GRASS TEXTURE — scatter tiny specks and one shrub / tree if empty */}
+      {kind === "grass" && !hasBuilding && (
+        <>
+          {/* speck texture */}
+          {[0, 1, 2, 3, 4].map((i) => {
+            const rx = hashCell(gx, gy, 10 + i);
+            const ry = hashCell(gx, gy, 20 + i);
+            const px = -TW / 2 + 8 + rx * (TW - 16);
+            const py = 6 + ry * (TH - 12);
+            return (
+              <circle key={i} cx={px} cy={py} r={0.6} fill="#2a2036" opacity="0.6" />
+            );
+          })}
+          {/* tree — chosen for ~40% of empty grass */}
+          {rA < 0.4 && (
+            <g transform={`translate(${(rB - 0.5) * 20}, ${(rC - 0.5) * 10 + TH / 2})`}>
+              <ellipse cx={0} cy={2} rx={5} ry={1.5} fill="#000" opacity="0.5" />
+              <rect x={-1} y={-8} width={2} height={8} fill="#3a2818" />
+              <circle cx={0} cy={-10} r={6} fill="#1e3a24" />
+              <circle cx={-2} cy={-11} r={3.5} fill="#274a2e" />
+              <circle cx={2} cy={-9} r={3} fill="#183020" />
+            </g>
+          )}
+          {/* park bench occasionally */}
+          {rA >= 0.7 && rA < 0.85 && (
+            <g transform={`translate(${(rB - 0.5) * 24}, ${TH / 2 + 4})`}>
+              <ellipse cx={0} cy={1} rx={7} ry={1.2} fill="#000" opacity="0.4" />
+              <rect x={-6} y={-3} width={12} height={1.5} fill="#5a4530" />
+              <rect x={-6} y={-6} width={12} height={1} fill="#5a4530" />
+              <rect x={-6} y={-3} width={1} height={3} fill="#3a2818" />
+              <rect x={5} y={-3} width={1} height={3} fill="#3a2818" />
+            </g>
+          )}
+        </>
+      )}
+
+      {/* ROAD detail */}
+      {kind === "road" && (
+        <>
+          {/* centreline */}
+          <line
+            x1={-TW / 4}
+            y1={TH / 2}
+            x2={TW / 4}
+            y2={TH / 2}
+            stroke="#3a3a48"
+            strokeWidth="0.8"
+            strokeDasharray="3 3"
+            opacity="0.7"
+          />
+          {/* Streetlamp on corners of road (not center row/col intersection) */}
+          {(gx === 2 ? gy !== 2 : true) && (gy === 2 ? gx !== 2 : true) && rA < 0.55 && (
+            <g transform={`translate(${gx === 2 ? -TW / 2 + 5 : 0}, ${gy === 2 ? TH / 2 : -2})`}>
+              <line x1={0} y1={0} x2={0} y2={-14} stroke="#4a4a55" strokeWidth="1" />
+              <line x1={0} y1={-14} x2={4} y2={-14} stroke="#4a4a55" strokeWidth="1" />
+              <circle cx={4} cy={-13} r={1.6} fill="#fde68a" opacity="0.95">
+                <animate attributeName="opacity" values="0.9;0.5;0.9" dur="3s" repeatCount="indefinite" />
+              </circle>
+              {/* light pool */}
+              <ellipse cx={4} cy={2} rx={10} ry={4} fill="#fde68a" opacity="0.08" />
+            </g>
+          )}
+          {/* parked car occasionally */}
+          {rB < 0.3 && (
+            <g transform={`translate(${(rC - 0.5) * 16}, ${TH / 2 + 2})`}>
+              <ellipse cx={0} cy={3} rx={9} ry={1.5} fill="#000" opacity="0.55" />
+              <rect x={-7} y={-2} width={14} height={4} rx={1} fill={rA < 0.5 ? "#3a1f22" : "#1f2a3a"} />
+              <rect x={-5} y={-4} width={9} height={2.5} rx={1} fill={rA < 0.5 ? "#5a2f32" : "#2f3a4a"} />
+              <rect x={-4} y={-3} width={3} height={1.5} fill="#a0d8ff" opacity="0.5" />
+              <circle cx={-5} cy={2} r={1} fill="#111" />
+              <circle cx={5} cy={2} r={1} fill="#111" />
+            </g>
+          )}
+        </>
+      )}
+
+      {/* PLAZA fountain */}
       {kind === "plaza" && (
         <>
-          <circle cx={0} cy={TH / 2} r={10} fill="#3a2e1a" stroke="#5a4a2a" strokeWidth="1" />
-          <circle cx={0} cy={TH / 2} r={4} fill="#fcd34d" opacity="0.5" />
+          <circle cx={0} cy={TH / 2} r={12} fill="#1f1a12" stroke="#5a4a2a" strokeWidth="1" />
+          <circle cx={0} cy={TH / 2} r={7} fill="#3a2e1a" stroke="#5a4a2a" strokeWidth="0.6" />
+          <circle cx={0} cy={TH / 2} r={3.5} fill="#fcd34d" opacity="0.6" />
+          <circle cx={0} cy={TH / 2 - 4} r={1.2} fill="#fde68a">
+            <animate attributeName="cy" values={`${TH / 2 - 4};${TH / 2 - 8};${TH / 2 - 4}`} dur="2.4s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.4s" repeatCount="indefinite" />
+          </circle>
         </>
       )}
     </g>
   );
 }
+
 
 /* ── building block ──────────────────────────────────────── */
 function Building({
@@ -159,15 +261,83 @@ function Building({
     }
   }
 
+  // Rooftop clutter unlocked by level: AC unit, water tank, satellite dish
+  const clutter: React.ReactNode[] = [];
+  if (level >= 2) {
+    // AC unit on left of roof
+    clutter.push(
+      <g key="ac" transform={`translate(${-halfW / 2}, ${top + halfD - 2})`}>
+        <rect x={-4} y={-3} width={8} height={4} fill="#2a2a30" stroke={palette.accent} strokeOpacity="0.3" strokeWidth="0.3" />
+        <line x1={-3} y1={-2} x2={3} y2={-2} stroke="#4a4a55" strokeWidth="0.4" />
+        <line x1={-3} y1={-1} x2={3} y2={-1} stroke="#4a4a55" strokeWidth="0.4" />
+      </g>,
+    );
+  }
+  if (level >= 3) {
+    // Water tank on the right of roof
+    clutter.push(
+      <g key="tank" transform={`translate(${halfW / 2}, ${top + halfD - 4})`}>
+        <rect x={-2} y={-2} width={4} height={2} fill="#3a2818" />
+        <ellipse cx={0} cy={-2} rx={3} ry={1.2} fill="#5a4025" />
+        <ellipse cx={0} cy={-6} rx={3} ry={1.2} fill="#8a5a35" />
+        <rect x={-3} y={-6} width={6} height={4} fill="#7a4a30" />
+      </g>,
+    );
+  }
+  if (level >= 4) {
+    // Satellite dish
+    clutter.push(
+      <g key="dish" transform={`translate(0, ${top + halfD - 1})`}>
+        <line x1={0} y1={0} x2={0} y2={-5} stroke="#4a4a55" strokeWidth="0.6" />
+        <ellipse cx={0} cy={-6} rx={4} ry={1.5} fill="#d6d3d1" opacity="0.85" />
+        <line x1={0} y1={-6} x2={2} y2={-8} stroke="#4a4a55" strokeWidth="0.5" />
+        <circle cx={2} cy={-8} r={0.6} fill={palette.accent} />
+      </g>,
+    );
+  }
+
   return (
     <g>
-      {/* shadow */}
-      <ellipse cx={0} cy={halfD + 2} rx={halfW + 2} ry={halfD / 2} fill="#000" opacity="0.55" />
+      {/* ground shadow */}
+      <ellipse cx={0} cy={halfD + 2} rx={halfW + 2} ry={halfD / 2} fill="#000" opacity="0.6" />
+      {/* concrete plinth / foundation base — small slab under building */}
+      <polygon
+        points={`0,-3 ${halfW + 2},${-3 + halfD} 0,${-3 + 2 * halfD} ${-(halfW + 2)},${-3 + halfD}`}
+        fill="#0f0d14"
+        stroke="#2a2432"
+        strokeWidth="0.4"
+      />
       {/* body */}
       <polygon points={leftFace} fill={palette.left} />
       <polygon points={rightFace} fill={palette.right} />
-      <polygon points={roof} fill={palette.top} stroke={palette.accent} strokeOpacity="0.35" strokeWidth="0.6" />
+      <polygon points={roof} fill={palette.top} stroke={palette.accent} strokeOpacity="0.4" strokeWidth="0.6" />
+      {/* vertical seam highlight — pillar edge */}
+      <line x1={0} y1={top} x2={0} y2={0} stroke={palette.accent} strokeOpacity="0.25" strokeWidth="0.5" />
       {windows}
+      {/* Neon sign strip on right face at Lv3+ */}
+      {level >= 3 && (
+        <g>
+          <rect
+            x={2}
+            y={top + halfD + 2}
+            width={halfW - 6}
+            height={5}
+            fill="#000"
+            opacity="0.6"
+          />
+          <rect
+            x={2.5}
+            y={top + halfD + 2.5}
+            width={halfW - 7}
+            height={4}
+            fill={palette.accent}
+            opacity="0.55"
+            className={reducedMotion ? undefined : "milv-window"}
+            filter="url(#glow-soft)"
+          />
+        </g>
+      )}
+      {clutter}
       <RoofDetail
         id={def.id}
         level={level}
@@ -508,10 +678,106 @@ export function CityIsometric() {
             </filter>
           </defs>
 
+          {/* ── SKY BACKDROP: distant skyline silhouette + moon ── */}
+          <g aria-hidden="true">
+            {/* moon */}
+            <circle cx={bounds.w / 2 - 60} cy={-100} r={12} fill="#f5e6c4" opacity="0.9" />
+            <circle cx={bounds.w / 2 - 56} cy={-104} r={12} fill="#0a0812" />
+            {/* stars */}
+            {Array.from({ length: 18 }).map((_, i) => {
+              const sx = -bounds.w / 2 + hashCell(i, 0, 5) * bounds.w;
+              const sy = -130 + hashCell(0, i, 5) * 40;
+              return <circle key={i} cx={sx} cy={sy} r={hashCell(i, i, 9) * 0.9 + 0.2} fill="#fef3c7" opacity={0.4 + hashCell(i, 1, 9) * 0.6} />;
+            })}
+            {/* far skyline — hand-composed rectangles, low-contrast */}
+            {(() => {
+              const rects: React.ReactNode[] = [];
+              let x = -bounds.w / 2 - 10;
+              let i = 0;
+              while (x < bounds.w / 2 + 10) {
+                const w = 18 + hashCell(i, 3, 7) * 30;
+                const h = 30 + hashCell(i, 5, 7) * 60;
+                const y = -60 - h;
+                rects.push(
+                  <g key={i}>
+                    <rect x={x} y={y} width={w} height={h} fill="#0d0a18" stroke="#1a1428" strokeWidth="0.4" />
+                    {/* window grid — very dim */}
+                    {Array.from({ length: Math.floor(h / 6) }).map((_, r) =>
+                      Array.from({ length: Math.floor(w / 4) }).map((__, c) => {
+                        const lit = hashCell(i * 31 + r, c, 13) > 0.7;
+                        return lit ? (
+                          <rect key={`${r}-${c}`} x={x + 1 + c * 4} y={y + 2 + r * 6} width={1.5} height={2} fill="#fde68a" opacity="0.5" />
+                        ) : null;
+                      })
+                    )}
+                    {/* aircraft warning beacon on tallest ones */}
+                    {h > 70 && (
+                      <circle cx={x + w / 2} cy={y - 1} r={0.9} fill="#f43f5e" opacity="0.9">
+                        <animate attributeName="opacity" values="0.9;0.2;0.9" dur="2s" repeatCount="indefinite" />
+                      </circle>
+                    )}
+                  </g>,
+                );
+                x += w + 2 + hashCell(i, 7, 7) * 6;
+                i += 1;
+              }
+              return rects;
+            })()}
+            {/* horizon haze */}
+            <rect x={-bounds.w / 2} y={-70} width={bounds.w} height={80} fill="url(#horizon-haze)" opacity="0.4" />
+          </g>
+          <defs>
+            <linearGradient id="horizon-haze" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0" stopColor="#000" stopOpacity="0" />
+              <stop offset="1" stopColor="#3a2a4a" stopOpacity="0.7" />
+            </linearGradient>
+          </defs>
+
           {/* ground tiles */}
           {cells.map(({ gx, gy }) => (
             <GroundTile key={`t-${gx}-${gy}`} gx={gx} gy={gy} />
           ))}
+
+          {/* ── MOVING TRAFFIC — two cars sliding along the two roads ── */}
+          {!reducedMotion && (() => {
+            // Horizontal road: gy=2, gx sweeps 0→4
+            const startH = iso(0, 2);
+            const endH = iso(4, 2);
+            // Vertical road: gx=2, gy sweeps 0→4
+            const startV = iso(2, 0);
+            const endV = iso(2, 4);
+            return (
+              <g aria-hidden="true">
+                <g>
+                  <ellipse cx={0} cy={TH / 2 + 3} rx={6} ry={1.2} fill="#000" opacity="0.5" />
+                  <rect x={-5} y={-2} width={10} height={3.5} rx={1} fill="#3a1f22" />
+                  <rect x={-4} y={-3.5} width={7} height={2} rx={0.6} fill="#5a2f32" />
+                  <circle cx={4} cy={0} r={0.9} fill="#fef3c7" opacity="0.9" />
+                  <animateTransform
+                    attributeName="transform"
+                    type="translate"
+                    values={`${startH.x},${startH.y + TH / 2};${endH.x},${endH.y + TH / 2};${startH.x},${startH.y + TH / 2}`}
+                    dur="14s"
+                    repeatCount="indefinite"
+                  />
+                </g>
+                <g>
+                  <ellipse cx={0} cy={TH / 2 + 3} rx={6} ry={1.2} fill="#000" opacity="0.5" />
+                  <rect x={-5} y={-2} width={10} height={3.5} rx={1} fill="#1f2a3a" />
+                  <rect x={-4} y={-3.5} width={7} height={2} rx={0.6} fill="#2f3a4a" />
+                  <circle cx={-4} cy={0} r={0.9} fill="#f43f5e" opacity="0.9" />
+                  <animateTransform
+                    attributeName="transform"
+                    type="translate"
+                    values={`${endV.x},${endV.y + TH / 2};${startV.x},${startV.y + TH / 2};${endV.x},${endV.y + TH / 2}`}
+                    dur="17s"
+                    repeatCount="indefinite"
+                  />
+                </g>
+              </g>
+            );
+          })()}
+
 
           {/* buildings (already in back-to-front order because their cells are sorted with the tiles) */}
           {cells
