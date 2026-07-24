@@ -1272,7 +1272,7 @@ export function CityIsometric() {
 
           {/* ── PLAZA FOUNTAIN — the centre of town, with water that moves ── */}
           {(() => {
-            const p = iso(2, 2);
+            const p = iso(CENTER, CENTER);
             const cy = p.y + TH / 2;
             return (
               <g aria-hidden="true" transform={`translate(${p.x},${cy})`}>
