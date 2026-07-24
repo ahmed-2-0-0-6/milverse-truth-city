@@ -1535,7 +1535,17 @@ export function CityIsometric() {
               <stop offset="0.5" stopColor="#a0d8ff" stopOpacity="0.4" />
               <stop offset="1" stopColor="#fde68a" stopOpacity="0.18" />
             </linearGradient>
+            {/* soil strata — the layers you see in the cut side of the slab */}
+            <pattern id="soil-strata" width="16" height="10" patternUnits="userSpaceOnUse">
+              <rect width="16" height="10" fill="none" />
+              <rect y="1.2" width="16" height="1" fill="#3a2a44" opacity="0.55" />
+              <rect y="4.5" width="16" height="0.7" fill="#120c18" opacity="0.7" />
+              <rect y="7.4" width="16" height="1.2" fill="#2c2036" opacity="0.45" />
+              <circle cx="3" cy="6" r="0.6" fill="#4a3a52" opacity="0.5" />
+              <circle cx="11" cy="3" r="0.5" fill="#4a3a52" opacity="0.4" />
+            </pattern>
           </defs>
+
 
 
 
