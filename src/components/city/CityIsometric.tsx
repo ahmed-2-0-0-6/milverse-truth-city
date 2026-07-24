@@ -1311,12 +1311,13 @@ export function CityIsometric() {
 
           {/* ── MOVING TRAFFIC — two cars sliding along the two roads ── */}
           {!reducedMotion && (() => {
-            // Horizontal road: gy=2, gx sweeps 0→4
-            const startH = iso(0, 2);
-            const endH = iso(4, 2);
-            // Vertical road: gx=2, gy sweeps 0→4
-            const startV = iso(2, 0);
-            const endV = iso(2, 4);
+            // Horizontal avenue: gy=CENTER, gx sweeps the full board
+            const startH = iso(0, CENTER);
+            const endH = iso(GRID - 1, CENTER);
+            // Vertical avenue: gx=CENTER, gy sweeps the full board
+            const startV = iso(CENTER, 0);
+            const endV = iso(CENTER, GRID - 1);
+
             return (
               <g aria-hidden="true">
                 <g>
