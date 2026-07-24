@@ -980,7 +980,7 @@ export function CityIsometric() {
                     }
                   }}
                 >
-                  <Building def={bc.def} level={lvl} reducedMotion={reducedMotion} />
+                  <Building def={bc.def} level={lvl} reducedMotion={reducedMotion} affordable={affordableIds.has(bc.id)} />
                   {/* label plate */}
                   <g transform={`translate(0, ${TH / 2 + 6})`}>
                     <rect
