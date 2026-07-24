@@ -66,8 +66,10 @@ const PALETTE: Record<
 /* ── ground tile ─────────────────────────────────────────── */
 type TileKind = "grass" | "road" | "plaza";
 function classifyTile(gx: number, gy: number): TileKind {
-  if (gx === 2 && gy === 2) return "plaza";
-  if (gx === 2 || gy === 2) return "road";
+  if (gx === CENTER && gy === CENTER) return "plaza";
+  // Two avenues through the middle, plus a ring road around the Outer Rim.
+  if (gx === CENTER || gy === CENTER) return "road";
+  if (ringOf(gx, gy) === 3) return "road";
   return "grass";
 }
 
@@ -80,12 +82,9 @@ function hashCell(gx: number, gy: number, seed = 0) {
 
 // Cells that hold buildings (so we don't scatter props on them)
 const BUILDING_CELLS = new Set(
-  Object.values({
-    signal_tower: [0, 0], outpost: [2, 0], archive: [4, 0],
-    library: [0, 2], school: [4, 2],
-    clean_room: [0, 4], newsroom: [2, 4], watchtower: [4, 4],
-  }).map(([a, b]) => `${a}-${b}`),
+  Object.values(PLOT_CELL).map(([a, b]) => `${a}-${b}`),
 );
+
 
 function GroundTileImpl({ gx, gy, reducedMotion }: { gx: number; gy: number; reducedMotion: boolean }) {
   const { x, y } = iso(gx, gy);
