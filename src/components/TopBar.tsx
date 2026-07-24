@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Volume2, VolumeX, BookOpen, Menu } from "lucide-react";
 import { InboxTray } from "@/components/inbox/InboxTray";
 import { RankChip } from "@/components/rank/RankChip";
+import { BrickChip } from "@/components/city/BrickChip";
 import { useJuniorMode } from "@/hooks/useJuniorMode";
 import {
   Sheet,
@@ -174,6 +175,7 @@ export function TopBar() {
         <div className="flex items-center gap-1.5 shrink-0">
           <FullscreenToggle />
           {showRankChip && <RankChip />}
+          <BrickChip />
           {showInbox && <InboxTray />}
 
           <Sheet open={navOpen} onOpenChange={setNavOpen}>

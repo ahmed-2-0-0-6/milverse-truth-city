@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { TopBar } from "@/components/TopBar";
 import { CityWorld } from "@/components/CityWorld";
+import { CityPlots } from "@/components/city/CityPlots";
 import { CityList } from "@/components/CityList";
 import { ChevronDown } from "lucide-react";
 import { CityHero3D } from "@/components/city3d/CityHero3D";
@@ -261,6 +262,8 @@ function CityMap() {
             )}
           </div>
         </div>
+
+        <CityPlots />
 
       </section>
       </main>

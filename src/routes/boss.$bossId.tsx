@@ -352,6 +352,19 @@ function BossPlay() {
         points: out.kind === "WIN" ? 100 : 0,
         ts: Date.now(),
       });
+      // Your City — bricks payout for boss.
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        void import("@/lib/city/economy").then(({ awardBricksForCase }) => {
+          awardBricksForCase(
+            "boss",
+            out.kind === "WIN" ? "boss_win" : "boss_loss",
+            (boss as { tier?: number })?.tier ?? 3,
+          );
+        });
+      } catch {
+        /* noop */
+      }
       setStage("cinema");
     }
 
