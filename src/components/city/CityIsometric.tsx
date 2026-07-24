@@ -259,6 +259,29 @@ function GroundTileImpl({ gx, gy, reducedMotion, lowFx }: { gx: number; gy: numb
 }
 const GroundTile = React.memo(GroundTileImpl);
 
+/* The whole ground plane — 81 tiles — only changes when the fx budget or the
+   player's rank changes. Memoized so hover, flash, clock ticks and brick
+   updates never touch a few hundred SVG nodes. */
+const GroundLayer = React.memo(function GroundLayer({
+  cells,
+  reducedMotion,
+  lowFx,
+}: {
+  cells: { gx: number; gy: number }[];
+  reducedMotion: boolean;
+  lowFx: boolean;
+}) {
+  return (
+    <g shapeRendering="optimizeSpeed">
+      {cells.map(({ gx, gy }) => (
+        <GroundTile key={`t-${gx}-${gy}`} gx={gx} gy={gy} reducedMotion={reducedMotion} lowFx={lowFx} />
+      ))}
+    </g>
+  );
+});
+
+
+
 
 /* ── building block ──────────────────────────────────────── */
 const Building = React.memo(function Building({
