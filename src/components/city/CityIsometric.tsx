@@ -943,7 +943,7 @@ export function CityIsometric() {
             <rect x={-bounds.w / 2} y={-70} width={bounds.w} height={80} fill="url(#horizon-haze)" opacity="0.4" />
             {/* DRIFTING CLOUDS — two soft banks that cross the sky */}
             {!reducedMotion && (
-              <g opacity={hr >= 6 && hr < 18 ? 0.45 : 0.22}>
+              <g opacity={isDay ? 0.45 : 0.22}>
                 <g>
                   <ellipse cx={0} cy={-90} rx={26} ry={5} fill="#d6c8e8" />
                   <ellipse cx={14} cy={-93} rx={16} ry={4} fill="#e6dcf0" />
@@ -969,6 +969,45 @@ export function CityIsometric() {
           {cells.map(({ gx, gy }) => (
             <GroundTile key={`t-${gx}-${gy}`} gx={gx} gy={gy} reducedMotion={reducedMotion} />
           ))}
+
+          {/* ── PLAZA FOUNTAIN — the centre of town, with water that moves ── */}
+          {(() => {
+            const p = iso(2, 2);
+            const cy = p.y + TH / 2;
+            return (
+              <g aria-hidden="true" transform={`translate(${p.x},${cy})`}>
+                {/* basin */}
+                <ellipse cx={0} cy={0} rx={17} ry={8.5} fill="#1b1720" stroke="#4a4256" strokeWidth="0.7" />
+                <ellipse cx={0} cy={-0.8} rx={13} ry={6.4} fill="#0d2a33" />
+                <ellipse cx={0} cy={-0.8} rx={13} ry={6.4} fill="url(#fountain-water)" opacity="0.75" />
+                {/* plinth + spout */}
+                <rect x={-2} y={-11} width={4} height={10} rx={1} fill="#3a3444" />
+                <ellipse cx={0} cy={-11.5} rx={4} ry={2} fill="#4a4256" />
+                <circle cx={0} cy={-13} r={1.6} fill="#67e8f9" opacity="0.85" filter="url(#glow-soft)" />
+                {!reducedMotion && (
+                  <>
+                    {/* jets */}
+                    {[-1, 1].map((dir, i) => (
+                      <circle key={i} cx={0} cy={-13} r={0.8} fill="#a5f3fc" opacity="0.9">
+                        <animate attributeName="cy" values="-13;-19;-2" dur="1.9s" begin={`${i * 0.5}s`} repeatCount="indefinite" />
+                        <animate attributeName="cx" values={`0;${dir * 4};${dir * 7}`} dur="1.9s" begin={`${i * 0.5}s`} repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.95;0.7;0" dur="1.9s" begin={`${i * 0.5}s`} repeatCount="indefinite" />
+                      </circle>
+                    ))}
+                    {/* ripples */}
+                    {[0, 1].map((i) => (
+                      <ellipse key={i} cx={0} cy={-0.8} rx={3} ry={1.5} fill="none" stroke="#67e8f9" strokeWidth="0.5" opacity="0.7">
+                        <animate attributeName="rx" values="3;12.5" dur="3.2s" begin={`${i * 1.6}s`} repeatCount="indefinite" />
+                        <animate attributeName="ry" values="1.5;6.2" dur="3.2s" begin={`${i * 1.6}s`} repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.7;0" dur="3.2s" begin={`${i * 1.6}s`} repeatCount="indefinite" />
+                      </ellipse>
+                    ))}
+                  </>
+                )}
+              </g>
+            );
+          })()}
+
 
           {/* ── MOVING TRAFFIC — two cars sliding along the two roads ── */}
           {!reducedMotion && (() => {
