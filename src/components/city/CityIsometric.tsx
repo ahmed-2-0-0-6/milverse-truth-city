@@ -23,6 +23,8 @@ import {
 } from "@/lib/city/citySave";
 import { BuildingCard } from "@/components/city/BuildingCard";
 import { PayrollTill } from "@/components/city/PayrollTill";
+import { ThreatSiren } from "@/components/city/ThreatSiren";
+
 
 import { useOnScreen } from "@/hooks/useOnScreen";
 
