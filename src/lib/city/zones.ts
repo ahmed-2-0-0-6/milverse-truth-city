@@ -27,35 +27,58 @@ export interface Zone {
   cells: Array<[number, number]>;
 }
 
-/** 5×5 grid, three concentric districts opening outward. */
+/** The board. 9×9 — a city with outskirts, not a courtyard. */
+export const GRID = 9;
+export const CENTER = 4;
+
+/** Chebyshev ring from the plaza: 0 at the fountain, 4 at the city limits. */
+export function ringOf(gx: number, gy: number): number {
+  return Math.max(Math.abs(gx - CENTER), Math.abs(gy - CENTER));
+}
+
+/** Five districts, opening outward ring by ring as the badge gets heavier. */
 export const ZONES: Zone[] = [
   {
     id: "central",
     name: "CENTRAL WARD",
     blurb: "The desk, the reading room, the school run.",
     step: 0,
-    cells: cellsWhere((gx, gy) => gy <= 2),
+    cells: cellsWhere((gx, gy) => ringOf(gx, gy) <= 1),
   },
   {
     id: "works",
     name: "THE WORKS",
-    blurb: "Print shops and back lots. Opens at CHIEF.",
-    step: 2,
-    cells: cellsWhere((_gx, gy) => gy === 3),
+    blurb: "Print shops and back lots. Opens at INSPECTOR.",
+    step: 1,
+    cells: cellsWhere((gx, gy) => ringOf(gx, gy) === 2),
   },
   {
     id: "rim",
     name: "OUTER RIM",
-    blurb: "Towers, vaults, clean rooms. Opens at COMMISSIONER.",
+    blurb: "Ring road, towers, night traffic. Opens at CHIEF.",
+    step: 2,
+    cells: cellsWhere((gx, gy) => ringOf(gx, gy) === 3),
+  },
+  {
+    id: "docks",
+    name: "WEST DOCKS",
+    blurb: "Containers, sodium lamps, bad receipts. Opens at COMMISSIONER.",
     step: 3,
-    cells: cellsWhere((_gx, gy) => gy === 4),
+    cells: cellsWhere((gx, gy) => ringOf(gx, gy) === 4 && gx < CENTER),
+  },
+  {
+    id: "heights",
+    name: "EAST HEIGHTS",
+    blurb: "Glass, vaults, clean rooms. Opens at MAYOR.",
+    step: 4,
+    cells: cellsWhere((gx, gy) => ringOf(gx, gy) === 4 && gx >= CENTER),
   },
 ];
 
 function cellsWhere(pred: (gx: number, gy: number) => boolean): Array<[number, number]> {
   const out: Array<[number, number]> = [];
-  for (let gy = 0; gy < 5; gy++)
-    for (let gx = 0; gx < 5; gx++) if (pred(gx, gy)) out.push([gx, gy]);
+  for (let gy = 0; gy < GRID; gy++)
+    for (let gx = 0; gx < GRID; gx++) if (pred(gx, gy)) out.push([gx, gy]);
   return out;
 }
 
@@ -91,20 +114,21 @@ export interface LockInfo {
   kind: "zone" | "permit" | "open";
 }
 
-/** Where each plot sits on the 5×5 board. Single source of truth. */
+/** Where each plot sits on the 9×9 board. Single source of truth. */
 export const PLOT_CELL: Record<BuildingId, [number, number]> = {
-  signal_tower: [0, 0],
-  outpost: [2, 0],
-  archive: [4, 0],
-  library: [0, 2],
-  school: [4, 2],
-  clean_room: [0, 4],
-  newsroom: [2, 4],
-  watchtower: [4, 4],
+  outpost: [4, 3],
+  library: [3, 5],
+  school: [5, 5],
+  signal_tower: [2, 2],
+  archive: [6, 2],
+  newsroom: [1, 5],
+  watchtower: [7, 1],
+  clean_room: [8, 8],
 };
 
 export function buildingLock(id: BuildingId, step: number): LockInfo {
-  const cell = PLOT_CELL[id] ?? [2, 2];
+  const cell = PLOT_CELL[id] ?? [CENTER, CENTER];
+
   const zone = zoneOfCell(cell[0], cell[1]);
   const permit = BUILDING_RANK[id] ?? 0;
   const needStep = Math.max(zone.step, permit);

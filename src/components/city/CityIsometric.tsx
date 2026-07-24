@@ -32,6 +32,9 @@ import { titleFor, nextTitle } from "@/lib/city/title";
 import {
   PLOT_CELL,
   ZONES,
+  GRID,
+  CENTER,
+  ringOf,
   cellLocked,
   buildingLock,
 } from "@/lib/city/zones";
@@ -39,13 +42,13 @@ import {
 /* ── geometry ────────────────────────────────────────────── */
 const TW = 96; // tile width
 const TH = 48; // tile height (2:1 iso)
-const GRID = 5;
 type Cell = [number, number];
 const PLACEMENT: Record<BuildingId, Cell> = PLOT_CELL;
 const iso = (gx: number, gy: number) => ({
   x: ((gx - gy) * TW) / 2,
   y: ((gx + gy) * TH) / 2,
 });
+
 
 /* ── palette per district ────────────────────────────────── */
 const PALETTE: Record<
@@ -63,8 +66,10 @@ const PALETTE: Record<
 /* ── ground tile ─────────────────────────────────────────── */
 type TileKind = "grass" | "road" | "plaza";
 function classifyTile(gx: number, gy: number): TileKind {
-  if (gx === 2 && gy === 2) return "plaza";
-  if (gx === 2 || gy === 2) return "road";
+  if (gx === CENTER && gy === CENTER) return "plaza";
+  // Two avenues through the middle, plus a ring road around the Outer Rim.
+  if (gx === CENTER || gy === CENTER) return "road";
+  if (ringOf(gx, gy) === 3) return "road";
   return "grass";
 }
 
@@ -77,12 +82,9 @@ function hashCell(gx: number, gy: number, seed = 0) {
 
 // Cells that hold buildings (so we don't scatter props on them)
 const BUILDING_CELLS = new Set(
-  Object.values({
-    signal_tower: [0, 0], outpost: [2, 0], archive: [4, 0],
-    library: [0, 2], school: [4, 2],
-    clean_room: [0, 4], newsroom: [2, 4], watchtower: [4, 4],
-  }).map(([a, b]) => `${a}-${b}`),
+  Object.values(PLOT_CELL).map(([a, b]) => `${a}-${b}`),
 );
+
 
 function GroundTileImpl({ gx, gy, reducedMotion }: { gx: number; gy: number; reducedMotion: boolean }) {
   const { x, y } = iso(gx, gy);
@@ -184,8 +186,9 @@ function GroundTileImpl({ gx, gy, reducedMotion }: { gx: number; gy: number; red
             strokeDasharray="3 3"
             opacity="0.7"
           />
-          {(gx === 2 ? gy !== 2 : true) && (gy === 2 ? gx !== 2 : true) && rA < 0.55 && (
-            <g transform={`translate(${gx === 2 ? -TW / 2 + 5 : 0}, ${gy === 2 ? TH / 2 : -2})`}>
+          {!(gx === CENTER && gy === CENTER) && rA < 0.55 && (
+            <g transform={`translate(${gx === CENTER ? -TW / 2 + 5 : 0}, ${gy === CENTER ? TH / 2 : -2})`}>
+
               <line x1={0} y1={0} x2={0} y2={-14} stroke="#4a4a55" strokeWidth="1" />
               <line x1={0} y1={-14} x2={4} y2={-14} stroke="#4a4a55" strokeWidth="1" />
               <circle cx={4} cy={-13} r={1.6} fill="#fde68a" opacity="0.95">
@@ -725,7 +728,7 @@ export function CityIsometric() {
   // ── CAMERA ── drag to pan, wheel/buttons to zoom, arrows to walk the city.
   // Imperative on purpose: panning writes the SVG viewBox directly inside a
   // rAF instead of re-rendering the whole city every pointermove.
-  const camRef = useRef({ x: 0, y: 0, z: 1 });
+  const camRef = useRef({ x: 0, y: 0, z: 1.7 });
   const dragRef = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
   const [dragging, setDragging] = useState(false);
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -734,7 +737,7 @@ export function CityIsometric() {
 
   const clampCam = (c: { x: number; y: number; z: number }) => {
     const z = Math.min(3, Math.max(0.6, c.z));
-    const span = 900 / z;
+    const span = 1600 / z;
     return { z, x: Math.min(span, Math.max(-span, c.x)), y: Math.min(span, Math.max(-span, c.y)) };
   };
 
@@ -749,7 +752,7 @@ export function CityIsometric() {
     const vh = (bh + 60) / c.z;
     const cyy = -140 + (bh + 60) / 2 + c.y;
     svg.setAttribute("viewBox", `${c.x - vw / 2} ${cyy - vh / 2} ${vw} ${vh}`);
-    if (zoomLabelRef.current) zoomLabelRef.current.textContent = `${Math.round(c.z * 100)}%`;
+    if (zoomLabelRef.current) zoomLabelRef.current.textContent = `${Math.round((c.z / 1.7) * 100)}%`;
   }, []);
 
   const scheduleCam = useCallback(() => {
@@ -775,7 +778,7 @@ export function CityIsometric() {
     const c = camRef.current;
     setCamTo({ ...c, z: c.z * f });
   }, [setCamTo]);
-  const resetCam = useCallback(() => setCamTo({ x: 0, y: 0, z: 1 }), [setCamTo]);
+  const resetCam = useCallback(() => setCamTo({ x: 0, y: 0, z: 1.7 }), [setCamTo]);
 
   const onPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
     if (e.button !== 0 && e.pointerType === "mouse") return;
@@ -1252,7 +1255,7 @@ export function CityIsometric() {
             })}
           {/* district seal plates */}
           {ZONES.filter((z) => z.step > step).map((z) => {
-            const mid = z.cells[0];
+            const mid = z.cells[Math.floor(z.cells.length / 2)];
             const { x, y } = iso(mid[0], mid[1]);
             return (
               <g key={`zseal-${z.id}`} transform={`translate(${x - 46},${y - 4})`} aria-hidden="true">
@@ -1269,7 +1272,7 @@ export function CityIsometric() {
 
           {/* ── PLAZA FOUNTAIN — the centre of town, with water that moves ── */}
           {(() => {
-            const p = iso(2, 2);
+            const p = iso(CENTER, CENTER);
             const cy = p.y + TH / 2;
             return (
               <g aria-hidden="true" transform={`translate(${p.x},${cy})`}>
@@ -1308,12 +1311,13 @@ export function CityIsometric() {
 
           {/* ── MOVING TRAFFIC — two cars sliding along the two roads ── */}
           {!reducedMotion && (() => {
-            // Horizontal road: gy=2, gx sweeps 0→4
-            const startH = iso(0, 2);
-            const endH = iso(4, 2);
-            // Vertical road: gx=2, gy sweeps 0→4
-            const startV = iso(2, 0);
-            const endV = iso(2, 4);
+            // Horizontal avenue: gy=CENTER, gx sweeps the full board
+            const startH = iso(0, CENTER);
+            const endH = iso(GRID - 1, CENTER);
+            // Vertical avenue: gx=CENTER, gy sweeps the full board
+            const startV = iso(CENTER, 0);
+            const endV = iso(CENTER, GRID - 1);
+
             return (
               <g aria-hidden="true">
                 <g>
@@ -1372,7 +1376,7 @@ export function CityIsometric() {
 
           {/* ── PEDESTRIANS — deterministic figures pacing the plaza ── */}
           {!reducedMotion && (() => {
-            const plaza = iso(2, 2);
+            const plaza = iso(CENTER, CENTER);
             const walkers = [
               { r: 18, dur: 24, phase: 0,   color: "#fde68a" },
               { r: 14, dur: 19, phase: 90,  color: "#a7f3d0" },
