@@ -168,6 +168,32 @@ function GroundTileImpl({ gx, gy, reducedMotion, lowFx }: { gx: number; gy: numb
             opacity="0.35"
             pointerEvents="none"
           />
+          {/* tyre polish — two worn tracks where the traffic actually runs */}
+          <g stroke="#1d1d25" strokeWidth="3.2" opacity="0.55" strokeLinecap="round" fill="none">
+            {gx === CENTER || ringOf(gx, gy) === 3 ? (
+              <>
+                <path d={`M${-TW / 2 + 4},${TH / 2 - 4} L${TW / 2 - 4},${TH / 2 - 8}`} />
+                <path d={`M${-TW / 2 + 4},${TH / 2 + 7} L${TW / 2 - 4},${TH / 2 + 3}`} />
+              </>
+            ) : (
+              <>
+                <path d={`M${-TW / 2 + 6},${TH / 2 + 6} L${TW / 2 - 6},${TH / 2 - 6}`} />
+                <path d={`M${-TW / 2 + 12},${TH / 2 + 11} L${TW / 2 - 2},${TH / 2 - 1}`} />
+              </>
+            )}
+          </g>
+          {/* zebra crossing where an avenue meets the plaza block */}
+          {(Math.abs(gx - CENTER) + Math.abs(gy - CENTER) === 1) && (
+            <g fill="#8a8a96" opacity="0.35">
+              {[0, 1, 2, 3].map((i) => (
+                <polygon
+                  key={i}
+                  points={`${-16 + i * 9},${TH / 2 - 8 + i * 4.5} ${-12 + i * 9},${TH / 2 - 6 + i * 4.5} ${-12 + i * 9 - 8},${TH / 2 - 2 + i * 4.5} ${-16 + i * 9 - 8},${TH / 2 - 4 + i * 4.5}`}
+                />
+              ))}
+            </g>
+          )}
+
           {/* patch job — resurfaced asphalt, darker than the rest */}
           {rC < 0.35 && (
             <polygon
@@ -228,6 +254,32 @@ function GroundTileImpl({ gx, gy, reducedMotion, lowFx }: { gx: number; gy: numb
 
       {kind === "grass" && !hasBuilding && (
         <>
+          {/* bare earth worn through the lot — dirt, not paint */}
+          {rB > 0.3 && (
+            <polygon
+              points={`${(rA - 0.5) * 14},${9 + rC * 6} ${(rA - 0.5) * 14 + 19},${17 + rC * 6} ${(rA - 0.5) * 14 + 3},${26 + rC * 6} ${(rA - 0.5) * 14 - 17},${17 + rC * 6}`}
+              fill="#171021"
+              opacity="0.7"
+            />
+          )}
+          {/* hardpan cracks running with the grain of the plot */}
+          {rC > 0.45 && (
+            <g stroke="#241a30" strokeWidth="0.45" fill="none" opacity="0.8">
+              <path d={`M${-TW / 4},${10 + rA * 8} L${-4},${TH / 2 - 2} L${TW / 4 - 6},${TH / 2 + 6}`} />
+              <path d={`M${-6},${TH / 2 - 1} L${2 + rB * 10},${TH / 2 + 9}`} />
+            </g>
+          )}
+          {/* footpath cut across the corner where people actually walk */}
+          {rD > 0.55 && (
+            <path
+              d={`M${-TW / 2 + 6},${TH / 2 - 4} Q0,${TH / 2 + (rA - 0.5) * 10} ${TW / 2 - 6},${TH / 2 + 3}`}
+              stroke="#241b2e"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              fill="none"
+              opacity="0.55"
+            />
+          )}
           {[0, 1, 2, 3, 4].map((i) => {
             const rx = hashCell(gx, gy, 10 + i);
             const ry = hashCell(gx, gy, 20 + i);
@@ -237,6 +289,19 @@ function GroundTileImpl({ gx, gy, reducedMotion, lowFx }: { gx: number; gy: numb
               <circle key={i} cx={px} cy={py} r={0.6} fill="#2a2036" opacity="0.6" />
             );
           })}
+          {/* scrub tufts — thin blades, the only green that survives here */}
+          {[0, 1, 2].map((i) => {
+            const tx = -TW / 4 + hashCell(gx, gy, 30 + i) * (TW / 2);
+            const ty = 12 + hashCell(gx, gy, 40 + i) * (TH - 20);
+            return (
+              <g key={`tuft-${i}`} stroke="#1e3a24" strokeWidth="0.5" opacity="0.75">
+                <line x1={tx} y1={ty} x2={tx - 1.4} y2={ty - 3.2} />
+                <line x1={tx} y1={ty} x2={tx + 0.4} y2={ty - 3.8} />
+                <line x1={tx} y1={ty} x2={tx + 1.8} y2={ty - 2.6} />
+              </g>
+            );
+          })}
+
           {rA < 0.4 && (
             <g transform={`translate(${(rB - 0.5) * 20}, ${(rC - 0.5) * 10 + TH / 2})`}>
               <ellipse cx={0} cy={2} rx={5} ry={1.5} fill="#000" opacity="0.5" />
@@ -328,13 +393,44 @@ const GroundLayer = React.memo(function GroundLayer({
   reducedMotion: boolean;
   lowFx: boolean;
 }) {
+  // The board is a slab of earth, not a sheet of paper. Cut the sides and the
+  // bedrock below it once, behind every tile.
+  const N = GRID;
+  const top = iso(0, 0);
+  const right = iso(N - 1, 0);
+  const bottom = iso(N - 1, N - 1);
+  const left = iso(0, N - 1);
+  const RX = right.x + TW / 2, RY = right.y + TH / 2;
+  const BX = bottom.x, BY = bottom.y + TH;
+  const LX = left.x - TW / 2, LY = left.y + TH / 2;
+  const D = 34; // slab thickness
+
   return (
     <g shapeRendering="optimizeSpeed">
+      <g aria-hidden="true" pointerEvents="none">
+        {/* south-west cut — the lit face */}
+        <polygon points={`${LX},${LY} ${BX},${BY} ${BX},${BY + D} ${LX},${LY + D}`} fill="#241a2c" />
+        <polygon points={`${LX},${LY} ${BX},${BY} ${BX},${BY + D} ${LX},${LY + D}`} fill="url(#soil-strata)" opacity="0.7" />
+        {/* south-east cut — in shadow */}
+        <polygon points={`${BX},${BY} ${RX},${RY} ${RX},${RY + D} ${BX},${BY + D}`} fill="#160f1c" />
+        <polygon points={`${BX},${BY} ${RX},${RY} ${RX},${RY + D} ${BX},${BY + D}`} fill="url(#soil-strata)" opacity="0.5" />
+        {/* topsoil line where the plate meets the cut */}
+        <polyline points={`${LX},${LY} ${BX},${BY} ${RX},${RY}`} fill="none" stroke="#4a3a52" strokeWidth="1.2" opacity="0.6" />
+        {/* the slab throws a shadow into the dark under the board */}
+        <polygon
+          points={`${LX},${LY + D} ${BX},${BY + D} ${RX},${RY + D} ${BX},${BY + D + 22}`}
+          fill="#000"
+          opacity="0.45"
+        />
+        {/* faint bedrock haze so the cut doesn't end on a hard line */}
+        <polygon points={`${top.x},${top.y} ${RX},${RY} ${BX},${BY} ${LX},${LY}`} fill="url(#ground-vignette)" opacity="0.35" />
+      </g>
       {cells.map(({ gx, gy }) => (
         <GroundTile key={`t-${gx}-${gy}`} gx={gx} gy={gy} reducedMotion={reducedMotion} lowFx={lowFx} />
       ))}
     </g>
   );
+
 });
 
 
@@ -1439,7 +1535,17 @@ export function CityIsometric() {
               <stop offset="0.5" stopColor="#a0d8ff" stopOpacity="0.4" />
               <stop offset="1" stopColor="#fde68a" stopOpacity="0.18" />
             </linearGradient>
+            {/* soil strata — the layers you see in the cut side of the slab */}
+            <pattern id="soil-strata" width="16" height="10" patternUnits="userSpaceOnUse">
+              <rect width="16" height="10" fill="none" />
+              <rect y="1.2" width="16" height="1" fill="#3a2a44" opacity="0.55" />
+              <rect y="4.5" width="16" height="0.7" fill="#120c18" opacity="0.7" />
+              <rect y="7.4" width="16" height="1.2" fill="#2c2036" opacity="0.45" />
+              <circle cx="3" cy="6" r="0.6" fill="#4a3a52" opacity="0.5" />
+              <circle cx="11" cy="3" r="0.5" fill="#4a3a52" opacity="0.4" />
+            </pattern>
           </defs>
+
 
 
 
