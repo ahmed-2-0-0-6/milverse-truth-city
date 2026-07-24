@@ -168,6 +168,32 @@ function GroundTileImpl({ gx, gy, reducedMotion, lowFx }: { gx: number; gy: numb
             opacity="0.35"
             pointerEvents="none"
           />
+          {/* tyre polish — two worn tracks where the traffic actually runs */}
+          <g stroke="#1d1d25" strokeWidth="3.2" opacity="0.55" strokeLinecap="round" fill="none">
+            {gx === CENTER || ringOf(gx, gy) === 3 ? (
+              <>
+                <path d={`M${-TW / 2 + 4},${TH / 2 - 4} L${TW / 2 - 4},${TH / 2 - 8}`} />
+                <path d={`M${-TW / 2 + 4},${TH / 2 + 7} L${TW / 2 - 4},${TH / 2 + 3}`} />
+              </>
+            ) : (
+              <>
+                <path d={`M${-TW / 2 + 6},${TH / 2 + 6} L${TW / 2 - 6},${TH / 2 - 6}`} />
+                <path d={`M${-TW / 2 + 12},${TH / 2 + 11} L${TW / 2 - 2},${TH / 2 - 1}`} />
+              </>
+            )}
+          </g>
+          {/* zebra crossing where an avenue meets the plaza block */}
+          {(Math.abs(gx - CENTER) + Math.abs(gy - CENTER) === 1) && (
+            <g fill="#8a8a96" opacity="0.35">
+              {[0, 1, 2, 3].map((i) => (
+                <polygon
+                  key={i}
+                  points={`${-16 + i * 9},${TH / 2 - 8 + i * 4.5} ${-12 + i * 9},${TH / 2 - 6 + i * 4.5} ${-12 + i * 9 - 8},${TH / 2 - 2 + i * 4.5} ${-16 + i * 9 - 8},${TH / 2 - 4 + i * 4.5}`}
+                />
+              ))}
+            </g>
+          )}
+
           {/* patch job — resurfaced asphalt, darker than the rest */}
           {rC < 0.35 && (
             <polygon
