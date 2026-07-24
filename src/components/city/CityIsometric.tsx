@@ -1248,7 +1248,7 @@ export function CityIsometric() {
             {/* stars — fade out around the edges of night */}
             {!isDay && (() => {
               const night = Math.min(1, Math.max(0, 1 - Math.abs(arcT - 0.5) * 1.6));
-              return Array.from({ length: 18 }).map((_, i) => {
+              return Array.from({ length: lowFx ? 8 : 18 }).map((_, i) => {
                 const sx = -bounds.w / 2 + hashCell(i, 0, 5) * bounds.w;
                 const sy = -130 + hashCell(0, i, 5) * 40;
                 return (
@@ -1382,7 +1382,7 @@ export function CityIsometric() {
 
 
           {/* ── MOVING TRAFFIC — two cars sliding along the two roads ── */}
-          {!reducedMotion && (() => {
+          {!reducedMotion && !lowFx && (() => {
             // Horizontal avenue: gy=CENTER, gx sweeps the full board
             const startH = iso(0, CENTER);
             const endH = iso(GRID - 1, CENTER);
@@ -1447,7 +1447,7 @@ export function CityIsometric() {
 
 
           {/* ── PEDESTRIANS — deterministic figures pacing the plaza ── */}
-          {!reducedMotion && (() => {
+          {!reducedMotion && !lowFx && (() => {
             const plaza = iso(CENTER, CENTER);
             const walkers = [
               { r: 18, dur: 24, phase: 0,   color: "#fde68a" },
@@ -1494,7 +1494,7 @@ export function CityIsometric() {
             if (!monsoon) return null;
             return (
               <g aria-hidden="true" opacity="0.55">
-                {Array.from({ length: 24 }).map((_, i) => {
+                {Array.from({ length: lowFx ? 10 : 24 }).map((_, i) => {
                   const x = -bounds.w / 2 + hashCell(i, 3, 11) * bounds.w;
                   const dur = 0.7 + hashCell(i, 5, 11) * 0.6;
                   const delay = hashCell(i, 7, 11) * 1.2;
