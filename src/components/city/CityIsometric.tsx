@@ -756,9 +756,22 @@ function CamBtn({
   );
 }
 
+/* Weak hardware detection — cheap, synchronous, run once. Phones with few
+   cores or little RAM get the same city with a smaller motion budget. */
+function detectLowFx() {
+  if (typeof window === "undefined") return false;
+  if (document.documentElement.dataset.visualQuality === "lite") return true;
+  const nav = navigator as Navigator & { deviceMemory?: number };
+  const cores = nav.hardwareConcurrency ?? 8;
+  const mem = nav.deviceMemory ?? 8;
+  return cores <= 4 || mem <= 4 || window.innerWidth < 640;
+}
+
 /* ── main component ──────────────────────────────────────── */
 export function CityIsometric() {
+  const [lowFx, setLowFx] = useState(false);
   const [save, setSave] = useState<CitySave | null>(null);
+
   const [open, setOpen] = useState<BuildingId | null>(null);
   const [hoverId, setHoverId] = useState<BuildingId | null>(null);
   const [flashId, setFlashId] = useState<BuildingId | null>(null);
