@@ -6,6 +6,8 @@
 // Perf: rows memoized; ambient window flicker gated on reduced-motion.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CinematicLayer } from "@/components/city/CinematicLayer";
+
 import {
   BUILDINGS_BY_ID,
   BUILDINGS,
