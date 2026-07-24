@@ -1,7 +1,8 @@
 // MILVERSE — Your City · Journal panel (Phase 3 upgrade).
 
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { loadJournal, wireJournalListeners, type JournalEntry } from "@/lib/city/journal";
+import { useCoalescedRefresh } from "@/hooks/useCoalescedRefresh";
 
 const KIND_LABEL: Record<JournalEntry["kind"], { tag: string; tone: string }> = {
   built:      { tag: "GROUNDBREAKING", tone: "text-amber-200" },
@@ -11,8 +12,8 @@ const KIND_LABEL: Record<JournalEntry["kind"], { tag: string; tone: string }> = 
   promotion:  { tag: "PROMOTION",      tone: "text-yellow-200" },
 };
 
-function relTime(ts: number): string {
-  const s = Math.max(1, Math.floor((Date.now() - ts) / 1000));
+function relTime(ts: number, now: number): string {
+  const s = Math.max(1, Math.floor((now - ts) / 1000));
   if (s < 60) return `${s}s ago`;
   const m = Math.floor(s / 60);
   if (m < 60) return `${m}m ago`;
@@ -24,12 +25,17 @@ function relTime(ts: number): string {
 
 export function CityJournal() {
   const [entries, setEntries] = useState<JournalEntry[]>(() => loadJournal());
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
     wireJournalListeners();
-    const on = () => setEntries(loadJournal());
-    window.addEventListener("milverse:journal", on);
-    return () => window.removeEventListener("milverse:journal", on);
+  }, []);
+  useCoalescedRefresh(["milverse:journal"], () => setEntries(loadJournal()));
+
+  // Refresh "Xs ago" once a minute — cheap, no listener churn.
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(t);
   }, []);
 
   return (
@@ -48,19 +54,29 @@ export function CityJournal() {
           </div>
         ) : (
           <ul className="divide-y divide-amber-400/10 max-h-64 overflow-y-auto">
-            {entries.map((e, i) => {
-              const meta = KIND_LABEL[e.kind];
-              return (
-                <li key={`${e.ts}-${i}`} className="px-4 py-2 grid grid-cols-[auto_1fr_auto] items-baseline gap-3">
-                  <span className={`stencil text-[9px] tracking-widest ${meta.tone}`}>{meta.tag}</span>
-                  <span className="font-mono text-[12px] text-amber-100/90 truncate">{e.text}</span>
-                  <span className="font-mono text-[10px] tabular-nums text-amber-200/50">{relTime(e.ts)}</span>
-                </li>
-              );
-            })}
+            {entries.map((e, i) => (
+              <JournalRow key={`${e.ts}-${i}`} entry={e} rel={relTime(e.ts, now)} />
+            ))}
           </ul>
         )}
       </div>
     </section>
   );
 }
+
+const JournalRow = memo(function JournalRow({
+  entry,
+  rel,
+}: {
+  entry: JournalEntry;
+  rel: string;
+}) {
+  const meta = KIND_LABEL[entry.kind];
+  return (
+    <li className="px-4 py-2 grid grid-cols-[auto_1fr_auto] items-baseline gap-3">
+      <span className={`stencil text-[9px] tracking-widest ${meta.tone}`}>{meta.tag}</span>
+      <span className="font-mono text-[12px] text-amber-100/90 truncate">{entry.text}</span>
+      <span className="font-mono text-[10px] tabular-nums text-amber-200/50">{rel}</span>
+    </li>
+  );
+});
