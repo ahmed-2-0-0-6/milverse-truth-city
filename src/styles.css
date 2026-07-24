@@ -6773,3 +6773,61 @@ img, video, canvas, svg {
   animation-play-state: paused !important;
   transition: none !important;
 }
+
+/* ── Cinematic film layer (city board) ─────────────────────
+   Grain, scanlines, an establishing sweep and a one-time slate.
+   Presentation only; all of it goes quiet under reduced motion. */
+.milv-grain {
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: milv-grain-shift 0.7s steps(3) infinite;
+}
+@keyframes milv-grain-shift {
+  0% { transform: translate3d(0, 0, 0); }
+  33% { transform: translate3d(-2%, 1%, 0); }
+  66% { transform: translate3d(1%, -2%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+.milv-scanlines {
+  opacity: 0.16;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.05) 0px,
+    rgba(255, 255, 255, 0.05) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+.milv-sweep {
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(251, 191, 36, 0.16) 48%,
+    rgba(255, 255, 255, 0.10) 52%,
+    transparent 70%
+  );
+  transform: translate3d(-120%, 0, 0);
+  animation: milv-sweep-run 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes milv-sweep-run {
+  0% { transform: translate3d(-120%, 0, 0); }
+  100% { transform: translate3d(120%, 0, 0); }
+}
+.milv-slate { animation: milv-slate-out 2.6s ease-in-out forwards; }
+@keyframes milv-slate-out {
+  0% { opacity: 0; letter-spacing: 0.12em; }
+  14% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+/* The board itself lands like a camera settling. */
+.milv-establish { animation: milv-establish-in 1.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes milv-establish-in {
+  0% { transform: scale(1.05); filter: brightness(0.4) saturate(0.5); }
+  100% { transform: scale(1); filter: brightness(1) saturate(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .milv-grain, .milv-sweep, .milv-slate, .milv-establish { animation: none; }
+  .milv-grain { opacity: 0.04; }
+}

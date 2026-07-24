@@ -6,6 +6,8 @@
 // Perf: rows memoized; ambient window flicker gated on reduced-motion.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CinematicLayer } from "@/components/city/CinematicLayer";
+
 import {
   BUILDINGS_BY_ID,
   BUILDINGS,
@@ -1195,11 +1197,20 @@ export function CityIsometric() {
           className="pointer-events-none absolute inset-0 mix-blend-overlay"
           style={{ background: tint }}
         />
+        <CinematicLayer
+          active={active}
+          immersed={immersed}
+          reducedMotion={reducedMotion}
+          lowFx={lowFx}
+          title="TRUTH CITY"
+          subtitle="SECTOR ONLINE"
+        />
+
 
         <svg
           ref={svgRef}
           viewBox={viewBox}
-          className={`block w-full h-auto touch-none select-none ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
+          className={`block w-full h-auto touch-none select-none ${active ? "milv-establish" : ""} ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
           style={{ maxHeight: immersed ? "100vh" : 520 }}
           role="img"
           aria-label="Your city — isometric view. Drag to pan, arrow keys to move, plus and minus to zoom."
