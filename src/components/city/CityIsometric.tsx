@@ -752,7 +752,7 @@ export function CityIsometric() {
     const vh = (bh + 60) / c.z;
     const cyy = -140 + (bh + 60) / 2 + c.y;
     svg.setAttribute("viewBox", `${c.x - vw / 2} ${cyy - vh / 2} ${vw} ${vh}`);
-    if (zoomLabelRef.current) zoomLabelRef.current.textContent = `${Math.round(c.z * 100)}%`;
+    if (zoomLabelRef.current) zoomLabelRef.current.textContent = `${Math.round((c.z / 1.7) * 100)}%`;
   }, []);
 
   const scheduleCam = useCallback(() => {
