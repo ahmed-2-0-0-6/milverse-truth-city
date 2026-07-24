@@ -639,7 +639,16 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
           >
             <Home className="h-4 w-4" />
           </button>
+          <button
+            onClick={() => setFullscreen((v) => !v)}
+            className="rounded-sm border border-primary/40 bg-background/70 backdrop-blur p-2 text-primary hover:bg-primary/10"
+            aria-label={fullscreen ? "Exit fullscreen (Esc)" : "Enter fullscreen"}
+            title={fullscreen ? "Exit fullscreen (Esc)" : "Fullscreen"}
+          >
+            {fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+          </button>
         </div>
+
       </div>
 
       {/* Progress chips */}
