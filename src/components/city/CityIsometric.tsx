@@ -899,7 +899,7 @@ export function CityIsometric() {
 
           {/* ground tiles */}
           {cells.map(({ gx, gy }) => (
-            <GroundTile key={`t-${gx}-${gy}`} gx={gx} gy={gy} />
+            <GroundTile key={`t-${gx}-${gy}`} gx={gx} gy={gy} reducedMotion={reducedMotion} />
           ))}
 
           {/* ── MOVING TRAFFIC — two cars sliding along the two roads ── */}
