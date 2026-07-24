@@ -436,7 +436,7 @@ const EmptyLot = React.memo(function EmptyLot({ crane = false, reducedMotion = f
       )}
     </g>
   );
-}
+});
 
 /* ── STATS HUD helpers ───────────────────────────────────── */
 function StatChip({ label, value, accent }: { label: string; value: string; accent: string }) {
