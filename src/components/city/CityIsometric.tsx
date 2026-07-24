@@ -39,6 +39,8 @@ import {
   ringOf,
   cellLocked,
   buildingLock,
+  rankName,
+
 } from "@/lib/city/zones";
 
 /* ── geometry ────────────────────────────────────────────── */
