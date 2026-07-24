@@ -116,12 +116,20 @@ function AuthPage() {
           ) : (
             <>
               <button
-                onClick={signIn}
-                disabled={busy}
+                onClick={() => signIn("apple")}
+                disabled={busy !== null}
                 className="tap flex w-full items-center justify-center gap-2 rounded-sm bg-amber-100 px-4 py-3 text-sm font-semibold text-black transition hover:bg-white disabled:opacity-60"
               >
                 <AppleGlyph />
-                {busy ? "Talking to Apple\u2026" : "Continue with Apple"}
+                {busy === "apple" ? "Talking to Apple\u2026" : "Continue with Apple"}
+              </button>
+              <button
+                onClick={() => signIn("google")}
+                disabled={busy !== null}
+                className="tap mt-3 flex w-full items-center justify-center gap-2 rounded-sm border border-amber-400/40 bg-black/30 px-4 py-3 text-sm font-semibold text-amber-100 transition hover:bg-amber-400/10 disabled:opacity-60"
+              >
+                <GoogleGlyph />
+                {busy === "google" ? "Talking to Google\u2026" : "Continue with Google"}
               </button>
               {error ? (
                 <p className="mt-3 text-xs text-red-300" role="alert">
@@ -129,6 +137,7 @@ function AuthPage() {
                 </p>
               ) : null}
             </>
+
           )}
         </div>
 
