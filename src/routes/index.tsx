@@ -1,12 +1,28 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import { TopBar } from "@/components/TopBar";
+// Perf: the city desk lives below the fold — ship it as its own chunk so the
+// first paint isn't paying for the map, the console and the ledger.
+const CityIsometric = lazy(() =>
+  import("@/components/city/CityIsometric").then((m) => ({ default: m.CityIsometric })),
+);
+const CityBulletin = lazy(() =>
+  import("@/components/city/CityBulletin").then((m) => ({ default: m.CityBulletin })),
+);
+const CityConsole = lazy(() =>
+  import("@/components/city/CityConsole").then((m) => ({ default: m.CityConsole })),
+);
+const CityPlots = lazy(() =>
+  import("@/components/city/CityPlots").then((m) => ({ default: m.CityPlots })),
+);
+const DeskFallback = () => (
+  <div
+    aria-hidden
+    className="mx-auto mt-8 h-40 w-full max-w-6xl animate-pulse rounded-md border border-amber-400/15 bg-black/30"
+  />
+);
 import { CityWorld } from "@/components/CityWorld";
-import { CityPlots } from "@/components/city/CityPlots";
-import { CityIsometric } from "@/components/city/CityIsometric";
 import { PerkUnlockToast } from "@/components/city/PerkUnlockToast";
-import { CityBulletin } from "@/components/city/CityBulletin";
-import { CityConsole } from "@/components/city/CityConsole";
 import { TitlePromotionToast } from "@/components/city/TitlePromotionToast";
 import { CityList } from "@/components/CityList";
 import { ChevronDown } from "lucide-react";
@@ -268,12 +284,18 @@ function CityMap() {
           </div>
         </div>
 
-        <CityIsometric />
-        <CityBulletin />
-        <CityConsole />
+        <Suspense fallback={<DeskFallback />}>
+          <div style={{ contentVisibility: "auto", containIntrinsicSize: "1200px" } as React.CSSProperties}>
+            <CityIsometric />
+            <CityBulletin />
+            <CityConsole />
+          </div>
+        </Suspense>
         <PerkUnlockToast />
         <TitlePromotionToast />
-        <CityPlots />
+        <Suspense fallback={null}>
+          <CityPlots />
+        </Suspense>
 
 
       </section>
