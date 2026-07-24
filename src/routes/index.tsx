@@ -274,7 +274,9 @@ function CityMap() {
         <CityBulletin />
         <DailyDirectives />
         <PerksLedger />
+        <CityJournal />
         <PerkUnlockToast />
+        <TitlePromotionToast />
         <CityPlots />
 
 
