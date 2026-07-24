@@ -737,7 +737,7 @@ export function CityIsometric() {
 
   const clampCam = (c: { x: number; y: number; z: number }) => {
     const z = Math.min(3, Math.max(0.6, c.z));
-    const span = 900 / z;
+    const span = 1600 / z;
     return { z, x: Math.min(span, Math.max(-span, c.x)), y: Math.min(span, Math.max(-span, c.y)) };
   };
 
