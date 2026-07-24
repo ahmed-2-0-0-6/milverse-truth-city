@@ -920,6 +920,10 @@ export function CityIsometric() {
 
   const onPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
     if (e.button !== 0 && e.pointerType === "mouse") return;
+    // The player's hand always outranks the director: kill any running glide.
+    stopGlide();
+    if (tour) stopTour();
+
     // No pointer capture yet — capturing here would retarget the click and
     // stop plots from opening. We only capture once a real drag starts.
     const c = camRef.current;
