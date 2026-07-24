@@ -63,7 +63,7 @@ export function DailyDirectives() {
     }
   };
 
-  const meta = directiveMeta(state);
+
 
   return (
     <section className="mx-auto mt-4 w-full max-w-5xl px-3">
