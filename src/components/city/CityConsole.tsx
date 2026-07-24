@@ -7,17 +7,20 @@ import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent a
 import { DailyDirectives } from "./DailyDirectives";
 import { PerksLedger } from "./PerksLedger";
 import { CityJournal } from "./CityJournal";
+import CitySim from "./CitySim";
 import { directiveDefs, loadDirectives } from "@/lib/city/directives";
 import { loadCity, levelOf } from "@/lib/city/citySave";
 import { loadJournal } from "@/lib/city/journal";
+import { simulate } from "@/lib/city/sim";
 import { readStore, writeStore } from "@/lib/storage";
 import { useCoalescedRefresh } from "@/hooks/useCoalescedRefresh";
 import type { BuildingId } from "@/lib/city/buildings";
 
-type TabId = "directives" | "perks" | "journal";
+type TabId = "directives" | "sim" | "perks" | "journal";
 
 const TABS: Array<{ id: TabId; label: string; hint: string }> = [
   { id: "directives", label: "DIRECTIVES", hint: "Today's three jobs." },
+  { id: "sim", label: "CITY", hint: "How the city is actually doing." },
   { id: "perks", label: "WIRING", hint: "What the city switches on." },
   { id: "journal", label: "JOURNAL", hint: "What the city logged." },
 ];
@@ -63,7 +66,7 @@ export function CityConsole() {
 
   // Badge counts — cheap derivations, recomputed only on city events.
   const badges = useMemo(() => {
-    if (typeof window === "undefined") return { directives: 0, perks: 0, journal: 0 };
+    if (typeof window === "undefined") return { directives: 0, sim: 0, perks: 0, journal: 0 };
     void tick;
     const d = loadDirectives();
     const defs = directiveDefs(d);
@@ -74,7 +77,8 @@ export function CityConsole() {
     const online = PERK_REQS.filter((p) => levelOf(save, p.building) >= p.req).length;
     const pending = PERK_REQS.length - online;
     const unseen = loadJournal().filter((e) => e.ts > seenTs).length;
-    return { directives: ready, perks: pending, journal: unseen };
+    const sim = simulate(save).advisories.filter((a) => a.severity !== "info").length;
+    return { directives: ready, sim, perks: pending, journal: unseen };
   }, [tick, seenTs]);
 
   const select = useCallback((id: TabId) => {
@@ -148,9 +152,11 @@ export function CityConsole() {
                     className={`ml-2 rounded-full px-1.5 py-0.5 font-mono text-[9px] tabular-nums ${
                       t.id === "directives"
                         ? "bg-emerald-500/20 text-emerald-200"
-                        : t.id === "journal"
-                          ? "bg-cyan-500/20 text-cyan-200"
-                          : "bg-amber-500/15 text-amber-200/80"
+                        : t.id === "sim"
+                          ? "bg-rose-500/20 text-rose-200"
+                          : t.id === "journal"
+                            ? "bg-cyan-500/20 text-cyan-200"
+                            : "bg-amber-500/15 text-amber-200/80"
                     }`}
                   >
                     {n}
@@ -178,6 +184,7 @@ export function CityConsole() {
           {/* Panels ship their own section chrome; pull the outer padding back in. */}
           <div className="[&>section]:mt-0 [&>section]:px-0 [&>section]:max-w-none [&>section>div]:border-0 [&>section>div]:bg-transparent [&>section>div]:backdrop-blur-none [&>section>div]:rounded-none">
             {tab === "directives" && <DailyDirectives />}
+            {tab === "sim" && <CitySim />}
             {tab === "perks" && <PerksLedger />}
             {tab === "journal" && <CityJournal />}
           </div>
