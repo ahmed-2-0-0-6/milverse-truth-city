@@ -160,39 +160,109 @@ function GroundTileImpl({ gx, gy, reducedMotion, lowFx }: { gx: number; gy: numb
         <polyline points={`0,0 ${-TW / 2},${TH / 2}`} fill="none" stroke="#3a3644" strokeWidth="1.1" opacity="0.55" />
       )}
 
-      {kind === "road" && (
-        <>
-          <polygon
-            points={pts}
-            fill="url(#road-sheen)"
-            opacity="0.35"
-            pointerEvents="none"
-          />
-          {/* tyre polish — two worn tracks where the traffic actually runs */}
-          <g stroke="#1d1d25" strokeWidth="3.2" opacity="0.55" strokeLinecap="round" fill="none">
-            {gx === CENTER || ringOf(gx, gy) === 3 ? (
+      {kind === "road" && (() => {
+        /* Roads are laid along the grid's own axes, not painted flat across
+           the diamond. X-axis runs NW↔SE, Y-axis runs NE↔SW. */
+        const isRoadish = (ax: number, ay: number) =>
+          ax >= 0 && ay >= 0 && ax < GRID && ay < GRID && classifyTile(ax, ay) !== "grass";
+        const cx0 = 0, cy0 = TH / 2;               // tile centre
+        const DX = { x: TW / 4, y: TH / 4 };        // toward gx+
+        const DY = { x: -TW / 4, y: TH / 4 };       // toward gy+
+        const uX = { x: DX.x / 26.83, y: DX.y / 26.83 };
+        const uY = { x: DY.x / 26.83, y: DY.y / 26.83 };
+        const xAxis = isRoadish(gx + 1, gy) || isRoadish(gx - 1, gy);
+        const yAxis = isRoadish(gx, gy + 1) || isRoadish(gx, gy - 1);
+        const junction = xAxis && yAxis;
+        // centreline + kerb geometry for one axis
+        const axisLine = (
+          d: { x: number; y: number },
+          u: { x: number; y: number },
+          off: number,
+        ) => ({
+          x1: cx0 - d.x + u.x * off,
+          y1: cy0 - d.y + u.y * off,
+          x2: cx0 + d.x + u.x * off,
+          y2: cy0 + d.y + u.y * off,
+        });
+        const lanes: React.ReactNode[] = [];
+        if (xAxis) {
+          const c = axisLine(DX, uY, 0);
+          const k1 = axisLine(DX, uY, 13);
+          const k2 = axisLine(DX, uY, -13);
+          lanes.push(
+            <g key="ax">
+              {/* worn tracks */}
+              <line {...axisLine(DX, uY, 6)} stroke="#1d1d25" strokeWidth="3.4" opacity="0.5" strokeLinecap="round" />
+              <line {...axisLine(DX, uY, -6)} stroke="#1d1d25" strokeWidth="3.4" opacity="0.5" strokeLinecap="round" />
+              {!junction && (
+                <line {...c} stroke="#c9a227" strokeWidth="0.8" strokeDasharray="5 6" opacity="0.5" />
+              )}
+              <line {...k1} stroke="#4a4656" strokeWidth="1" opacity="0.5" />
+              <line {...k2} stroke="#4a4656" strokeWidth="1" opacity="0.5" />
+            </g>,
+          );
+        }
+        if (yAxis) {
+          const c = axisLine(DY, uX, 0);
+          lanes.push(
+            <g key="ay">
+              <line {...axisLine(DY, uX, 6)} stroke="#1d1d25" strokeWidth="3.4" opacity="0.5" strokeLinecap="round" />
+              <line {...axisLine(DY, uX, -6)} stroke="#1d1d25" strokeWidth="3.4" opacity="0.5" strokeLinecap="round" />
+              {!junction && (
+                <line {...c} stroke="#c9a227" strokeWidth="0.8" strokeDasharray="5 6" opacity="0.5" />
+              )}
+              <line {...axisLine(DY, uX, 13)} stroke="#4a4656" strokeWidth="1" opacity="0.5" />
+              <line {...axisLine(DY, uX, -13)} stroke="#4a4656" strokeWidth="1" opacity="0.5" />
+            </g>,
+          );
+        }
+        // stop bars + zebra on the approaches to the plaza
+        const approach = Math.abs(gx - CENTER) + Math.abs(gy - CENTER) === 1;
+        const towardPlaza = gx === CENTER ? (gy < CENTER ? DY : { x: -DY.x, y: -DY.y }) : (gx < CENTER ? DX : { x: -DX.x, y: -DX.y });
+        const perp = gx === CENTER ? uX : uY;
+        return (
+          <>
+            <polygon points={pts} fill="url(#road-sheen)" opacity="0.35" pointerEvents="none" />
+            {lanes}
+            {junction && (
               <>
-                <path d={`M${-TW / 2 + 4},${TH / 2 - 4} L${TW / 2 - 4},${TH / 2 - 8}`} />
-                <path d={`M${-TW / 2 + 4},${TH / 2 + 7} L${TW / 2 - 4},${TH / 2 + 3}`} />
-              </>
-            ) : (
-              <>
-                <path d={`M${-TW / 2 + 6},${TH / 2 + 6} L${TW / 2 - 6},${TH / 2 - 6}`} />
-                <path d={`M${-TW / 2 + 12},${TH / 2 + 11} L${TW / 2 - 2},${TH / 2 - 1}`} />
+                {/* junction plate — resurfaced, no markings through the box */}
+                <polygon
+                  points={`0,${TH / 2 - 11} ${22},${TH / 2} 0,${TH / 2 + 11} ${-22},${TH / 2}`}
+                  fill="#12121a"
+                  opacity="0.75"
+                />
+                <circle cx={0} cy={TH / 2} r={1.3} fill="#2e2e3a" opacity="0.8" />
               </>
             )}
-          </g>
-          {/* zebra crossing where an avenue meets the plaza block */}
-          {(Math.abs(gx - CENTER) + Math.abs(gy - CENTER) === 1) && (
-            <g fill="#8a8a96" opacity="0.35">
-              {[0, 1, 2, 3].map((i) => (
-                <polygon
-                  key={i}
-                  points={`${-16 + i * 9},${TH / 2 - 8 + i * 4.5} ${-12 + i * 9},${TH / 2 - 6 + i * 4.5} ${-12 + i * 9 - 8},${TH / 2 - 2 + i * 4.5} ${-16 + i * 9 - 8},${TH / 2 - 4 + i * 4.5}`}
+            {approach && (
+              <g>
+                {/* stop bar */}
+                <line
+                  x1={cx0 + towardPlaza.x * 0.6 + perp.x * 12}
+                  y1={cy0 + towardPlaza.y * 0.6 + perp.y * 12}
+                  x2={cx0 + towardPlaza.x * 0.6 - perp.x * 12}
+                  y2={cy0 + towardPlaza.y * 0.6 - perp.y * 12}
+                  stroke="#9a9aa6"
+                  strokeWidth="1.6"
+                  opacity="0.45"
                 />
-              ))}
-            </g>
-          )}
+                {/* zebra bars laid along the crossing, not across the tile */}
+                {[-8, -3.5, 1, 5.5].map((o, i) => (
+                  <line
+                    key={i}
+                    x1={cx0 + towardPlaza.x * 0.78 + perp.x * o}
+                    y1={cy0 + towardPlaza.y * 0.78 + perp.y * o}
+                    x2={cx0 + towardPlaza.x * 0.34 + perp.x * o}
+                    y2={cy0 + towardPlaza.y * 0.34 + perp.y * o}
+                    stroke="#8a8a96"
+                    strokeWidth="2.2"
+                    opacity="0.32"
+                  />
+                ))}
+              </g>
+            )}
+
 
           {/* patch job — resurfaced asphalt, darker than the rest */}
           {rC < 0.35 && (
