@@ -40,11 +40,29 @@ export function DailyDirectives() {
   );
 
 
-  const onClaim = (id: DirectiveId) => {
+  const readyIds = useMemo(
+    () =>
+      defs
+        .filter((d) => !state.claimed[d.id] && (state.progress[d.id] ?? 0) >= d.target)
+        .map((d) => d.id),
+    [defs, state.claimed, state.progress],
+  );
+
+  // Countdown to midnight; also rolls the board over when the day flips.
+  const [left, setLeft] = useState(() => msToMidnight());
+  useEffect(() => {
+    const t = setInterval(() => {
+      const ms = msToMidnight();
+      setLeft(ms);
+      if (ms > 23 * 3600_000) setState(loadDirectives()); // just past midnight
+    }, 30_000);
+    return () => clearInterval(t);
+  }, []);
+
+  const claimOne = (id: DirectiveId) => {
     const def = defs.find((x) => x.id === id);
     const res = claim(id);
     if (res.ok) {
-      setState(loadDirectives());
       window.dispatchEvent(
         new CustomEvent("milverse:toast", {
           detail: {
@@ -61,7 +79,19 @@ export function DailyDirectives() {
         }),
       );
     }
+    return res.ok;
   };
+
+  const onClaim = (id: DirectiveId) => {
+    if (claimOne(id)) setState(loadDirectives());
+  };
+
+  const onClaimAll = () => {
+    let any = false;
+    for (const id of readyIds) any = claimOne(id) || any;
+    if (any) setState(loadDirectives());
+  };
+
 
 
 
