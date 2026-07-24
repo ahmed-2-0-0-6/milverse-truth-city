@@ -427,6 +427,183 @@ export const OceanLayer = React.memo(function OceanLayer({
           </g>
         ))}
 
+      {/* ── OCEAN LIFE ────────────────────────────────────────
+         The bay is alive: pods, schools, jellies, a turtle, and
+         one whale that only surfaces when the fx budget allows. */}
+
+      {/* dolphin pod arcing out of the water */}
+      {[0, 1, 2].map((i) => {
+        const px = T.x - 420 + i * 46;
+        const py = T.y - 300 + (i % 2) * 14;
+        return (
+          <g key={`dolphin-${i}`} transform={`translate(${px},${py})`}>
+            <ellipse cx={0} cy={8} rx={16} ry={3.5} fill="#000" opacity="0.25" />
+            <g opacity={animate ? 1 : 0.85}>
+              {animate && (
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values={`0 8; 0 -10; 0 8; 0 8`}
+                  keyTimes="0;0.25;0.5;1"
+                  dur={`${7 + i}s`}
+                  repeatCount="indefinite"
+                />
+              )}
+              <path d="M-13,4 Q-6,-8 6,-6 Q13,-5 15,1 Q6,4 -2,6 Z" fill="#2b3a4a" stroke="#3f5468" strokeWidth="0.5" />
+              <path d="M-2,-5 L2,-12 L6,-5 Z" fill="#22303e" />
+              <path d="M-13,4 L-19,0 L-18,7 Z" fill="#22303e" />
+              <circle cx={11} cy={-3} r={0.8} fill="#0b0f14" />
+            </g>
+            {/* splash ring */}
+            <ellipse cx={0} cy={9} rx={9} ry={2.4} fill="none" stroke="#bfe9f2" strokeWidth="0.6" opacity="0.18">
+              {animate && (
+                <animate attributeName="rx" values="4;14;4" dur={`${7 + i}s`} repeatCount="indefinite" />
+              )}
+            </ellipse>
+          </g>
+        );
+      })}
+
+      {/* whale: back, blowhole spout, tail fluke */}
+      <g transform={`translate(${T.x + 210},${T.y - 470})`} opacity="0.9">
+        {animate && (
+          <animateTransform
+            attributeName="transform"
+            type="translate"
+            additive="sum"
+            values="0 0; 26 6; 0 0"
+            dur="46s"
+            repeatCount="indefinite"
+          />
+        )}
+        <ellipse cx={0} cy={10} rx={54} ry={9} fill="#000" opacity="0.28" />
+        <path d="M-46,6 Q-10,-12 26,0 Q40,4 46,8 Q10,12 -34,11 Z" fill="#1d2b38" stroke="#33475a" strokeWidth="0.6" />
+        <path d="M-2,-6 L4,-18 L12,-5 Z" fill="#16222d" />
+        <path d="M46,8 Q60,-2 70,-10 Q62,10 74,14 Q56,16 46,10 Z" fill="#16222d" opacity="0.9" />
+        <circle cx={20} cy={0} r={0.9} fill="#0a0f14" />
+        {animate && (
+          <g>
+            <path d="M8,-8 Q6,-26 0,-38" stroke="#cfeef7" strokeWidth="1.6" fill="none" opacity="0.35">
+              <animate attributeName="opacity" values="0;0.4;0" dur="9s" repeatCount="indefinite" />
+            </path>
+            <path d="M10,-8 Q14,-24 22,-34" stroke="#cfeef7" strokeWidth="1.4" fill="none" opacity="0.3">
+              <animate attributeName="opacity" values="0;0.35;0" dur="9s" repeatCount="indefinite" />
+            </path>
+          </g>
+        )}
+      </g>
+
+      {/* fish schools: dark shoals sliding under the surface */}
+      {[
+        [T.x - 200, T.y - 200, 1],
+        [R.x - 380, R.y - 260, 0.8],
+        [L.x + 300, L.y - 300, 0.9],
+      ].map(([fx, fy, s], i) => (
+        <g key={`school-${i}`} transform={`translate(${fx},${fy}) scale(${s})`} opacity="0.5">
+          {animate && (
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              additive="sum"
+              values={`0 0; ${18 + i * 8} ${6 - i * 4}; 0 0`}
+              dur={`${20 + i * 7}s`}
+              repeatCount="indefinite"
+            />
+          )}
+          <ellipse cx={0} cy={0} rx={26} ry={8} fill="#0a2230" opacity="0.55" />
+          {Array.from({ length: 11 }).map((_, k) => {
+            const a = ((k * 37) % 100) / 100;
+            const b = ((k * 61) % 100) / 100;
+            return (
+              <path
+                key={k}
+                d={`M${-22 + a * 44},${-6 + b * 12} l4,-1.4 l-4,-1.4 z`}
+                fill="#67e8f9"
+                opacity={0.25 + b * 0.3}
+              >
+                {animate && (
+                  <animate attributeName="opacity" values={`${0.35 + b * 0.2};0.1;${0.35 + b * 0.2}`} dur={`${3 + k * 0.3}s`} repeatCount="indefinite" />
+                )}
+              </path>
+            );
+          })}
+        </g>
+      ))}
+
+      {/* jellyfish bloom — slow cold glow near the breakwater */}
+      {[0, 1, 2, 3, 4].map((i) => {
+        const jx = R.x - 300 + ((i * 43) % 90) - 40;
+        const jy = R.y - 190 - i * 26;
+        return (
+          <g key={`jelly-${i}`} transform={`translate(${jx},${jy})`} opacity="0.4">
+            {animate && (
+              <animateTransform
+                attributeName="transform"
+                type="translate"
+                additive="sum"
+                values="0 0; 0 -6; 0 0"
+                dur={`${8 + i}s`}
+                repeatCount="indefinite"
+              />
+            )}
+            <path d="M-5,0 A5,4 0 0 1 5,0 Z" fill="#a78bfa" opacity="0.55" />
+            <path d="M-3,0 Q-3,6 -4,9 M0,0 Q0,7 1,10 M3,0 Q3,6 4,8" stroke="#c4b5fd" strokeWidth="0.5" fill="none" opacity="0.5" />
+            <circle cx={0} cy={-1} r={7} fill="#a78bfa" opacity="0.07" />
+          </g>
+        );
+      })}
+
+      {/* sea turtle paddling the shallows off the resort */}
+      <g transform={`translate(${L.x + 260},${L.y - 130}) scale(0.9)`} opacity="0.8">
+        {animate && (
+          <animateTransform
+            attributeName="transform"
+            type="translate"
+            additive="sum"
+            values="0 0; 14 -6; 0 0"
+            dur="34s"
+            repeatCount="indefinite"
+          />
+        )}
+        <ellipse cx={0} cy={4} rx={13} ry={4} fill="#000" opacity="0.25" />
+        <ellipse cx={0} cy={0} rx={9} ry={6} fill="#1f4436" stroke="#2f6b52" strokeWidth="0.6" />
+        <path d="M-3,-3 l3,-1 l3,1 l-1,3 l-4,0 z" fill="#2c5f49" opacity="0.8" />
+        <ellipse cx={9} cy={-1} rx={3} ry={2} fill="#2c5f49" />
+        <path d="M-6,-6 Q-13,-10 -15,-5 M-6,6 Q-13,10 -15,5 M5,-6 Q10,-11 13,-7" stroke="#2c5f49" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+      </g>
+
+      {/* bioluminescent plankton smear along the surf line */}
+      {animate && (
+        <polyline
+          points={`${L.x},${L.y} ${T.x},${T.y} ${R.x},${R.y}`}
+          fill="none"
+          stroke="#5eead4"
+          strokeWidth="2.4"
+          strokeDasharray="6 34"
+          opacity="0.18"
+        >
+          <animate attributeName="stroke-dashoffset" values="0;-80" dur="11s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.2;0.07;0.2" dur="6s" repeatCount="indefinite" />
+        </polyline>
+      )}
+
+      {/* lone shark fin cutting a line, far out */}
+      {animate && (
+        <g transform={`translate(${T.x - 560},${T.y - 380})`} opacity="0.55">
+          <animateTransform
+            attributeName="transform"
+            type="translate"
+            additive="sum"
+            values="0 0; 120 34; 0 0"
+            dur="58s"
+            repeatCount="indefinite"
+          />
+          <path d="M-16,3 Q-6,3 0,3" stroke="#bfe9f2" strokeWidth="0.8" fill="none" opacity="0.35" />
+          <path d="M0,3 L5,-8 L9,3 Z" fill="#243543" stroke="#3a5266" strokeWidth="0.5" />
+        </g>
+      )}
+
+
       {/* HARBOUR */}
       {pier(0.55, 150, "p1")}
       {pier(0.78, 108, "p2")}
