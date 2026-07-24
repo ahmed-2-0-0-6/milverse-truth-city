@@ -261,15 +261,83 @@ function Building({
     }
   }
 
+  // Rooftop clutter unlocked by level: AC unit, water tank, satellite dish
+  const clutter: React.ReactNode[] = [];
+  if (level >= 2) {
+    // AC unit on left of roof
+    clutter.push(
+      <g key="ac" transform={`translate(${-halfW / 2}, ${top + halfD - 2})`}>
+        <rect x={-4} y={-3} width={8} height={4} fill="#2a2a30" stroke={palette.accent} strokeOpacity="0.3" strokeWidth="0.3" />
+        <line x1={-3} y1={-2} x2={3} y2={-2} stroke="#4a4a55" strokeWidth="0.4" />
+        <line x1={-3} y1={-1} x2={3} y2={-1} stroke="#4a4a55" strokeWidth="0.4" />
+      </g>,
+    );
+  }
+  if (level >= 3) {
+    // Water tank on the right of roof
+    clutter.push(
+      <g key="tank" transform={`translate(${halfW / 2}, ${top + halfD - 4})`}>
+        <rect x={-2} y={-2} width={4} height={2} fill="#3a2818" />
+        <ellipse cx={0} cy={-2} rx={3} ry={1.2} fill="#5a4025" />
+        <ellipse cx={0} cy={-6} rx={3} ry={1.2} fill="#8a5a35" />
+        <rect x={-3} y={-6} width={6} height={4} fill="#7a4a30" />
+      </g>,
+    );
+  }
+  if (level >= 4) {
+    // Satellite dish
+    clutter.push(
+      <g key="dish" transform={`translate(0, ${top + halfD - 1})`}>
+        <line x1={0} y1={0} x2={0} y2={-5} stroke="#4a4a55" strokeWidth="0.6" />
+        <ellipse cx={0} cy={-6} rx={4} ry={1.5} fill="#d6d3d1" opacity="0.85" />
+        <line x1={0} y1={-6} x2={2} y2={-8} stroke="#4a4a55" strokeWidth="0.5" />
+        <circle cx={2} cy={-8} r={0.6} fill={palette.accent} />
+      </g>,
+    );
+  }
+
   return (
     <g>
-      {/* shadow */}
-      <ellipse cx={0} cy={halfD + 2} rx={halfW + 2} ry={halfD / 2} fill="#000" opacity="0.55" />
+      {/* ground shadow */}
+      <ellipse cx={0} cy={halfD + 2} rx={halfW + 2} ry={halfD / 2} fill="#000" opacity="0.6" />
+      {/* concrete plinth / foundation base — small slab under building */}
+      <polygon
+        points={`0,-3 ${halfW + 2},${-3 + halfD} 0,${-3 + 2 * halfD} ${-(halfW + 2)},${-3 + halfD}`}
+        fill="#0f0d14"
+        stroke="#2a2432"
+        strokeWidth="0.4"
+      />
       {/* body */}
       <polygon points={leftFace} fill={palette.left} />
       <polygon points={rightFace} fill={palette.right} />
-      <polygon points={roof} fill={palette.top} stroke={palette.accent} strokeOpacity="0.35" strokeWidth="0.6" />
+      <polygon points={roof} fill={palette.top} stroke={palette.accent} strokeOpacity="0.4" strokeWidth="0.6" />
+      {/* vertical seam highlight — pillar edge */}
+      <line x1={0} y1={top} x2={0} y2={0} stroke={palette.accent} strokeOpacity="0.25" strokeWidth="0.5" />
       {windows}
+      {/* Neon sign strip on right face at Lv3+ */}
+      {level >= 3 && (
+        <g>
+          <rect
+            x={2}
+            y={top + halfD + 2}
+            width={halfW - 6}
+            height={5}
+            fill="#000"
+            opacity="0.6"
+          />
+          <rect
+            x={2.5}
+            y={top + halfD + 2.5}
+            width={halfW - 7}
+            height={4}
+            fill={palette.accent}
+            opacity="0.55"
+            className={reducedMotion ? undefined : "milv-window"}
+            filter="url(#glow-soft)"
+          />
+        </g>
+      )}
+      {clutter}
       <RoofDetail
         id={def.id}
         level={level}
