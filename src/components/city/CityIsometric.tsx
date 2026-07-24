@@ -5,7 +5,7 @@
 // Interaction: tap a tile → BuildingCard bottom sheet.
 // Perf: rows memoized; ambient window flicker gated on reduced-motion.
 
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   BUILDINGS_BY_ID,
   BUILDINGS,
@@ -122,7 +122,7 @@ function Building({
 
   // Windows: rows of two per face, starts halfway up
   const rows = Math.min(level, 4);
-  const windows: JSX.Element[] = [];
+  const windows: React.ReactNode[] = [];
   for (let r = 0; r < rows; r++) {
     const wy = top + halfD + 6 + r * 12;
     if (wy > halfD - 6) break;
