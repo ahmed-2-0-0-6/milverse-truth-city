@@ -885,7 +885,12 @@ export function CityIsometric() {
               <stop offset="0.5" stopColor="#a0d8ff" stopOpacity="0.35" />
               <stop offset="1" stopColor="#a0d8ff" stopOpacity="0" />
             </linearGradient>
+            <radialGradient id="fountain-water" cx="0.5" cy="0.4" r="0.6">
+              <stop offset="0" stopColor="#67e8f9" stopOpacity="0.55" />
+              <stop offset="1" stopColor="#0d2a33" stopOpacity="0" />
+            </radialGradient>
           </defs>
+
 
           {/* ── SKY BACKDROP: sun/moon by hour + skyline + drifting clouds ── */}
           <g aria-hidden="true">
