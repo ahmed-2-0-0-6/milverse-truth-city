@@ -919,11 +919,21 @@ export function CityIsometric() {
   // Perf: everything ambient stops when the board is offscreen or the tab is hidden.
   const { ref: boardRef, active } = useOnScreen<HTMLElement>("300px");
 
+  // SMIL keeps ticking even when the board scrolls away — stop the clock.
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    if (active) svg.unpauseAnimations();
+    else svg.pauseAnimations();
+  }, [active, save]);
+
   useEffect(() => {
     setSave(loadCity());
+    setLowFx(detectLowFx());
     if (typeof window !== "undefined" && window.matchMedia) {
       setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     }
+
 
     const refresh = () => setSave(loadCity());
     const onBuilt = (e: Event) => {
