@@ -3,7 +3,7 @@
 // Reduced-motion: falls back to a static rotating stack.
 
 import { useEffect, useMemo, useState } from "react";
-import { loadCity, type CitySave } from "@/lib/city/citySave";
+import { loadCity, plotsBuilt, type CitySave } from "@/lib/city/citySave";
 import { bulletinsFor, type Bulletin } from "@/lib/city/bulletin";
 import { titleFor, nextTitle } from "@/lib/city/title";
 import { useCoalescedRefresh } from "@/hooks/useCoalescedRefresh";
@@ -43,8 +43,24 @@ export function CityBulletin() {
     return () => clearInterval(t);
   }, [rm, items.length]);
 
-  if (!save || !title) return null;
+  const [paused, setPaused] = useState(false);
 
+  // Progress toward the next seat: average of the plot and brick ratios.
+  const seatPct = useMemo(() => {
+    if (!save || !next) return 100;
+    const built = plotsBuilt(save);
+    const bricks = save.bricksLifetime | 0;
+    const plotTarget = built + next.plotsNeeded;
+    const brickTarget = bricks + next.bricksNeeded;
+    const parts: number[] = [];
+    if (plotTarget > 0) parts.push(built / plotTarget);
+    if (brickTarget > 0) parts.push(bricks / brickTarget);
+    if (!parts.length) return 0;
+    return Math.round((parts.reduce((a, b) => a + b, 0) / parts.length) * 100);
+  }, [save, next]);
+
+
+  if (!save || !title) return null;
 
   return (
     <section className="mx-auto mt-4 w-full max-w-5xl px-3">
@@ -62,6 +78,16 @@ export function CityBulletin() {
             <span className="font-mono text-[11px] text-amber-100">{title.rank}</span>
             <span className="text-amber-300/50 text-[10px] hidden sm:inline">·</span>
             <span className="text-amber-100/60 text-[10px] hidden sm:inline">{title.seat}</span>
+            {!rm && (
+              <button
+                type="button"
+                onClick={() => setPaused((p) => !p)}
+                className="tap stencil ml-1 rounded border border-amber-400/30 px-1.5 py-0.5 text-[9px] tracking-widest text-amber-200/70 hover:text-amber-100 transition-colors"
+                aria-pressed={paused}
+              >
+                {paused ? "RESUME" : "HOLD"}
+              </button>
+            )}
           </div>
         </header>
 
@@ -74,7 +100,10 @@ export function CityBulletin() {
           ) : (
             <div
               className="absolute inset-y-0 flex items-center whitespace-nowrap will-change-transform group-hover:[animation-play-state:paused]"
-              style={{ animation: `bulletin-scroll ${Math.max(24, items.length * 6)}s linear infinite` }}
+              style={{
+                animation: `bulletin-scroll ${Math.max(24, items.length * 6)}s linear infinite`,
+                animationPlayState: paused ? "paused" : "running",
+              }}
             >
               {[...items, ...items].map((b, i) => (
                 <span key={`${b.id}-${i}`} className="inline-flex items-center gap-2 px-6">
@@ -87,20 +116,29 @@ export function CityBulletin() {
         </div>
 
         {next && (
-          <footer className="border-t border-amber-400/15 px-4 py-2 flex items-baseline justify-between gap-3 flex-wrap">
-            <span className="stencil text-[10px] tracking-widest text-amber-300/80">NEXT SEAT</span>
-            <span className="font-mono text-[11px] text-amber-100/90">
-              {next.rank}
-              {next.plotsNeeded > 0 && (
-                <span className="text-amber-200/60"> · {next.plotsNeeded} plot{next.plotsNeeded === 1 ? "" : "s"}</span>
-              )}
-              {next.bricksNeeded > 0 && (
-                <span className="text-amber-200/60"> · {next.bricksNeeded} bricks</span>
-              )}
-            </span>
+          <footer className="border-t border-amber-400/15 px-4 py-2 flex flex-col gap-1.5">
+            <div className="flex items-baseline justify-between gap-3 flex-wrap">
+              <span className="stencil text-[10px] tracking-widest text-amber-300/80">NEXT SEAT</span>
+              <span className="font-mono text-[11px] text-amber-100/90">
+                {next.rank}
+                {next.plotsNeeded > 0 && (
+                  <span className="text-amber-200/60"> · {next.plotsNeeded} plot{next.plotsNeeded === 1 ? "" : "s"}</span>
+                )}
+                {next.bricksNeeded > 0 && (
+                  <span className="text-amber-200/60"> · {next.bricksNeeded} bricks</span>
+                )}
+              </span>
+            </div>
+            <div className="h-1 rounded-full bg-amber-400/10 overflow-hidden" aria-hidden>
+              <div
+                className="h-full bg-amber-400/60 transition-[width] duration-700"
+                style={{ width: `${seatPct}%` }}
+              />
+            </div>
           </footer>
         )}
       </div>
+
 
       <style>{`
         @keyframes bulletin-scroll {

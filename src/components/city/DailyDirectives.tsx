@@ -16,7 +16,23 @@ import {
 } from "@/lib/city/directives";
 import { useCoalescedRefresh } from "@/hooks/useCoalescedRefresh";
 
+/** Milliseconds until local midnight. */
+function msToMidnight(): number {
+  const now = new Date();
+  const mid = new Date(now);
+  mid.setHours(24, 0, 0, 0);
+  return mid.getTime() - now.getTime();
+}
+
+function fmtLeft(ms: number): string {
+  const total = Math.max(0, Math.floor(ms / 60000));
+  const h = Math.floor(total / 60);
+  const m = total % 60;
+  return `${h}h ${String(m).padStart(2, "0")}m`;
+}
+
 export function DailyDirectives() {
+
   const [state, setState] = useState(() => loadDirectives());
 
   useEffect(() => {
@@ -40,11 +56,29 @@ export function DailyDirectives() {
   );
 
 
-  const onClaim = (id: DirectiveId) => {
+  const readyIds = useMemo(
+    () =>
+      defs
+        .filter((d) => !state.claimed[d.id] && (state.progress[d.id] ?? 0) >= d.target)
+        .map((d) => d.id),
+    [defs, state.claimed, state.progress],
+  );
+
+  // Countdown to midnight; also rolls the board over when the day flips.
+  const [left, setLeft] = useState(() => msToMidnight());
+  useEffect(() => {
+    const t = setInterval(() => {
+      const ms = msToMidnight();
+      setLeft(ms);
+      if (ms > 23 * 3600_000) setState(loadDirectives()); // just past midnight
+    }, 30_000);
+    return () => clearInterval(t);
+  }, []);
+
+  const claimOne = (id: DirectiveId) => {
     const def = defs.find((x) => x.id === id);
     const res = claim(id);
     if (res.ok) {
-      setState(loadDirectives());
       window.dispatchEvent(
         new CustomEvent("milverse:toast", {
           detail: {
@@ -61,7 +95,19 @@ export function DailyDirectives() {
         }),
       );
     }
+    return res.ok;
   };
+
+  const onClaim = (id: DirectiveId) => {
+    if (claimOne(id)) setState(loadDirectives());
+  };
+
+  const onClaimAll = () => {
+    let any = false;
+    for (const id of readyIds) any = claimOne(id) || any;
+    if (any) setState(loadDirectives());
+  };
+
 
 
 
@@ -79,7 +125,13 @@ export function DailyDirectives() {
               </span>
             )}
           </div>
-          <div className="flex items-baseline gap-3">
+          <div className="flex items-center gap-3">
+            <span
+              className="font-mono text-[10px] text-amber-200/60 tabular-nums"
+              title="Time until the board resets."
+            >
+              RESET IN {fmtLeft(left)}
+            </span>
             <span className="font-mono text-[10px] text-amber-200/70 tabular-nums">
               {doneCount} / {defs.length} DONE
             </span>
@@ -91,8 +143,18 @@ export function DailyDirectives() {
             >
               COMBO +{COMBO_BONUS}
             </span>
+            {readyIds.length > 1 && (
+              <button
+                type="button"
+                onClick={onClaimAll}
+                className="tap stencil text-[10px] tracking-widest rounded px-2.5 py-1 border border-emerald-400/60 text-emerald-200 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors"
+              >
+                CLAIM ALL ({readyIds.length})
+              </button>
+            )}
           </div>
         </header>
+
 
         <ul className="divide-y divide-amber-400/10">
           {defs.map((d) => (
@@ -147,9 +209,10 @@ const DirectiveRow = memo(function DirectiveRow({
               disabled={!complete}
               className={`tap stencil text-[10px] tracking-widest rounded px-2.5 py-1 border transition-colors ${
                 complete
-                  ? "border-emerald-400/60 text-emerald-200 bg-emerald-500/10 hover:bg-emerald-500/20"
+                  ? "border-emerald-400/60 text-emerald-200 bg-emerald-500/10 hover:bg-emerald-500/20 shadow-[0_0_10px_rgba(52,211,153,0.25)] motion-safe:animate-pulse"
                   : "border-amber-400/25 text-amber-200/40 cursor-not-allowed"
               }`}
+
               aria-label={`Claim ${d.reward} BRICKS for ${d.label}`}
             >
               {complete ? `CLAIM +${d.reward}` : `+${d.reward}`}

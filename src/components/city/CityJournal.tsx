@@ -1,6 +1,6 @@
 // MILVERSE — Your City · Journal panel (Phase 3 upgrade).
 
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { loadJournal, wireJournalListeners, type JournalEntry } from "@/lib/city/journal";
 import { useCoalescedRefresh } from "@/hooks/useCoalescedRefresh";
 
@@ -23,9 +23,20 @@ function relTime(ts: number, now: number): string {
   return `${d}d ago`;
 }
 
+type Filter = "all" | JournalEntry["kind"];
+
+const FILTERS: Array<{ id: Filter; label: string }> = [
+  { id: "all", label: "ALL" },
+  { id: "built", label: "BUILDS" },
+  { id: "perk", label: "PERKS" },
+  { id: "directive", label: "DIRECTIVES" },
+  { id: "promotion", label: "SEATS" },
+];
+
 export function CityJournal() {
   const [entries, setEntries] = useState<JournalEntry[]>(() => loadJournal());
   const [now, setNow] = useState(() => Date.now());
+  const [filter, setFilter] = useState<Filter>("all");
 
   useEffect(() => {
     wireJournalListeners();
@@ -38,6 +49,22 @@ export function CityJournal() {
     return () => clearInterval(t);
   }, []);
 
+  const shown = useMemo(
+    () =>
+      filter === "all"
+        ? entries
+        : entries.filter((e) =>
+            filter === "directive" ? e.kind === "directive" || e.kind === "combo" : e.kind === filter,
+          ),
+    [entries, filter],
+  );
+
+  const counts = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const e of entries) map[e.kind] = (map[e.kind] ?? 0) + 1;
+    return map;
+  }, [entries]);
+
   return (
     <section className="mx-auto mt-4 w-full max-w-5xl px-3">
       <div className="rounded-md border border-amber-400/25 bg-black/60 backdrop-blur-sm">
@@ -48,13 +75,47 @@ export function CityJournal() {
           </span>
         </header>
 
-        {entries.length === 0 ? (
+        {entries.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 border-b border-amber-400/10 px-4 py-2">
+            {FILTERS.map((f) => {
+              const n =
+                f.id === "all"
+                  ? entries.length
+                  : f.id === "directive"
+                    ? (counts.directive ?? 0) + (counts.combo ?? 0)
+                    : (counts[f.id] ?? 0);
+              const active = filter === f.id;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setFilter(f.id)}
+                  disabled={n === 0}
+                  className={`tap stencil rounded border px-2 py-0.5 text-[9px] tracking-widest transition-colors ${
+                    active
+                      ? "border-amber-300/70 bg-amber-400/15 text-amber-100"
+                      : n === 0
+                        ? "border-amber-400/15 text-amber-200/25 cursor-not-allowed"
+                        : "border-amber-400/25 text-amber-200/70 hover:text-amber-100"
+                  }`}
+                  aria-pressed={active}
+                >
+                  {f.label} · {n}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {shown.length === 0 ? (
           <div className="px-4 py-6 text-center font-mono text-[11px] text-amber-100/50">
-            Nothing on the wire yet. Take down a case or break ground.
+            {entries.length === 0
+              ? "Nothing on the wire yet. Take down a case or break ground."
+              : "Nothing filed under that tag yet."}
           </div>
         ) : (
           <ul className="divide-y divide-amber-400/10 max-h-64 overflow-y-auto">
-            {entries.map((e, i) => (
+            {shown.map((e, i) => (
               <JournalRow key={`${e.ts}-${i}`} entry={e} rel={relTime(e.ts, now)} />
             ))}
           </ul>
@@ -63,6 +124,7 @@ export function CityJournal() {
     </section>
   );
 }
+
 
 const JournalRow = memo(function JournalRow({
   entry,
