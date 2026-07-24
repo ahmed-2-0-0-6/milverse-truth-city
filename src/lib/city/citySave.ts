@@ -14,6 +14,9 @@ export interface CitySave {
   bricksLifetime: number; // for prestige / rank hooks
   buildings: Partial<Record<BuildingId, { level: number }>>;
   lastVisit: number;
+  /** When the payroll ledger was last emptied. Optional on old saves. */
+  lastCollect?: number;
+
 }
 
 function defaultSave(): CitySave {
@@ -98,7 +101,26 @@ export function upgradeBuilding(id: BuildingId): UpgradeOutcome {
   return { ok: true, level: cur + 1, spent: cost };
 }
 
+/** Empty the payroll ledger into your bricks. Returns what was collected. */
+export function collectPayroll(amount: number): { collected: number; save: CitySave } {
+  const s = loadCity();
+  const take = Math.max(0, Math.floor(amount));
+  s.lastCollect = Date.now();
+  if (take > 0) {
+    s.bricks += take;
+    s.bricksLifetime += take;
+  }
+  persist(s);
+  if (typeof window !== "undefined" && take > 0) {
+    window.dispatchEvent(
+      new CustomEvent("milverse:city:payroll", { detail: { collected: take } }),
+    );
+  }
+  return { collected: take, save: s };
+}
+
 /** Count of built plots (level ≥ 1). */
+
 export function plotsBuilt(save: CitySave): number {
   return Object.values(save.buildings).filter((b) => (b?.level ?? 0) > 0).length;
 }

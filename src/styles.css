@@ -6726,3 +6726,16 @@ img, video, canvas, svg {
   }
 }
 
+
+/* Payroll collect — the bricks jump out of the till. */
+@keyframes milv-payroll-pop {
+  0% { opacity: 0; transform: translate(-50%, 6px) scale(0.9); }
+  20% { opacity: 1; transform: translate(-50%, -2px) scale(1.06); }
+  100% { opacity: 0; transform: translate(-50%, -26px) scale(1); }
+}
+.milv-payroll-pop {
+  animation: milv-payroll-pop 1.6s ease-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .milv-payroll-pop { animation: none; opacity: 0; }
+}
