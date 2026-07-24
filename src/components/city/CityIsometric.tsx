@@ -664,13 +664,19 @@ export function CityIsometric() {
         window.setTimeout(() => setFlashId(null), 1400);
       }
     };
+    const onOpen = (e: Event) => {
+      const d = (e as CustomEvent<{ id: BuildingId }>).detail;
+      if (d?.id) setOpen(d.id);
+    };
     window.addEventListener("milverse:city", refresh);
     window.addEventListener("milverse:city:built", onBuilt);
     window.addEventListener("milverse:bricks", refresh);
+    window.addEventListener("milverse:city:open", onOpen);
     return () => {
       window.removeEventListener("milverse:city", refresh);
       window.removeEventListener("milverse:city:built", onBuilt);
       window.removeEventListener("milverse:bricks", refresh);
+      window.removeEventListener("milverse:city:open", onOpen);
     };
   }, []);
 
