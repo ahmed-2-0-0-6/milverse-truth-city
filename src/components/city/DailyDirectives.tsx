@@ -16,7 +16,23 @@ import {
 } from "@/lib/city/directives";
 import { useCoalescedRefresh } from "@/hooks/useCoalescedRefresh";
 
+/** Milliseconds until local midnight. */
+function msToMidnight(): number {
+  const now = new Date();
+  const mid = new Date(now);
+  mid.setHours(24, 0, 0, 0);
+  return mid.getTime() - now.getTime();
+}
+
+function fmtLeft(ms: number): string {
+  const total = Math.max(0, Math.floor(ms / 60000));
+  const h = Math.floor(total / 60);
+  const m = total % 60;
+  return `${h}h ${String(m).padStart(2, "0")}m`;
+}
+
 export function DailyDirectives() {
+
   const [state, setState] = useState(() => loadDirectives());
 
   useEffect(() => {
