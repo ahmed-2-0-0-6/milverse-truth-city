@@ -351,33 +351,105 @@ function Building({
   );
 }
 
-function EmptyLot() {
+function EmptyLot({ crane = false, reducedMotion = false }: { crane?: boolean; reducedMotion?: boolean }) {
   const halfW = TW / 2 - 10;
   const halfD = TH / 2 - 4;
   return (
     <g>
+      {/* dashed plot outline */}
       <polygon
         points={`0,${-6} ${halfW},${-6 + halfD} 0,${-6 + 2 * halfD} ${-halfW},${-6 + halfD}`}
         fill="none"
-        stroke="#8a6a2a"
+        stroke={crane ? "#fde047" : "#8a6a2a"}
         strokeWidth="1"
         strokeDasharray="3 3"
-        opacity="0.7"
+        opacity={crane ? 0.95 : 0.7}
       />
-      <text
-        x={0}
-        y={halfD - 1}
-        textAnchor="middle"
-        fontSize="14"
-        fill="#a97a2a"
-        opacity="0.9"
-        style={{ fontFamily: "monospace" }}
-      >
-        +
-      </text>
+      {!crane && (
+        <text x={0} y={halfD - 1} textAnchor="middle" fontSize="14" fill="#a97a2a" opacity="0.9" style={{ fontFamily: "monospace" }}>
+          +
+        </text>
+      )}
+      {/* CONSTRUCTION CRANE — anticipation cue when affordable */}
+      {crane && (
+        <g transform={`translate(${-halfW / 2}, ${halfD - 4})`}>
+          {/* base */}
+          <rect x={-2} y={-4} width={4} height={4} fill="#3a2818" />
+          {/* mast */}
+          <line x1={0} y1={-4} x2={0} y2={-26} stroke="#c9a84c" strokeWidth="1.2" />
+          {/* jib (horizontal arm) */}
+          <line x1={-8} y1={-26} x2={18} y2={-26} stroke="#c9a84c" strokeWidth="1" />
+          {/* counter-jib rail */}
+          <line x1={-8} y1={-24} x2={0} y2={-26} stroke="#c9a84c" strokeWidth="0.6" opacity="0.7" />
+          <line x1={18} y1={-24} x2={0} y2={-26} stroke="#c9a84c" strokeWidth="0.6" opacity="0.7" />
+          {/* hook + cable */}
+          <line x1={14} y1={-26} x2={14} y2={-14} stroke="#c9a84c" strokeWidth="0.5" opacity="0.8">
+            {!reducedMotion && (
+              <animate attributeName="y2" values="-14;-8;-14" dur="3.5s" repeatCount="indefinite" />
+            )}
+          </line>
+          <rect x={13} y={-16} width={2} height={2} fill="#fde047">
+            {!reducedMotion && (
+              <animate attributeName="y" values="-16;-10;-16" dur="3.5s" repeatCount="indefinite" />
+            )}
+          </rect>
+          {/* warning beacon on mast top */}
+          <circle cx={0} cy={-27} r={1} fill="#f43f5e">
+            {!reducedMotion && (
+              <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" repeatCount="indefinite" />
+            )}
+          </circle>
+          {/* small ground pallet with materials */}
+          <rect x={-6} y={-1} width={10} height={2} fill="#3a2818" />
+          <rect x={-5} y={-2} width={3} height={1} fill="#c9a84c" opacity="0.7" />
+          <rect x={-1} y={-2} width={3} height={1} fill="#c9a84c" opacity="0.5" />
+        </g>
+      )}
     </g>
   );
 }
+
+/* ── STATS HUD helpers ───────────────────────────────────── */
+function StatChip({ label, value, accent }: { label: string; value: string; accent: string }) {
+  return (
+    <div className="rounded-sm border border-amber-400/20 bg-black/40 px-2 py-1.5 flex items-center justify-between gap-2 min-w-0">
+      <span className="stencil tracking-widest text-amber-300/70 shrink-0">{label}</span>
+      <span
+        className="font-mono tabular-nums text-[13px] leading-none truncate transition-all duration-500"
+        style={{ color: accent, textShadow: `0 0 8px ${accent}55` }}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function StatBar({ label, value, accent, suffix = "" }: { label: string; value: number; accent: string; suffix?: string }) {
+  return (
+    <div className="rounded-sm border border-amber-400/20 bg-black/40 px-2 py-1.5 min-w-0">
+      <div className="flex items-center justify-between gap-2 mb-1">
+        <span className="stencil tracking-widest text-amber-300/70">{label}</span>
+        <span
+          className="font-mono tabular-nums text-[11px] leading-none transition-all duration-500"
+          style={{ color: accent, textShadow: `0 0 6px ${accent}55` }}
+        >
+          {value}{suffix}
+        </span>
+      </div>
+      <div className="h-[3px] w-full bg-white/5 rounded-full overflow-hidden">
+        <div
+          className="h-full transition-all duration-700 ease-out"
+          style={{
+            width: `${Math.max(0, Math.min(100, value))}%`,
+            background: `linear-gradient(90deg, ${accent}55, ${accent})`,
+            boxShadow: `0 0 6px ${accent}88`,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 
 /* ── per-building roof details unlocked by level ─────────── */
 function RoofDetail({
