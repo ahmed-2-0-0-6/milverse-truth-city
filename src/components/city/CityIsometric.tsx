@@ -109,7 +109,7 @@ const BUILDING_CELLS = new Set(
 );
 
 
-function GroundTileImpl({ gx, gy, reducedMotion }: { gx: number; gy: number; reducedMotion: boolean }) {
+function GroundTileImpl({ gx, gy, reducedMotion, lowFx }: { gx: number; gy: number; reducedMotion: boolean; lowFx: boolean }) {
   const { x, y } = iso(gx, gy);
   const kind = classifyTile(gx, gy);
   const fill =
@@ -120,6 +120,10 @@ function GroundTileImpl({ gx, gy, reducedMotion }: { gx: number; gy: number; red
   const rA = hashCell(gx, gy, 1);
   const rB = hashCell(gx, gy, 2);
   const rC = hashCell(gx, gy, 3);
+  // Per-tile SMIL is the single biggest cost on 81 tiles. On weak hardware the
+  // decoration stays, the motion goes.
+  const animate = !reducedMotion && !lowFx;
+
 
   return (
     <g transform={`translate(${x},${y})`}>
@@ -142,7 +146,7 @@ function GroundTileImpl({ gx, gy, reducedMotion }: { gx: number; gy: number; red
             stroke="#3a3444"
             strokeWidth="0.4"
           />
-          {!reducedMotion && (
+          {animate && (
             <>
               <circle cx={-(TW / 2 - 8)} cy={TH / 2} r={1.1} fill="#fef3c7" opacity="0.9">
                 <animate
@@ -215,7 +219,7 @@ function GroundTileImpl({ gx, gy, reducedMotion }: { gx: number; gy: number; red
               <line x1={0} y1={0} x2={0} y2={-14} stroke="#4a4a55" strokeWidth="1" />
               <line x1={0} y1={-14} x2={4} y2={-14} stroke="#4a4a55" strokeWidth="1" />
               <circle cx={4} cy={-13} r={1.6} fill="#fde68a" opacity="0.95">
-                {!reducedMotion && (
+                {animate && (
                   <animate attributeName="opacity" values="0.9;0.5;0.9" dur="3s" repeatCount="indefinite" />
                 )}
               </circle>
@@ -241,7 +245,7 @@ function GroundTileImpl({ gx, gy, reducedMotion }: { gx: number; gy: number; red
           <circle cx={0} cy={TH / 2} r={7} fill="#3a2e1a" stroke="#5a4a2a" strokeWidth="0.6" />
           <circle cx={0} cy={TH / 2} r={3.5} fill="#fcd34d" opacity="0.6" />
           <circle cx={0} cy={TH / 2 - 4} r={1.2} fill="#fde68a">
-            {!reducedMotion && (
+            {animate && (
               <>
                 <animate attributeName="cy" values={`${TH / 2 - 4};${TH / 2 - 8};${TH / 2 - 4}`} dur="2.4s" repeatCount="indefinite" />
                 <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.4s" repeatCount="indefinite" />
@@ -254,6 +258,29 @@ function GroundTileImpl({ gx, gy, reducedMotion }: { gx: number; gy: number; red
   );
 }
 const GroundTile = React.memo(GroundTileImpl);
+
+/* The whole ground plane — 81 tiles — only changes when the fx budget or the
+   player's rank changes. Memoized so hover, flash, clock ticks and brick
+   updates never touch a few hundred SVG nodes. */
+const GroundLayer = React.memo(function GroundLayer({
+  cells,
+  reducedMotion,
+  lowFx,
+}: {
+  cells: { gx: number; gy: number }[];
+  reducedMotion: boolean;
+  lowFx: boolean;
+}) {
+  return (
+    <g shapeRendering="optimizeSpeed">
+      {cells.map(({ gx, gy }) => (
+        <GroundTile key={`t-${gx}-${gy}`} gx={gx} gy={gy} reducedMotion={reducedMotion} lowFx={lowFx} />
+      ))}
+    </g>
+  );
+});
+
+
 
 
 /* ── building block ──────────────────────────────────────── */
@@ -729,9 +756,22 @@ function CamBtn({
   );
 }
 
+/* Weak hardware detection — cheap, synchronous, run once. Phones with few
+   cores or little RAM get the same city with a smaller motion budget. */
+function detectLowFx() {
+  if (typeof window === "undefined") return false;
+  if (document.documentElement.dataset.visualQuality === "lite") return true;
+  const nav = navigator as Navigator & { deviceMemory?: number };
+  const cores = nav.hardwareConcurrency ?? 8;
+  const mem = nav.deviceMemory ?? 8;
+  return cores <= 4 || mem <= 4 || window.innerWidth < 640;
+}
+
 /* ── main component ──────────────────────────────────────── */
 export function CityIsometric() {
+  const [lowFx, setLowFx] = useState(false);
   const [save, setSave] = useState<CitySave | null>(null);
+
   const [open, setOpen] = useState<BuildingId | null>(null);
   const [hoverId, setHoverId] = useState<BuildingId | null>(null);
   const [flashId, setFlashId] = useState<BuildingId | null>(null);
@@ -879,11 +919,21 @@ export function CityIsometric() {
   // Perf: everything ambient stops when the board is offscreen or the tab is hidden.
   const { ref: boardRef, active } = useOnScreen<HTMLElement>("300px");
 
+  // SMIL keeps ticking even when the board scrolls away — stop the clock.
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    if (active) svg.unpauseAnimations();
+    else svg.pauseAnimations();
+  }, [active, save]);
+
   useEffect(() => {
     setSave(loadCity());
+    setLowFx(detectLowFx());
     if (typeof window !== "undefined" && window.matchMedia) {
       setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     }
+
 
     const refresh = () => setSave(loadCity());
     const onBuilt = (e: Event) => {
@@ -936,6 +986,14 @@ export function CityIsometric() {
       def: BUILDINGS_BY_ID[id],
     }));
   }, []);
+
+  // Back-to-front paint order, computed once instead of a find() per tile.
+  const orderedBuildings = useMemo(
+    () => [...buildingCells].sort((a, b) => a.gx + a.gy - (b.gx + b.gy)),
+    [buildingCells],
+  );
+
+
 
   // Derived stats/affordability/perks — memoized on save so flashId re-renders stay cheap.
   const derived = useMemo(() => {
@@ -1198,7 +1256,7 @@ export function CityIsometric() {
             {/* stars — fade out around the edges of night */}
             {!isDay && (() => {
               const night = Math.min(1, Math.max(0, 1 - Math.abs(arcT - 0.5) * 1.6));
-              return Array.from({ length: 18 }).map((_, i) => {
+              return Array.from({ length: lowFx ? 8 : 18 }).map((_, i) => {
                 const sx = -bounds.w / 2 + hashCell(i, 0, 5) * bounds.w;
                 const sy = -130 + hashCell(0, i, 5) * 40;
                 return (
@@ -1252,9 +1310,8 @@ export function CityIsometric() {
           </defs>
 
           {/* ground tiles */}
-          {cells.map(({ gx, gy }) => (
-            <GroundTile key={`t-${gx}-${gy}`} gx={gx} gy={gy} reducedMotion={reducedMotion} />
-          ))}
+          <GroundLayer cells={cells} reducedMotion={reducedMotion} lowFx={lowFx} />
+
 
           {/* ── SEALED GROUND — districts you haven't earned yet ── */}
           <defs>
@@ -1333,7 +1390,7 @@ export function CityIsometric() {
 
 
           {/* ── MOVING TRAFFIC — two cars sliding along the two roads ── */}
-          {!reducedMotion && (() => {
+          {!reducedMotion && !lowFx && (() => {
             // Horizontal avenue: gy=CENTER, gx sweeps the full board
             const startH = iso(0, CENTER);
             const endH = iso(GRID - 1, CENTER);
@@ -1398,7 +1455,7 @@ export function CityIsometric() {
 
 
           {/* ── PEDESTRIANS — deterministic figures pacing the plaza ── */}
-          {!reducedMotion && (() => {
+          {!reducedMotion && !lowFx && (() => {
             const plaza = iso(CENTER, CENTER);
             const walkers = [
               { r: 18, dur: 24, phase: 0,   color: "#fde68a" },
@@ -1445,7 +1502,7 @@ export function CityIsometric() {
             if (!monsoon) return null;
             return (
               <g aria-hidden="true" opacity="0.55">
-                {Array.from({ length: 24 }).map((_, i) => {
+                {Array.from({ length: lowFx ? 10 : 24 }).map((_, i) => {
                   const x = -bounds.w / 2 + hashCell(i, 3, 11) * bounds.w;
                   const dur = 0.7 + hashCell(i, 5, 11) * 0.6;
                   const delay = hashCell(i, 7, 11) * 1.2;
@@ -1482,11 +1539,9 @@ export function CityIsometric() {
           })()}
 
           {/* buildings (already in back-to-front order because their cells are sorted with the tiles) */}
-          {cells
-            .map(({ gx, gy }) => buildingCells.find((b) => b.gx === gx && b.gy === gy))
-            .filter(Boolean)
+          {orderedBuildings
             .map((b) => {
-              const bc = b!;
+              const bc = b;
               const lvl = levelOf(save, bc.id);
               const { x, y } = iso(bc.gx, bc.gy);
               const cost = nextCost(bc.id, lvl);

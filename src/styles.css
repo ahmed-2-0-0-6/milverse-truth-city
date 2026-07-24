@@ -6764,3 +6764,12 @@ img, video, canvas, svg {
   .milv-siren-wash, .milv-siren-dot, .milv-siren-edge { animation: none; }
   .milv-siren-wash { opacity: 0.16; }
 }
+
+/* Offscreen boards stop burning frames: CSS animations halt while idle.
+   (SMIL inside the city SVG is paused imperatively via pauseAnimations().) */
+.milv-idle *,
+.milv-idle *::before,
+.milv-idle *::after {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
