@@ -82,6 +82,7 @@ const DISTRICTS: District[] = [
     label: "CLEAN ROOM",
     tag: "Calibrate confidence — know when you know.",
     art: cleanroomArt,
+    video: cleanroomVideo.url,
     href: "/devintel",
     glow: "34,211,238",
   },
