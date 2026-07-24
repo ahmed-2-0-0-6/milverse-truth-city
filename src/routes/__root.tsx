@@ -18,6 +18,7 @@ import { AtmosphereLayer } from "@/components/AtmosphereLayer";
 import { GlowCursor } from "@/components/GlowCursor";
 import { RouteWipe } from "@/components/RouteWipe";
 import { RankUpBeat } from "@/components/RankUpBeat";
+import { UpgradeToastHost } from "@/components/city/UpgradeToast";
 import { AssessmentGate } from "@/components/AssessmentGate";
 import { Toaster } from "@/components/ui/sonner";
 import { installTelemetry, track } from "@/lib/telemetry";
@@ -209,6 +210,7 @@ function RootComponent() {
           <GlowCursor />
           <RouteWipe />
           <RankUpBeat />
+          <UpgradeToastHost />
           <footer className="print:hidden border-t border-border/60 bg-background/60 py-3 text-center text-[11px] text-muted-foreground">
             <Link to="/charter" className="font-mono tracking-widest hover:text-foreground">
               THE CITY CHARTER
