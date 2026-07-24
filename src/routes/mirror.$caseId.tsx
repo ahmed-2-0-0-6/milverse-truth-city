@@ -2342,18 +2342,19 @@ function Debrief({ scenario }: { scenario: Scenario }) {
     checkAndAwardBadges(p);
     // Your City — bricks payout (deterministic; no AI, no truth reveal).
     try {
-      const { awardBricksForCase } = await import("@/lib/city/economy");
-      const verdictForCity =
-        result.resultKind === "correct"
-          ? "correct"
-          : result.resultKind === "pyrrhic"
-            ? "pyrrhic"
+      void import("@/lib/city/economy").then(({ awardBricksForCase }) => {
+        const v =
+          result.resultKind === "correct"
+            ? "correct"
             : result.resultKind === "missed_scam"
               ? "missed_scam"
-              : "false_alarm";
-      awardBricksForCase("mirror", verdictForCity, scenario.tier ?? 1);
+              : result.resultKind === "false_alarm"
+                ? "false_alarm"
+                : "correct"; // "lucky_guess" → treat as correct payout
+        awardBricksForCase("mirror", v, scenario.tier ?? 1);
+      });
     } catch {
-      /* noop — city is presentation-only */
+      /* noop */
     }
 
     // "The City Checks Back" — spaced retests.
