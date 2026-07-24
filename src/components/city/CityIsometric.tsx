@@ -1086,7 +1086,7 @@ export function CityIsometric() {
           </div>
         </div>
         <div className="absolute right-3 bottom-3 z-20 stencil text-[9px] tracking-widest text-amber-200/50 pointer-events-none">
-          DRAG TO PAN · SCROLL TO ZOOM · {Math.round(cam.z * 100)}%
+          DRAG TO PAN · SCROLL TO ZOOM · <span ref={zoomLabelRef}>100%</span>
         </div>
         {/* subtle grid vignette */}
         <div
