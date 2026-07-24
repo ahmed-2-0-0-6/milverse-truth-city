@@ -22,6 +22,8 @@ import {
   type CitySave,
 } from "@/lib/city/citySave";
 import { BuildingCard } from "@/components/city/BuildingCard";
+import { PayrollTill } from "@/components/city/PayrollTill";
+
 import { useOnScreen } from "@/hooks/useOnScreen";
 
 import { titleFor, nextTitle } from "@/lib/city/title";
