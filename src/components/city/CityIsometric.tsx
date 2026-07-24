@@ -1662,11 +1662,11 @@ export function CityIsometric() {
               <g aria-hidden="true" pointerEvents="none" className="milv-tip" transform={`translate(${tx},${ty})`}>
                 <rect x={0} y={0} width={w} height={h} rx={3} fill="#08060c" opacity="0.94" stroke="#f59e0b" strokeWidth="0.6" />
                 <rect x={0} y={0} width={w} height={1.4} fill="#f59e0b" opacity="0.7" />
-                <text x={7} y={14} fontSize="9" fill="#fde68a" style={{ fontFamily: '"Bebas Neue", sans-serif', letterSpacing: "1px" }}>
+                <text x={7} y={14} fontSize={SIGN_SIZE.titleLg} fill={INK.live} style={SIGN_TITLE}>
                   {b.def.name.toUpperCase()}
                 </text>
                 {rows.map((r, i) => (
-                  <text key={i} x={7} y={25 + i * 10} fontSize="6.5" fill={i === 1 && perkOnline.has(hoverId) ? "#6ee7b7" : "#a8a29e"} style={{ fontFamily: "monospace" }}>
+                  <text key={i} x={7} y={25 + i * 10} fontSize={SIGN_SIZE.metaLg} fill={i === 1 && perkOnline.has(hoverId) ? INK.doneMeta : INK.meta} style={SIGN_META}>
                     {r}
                   </text>
                 ))}
