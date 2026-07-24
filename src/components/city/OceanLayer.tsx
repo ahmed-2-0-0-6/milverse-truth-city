@@ -190,6 +190,243 @@ export const OceanLayer = React.memo(function OceanLayer({
         )}
       </polyline>
 
+      {/* ── OPEN WATER DETAIL ─────────────────────────────────
+         Everything here is deterministic: same board, same bay,
+         every load. Motion only when the fx budget allows. */}
+
+      {/* horizon fog band + far shore */}
+      <polygon
+        points={`${P6.x},${T.y - 780} ${P4.x},${T.y - 780} ${P4.x},${T.y - 700} ${P6.x},${T.y - 700}`}
+        fill="#122a3c"
+        opacity="0.55"
+      />
+      <path
+        d={`M${P6.x},${T.y - 706} L${T.x - 620},${T.y - 724} L${T.x - 470},${T.y - 706} L${T.x - 300},${T.y - 732} L${T.x - 120},${T.y - 704} L${T.x + 180},${T.y - 736} L${T.x + 420},${T.y - 702} L${P4.x},${T.y - 712} L${P4.x},${T.y - 690} L${P6.x},${T.y - 690} Z`}
+        fill="#0b1b28"
+        opacity="0.8"
+      />
+      {[-560, -240, 120, 460].map((hx, i) => (
+        <circle key={`farlight-${i}`} cx={T.x + hx} cy={T.y - 712 - (i % 2) * 8} r={1.3} fill="#fcd34d" opacity="0.5">
+          {animate && (
+            <animate attributeName="opacity" values="0.5;0.15;0.5" dur={`${5 + i}s`} repeatCount="indefinite" />
+          )}
+        </circle>
+      ))}
+      <polygon
+        points={`${P6.x},${T.y - 700} ${P4.x},${T.y - 700} ${P4.x},${T.y - 560} ${P6.x},${T.y - 560}`}
+        fill="url(#horizon-haze)"
+        opacity="0.25"
+      />
+
+      {/* rock breakwater + lighthouse guarding the harbour mouth */}
+      <g transform={`translate(${R.x - 130},${R.y - 300})`}>
+        <path d="M-120,26 L-60,6 L10,-6 L64,2 L74,14 L20,26 L-46,38 Z" fill="#1b1f28" stroke="#2b3240" strokeWidth="0.7" />
+        {[-96, -70, -44, -16, 12, 40].map((rx, i) => (
+          <polygon
+            key={`rock-${i}`}
+            points={`${rx},${20 - (i % 3) * 3} ${rx + 12},${12 - (i % 2) * 4} ${rx + 22},${22 - (i % 3) * 2} ${rx + 8},${28}`}
+            fill={i % 2 ? "#242a34" : "#161b23"}
+          />
+        ))}
+        <ellipse cx={48} cy={4} rx={16} ry={6} fill="#20262f" />
+        <polygon points="40,2 56,2 53,-34 43,-34" fill="#e5e7eb" opacity="0.16" />
+        <polygon points="43,-16 53,-16 52,-34 44,-34" fill="#b91c1c" opacity="0.35" />
+        <rect x={42} y={-42} width={12} height={9} fill="#0f1720" stroke="#3a4453" strokeWidth="0.6" />
+        <circle cx={48} cy={-37} r={2.4} fill="#fef3c7">
+          {animate && <animate attributeName="opacity" values="1;0.25;1" dur="3.6s" repeatCount="indefinite" />}
+        </circle>
+        {animate && (
+          <polygon points="48,-37 190,-84 190,-4" fill="#fef3c7" opacity="0.06">
+            <animateTransform
+              attributeName="transform"
+              type="rotate"
+              values="0 48 -37; 360 48 -37"
+              dur="14s"
+              repeatCount="indefinite"
+            />
+          </polygon>
+        )}
+      </g>
+
+      {/* channel buoys marking the approach lane */}
+      {[
+        [R.x - 210, R.y - 240, "#f87171"],
+        [R.x - 330, R.y - 330, "#4ade80"],
+        [R.x - 450, R.y - 420, "#f87171"],
+        [T.x + 120, T.y - 300, "#4ade80"],
+      ].map(([bx, by, col], i) => (
+        <g key={`buoy-${i}`} transform={`translate(${bx},${by})`}>
+          {animate && (
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              additive="sum"
+              values="0 0; 0 3; 0 0"
+              dur={`${4 + i}s`}
+              repeatCount="indefinite"
+            />
+          )}
+          <ellipse cx={0} cy={3} rx={7} ry={2.4} fill="#0b1a24" opacity="0.7" />
+          <polygon points="-4,2 4,2 2,-8 -2,-8" fill={col as string} opacity="0.85" />
+          <circle cx={0} cy={-10} r={1.5} fill={col as string}>
+            {animate && (
+              <animate attributeName="opacity" values="1;0.2;1" dur={`${2 + i * 0.4}s`} repeatCount="indefinite" />
+            )}
+          </circle>
+        </g>
+      ))}
+
+      {/* sailboats out on the bay */}
+      {[
+        [T.x - 300, T.y - 250, 1],
+        [T.x - 520, T.y - 400, 0.8],
+        [T.x + 380, T.y - 250, 0.7],
+        [T.x - 90, T.y - 470, 0.6],
+      ].map(([sx, sy, s], i) => (
+        <g key={`sail-${i}`} transform={`translate(${sx},${sy}) scale(${s})`}>
+          {animate && (
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              additive="sum"
+              values={`0 0; ${8 + i * 4} -2; 0 0`}
+              dur={`${22 + i * 6}s`}
+              repeatCount="indefinite"
+            />
+          )}
+          <ellipse cx={0} cy={4} rx={16} ry={4} fill="#000" opacity="0.3" />
+          <path d="M-14,2 L14,2 L9,7 L-10,7 Z" fill="#20262f" stroke="#39404d" strokeWidth="0.5" />
+          <line x1={-1} y1={2} x2={-1} y2={-26} stroke="#6b7280" strokeWidth="1" />
+          <path d="M0,-26 L0,0 L14,0 Z" fill="#e2e8f0" opacity="0.7" />
+          <path d="M-2,-24 L-2,-2 L-12,-2 Z" fill="#cbd5e1" opacity="0.45" />
+        </g>
+      ))}
+
+      {/* fishing skiffs, close in, with nets and lamps */}
+      {[
+        [T.x - 170, T.y - 150],
+        [L.x + 220, L.y - 190],
+        [T.x + 90, T.y - 180],
+      ].map(([fx, fy], i) => (
+        <g key={`skiff-${i}`} transform={`translate(${fx},${fy}) scale(0.8)`}>
+          {animate && (
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              additive="sum"
+              values="0 0; 0 2.5; 0 0"
+              dur={`${5 + i}s`}
+              repeatCount="indefinite"
+            />
+          )}
+          <ellipse cx={0} cy={5} rx={14} ry={3.5} fill="#000" opacity="0.35" />
+          <path d="M-13,0 L13,0 L8,6 L-9,6 Z" fill="#3a2b1e" stroke="#54402e" strokeWidth="0.5" />
+          <line x1={4} y1={0} x2={4} y2={-14} stroke="#5a4530" strokeWidth="0.9" />
+          <circle cx={4} cy={-15} r={1.6} fill="#fde68a" opacity="0.9">
+            {animate && <animate attributeName="opacity" values="0.9;0.4;0.9" dur="3s" repeatCount="indefinite" />}
+          </circle>
+          <path d="M-12,-1 Q-18,4 -20,10" stroke="#4b5563" strokeWidth="0.6" fill="none" opacity="0.7" />
+          <circle cx={-4} cy={-3} r={1.6} fill="#1f2937" />
+        </g>
+      ))}
+
+      {/* ferry crossing the bay, dragging a wake */}
+      <g>
+        <g>
+          {animate && (
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              values={`${L.x + 60} ${L.y - 320}; ${R.x - 60} ${R.y - 320}; ${L.x + 60} ${L.y - 320}`}
+              dur="120s"
+              repeatCount="indefinite"
+            />
+          )}
+          <g transform={animate ? undefined : `translate(${T.x - 200},${T.y - 320})`}>
+            <path d="M-90,0 Q-40,-6 0,0 Q-40,8 -90,0 Z" fill="#7dd3fc" opacity="0.12" />
+            <ellipse cx={0} cy={4} rx={26} ry={5} fill="#000" opacity="0.3" />
+            <path d="M-22,-2 L22,-2 L17,6 L-18,6 Z" fill="#2a3340" stroke="#3f4a5a" strokeWidth="0.6" />
+            <rect x={-14} y={-11} width={28} height={9} fill="#38414f" />
+            {[-11, -5, 1, 7].map((wx, i) => (
+              <rect key={i} x={wx} y={-9} width={4} height={4} fill="#a0d8ff" opacity={i % 2 ? 0.45 : 0.75} />
+            ))}
+            <rect x={12} y={-18} width={3} height={7} fill="#7a3b32" />
+          </g>
+        </g>
+      </g>
+
+      {/* jet skis off the resort */}
+      {[
+        [L.x + 130, L.y - 120],
+        [L.x + 190, L.y - 168],
+      ].map(([jx, jy], i) => (
+        <g key={`ski-${i}`} transform={`translate(${jx},${jy}) scale(0.55)`}>
+          <path d={`M-2,2 Q-34,${6 + i * 3} -70,2`} stroke="#bfe9f2" strokeWidth="2" fill="none" opacity="0.2">
+            {animate && (
+              <animate attributeName="opacity" values="0.22;0.06;0.22" dur="3.4s" repeatCount="indefinite" />
+            )}
+          </path>
+          <ellipse cx={0} cy={4} rx={9} ry={2.5} fill="#000" opacity="0.35" />
+          <path d="M-9,0 L9,0 L6,5 L-7,5 Z" fill="#b45309" />
+          <circle cx={1} cy={-5} r={3} fill="#1f2937" />
+        </g>
+      ))}
+
+      {/* ripple rings + foam patches on open water */}
+      {Array.from({ length: 14 }).map((_, i) => {
+        const a = ((i * 97) % 100) / 100;
+        const b = ((i * 53) % 100) / 100;
+        const rx = T.x - 620 + a * 1240;
+        const ry = T.y - 120 - b * 520;
+        return (
+          <g key={`rip-${i}`}>
+            <ellipse cx={rx} cy={ry} rx={10 + a * 14} ry={3 + b * 3} fill="none" stroke="#7dd3fc" strokeWidth="0.5" opacity="0.14">
+              {animate && (
+                <animate attributeName="opacity" values="0.16;0.03;0.16" dur={`${6 + i}s`} repeatCount="indefinite" />
+              )}
+            </ellipse>
+            <ellipse cx={rx + 8} cy={ry + 5} rx={5 + b * 6} ry={1.6} fill="#cfeef7" opacity="0.07" />
+          </g>
+        );
+      })}
+
+      {/* city lights bleeding into the water along the shore */}
+      {[0.15, 0.3, 0.45, 0.62, 0.8].map((t, i) => {
+        const sxp = T.x + (R.x - T.x) * t;
+        const syp = T.y + (R.y - T.y) * t;
+        const lxp = T.x + (L.x - T.x) * t;
+        const lyp = T.y + (L.y - T.y) * t;
+        return (
+          <g key={`refl-${i}`}>
+            <ellipse cx={sxp + 16} cy={syp - 14} rx={4} ry={22} fill="#fcd34d" opacity="0.07" transform={`rotate(-27 ${sxp + 16} ${syp - 14})`} />
+            <ellipse cx={lxp - 16} cy={lyp - 14} rx={4} ry={22} fill="#67e8f9" opacity="0.06" transform={`rotate(27 ${lxp - 16} ${lyp - 14})`} />
+          </g>
+        );
+      })}
+
+      {/* gulls over the harbour */}
+      {animate &&
+        [
+          [R.x - 180, R.y - 380, 1],
+          [R.x - 260, R.y - 430, 0.8],
+          [T.x + 40, T.y - 400, 0.7],
+          [T.x - 220, T.y - 460, 0.6],
+        ].map(([gx2, gy2, s], i) => (
+          <g key={`gull-${i}`} transform={`translate(${gx2},${gy2}) scale(${s})`} opacity="0.5">
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              additive="sum"
+              values={`0 0; ${30 + i * 12} ${-8 - i * 3}; 0 0`}
+              dur={`${16 + i * 5}s`}
+              repeatCount="indefinite"
+            />
+            <path d="M-7,0 Q-3,-4 0,0 Q3,-4 7,0" stroke="#e5e7eb" strokeWidth="1" fill="none">
+              <animate attributeName="d" values="M-7,0 Q-3,-4 0,0 Q3,-4 7,0; M-7,0 Q-3,1 0,0 Q3,1 7,0; M-7,0 Q-3,-4 0,0 Q3,-4 7,0" dur="1.6s" repeatCount="indefinite" />
+            </path>
+          </g>
+        ))}
+
       {/* HARBOUR */}
       {pier(0.55, 150, "p1")}
       {pier(0.78, 108, "p2")}
