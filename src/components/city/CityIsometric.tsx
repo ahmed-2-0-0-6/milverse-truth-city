@@ -1576,7 +1576,33 @@ export function CityIsometric() {
 
 
 
+        {gl3d ? (
+          <React.Suspense fallback={<div className="h-[520px] w-full animate-pulse bg-black/40" aria-hidden />}>
+            <CityWebGL
+              camRef={camRef}
+              immersed={immersed}
+              hour={hFrac}
+              reducedMotion={reducedMotion}
+              lowFx={lowFx}
+              onSelect={(id) => setOpen(id)}
+              onDragStateChange={setDragging}
+              lockedCells={cells
+                .filter(({ gx, gy }) => cellLocked(gx, gy, step))
+                .map(({ gx, gy }) => [gx, gy] as [number, number])}
+              plots={orderedBuildings.map((b) => ({
+                id: b.id,
+                gx: b.gx,
+                gy: b.gy,
+                level: levelOf(save, b.id),
+                locked: buildingLock(b.id, step).locked || cellLocked(b.gx, b.gy, step),
+                district: b.def.district,
+                name: b.def.name,
+              }))}
+            />
+          </React.Suspense>
+        ) : (
         <svg
+
           ref={svgRef}
           viewBox={viewBox}
           className={`block w-full h-auto touch-none select-none ${active ? "milv-establish" : ""} ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
