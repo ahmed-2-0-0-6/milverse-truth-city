@@ -8,6 +8,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CinematicLayer } from "@/components/city/CinematicLayer";
 import { OceanLayer } from "@/components/city/OceanLayer";
+// The WebGL board ships as its own chunk — three.js never loads on LITE.
+const CityWebGL = React.lazy(() => import("@/components/city/CityWebGL"));
+
 
 import {
   BUILDINGS_BY_ID,
