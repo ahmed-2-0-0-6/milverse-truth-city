@@ -1230,7 +1230,12 @@ export function CityIsometric() {
 
   useEffect(() => {
     setSave(loadCity());
-    setLowFx(detectLowFx());
+    const low = detectLowFx();
+    setLowFx(low);
+    // WEBGL BOARD — the city renders in real 3D wherever the glass allows it.
+    // LITE mode, weak hardware and no-WebGL devices keep the SVG board.
+    setGl3d(!low && hasWebGL());
+
     if (typeof window !== "undefined" && window.matchMedia) {
       setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     }
