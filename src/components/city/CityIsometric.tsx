@@ -996,7 +996,9 @@ function detectLowFx() {
 /* ── main component ──────────────────────────────────────── */
 export function CityIsometric() {
   const [lowFx, setLowFx] = useState(false);
+  const [gl3d, setGl3d] = useState(false);
   const [save, setSave] = useState<CitySave | null>(null);
+
 
   const [open, setOpen] = useState<BuildingId | null>(null);
   const [hoverId, setHoverId] = useState<BuildingId | null>(null);
