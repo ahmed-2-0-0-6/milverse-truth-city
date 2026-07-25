@@ -993,6 +993,18 @@ function detectLowFx() {
   return cores <= 4 || mem <= 4 || window.innerWidth < 640;
 }
 
+/* Does this glass do WebGL at all? One synchronous probe, run once. */
+function hasWebGL() {
+  if (typeof window === "undefined") return false;
+  try {
+    const c = document.createElement("canvas");
+    return !!(c.getContext("webgl2") || c.getContext("webgl"));
+  } catch {
+    return false;
+  }
+}
+
+
 /* ── main component ──────────────────────────────────────── */
 export function CityIsometric() {
   const [lowFx, setLowFx] = useState(false);
