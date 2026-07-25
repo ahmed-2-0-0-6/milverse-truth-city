@@ -2142,6 +2142,8 @@ export function CityIsometric() {
             );
           })()}
         </svg>
+        )}
+
       </div>
 
       {/* ambient CSS — window flicker, beacon, smoke, searchlight, flash ring */}
