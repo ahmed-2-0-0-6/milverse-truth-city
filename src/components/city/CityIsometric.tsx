@@ -8,6 +8,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CinematicLayer } from "@/components/city/CinematicLayer";
 import { OceanLayer } from "@/components/city/OceanLayer";
+// The WebGL board ships as its own chunk — three.js never loads on LITE.
+const CityWebGL = React.lazy(() => import("@/components/city/CityWebGL"));
+
 
 import {
   BUILDINGS_BY_ID,
@@ -993,10 +996,24 @@ function detectLowFx() {
   return cores <= 4 || mem <= 4 || window.innerWidth < 640;
 }
 
+/* Does this glass do WebGL at all? One synchronous probe, run once. */
+function hasWebGL() {
+  if (typeof window === "undefined") return false;
+  try {
+    const c = document.createElement("canvas");
+    return !!(c.getContext("webgl2") || c.getContext("webgl"));
+  } catch {
+    return false;
+  }
+}
+
+
 /* ── main component ──────────────────────────────────────── */
 export function CityIsometric() {
   const [lowFx, setLowFx] = useState(false);
+  const [gl3d, setGl3d] = useState(false);
   const [save, setSave] = useState<CitySave | null>(null);
+
 
   const [open, setOpen] = useState<BuildingId | null>(null);
   const [hoverId, setHoverId] = useState<BuildingId | null>(null);
@@ -1230,7 +1247,12 @@ export function CityIsometric() {
 
   useEffect(() => {
     setSave(loadCity());
-    setLowFx(detectLowFx());
+    const low = detectLowFx();
+    setLowFx(low);
+    // WEBGL BOARD — the city renders in real 3D wherever the glass allows it.
+    // LITE mode, weak hardware and no-WebGL devices keep the SVG board.
+    setGl3d(!low && hasWebGL());
+
     if (typeof window !== "undefined" && window.matchMedia) {
       setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     }
@@ -1557,7 +1579,33 @@ export function CityIsometric() {
 
 
 
+        {gl3d ? (
+          <React.Suspense fallback={<div className="h-[520px] w-full animate-pulse bg-black/40" aria-hidden />}>
+            <CityWebGL
+              camRef={camRef}
+              immersed={immersed}
+              hour={hFrac}
+              reducedMotion={reducedMotion}
+              lowFx={lowFx}
+              onSelect={(id) => setOpen(id)}
+              onDragStateChange={setDragging}
+              lockedCells={cells
+                .filter(({ gx, gy }) => cellLocked(gx, gy, step))
+                .map(({ gx, gy }) => [gx, gy] as [number, number])}
+              plots={orderedBuildings.map((b) => ({
+                id: b.id,
+                gx: b.gx,
+                gy: b.gy,
+                level: levelOf(save, b.id),
+                locked: buildingLock(b.id, step).locked || cellLocked(b.gx, b.gy, step),
+                district: b.def.district,
+                name: b.def.name,
+              }))}
+            />
+          </React.Suspense>
+        ) : (
         <svg
+
           ref={svgRef}
           viewBox={viewBox}
           className={`block w-full h-auto touch-none select-none ${active ? "milv-establish" : ""} ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
@@ -2123,6 +2171,8 @@ export function CityIsometric() {
             );
           })()}
         </svg>
+        )}
+
       </div>
 
       {/* ambient CSS — window flicker, beacon, smoke, searchlight, flash ring */}
