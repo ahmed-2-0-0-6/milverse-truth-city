@@ -22,6 +22,7 @@ const DeskFallback = () => (
   />
 );
 import { CityWorld } from "@/components/CityWorld";
+import { CityWorldWebGL } from "@/components/city3d/CityWorldWebGL";
 import { PerkUnlockToast } from "@/components/city/PerkUnlockToast";
 import { TitlePromotionToast } from "@/components/city/TitlePromotionToast";
 import { CityList } from "@/components/CityList";
@@ -61,7 +62,7 @@ export const Route = createFileRoute("/")({
 const INTRO_KEY = "milverse.intro.seen";
 const VIEW_KEY = "milverse.world.view";
 
-function preferredDefaultView(): "map" | "list" {
+function preferredDefaultView(): "map" | "list" | "webgl" {
   if (typeof window === "undefined") return "map";
   try {
     const stored = localStorage.getItem(VIEW_KEY);
@@ -80,7 +81,7 @@ function CityMap() {
   const { mode } = useVisualMode();
   const [booted, setBooted] = useState(mode !== "cinematic");
   const [intro, setIntro] = useState(false);
-  const [view, setView] = useState<"map" | "list">("map");
+  const [view, setView] = useState<"map" | "list" | "webgl">("map");
   // Hydration idiom (mirrors the existing setView useEffect below): SSR
   // renders the poster (isReturning=false); the desk is enabled after
   // mount when localStorage is readable. Wrapped in a stable-height
@@ -133,7 +134,7 @@ function CityMap() {
     if (mode !== "cinematic") setBooted(true);
   }, [mode]);
 
-  const setViewPersist = (v: "map" | "list") => {
+  const setViewPersist = (v: "map" | "list" | "webgl") => {
     setView(v);
     try {
       localStorage.setItem(VIEW_KEY, v);
@@ -274,12 +275,14 @@ function CityMap() {
           </div>
         </div>
 
-        <div className={view === "map" ? "mt-6 relative w-full px-0 sm:px-2" : "mx-auto max-w-6xl mt-6 relative"}>
+        <div className={view === "map" || view === "webgl" ? "mt-6 relative w-full px-0 sm:px-2" : "mx-auto max-w-6xl mt-6 relative"}>
           <div className="relative z-[1]">
-            {view === "map" ? (
-              <CityWorld onSwitchToList={() => setViewPersist("list")} />
+            {view === "webgl" ? (
+              <CityWorldWebGL onSwitchView={(v) => setViewPersist(v)} />
+            ) : view === "map" ? (
+              <CityWorld onSwitchToList={() => setViewPersist("list")} onSwitchToWebGL={() => setViewPersist("webgl")} />
             ) : (
-              <CityList onSwitchToMap={() => setViewPersist("map")} />
+              <CityList onSwitchToMap={() => setViewPersist("map")} onSwitchToWebGL={() => setViewPersist("webgl")} />
             )}
           </div>
         </div>

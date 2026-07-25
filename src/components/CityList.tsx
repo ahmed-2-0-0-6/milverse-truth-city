@@ -29,7 +29,7 @@ import { getMirrorRecommendations } from "@/lib/recommendations";
 import { SIGNAGE } from "@/lib/city/signage";
 
 
-export function CityList({ onSwitchToMap }: { onSwitchToMap: () => void }) {
+export function CityList({ onSwitchToMap, onSwitchToWebGL }: { onSwitchToMap: () => void; onSwitchToWebGL?: () => void }) {
   const [profile, setProfile] = useState<TrustProfile | null>(null);
   useEffect(() => {
     setProfile(loadProfile());
@@ -64,6 +64,14 @@ export function CityList({ onSwitchToMap }: { onSwitchToMap: () => void }) {
             MAP
           </button>
           <button className="px-2 py-1 rounded-sm bg-primary text-primary-foreground">LIST</button>
+          {onSwitchToWebGL && (
+            <button
+              onClick={onSwitchToWebGL}
+              className="px-2 py-1 rounded-sm text-emerald-400 hover:text-emerald-300 font-bold ml-1"
+            >
+              WEBGL
+            </button>
+          )}
         </div>
         <div className="stencil text-[10px] text-muted-foreground">LIST VIEW · LOW-DATA</div>
       </div>

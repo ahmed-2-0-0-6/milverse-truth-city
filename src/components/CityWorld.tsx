@@ -87,7 +87,7 @@ const ZOOM_LEVELS = [0.35, 0.7, 1.25]; // overview / quarter / street
 const DEFAULT_ZOOM_IDX = 1;
 
 /* ══════════════════════════════════════════════════════════════ */
-export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
+export function CityWorld({ onSwitchToList, onSwitchToWebGL }: { onSwitchToList: () => void; onSwitchToWebGL?: () => void }) {
   const nav = useNavigate();
   const prefersReduced = useReducedMotion();
   const { mode } = useVisualMode();
@@ -616,7 +616,7 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
 
 
 
-      {/* ── UI overlays ─────────────────────────────────────── */}
+      {/* UI overlays ─────────────────────────────────────── */}
       {/* top bar: MAP/LIST + recenter */}
       <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-2 gap-2">
         <div className="pointer-events-auto flex items-center gap-1 rounded-sm border border-primary/40 bg-background/70 backdrop-blur px-1 py-1 stencil text-[10px]">
@@ -627,6 +627,14 @@ export function CityWorld({ onSwitchToList }: { onSwitchToList: () => void }) {
           >
             LIST
           </button>
+          {onSwitchToWebGL && (
+            <button
+              onClick={onSwitchToWebGL}
+              className="px-2 py-1 rounded-sm text-emerald-400 hover:text-emerald-300 font-bold ml-1"
+            >
+              WEBGL
+            </button>
+          )}
           <MapLegend />
         </div>
 

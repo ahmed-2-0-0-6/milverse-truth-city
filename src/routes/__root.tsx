@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BadgeToast } from "@/components/BadgeToast";
 import { VisualQualityProvider } from "@/lib/visual-quality";
 import { AccessProvider } from "@/lib/access";
+import { GameStateProvider } from "@/lib/game/GameStateProvider";
 import { AtmosphereLayer } from "@/components/AtmosphereLayer";
 import { GlowCursor } from "@/components/GlowCursor";
 import { RouteWipe } from "@/components/RouteWipe";
@@ -190,36 +191,38 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AccessProvider>
-        <VisualQualityProvider>
-          <a
-            href="#main"
-            className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[200] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
-          >
-            Skip to content
-          </a>
-          <AssessmentGate />
-          {/* Skip-link target only. Each route provides its own <main> landmark. */}
-          <div id="main" tabIndex={-1} className="outline-none">
-            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-            <Outlet />
-          </div>
-          <BadgeToast />
-          <Toaster />
-          <AtmosphereLayer />
-          <GlowCursor />
-          <RouteWipe />
-          <RankUpBeat />
-          <UpgradeToastHost />
-          <footer className="print:hidden border-t border-border/60 bg-background/60 py-3 text-center text-[11px] text-muted-foreground">
-            <Link to="/charter" className="font-mono tracking-widest hover:text-foreground">
-              THE CITY CHARTER
-            </Link>
-            <span className="mx-2 opacity-40">·</span>
-            <span className="italic">A city in the MILtiverse.</span>
-          </footer>
-        </VisualQualityProvider>
-      </AccessProvider>
+      <GameStateProvider>
+        <AccessProvider>
+          <VisualQualityProvider>
+            <a
+              href="#main"
+              className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[200] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
+            >
+              Skip to content
+            </a>
+            <AssessmentGate />
+            {/* Skip-link target only. Each route provides its own <main> landmark. */}
+            <div id="main" tabIndex={-1} className="outline-none">
+              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+              <Outlet />
+            </div>
+            <BadgeToast />
+            <Toaster />
+            <AtmosphereLayer />
+            <GlowCursor />
+            <RouteWipe />
+            <RankUpBeat />
+            <UpgradeToastHost />
+            <footer className="print:hidden border-t border-border/60 bg-background/60 py-3 text-center text-[11px] text-muted-foreground">
+              <Link to="/charter" className="font-mono tracking-widest hover:text-foreground">
+                THE CITY CHARTER
+              </Link>
+              <span className="mx-2 opacity-40">·</span>
+              <span className="italic">A city in the MILtiverse.</span>
+            </footer>
+          </VisualQualityProvider>
+        </AccessProvider>
+      </GameStateProvider>
     </QueryClientProvider>
   );
 }

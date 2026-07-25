@@ -15,14 +15,16 @@ import { simulate } from "@/lib/city/sim";
 import { readStore, writeStore } from "@/lib/storage";
 import { useCoalescedRefresh } from "@/hooks/useCoalescedRefresh";
 import type { BuildingId } from "@/lib/city/buildings";
+import { DetectiveAcademy } from "./DetectiveAcademy";
 
-type TabId = "directives" | "sim" | "perks" | "journal";
+type TabId = "directives" | "sim" | "perks" | "journal" | "academy";
 
 const TABS: Array<{ id: TabId; label: string; hint: string }> = [
   { id: "directives", label: "DIRECTIVES", hint: "Today's three jobs." },
   { id: "sim", label: "CITY", hint: "How the city is actually doing." },
   { id: "perks", label: "WIRING", hint: "What the city switches on." },
   { id: "journal", label: "JOURNAL", hint: "What the city logged." },
+  { id: "academy", label: "ACADEMY", hint: "Train operatives and solve cases." },
 ];
 
 const PERK_REQS: Array<{ building: BuildingId; req: number }> = [
@@ -78,7 +80,7 @@ export function CityConsole() {
     const pending = PERK_REQS.length - online;
     const unseen = loadJournal().filter((e) => e.ts > seenTs).length;
     const sim = simulate(save).advisories.filter((a) => a.severity !== "info").length;
-    return { directives: ready, sim, perks: pending, journal: unseen };
+    return { directives: ready, sim, perks: pending, journal: unseen, academy: 0 };
   }, [tick, seenTs]);
 
   const select = useCallback((id: TabId) => {
@@ -156,7 +158,9 @@ export function CityConsole() {
                           ? "bg-rose-500/20 text-rose-200"
                           : t.id === "journal"
                             ? "bg-cyan-500/20 text-cyan-200"
-                            : "bg-amber-500/15 text-amber-200/80"
+                            : t.id === "academy"
+                              ? "bg-emerald-500/20 text-emerald-200"
+                              : "bg-amber-500/15 text-amber-200/80"
                     }`}
                   >
                     {n}
@@ -187,6 +191,7 @@ export function CityConsole() {
             {tab === "sim" && <CitySim />}
             {tab === "perks" && <PerksLedger />}
             {tab === "journal" && <CityJournal />}
+            {tab === "academy" && <DetectiveAcademy />}
           </div>
         </div>
       </div>
