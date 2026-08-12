@@ -38,10 +38,10 @@ export interface SignalBeaconsProps {
 }
 
 export function SignalBeacons({ ambient, onBeacon }: SignalBeaconsProps) {
-  const [signals, setSignals] = useState<CitySignal[]>(() => {
-    if (typeof window === "undefined") return [];
-    return readCitySignals(new Date());
-  });
+  // Hydration-safe: server and first client render both start empty; the
+  // effect below fills signals after mount.
+  const [signals, setSignals] = useState<CitySignal[]>([]);
+
 
   useEffect(() => {
     const refresh = () => setSignals(readCitySignals(new Date()));
